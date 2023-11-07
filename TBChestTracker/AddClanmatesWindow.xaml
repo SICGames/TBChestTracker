@@ -1,0 +1,88 @@
+﻿<Window x:Class="TBChestTracker.AddClanmatesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TBChestTracker"
+        mc:Ignorable="d"
+        Title="Add Clanmates" Height="450" Width="355" Topmost="True" WindowStyle="ToolWindow" ShowInTaskbar="False" Loaded="Window_Loaded" ResizeMode="NoResize" Closing="Window_Closing">
+    <Window.Resources>
+        <DataTemplate x:Key="ListBoxItemTemplate1">
+            <Grid MaxWidth="250">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="{Binding Path=Name}" Grid.Row="0" Grid.Column="0" Width="325" PreviewMouseDown="TextBlock_PreviewMouseDown"/>
+                <TextBox Text="{Binding Path=Name, Mode=TwoWay}" Grid.Row="0" Width="325" 
+                         LostFocus="TextBox_LostFocus" Visibility="Collapsed" 
+                         PreviewKeyDown="TextBox_PreviewKeyDown" TextChanged="TextBox_TextChanged"/>
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32"/>
+            <RowDefinition Height="32"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="32"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="0" Background="#eeeeeeff" x:Name="Tray">
+            <ToolBarPanel VerticalAlignment="Top" Grid.Row="0" Grid.Column="0">
+                <ToolBar Height="25" ToolBarTray.IsLocked="True" IsOverflowOpen="False" Width="{Binding ElementName=Tray, Path=ActualWidth}">
+                    <Image Source="Images/folderIcon.png" Height="16" Width="16" 
+                           x:Name="LoadFromFileBtn" 
+                           PreviewMouseDown="LoadFromFileBtn_PreviewMouseDown" 
+                           ToolTip="Load From Text File" 
+                           Margin="5,0,0,0"/>
+                    <Image Source="Images/camera_64x64.png" Height="16" Width="16" 
+                           x:Name="LoadFromCapturing" 
+                           ToolTip="Screen Capture Clanmates names." 
+                           Margin="5,0,0,0"
+                           PreviewMouseDown="LoadFromCapturing_PreviewMouseDown"/>
+                    <Separator/>
+                    <Image Source="Images/trashIcon.png" Height="16" Width="16" 
+                           x:Name="DeleteSelectedItems" 
+                           ToolTip="Delete selected clanmates" 
+                           Margin="5,0,0,0"
+                           PreviewMouseDown="DeleteSelectedItems_PreviewMouseDown"/>
+                </ToolBar>
+            </ToolBarPanel>
+        </StackPanel>
+        <Grid Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Content="Clanmate name" Grid.Column="0"/>
+            <Grid Grid.Column="1">
+                <TextBox Text="{Binding Name, Mode=TwoWay}" Height="18" Width="230" x:Name="clanmatenameBox" 
+                         ToolTip="To add clanmate, press ENTER key." PreviewKeyUp="clanmatenameBox_PreviewKeyUp" TextChanged="clanmatenameBox_TextChanged"/>
+                <Image Source="Images/searchIcon-gray.png" Height="16" Width="16" HorizontalAlignment="Right" Margin="0,0,10,0"/>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="2" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <DockPanel Grid.Column="0" Grid.Row="0" LastChildFill="True">
+                <ListBox ItemTemplate="{DynamicResource ListBoxItemTemplate1}" x:Name="ListClanMates01" Grid.Row="0" Width="345"
+                         HorizontalAlignment="Left"
+                         SelectionMode="Multiple"
+                         ItemsSource="{Binding Clanmates, Mode=TwoWay}">
+                </ListBox>
+            </DockPanel>
+        </Grid>
+        <DockPanel Grid.Column="0" Grid.Row="3" Background="#ddddddff">
+            <Button x:Name="OkayButton" Height="24" Width="64" Content="Save" HorizontalAlignment="Right" Margin="0,0,25,0" IsEnabled="{Binding clanmatesAdded, Mode=TwoWay}" Click="OkayButton_Click"/>
+        </DockPanel>
+    </Grid>
+</Window>

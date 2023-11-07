@@ -1,0 +1,46 @@
+﻿<Window x:Class="TBChestTracker.ExportWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TBChestTracker"
+        mc:Ignorable="d"
+        Title="Export Clan Chest Window" Width="300" WindowStyle="ToolWindow" SizeToContent="Height" ResizeMode="NoResize">
+    <Grid>
+        <Grid.RowDefinitions >
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="32"/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0">
+            <local:FilePicker x:Name="FilePicker01" Title="Export Clan Chest Data" Height="35" VerticalAlignment="Top" 
+                              Extensions="Text Files | *.txt" HoverColor="LightBlue" 
+                              DefaultColor="Gray" FileAccepted="FilePicker_FileAccepted" Margin="5"/>
+        </DockPanel>
+        <DockPanel Grid.Row="1">
+            <StackPanel Orientation="Vertical" Margin="5">
+                <GroupBox Header="Sort Options">
+                    <ComboBox x:Name="SortOptions" SelectedIndex="0" Margin="5">
+                        <ComboBoxItem Content="None"/>
+                        <ComboBoxItem Content="Ascending"/>
+                        <ComboBoxItem Content="Desending"/>
+                    </ComboBox>
+                </GroupBox>
+                <GroupBox Header="Export Options">
+                    <ComboBox x:Name="ExportOptions" SelectedIndex="0" Margin="5">
+                        <ComboBoxItem Content="Do Nothing"/>
+                        <ComboBoxItem Content="Archive"/>
+                        <ComboBoxItem Content="Delete"/>
+                    </ComboBox>
+                </GroupBox>
+                
+            </StackPanel>
+        </DockPanel>
+        <DockPanel Grid.Row="2" Background="#eeeeee">
+            <Button x:Name="exportBtn" Content="Export" Width="64" Height="24" 
+                    VerticalAlignment="Center" HorizontalAlignment="Right"
+                    Click="exportBtn_Click"
+                    Margin="0,0,20,0"/>
+        </DockPanel>
+    </Grid>
+</Window>

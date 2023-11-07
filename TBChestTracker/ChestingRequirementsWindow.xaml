@@ -1,0 +1,66 @@
+﻿<Window x:Class="TBChestTracker.ChestingRequirementsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TBChestTracker"
+        mc:Ignorable="d"
+        Title="Clan Chests Management" Height="600" Width="800" Topmost="True">
+    <Grid Background="#eeeeee">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="32"/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0" LastChildFill="True">
+            <TabControl>
+                <TabItem Header="Conditions">
+                    <ScrollViewer>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="100"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <GroupBox Header="Condition Options" Grid.Row="0">
+                                <StackPanel Orientation="Vertical" Margin="10,5">
+                                    <RadioButton Content="Do not use" Margin="0,2" IsChecked="{Binding useNoChestConditions, Mode=TwoWay}"/>
+                                    <RadioButton Content="Use Specific Conditions" IsChecked="{Binding useChestConditions, Mode=TwoWay}"/>
+                                    <TextBlock Text="Using Specific Conditions will only count the types of clan chests specified if conditions are met." Margin="10,10" FontWeight="Bold" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </GroupBox>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="24"/>
+                                </Grid.ColumnDefinitions>
+                                <ListView Grid.Column="0" ItemsSource="{Binding ChestConditions}">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="Clan Chest Type" Width="150" DisplayMemberBinding="{Binding ChestType}"/>
+                                            <GridViewColumn Header="Comparator" Width="100" DisplayMemberBinding="{Binding Comparator}"/>
+                                            <GridViewColumn Header="Value" Width="100" DisplayMemberBinding="{Binding level}"/>
+                                            
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <StackPanel Orientation="Vertical" Grid.Column="1">
+                                    <Button Height="16" Width="16" Margin="0,2" x:Name="AddConditionBtn" Click="AddConditionBtn_Click">
+                                        +
+                                    </Button>
+                                    <Button Height="16" Width="16" Margin="0,2" x:Name="RemoveConditionBtn" Click="RemoveConditionBtn_Click">
+                                        -
+                                    </Button>
+                                    <Button Height="16" Width="16" Margin="0,2" x:Name="ClearAllConditionsBtn" Click="ClearAllConditionsBtn_Click">
+                                        x
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+        </DockPanel>
+        <DockPanel Grid.Column="0" Grid.Row="1">
+            <Button Content="Apply" x:Name="ApplyBtn" Width="100" HorizontalAlignment="Right" Margin="10, 5" Click="ApplyBtn_Click"/>
+        </DockPanel>
+    </Grid>
+</Window>

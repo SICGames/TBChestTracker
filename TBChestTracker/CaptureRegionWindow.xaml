@@ -1,0 +1,15 @@
+﻿<Window x:Class="TBChestTracker.CaptureRegionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TBChestTracker"
+        mc:Ignorable="d"
+        Title="CaptureRegionWindow" Height="450" Width="800" WindowState="Maximized" WindowStyle="None" AllowsTransparency="True"
+        Background="#000000FF" Opacity="0.1">
+    <Grid>
+        <Canvas>
+            <Rectangle x:Name="SelectRegionMarker" Height="300" Width="300" Fill="white" Canvas.Left="250" Canvas.Top="100"/>
+        </Canvas>
+    </Grid>
+</Window>

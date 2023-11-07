@@ -1,0 +1,294 @@
+﻿<Window x:Class="TBChestTracker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TBChestTracker"
+        xmlns:Commands="clr-namespace:Hellscape.Commands"
+        mc:Ignorable="d"
+        Title="{Binding Path=AppTitle, Mode=TwoWay}" Width="800" Height="64" Loaded="Window_Loaded" SizeToContent="Height" Topmost="True" WindowStyle="ToolWindow" ResizeMode="NoResize"
+    xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2">
+    <Window.CommandBindings>
+        <CommandBinding Command="Commands:CustomCommandBindings.NewClanDatabase" 
+                        x:Name="NewClanDatabaseCommand" 
+                        CanExecute="NewClanDatabaseCommand_CanExecute" 
+                        Executed="NewClanDatabaseCommand_Executed"/>
+        <CommandBinding Command="Commands:CustomCommandBindings.LoadClanDatabase" 
+                        x:Name="LoadClanDatabaseCommand" 
+                        CanExecute="LoadClanDatabaseCommand_CanExecute" 
+                        Executed="LoadClanDatabaseCommand_Executed"/>
+        <CommandBinding Command="Commands:CustomCommandBindings.SaveClanDatabase" 
+                        x:Name="SaveClanDatabaseCommand" 
+                        CanExecute="SaveClanDatabaseCommand_CanExecute" 
+                        Executed="SaveClanDatabaseCommand_Executed"/>
+        <CommandBinding Command="Commands:CustomCommandBindings.SaveAsClanDatabase" 
+                        x:Name="SaveAsClanDatabaseCommand" 
+                        CanExecute="SaveAsClanDatabaseCommand_CanExecute" 
+                        Executed="SaveAsClanDatabaseCommand_Executed"/>
+        <CommandBinding Command="Commands:CustomCommandBindings.ExportClanDatabase" 
+                        x:Name="ExportClanDatabase" 
+                        CanExecute="ExportClanDatabase_CanExecute" 
+                        Executed="ExportClanDatabase_Executed"/>
+        <CommandBinding Command="Commands:CustomCommandBindings.QuitApplication" 
+                        x:Name="QuitApplication" 
+                        CanExecute="QuitApplication_CanExecute" 
+                        Executed="QuitApplication_Executed"/>
+        <CommandBinding Command="Commands:CustomCommandBindings.ManageClanmates" 
+                        x:Name="ManageClanmatesCommand" 
+                        CanExecute="ManageClanmatesCommand_CanExecute" 
+                        Executed="ManageClanmatesCommand_Executed"/>
+        <CommandBinding Command="Commands:CustomCommandBindings.ManageClanchestSettings" 
+                        x:Name="ManageClanchestSettingsCommand" 
+                        CanExecute="ManageClanchestSettingsCommand_CanExecute"
+                        Executed="ManageClanchestSettingsCommand_Executed"/>
+        <CommandBinding Command="Commands:CustomCommandBindings.ManuallyCaptureScreen" 
+                        x:Name="ManuallyCaptureScreenCommand" 
+                        CanExecute="ManuallyCaptureScreenCommand_CanExecute"
+                        Executed="ManuallyCaptureScreenCommand_Executed"/>
+        <CommandBinding Command="Commands:CustomCommandBindings.StartAutomation" 
+                        x:Name="StartAutomationCommand" 
+                        CanExecute="StartAutomationCommand_CanExecute"
+                        Executed="StartAutomationCommand_Executed"/>
+        <CommandBinding Command="Commands:CustomCommandBindings.StopAutomation" 
+                        x:Name="StopAutomationCommand" 
+                        CanExecute="StopAutomationCommand_CanExecute"
+                        Executed="StopAutomationCommand_Executed"/>
+        <CommandBinding Command="Commands:CustomCommandBindings.ClanStats" 
+                        x:Name="ClanStatsCommand" 
+                        CanExecute="ClanStatsCommand_CanExecute"
+                        Executed="ClanStatsCommand_Executed"/>
+        
+    </Window.CommandBindings>
+    <!--#region Resources -->
+    <Window.Resources>
+        <SolidColorBrush x:Key="ToolBarButtonHover" Color="#210080FF"/>
+        <SolidColorBrush x:Key="ToolBarMenuBorder" Color="#FFB6BDC5"/>
+        <SolidColorBrush x:Key="ToolBarSubMenuBackground" Color="#FFEEF5FD"/>
+        <SolidColorBrush x:Key="ToolBarHorizontalBackground" Color="#FFEEF5FD"/>
+        <SolidColorBrush x:Key="ToolBarVerticalBackground" Color="#FFEEF5FD"/>
+        <SolidColorBrush x:Key="ToolBarGripper" Color="#FF6D6D6D"/>
+        <SolidColorBrush x:Key="ToolBarToggleButtonHorizontalBackground" Color="#FFEEF5FD"/>
+        <SolidColorBrush x:Key="ToolBarToggleButtonVerticalBackground" Color="#FFEEF5FD"/>
+        <Style x:Key="ToolBarMainPanelBorderStyle" TargetType="{x:Type Border}">
+            <Setter Property="Margin" Value="0,0,11,0"/>
+            <Setter Property="CornerRadius" Value="3,3,3,3"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={x:Static SystemParameters.HighContrast}}" Value="true">
+                    <Setter Property="CornerRadius" Value="0,0,0,0"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="ToolBarThumbStyle" TargetType="{x:Type Thumb}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Border Background="Transparent" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
+                            <Rectangle>
+                                <Rectangle.Fill>
+                                    <DrawingBrush TileMode="Tile" ViewboxUnits="Absolute" Viewbox="0,0,4,4" ViewportUnits="Absolute" Viewport="0,0,4,4">
+                                        <DrawingBrush.Drawing>
+                                            <DrawingGroup>
+                                                <GeometryDrawing Brush="White" Geometry="M 1 1 L 1 3 L 3 3 L 3 1 z"/>
+                                                <GeometryDrawing Brush="{StaticResource ToolBarGripper}" Geometry="M 0 0 L 0 2 L 2 2 L 2 0 z"/>
+                                            </DrawingGroup>
+                                        </DrawingBrush.Drawing>
+                                    </DrawingBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Cursor" Value="SizeAll"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ToolBarHorizontalOverflowButtonStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Background" Value="{StaticResource ToolBarToggleButtonHorizontalBackground}"/>
+            <Setter Property="MinHeight" Value="0"/>
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="0,3,3,0" SnapsToDevicePixels="true">
+                            <Canvas HorizontalAlignment="Right" Height="7" Margin="7,2,2,2" SnapsToDevicePixels="true" VerticalAlignment="Bottom" Width="6">
+                                <Path Data="M 1 1.5 L 6 1.5" Stroke="White"/>
+                                <Path Data="M 0 0.5 L 5 0.5" Stroke="{TemplateBinding Foreground}"/>
+                                <Path Data="M 0.5 4 L 6.5 4 L 3.5 7 Z" Fill="White"/>
+                                <Path Data="M -0.5 3 L 5.5 3 L 2.5 6 Z" Fill="{TemplateBinding Foreground}"/>
+                            </Canvas>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background" TargetName="Bd" Value="{StaticResource ToolBarButtonHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="true">
+                                <Setter Property="Background" TargetName="Bd" Value="{StaticResource ToolBarButtonHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="{StaticResource ToolBarGripper}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={x:Static SystemParameters.HighContrast}}" Value="true">
+                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="ToolBarVerticalOverflowButtonStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Background" Value="{StaticResource ToolBarToggleButtonVerticalBackground}"/>
+            <Setter Property="MinHeight" Value="0"/>
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="0,0,3,3" SnapsToDevicePixels="true">
+                            <Canvas HorizontalAlignment="Right" Height="6" Margin="2,7,2,2" SnapsToDevicePixels="true" VerticalAlignment="Bottom" Width="7">
+                                <Path Data="M 1.5 1 L 1.5 6" Stroke="White"/>
+                                <Path Data="M 0.5 0 L 0.5 5" Stroke="{TemplateBinding Foreground}"/>
+                                <Path Data="M 3.5 0.5 L 7 3.5 L 4 6.5 Z" Fill="White"/>
+                                <Path Data="M 3 -0.5 L 6 2.5 L 3 5.5 Z" Fill="{TemplateBinding Foreground}"/>
+                            </Canvas>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background" TargetName="Bd" Value="{StaticResource ToolBarButtonHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="true">
+                                <Setter Property="Background" TargetName="Bd" Value="{StaticResource ToolBarButtonHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="{StaticResource ToolBarGripper}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={x:Static SystemParameters.HighContrast}}" Value="true">
+                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="ToolBarStyle1" TargetType="{x:Type ToolBar}">
+            <Setter Property="Background" Value="{StaticResource ToolBarHorizontalBackground}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToolBar}">
+                        <Grid x:Name="Grid" Margin="3,1,1,1" SnapsToDevicePixels="true">
+                            <Border x:Name="MainPanelBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" Style="{StaticResource ToolBarMainPanelBorderStyle}">
+                                <DockPanel KeyboardNavigation.TabIndex="1" KeyboardNavigation.TabNavigation="Local">
+                                    <Thumb x:Name="ToolBarThumb" Margin="-3,-1,0,0" Padding="6,5,1,6" Style="{StaticResource ToolBarThumbStyle}" Width="10"/>
+                                    <ContentPresenter x:Name="ToolBarHeader" ContentSource="Header" HorizontalAlignment="Center" Margin="4,0,4,0" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center"/>
+                                    <ToolBarPanel x:Name="PART_ToolBarPanel" IsItemsHost="true" Margin="0,1,2,2" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                </DockPanel>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsOverflowOpen" Value="true">
+                                <Setter Property="IsEnabled" TargetName="ToolBarThumb" Value="false"/>
+                            </Trigger>
+                            <Trigger Property="Header" Value="{x:Null}">
+                                <Setter Property="Visibility" TargetName="ToolBarHeader" Value="Collapsed"/>
+                            </Trigger>
+                            <Trigger Property="ToolBarTray.IsLocked" Value="true">
+                                <Setter Property="Visibility" TargetName="ToolBarThumb" Value="Collapsed"/>
+                            </Trigger>
+                            <Trigger Property="Orientation" Value="Vertical">
+                                <Setter Property="Margin" TargetName="Grid" Value="1,3,1,1"/>
+                                <Setter Property="Height" TargetName="ToolBarThumb" Value="10"/>
+                                <Setter Property="Width" TargetName="ToolBarThumb" Value="Auto"/>
+                                <Setter Property="Margin" TargetName="ToolBarThumb" Value="-1,-3,0,0"/>
+                                <Setter Property="Padding" TargetName="ToolBarThumb" Value="5,6,6,1"/>
+                                <Setter Property="Margin" TargetName="ToolBarHeader" Value="0,0,0,4"/>
+                                <Setter Property="Margin" TargetName="PART_ToolBarPanel" Value="1,0,2,2"/>
+                                <Setter Property="DockPanel.Dock" TargetName="ToolBarThumb" Value="Top"/>
+                                <Setter Property="DockPanel.Dock" TargetName="ToolBarHeader" Value="Top"/>
+                                <Setter Property="Margin" TargetName="MainPanelBorder" Value="0,0,0,11"/>
+                                <Setter Property="Background" Value="{StaticResource ToolBarVerticalBackground}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={x:Static SystemParameters.HighContrast}}" Value="true">
+                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <!--#endregion-->
+    
+    <Grid Background="#dddddd">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="28"/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0" LastChildFill="True">
+            <Menu DockPanel.Dock="Top" Height="auto" VerticalAlignment="Top">
+                <MenuItem Header="File">
+                    <MenuItem Header="New Clan Database" x:Name="NewClanDB" Command="Commands:CustomCommandBindings.NewClanDatabase"/>
+                    <Separator/>
+                    <MenuItem Header="Load Clan Database" x:Name="LoadClanDB" Command="Commands:CustomCommandBindings.LoadClanDatabase"/>
+                    <Separator/>
+                    <MenuItem Header="Save Clan Database" x:Name="SaveClanDB" Command="Commands:CustomCommandBindings.SaveClanDatabase"/>
+                    <MenuItem Header="Save As..." x:Name="SaveClanDBAs" Command="Commands:CustomCommandBindings.SaveAsClanDatabase"/>
+                    <Separator/>
+                    <MenuItem Header="Export Chest Data" Command="Commands:CustomCommandBindings.ExportClanDatabase"/>
+                    <Separator/>
+                    <MenuItem x:Name="RecentlyOpenedParent" Header="Recently Opened Databases">
+                        
+                    </MenuItem>
+                    <MenuItem Header="Quit" Command="Commands:CustomCommandBindings.QuitApplication"/>
+                </MenuItem>
+                <MenuItem Header="Edit">
+                    <MenuItem Header="Clanmate Manager"/>
+                    <MenuItem Header="Clan Chest Manager"/>
+                    <Separator/>
+                    <MenuItem Header="Settings"/>
+                </MenuItem>
+                <MenuItem Header="Help">
+                    <MenuItem Header="Tutorial"/>
+                </MenuItem>
+            </Menu>
+        </DockPanel>
+        <DockPanel Grid.Row="1">
+            <ToolBarTray DockPanel.Dock="Top" Height="32" IsLocked="True">
+                <ToolBar Style="{DynamicResource ToolBarStyle1}" Height="32" ToolBar.OverflowMode="Never" Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type ToolBarTray}}, Path=ActualWidth}" >
+                    <Button Height="24" Width="24" ToolTip="Manage Clanmates" Margin="0,0,5,5" Command="Commands:CustomCommandBindings.ManageClanmates">
+                        <Image Source="Images/icons_main_menu_clan_1.png" Stretch="UniformToFill"/>
+                    </Button>
+                    <Button Height="24" Width="24" ToolTip="Manage Clan Chest Settings" Margin="0,0,5,5" Command="Commands:CustomCommandBindings.ManageClanchestSettings">
+                        <Image Source="Images/Icons_chest_1.png" Stretch="UniformToFill"/>
+                    </Button>
+                    <Button Height="24" Width="24" ToolTip="Manually Take Screenshot [F6]" Margin="0,0,5,5" Command="Commands:CustomCommandBindings.ManuallyCaptureScreen">
+                        <Image Source="Images/camera_64x64.png" Stretch="UniformToFill"/>
+                    </Button>
+                    <Separator/>
+                    <Button Height="24" Width="24" ToolTip="Start Automation [F9]" Margin="5,2,5,5" Command="Commands:CustomCommandBindings.StartAutomation">
+                        <Image Source="Images/StartAutomationIcon.png" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                    <Button Height="24" Width="24" ToolTip="Stop Automation [F10]" Margin="0,0,5,5">
+                        <Image Source="Images/StopAutomation.png" Stretch="UniformToFill"/>
+                    </Button>
+                    <Separator/>
+                    <Button Height="24" Width="24" Command="Commands:CustomCommandBindings.ClanStats" ToolTip="View Clan Stats" Margin="5,0,5,5">
+                        <Image Source="Images/ClanStatsIcon.png" Stretch="UniformToFill"/>
+                    </Button>
+                    <Button Height="24" Width="24" ToolTip="Settings" Margin="0,0,5,5">
+                        <Image Source="Images/SettingsIcon01.png" Stretch="UniformToFill"/>
+                    </Button>
+                </ToolBar>
+            </ToolBarTray>
+        </DockPanel>
+    </Grid>
+</Window>
