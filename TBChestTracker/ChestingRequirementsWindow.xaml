@@ -6,6 +6,11 @@
         xmlns:local="clr-namespace:TBChestTracker"
         mc:Ignorable="d"
         Title="Clan Chests Management" Height="600" Width="800" Topmost="True">
+    <Window.Resources>
+        <Style x:Key="ConditionsListViewItemStyle" TargetType="ListViewItem">
+            <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
+        </Style>
+    </Window.Resources>
     <Grid Background="#eeeeee">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -32,13 +37,12 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="24"/>
                                 </Grid.ColumnDefinitions>
-                                <ListView Grid.Column="0" ItemsSource="{Binding ChestConditions}">
+                                <ListView Grid.Column="0" ItemsSource="{Binding ChestConditions}" ItemContainerStyle="{StaticResource ConditionsListViewItemStyle}">
                                     <ListView.View>
                                         <GridView>
-                                            <GridViewColumn Header="Clan Chest Type" Width="150" DisplayMemberBinding="{Binding ChestType}"/>
-                                            <GridViewColumn Header="Comparator" Width="100" DisplayMemberBinding="{Binding Comparator}"/>
-                                            <GridViewColumn Header="Value" Width="100" DisplayMemberBinding="{Binding level}"/>
-                                            
+                                            <GridViewColumn Header="Clan Chest Type" Width="150" DisplayMemberBinding="{Binding ChestType, Mode=TwoWay}"/>
+                                            <GridViewColumn Header="Comparator" Width="100" DisplayMemberBinding="{Binding Comparator, Mode=TwoWay}"/>
+                                            <GridViewColumn Header="Value" Width="100" DisplayMemberBinding="{Binding level, Mode=TwoWay}"/>
                                         </GridView>
                                     </ListView.View>
                                 </ListView>

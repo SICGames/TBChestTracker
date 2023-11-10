@@ -156,6 +156,10 @@
       <DependentUpon>ClanStatisticsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ClanData\ClanStatStatisticData.cs" />
+    <Compile Include="Converters\EnumToIntConverter.cs" />
+    <Compile Include="EditConditionWindow.xaml.cs">
+      <DependentUpon>EditConditionWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Shared\CustomCommandBindings.cs" />
     <Compile Include="Converters\EnumToBooleanConverter.cs" />
     <Compile Include="ExportWindow.xaml.cs">
@@ -219,6 +223,10 @@
     <Page Include="NewClanDatabaseWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EditConditionWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="NewConditionWindow.xaml">
       <SubType>Designer</SubType>

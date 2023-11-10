@@ -54,5 +54,17 @@ namespace TBChestTracker
             ClanChestSettings.SaveSettings(clanchestsettings);
             this.Close();
         }
+
+        private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            
+            var item = ((ListViewItem)sender).Content as ChestConditions;
+            EditConditionWindow editConditionWindow = new EditConditionWindow();
+            editConditionWindow.LoadChestCondition(item.ChestType, item.Comparator, item.level);
+            if(editConditionWindow.ShowDialog() == true)
+            {
+
+            }
+        }
     }
 }
