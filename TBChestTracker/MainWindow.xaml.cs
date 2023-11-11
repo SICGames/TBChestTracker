@@ -441,6 +441,7 @@ namespace TBChestTracker
             ClanChestSettings.Clear();
         }
 
+        /*
         private void NewClanDatabaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
@@ -456,13 +457,12 @@ namespace TBChestTracker
                 AppTitle = $"TotalBattle Chest Tracker v0.1.0 - {ClanDatabaseManager.ClanDatabase.Clanname}";
             }
         }
+        */
 
         private void LoadClanDatabaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute= true; 
         }
-
-
         private void LoadClanDatabaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -543,9 +543,6 @@ namespace TBChestTracker
                 }
             }
         }
-
-      
-
         private void SaveClanDatabaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             if (GlobalDeclarations.hasNewClanDatabaseCreated)
@@ -679,6 +676,21 @@ namespace TBChestTracker
             ClanStatisticsWindow clanStatisticsWindow = new ClanStatisticsWindow();
             clanStatisticsWindow.ChestManager = ClanChestManager;
             clanStatisticsWindow.Show();    
+        }
+
+        private void ClanManagerCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void ClanManagerCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ClanManagementWindow clanManagementWindow = new ClanManagementWindow();
+            clanManagementWindow.mainWindow = this; 
+            if(clanManagementWindow.ShowDialog() == true)
+            {
+
+            }
         }
     }
 }

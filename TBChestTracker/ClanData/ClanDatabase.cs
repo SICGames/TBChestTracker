@@ -60,20 +60,6 @@ namespace TBChestTracker
         public string ClanChestReportFolderPath { get; set; }
         public string ClanDatabaseBackupFolderPath { get; set; }
 
-        private ClanQuota _ClanQuota = ClanQuota.DAILY;
-        public ClanQuota ClanQuota
-        {
-            get
-            {
-                return _ClanQuota;
-            }
-            set
-            {
-                _ClanQuota = value;
-                OnPropertyChanged(nameof(ClanQuota));   
-            }
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(String propertyName)
         {

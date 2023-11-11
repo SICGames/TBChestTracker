@@ -9,16 +9,16 @@ namespace Hellscape.Commands
 {
     public static class CustomCommandBindings
     {
-        public static readonly RoutedUICommand NewClanDatabase = new RoutedUICommand
-            (
-                "New CLan Database",
-                "New Clan Database",
-                typeof(CustomCommandBindings),
-                new InputGestureCollection()
-                {
-                    new KeyGesture(Key.N, ModifierKeys.Control)
-                }
-            );
+        public static readonly RoutedUICommand ClanManager = new RoutedUICommand
+           (
+               "Clan Manager",
+               "Clan Manager",
+               typeof(CustomCommandBindings),
+               new InputGestureCollection()
+               {
+                    new KeyGesture(Key.M, ModifierKeys.Control)
+               }
+           );
         public static readonly RoutedUICommand LoadClanDatabase = new RoutedUICommand
             (
                 "Load CLan Database",

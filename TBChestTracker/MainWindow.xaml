@@ -9,10 +9,10 @@
         Title="{Binding Path=AppTitle, Mode=TwoWay}" Width="800" Height="64" Loaded="Window_Loaded" SizeToContent="Height" Topmost="True" WindowStyle="ToolWindow" ResizeMode="NoResize"
     xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2">
     <Window.CommandBindings>
-        <CommandBinding Command="Commands:CustomCommandBindings.NewClanDatabase" 
-                        x:Name="NewClanDatabaseCommand" 
-                        CanExecute="NewClanDatabaseCommand_CanExecute" 
-                        Executed="NewClanDatabaseCommand_Executed"/>
+        <CommandBinding Command="Commands:CustomCommandBindings.ClanManager" 
+                        x:Name="ClanManagerCommand" 
+                        CanExecute="ClanManagerCommand_CanExecute" 
+                        Executed="ClanManagerCommand_Executed"/>
         <CommandBinding Command="Commands:CustomCommandBindings.LoadClanDatabase" 
                         x:Name="LoadClanDatabaseCommand" 
                         CanExecute="LoadClanDatabaseCommand_CanExecute" 
@@ -236,7 +236,8 @@
         <DockPanel Grid.Row="0" LastChildFill="True">
             <Menu DockPanel.Dock="Top" Height="auto" VerticalAlignment="Top">
                 <MenuItem Header="File">
-                    <MenuItem Header="New Clan Database" x:Name="NewClanDB" Command="Commands:CustomCommandBindings.NewClanDatabase"/>
+                    <MenuItem Header="Clan Manager" x:Name="ClanManager" Command="Commands:CustomCommandBindings.ClanManager"/>
+                    
                     <Separator/>
                     <MenuItem Header="Load Clan Database" x:Name="LoadClanDB" Command="Commands:CustomCommandBindings.LoadClanDatabase"/>
                     <Separator/>

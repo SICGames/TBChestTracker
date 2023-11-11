@@ -1,0 +1,33 @@
+﻿<Window x:Class="TBChestTracker.ClanManagementWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TBChestTracker"
+        mc:Ignorable="d"
+        Title="Clan Manager" Height="450" Width="420" Topmost="True" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="30"/>
+        </Grid.ColumnDefinitions>
+        <ListView x:Name="ClansListView" Grid.Column="0" ItemsSource="{Binding clans}">
+            <ListView.View>
+                <GridView>
+                    <GridView.Columns>
+                        <GridViewColumn Header="Clan" Width="200" DisplayMemberBinding="{Binding Name, Mode=TwoWay}"/>
+                        <GridViewColumn Header="Members" Width="100" DisplayMemberBinding="{Binding Members, Mode=TwoWay}"/>
+                    </GridView.Columns>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <StackPanel Orientation="Vertical" Grid.Column="1">
+            <Button Height="24" Width="24" Margin="0,5" ToolTip="New Clan" x:Name="NewClanBtn" Click="NewClanBtn_Click">
+                <Image Source="Images/plusIcon.png" Height="16" Width="16"/>
+            </Button>
+            <Button Height="24" Width="24" Margin="0,5" ToolTip="Delete Clan" x:Name="DeleteClanBtn" Click="DeleteClanBtn_Click">
+                <Image Source="Images/trashIcon.png" Height="16" Width="16"/>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>
