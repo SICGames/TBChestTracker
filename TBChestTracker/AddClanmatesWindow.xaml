@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
         mc:Ignorable="d"
-        Title="Add Clanmates" Height="450" Width="355" Topmost="True" WindowStyle="ToolWindow" ShowInTaskbar="False" Loaded="Window_Loaded" ResizeMode="NoResize" Closing="Window_Closing">
+        Title="Add Clanmates" Height="450" Width="355" Topmost="True" WindowStyle="ToolWindow" ShowInTaskbar="False" Loaded="Window_Loaded" ResizeMode="NoResize" 
+        Closing="Window_Closing" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <DataTemplate x:Key="ListBoxItemTemplate1">
             <Grid MaxWidth="250">

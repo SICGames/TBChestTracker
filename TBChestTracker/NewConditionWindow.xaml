@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
         mc:Ignorable="d"
-        Title="New Condition" Width="400" WindowStyle="ToolWindow" SizeToContent="Height" Topmost="True" DataContext="local:ClanChestSettings">
+        Title="New Condition" Width="400" WindowStyle="ToolWindow" SizeToContent="Height" Topmost="True" DataContext="local:ClanChestSettings" WindowStartupLocation="CenterScreen">
     <Grid>
         <StackPanel Orientation="Vertical">
             <Grid>

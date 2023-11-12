@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
         mc:Ignorable="d"
-        Title="Clan Chests Management" Height="600" Width="800" Topmost="True">
+        Title="Clan Chests Management" Height="600" Width="800" Topmost="True" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <Style x:Key="ConditionsListViewItemStyle" TargetType="ListViewItem">
             <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>

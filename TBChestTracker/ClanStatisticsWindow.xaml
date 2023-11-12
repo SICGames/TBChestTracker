@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
         mc:Ignorable="d"
-        Title="Clan Chest Statistics" Height="450" Width="800" Loaded="Window_Loaded" Closing="Window_Closing" WindowState="Maximized">
+        Title="Clan Chest Statistics" Height="450" Width="800" Loaded="Window_Loaded" Closing="Window_Closing" WindowState="Maximized" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <local:BooleanToWidthConverter x:Key="BooleanToWidthConverter"/>

@@ -265,6 +265,10 @@
         <DockPanel Grid.Row="1">
             <ToolBarTray DockPanel.Dock="Top" Height="32" IsLocked="True">
                 <ToolBar Style="{DynamicResource ToolBarStyle1}" Height="32" ToolBar.OverflowMode="Never" Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type ToolBarTray}}, Path=ActualWidth}" >
+                    <Button Height="24" Width="24" ToolTip="Manage Clan(s)" Margin="0,0,5,5" Command="Commands:CustomCommandBindings.ClanManager">
+                        <Image Source="Images/ClanManagerIcon.png" Stretch="UniformToFill"/>
+                    </Button>
+                    <Separator/>
                     <Button Height="24" Width="24" ToolTip="Manage Clanmates" Margin="0,0,5,5" Command="Commands:CustomCommandBindings.ManageClanmates">
                         <Image Source="Images/icons_main_menu_clan_1.png" Stretch="UniformToFill"/>
                     </Button>
