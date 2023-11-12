@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using com.HellStormGames.Logging;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -99,14 +100,14 @@ namespace TBChestTracker
 
                             if (chestobtained.Contains("epic"))
                                 type = ChestType.EPIC;
-                            else if (chestobtained.Contains("bank"))
-                                type = ChestType.BANK;
+                            else if (chestobtained.Contains("rare"))
+                                type = ChestType.RARE;
                             else if (chestobtained.Contains("heroic"))
                                 type = ChestType.HEROIC;
-                            else if (chestobtained.Contains("arena"))
-                                type = ChestType.ARENA;
                             else if (chestobtained.Contains("citadel"))
                                 type = ChestType.CITADEL;
+                            else
+                                type = ChestType.COMMON;
 
                             int level = 0;
 
@@ -158,10 +159,6 @@ namespace TBChestTracker
                                 tmpchests.Add(new ChestData(clanmate, new Chest(chestName, ChestType.MIMIC, 0)));
                                 continue;
                             }
-                            else if (chestobtained.Contains("epic"))
-                            {
-                                tmpchests.Add(new ChestData(clanmate, new Chest(chestName, ChestType.EPIC_BOSS, 0)));
-                            }
                             else if (chestobtained.Contains("rise"))
                             {
                                 tmpchests.Add(new ChestData(clanmate, new Chest(chestName, ChestType.ANCIENT_EVENT, 0)));
@@ -207,6 +204,8 @@ namespace TBChestTracker
                                 {
                                     validated.Add(new ChestData(ttmpChest.Clanmate, ttmpChest.Chest));
                                     Debug.WriteLine($"[[Level {ttmpChest.Chest.Level} ({ttmpChest.Chest.Type.ToString()}) {ttmpChest.Chest.Name} from {ttmpChest.Clanmate} validated.]]");
+                                    Loggy.Write($"[[Level {ttmpChest.Chest.Level} ({ttmpChest.Chest.Type.ToString()}) {ttmpChest.Chest.Name} from {ttmpChest.Clanmate} validated.]]", LogType.LOG);
+
                                     isValidated = true;
                                 }
                             }
