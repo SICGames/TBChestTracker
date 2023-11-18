@@ -57,21 +57,21 @@ namespace TBChestTracker
             SaveData();
             return;
         }
-        private List<ChestData> ProcessText(OcrResult result)
+        private Task<List<ChestData>> ProcessText(string[] result)
         {
             List<ChestData> tmpchests = new List<ChestData>();
 
-            for (var x = 0; x < result.Lines.Count; x += 3)
+            for (var x = 0; x < result.Length; x += 3)
             {
-                var word = result.Lines[x].Text;
+                var word = result[x];
                 if (word == null)
                     continue;
 
                 if (!word.Contains("Clan"))
                 {
-                    var chestName = result.Lines[x + 0].Text;
-                    var clanmate = result.Lines[x + 1].Text;
-                    var chestobtained = result.Lines[x + 2].Text;
+                    var chestName = result[x + 0];
+                    var clanmate = result[x + 1];
+                    var chestobtained = result[x + 2];
 
                     if (clanmate.Contains("From:"))
                     {
@@ -179,7 +179,7 @@ namespace TBChestTracker
                 }
             }
 
-            return tmpchests;
+            return Task.FromResult(tmpchests);
         }
 
         private void ProcessChestConditions(ref List<ChestData> chestdata)
@@ -220,8 +220,9 @@ namespace TBChestTracker
                     chestdata = validated;
                 }
             }
+            
         }
-        private List<ClanChestData> CreateClanChestData(List<ChestData> chestdata)
+        private Task<List<ClanChestData>> CreateClanChestData(List<ChestData> chestdata)
         {
             List<ClanChestData> clanChestData = new List<ClanChestData>();
             var clanmates = chestdata.GroupBy(clanmate => clanmate.Clanmate);
@@ -238,10 +239,10 @@ namespace TBChestTracker
                 }
                 clanChestData.Add(clanchestdata);
             }
-            return clanChestData;
+            return Task.FromResult(clanChestData);
         }
 
-        public async void ProcessChestData(OcrResult result)
+        public async void ProcessChestData(string[] result)
         {
 
             /*
@@ -252,15 +253,14 @@ namespace TBChestTracker
             */
 
             GlobalDeclarations.isBusyProcessingClanchests = true;
-            var resulttext = result.Text;
-
+            var resulttext = result;
             //- doesn't handle expired gifts. Will patch soon.
-            if (!resulttext.Contains("No gifts"))
+            if (!resulttext[0].Contains("No gifts"))
             {
                 GlobalDeclarations.isAnyGiftsAvailable = true;
-                List<ChestData> tmpchests = ProcessText(result);
+                List<ChestData> tmpchests = await ProcessText(resulttext);
                 ProcessChestConditions(ref tmpchests);
-                List<ClanChestData> tmpchestdata = CreateClanChestData(tmpchests);  
+                List<ClanChestData> tmpchestdata = await CreateClanChestData(tmpchests);  
 
                 var names = ClanmateManager.Clanmates.Select(n => n.Name);
 
@@ -283,7 +283,7 @@ namespace TBChestTracker
                 //-- make sure clanmate exists.
                 foreach (var tmpchest in tmpchestdata)
                 {
-                    bool exists = names.Contains(tmpchest.Clanmate, StringComparer.OrdinalIgnoreCase);
+                    bool exists = names.Contains(tmpchest.Clanmate, StringComparer.CurrentCultureIgnoreCase);
                     if (!exists)
                     {
                         Debug.WriteLine($"{tmpchest.Clanmate} doesn't exist within clanmates database.");
@@ -382,6 +382,9 @@ namespace TBChestTracker
                 }
             }
 
+            //-- when adding new member, it pulls previous clan chest statistic data.
+            //-- needs to add the new member in.
+
             if (!System.IO.File.Exists(clanchestfile))
             {
                 ClanChestDailyData.Add(DateTime.Now.ToString(@"MM-dd-yyyy"), clanChestData);
@@ -401,7 +404,16 @@ namespace TBChestTracker
             var dateStr = DateTime.Now.ToString(@"MM-dd-yyyy");
             if (lastDate.Equals(dateStr))
             {
+
                 clanChestData = ClanChestDailyData[lastDate];
+                foreach (var member in clanmates)
+                {
+                    var clanmate_exists = clanChestData.Exists(mate => mate.Clanmate.ToLower().Contains(member.ToLower()));
+                    if (!clanmate_exists)
+                    {
+                        clanChestData.Add(new ClanChestData(member, null));
+                    }
+                }
             }
             else
             {

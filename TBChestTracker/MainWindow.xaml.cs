@@ -102,14 +102,56 @@ namespace TBChestTracker
         }
 
         #region Image Processing Functions & Other Related Functions
-        private async Task<OcrResult> LoadBitmap(System.Drawing.Bitmap bitmap, Language language)
+
+        private Task<String[]> GetTextFromBitmap(System.Drawing.Bitmap bitmap)
+        {
+            Image<Gray, Byte> image = null;
+            Image<Gray, Byte> imageOut = null;
+            var brightness = 0.0d;
+            if (CaptureMode == CaptureMode.CLANMATES)
+            {
+                brightness = 0.5d;
+                image = bitmap.ToImage<Gray, Byte>();
+                imageOut = image.Mul(brightness) + brightness;
+            }
+            else
+            {
+                brightness = CLANCHEST_IMAGE_BRIGHTNESS;
+                image = bitmap.ToImage<Gray, Byte>();
+                imageOut = image.Mul(brightness) + brightness;
+            }
+            var tessy = new Tesseract(GlobalDeclarations.TesseractData, "eng+tur+ara+spa+chi+jap+rus", OcrEngineMode.Default);
+            tessy.SetImage(imageOut);
+            tessy.Recognize();
+            
+            var result = tessy.GetUTF8Text();
+            result = result.Replace("\r\n", ",");
+            string[] results = result.Split(',');
+            List<String> ocrResults = new List<string>();
+            foreach(var r in results.ToList())
+            {
+                if(!String.IsNullOrEmpty(r))
+                {
+                    ocrResults.Add(r);
+                }
+            }
+
+            imageOut.Dispose();
+            imageOut = null;
+            image.Dispose();
+            image = null;
+            results = null;
+
+            return Task.FromResult(ocrResults.ToArray());
+        }
+        private async Task<OcrResult> GetTextFromBitmap(System.Drawing.Bitmap bitmap, Language language)
         {
             Image<Gray, Byte> image = null;
             Image<Gray, Byte> imageOut = null;
             System.Drawing.Bitmap bitmapOut = null;
             OcrResult result = null;
             var brightness = 0.0d;
-            if(CaptureMode == CaptureMode.CLANMATES)
+            if (CaptureMode == CaptureMode.CLANMATES)
             {
                 brightness = 0.5d;
                 image = bitmap.ToImage<Gray, Byte>();
@@ -123,16 +165,15 @@ namespace TBChestTracker
                 imageOut = image.Mul(brightness) + brightness;
                 bitmapOut = imageOut.AsBitmap();
             }
-            
-            bitmapOut.Save("test-out-image-bw.jpg", ImageFormat.Jpeg);
 
+            bitmapOut.Save("test-out-image-bw.jpg", ImageFormat.Jpeg);
             using (var stream = new Windows.Storage.Streams.InMemoryRandomAccessStream())
             {
 
                 bitmapOut.Save(stream.AsStream(), ImageFormat.Bmp);
                 var decoder = await Windows.Graphics.Imaging.BitmapDecoder.CreateAsync(stream).AsTask(); //-- Can not find component exception when size is == 0.
                 var bitmapSoftware = await decoder.GetSoftwareBitmapAsync();
-                //var engine = OcrEngine.TryCreateFromLanguage(new Language("tr"));
+
                 var engine = OcrEngine.TryCreateFromUserProfileLanguages();
                 var ocrResult = await engine.RecognizeAsync(bitmapSoftware);
                 result = ocrResult;
@@ -153,16 +194,16 @@ namespace TBChestTracker
             image.Dispose();
             image = null;
             return result;
-
         }
-
         private void CaptureRegion()
         {
+            /*
             var language = new Language("en");
             if (!OcrEngine.IsLanguageSupported(language))
             {
                 throw new Exception($"{language.ToString()} is not supported.");
             }
+            */
 
             //-- now everything is completely manual when capturing. CLI C++ doesn't do any while loop.
             int sh = Snapture.ScreenHeight;
@@ -281,10 +322,12 @@ namespace TBChestTracker
             {
                 if (GlobalDeclarations.canCaptureAgain)
                 {
-                    Thread.Sleep(2000); //-- could prevent the "From:" bug.
+                    Thread.Sleep(3000); //-- could prevent the "From:" bug.
                     CaptureRegion();
+                    GlobalDeclarations.canCaptureAgain = false;
                     captureCounter++;
                     Debug.WriteLine($"Captured {captureCounter} Times.");
+                    
                 }
 
                 if (GlobalDeclarations.isAnyGiftsAvailable == false)
@@ -298,8 +341,11 @@ namespace TBChestTracker
                     else
                         automatorClicks++;
 
-                    Thread.Sleep(150);
+                    Thread.Sleep(50);
                 }
+                
+                //-- canCaptureAgain not being switched back on.
+                GlobalDeclarations.canCaptureAgain = true;
                 automatorClicks = 1;
             }
 
@@ -352,19 +398,17 @@ namespace TBChestTracker
         #region Snapture onFrameCaptured Event
         private async void Snapture_onFrameCaptured(object sender, FrameCapturedEventArgs e)
         {
-            var ocrResult = await LoadBitmap(e.ScreenCapturedBitmap, new Windows.Globalization.Language("en"));
-            
-            if (ocrResult == null) 
-                return;
+            var ocrResult = await GetTextFromBitmap(e.ScreenCapturedBitmap); //LoadBitmap(e.ScreenCapturedBitmap, new Windows.Globalization.Language("en"));
+
+            if (ocrResult == null)
+                throw new Exception("OCR text shouldn't be null or there's a problem.");
 
             //-- here we process data.
             e.ScreenCapturedBitmap.Dispose();
-
+            
             if (CaptureMode == CaptureMode.CHESTS)
                 ClanChestManager.ProcessChestData(ocrResult);
-            else
-                ProcessClanmates(ocrResult);
-
+            
         }
         #endregion
 

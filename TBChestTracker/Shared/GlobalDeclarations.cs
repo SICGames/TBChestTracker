@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,5 +15,13 @@ namespace TBChestTracker
         public static bool isAnyGiftsAvailable { get; set; }
         public static bool isBusyProcessingClanchests { get; set; }
         public static bool canCaptureAgain { get; set; }
+        public static string AppFolder
+        {
+            get => $@"{System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\";
+        }
+        public static string TesseractData
+        {
+            get => $@"{AppFolder}TessData";
+        }
     }
 }
