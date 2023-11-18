@@ -23,5 +23,7 @@ namespace TBChestTracker
         {
             get => $@"{AppFolder}TessData";
         }
+        public static bool TessDataExists { get; set; }
+        public static bool AuotmationRunning { get; set; }
     }
 }

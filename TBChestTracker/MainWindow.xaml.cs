@@ -33,6 +33,7 @@ using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using System.Threading;
 using System.Windows.Controls;
+using System.Windows.Navigation;
 
 namespace TBChestTracker
 {
@@ -57,7 +58,7 @@ namespace TBChestTracker
 
         bool isClosing = false;
         bool stopAutomation = false;
-        private double CLANCHEST_IMAGE_BRIGHTNESS = 0.55d;
+        private double CLANCHEST_IMAGE_BRIGHTNESS = 0.75d;
 
         private string pAppTitle = $"TotalBattle Chest Tracker v0.1.0 - Untitled";
         public string AppTitle
@@ -76,6 +77,7 @@ namespace TBChestTracker
         List<string> recently_opened_files { get; set; }
 
 
+        Tesseract tessy { get; set; }
         #endregion
 
         #region PropertyChanged Event
@@ -107,20 +109,23 @@ namespace TBChestTracker
         {
             Image<Gray, Byte> image = null;
             Image<Gray, Byte> imageOut = null;
+            System.Drawing.Bitmap bitmapOut = null;
             var brightness = 0.0d;
             if (CaptureMode == CaptureMode.CLANMATES)
             {
                 brightness = 0.5d;
                 image = bitmap.ToImage<Gray, Byte>();
                 imageOut = image.Mul(brightness) + brightness;
+                bitmapOut = imageOut.AsBitmap();
             }
             else
             {
                 brightness = CLANCHEST_IMAGE_BRIGHTNESS;
                 image = bitmap.ToImage<Gray, Byte>();
                 imageOut = image.Mul(brightness) + brightness;
+                bitmapOut = imageOut.AsBitmap();
             }
-            var tessy = new Tesseract(GlobalDeclarations.TesseractData, "eng+tur+ara+spa+chi+jap+rus", OcrEngineMode.Default);
+            bitmapOut.Save("test-out-image-bw.jpg", ImageFormat.Jpeg);
             tessy.SetImage(imageOut);
             tessy.Recognize();
             
@@ -135,6 +140,8 @@ namespace TBChestTracker
                     ocrResults.Add(r);
                 }
             }
+            bitmapOut.Dispose();
+            bitmapOut = null;
 
             imageOut.Dispose();
             imageOut = null;
@@ -197,14 +204,6 @@ namespace TBChestTracker
         }
         private void CaptureRegion()
         {
-            /*
-            var language = new Language("en");
-            if (!OcrEngine.IsLanguageSupported(language))
-            {
-                throw new Exception($"{language.ToString()} is not supported.");
-            }
-            */
-
             //-- now everything is completely manual when capturing. CLI C++ doesn't do any while loop.
             int sh = Snapture.ScreenHeight;
             int sw = Snapture.ScreenWidth;
@@ -283,6 +282,7 @@ namespace TBChestTracker
         void StartAutomationThread()
         {
             stopAutomation = false;
+            GlobalDeclarations.AuotmationRunning = true;
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
                 Task automationTask = Task.Run(() => StartAutomationProcess());
@@ -292,7 +292,8 @@ namespace TBChestTracker
         void StopAutomation()
         {
             stopAutomation = true;
-          
+            GlobalDeclarations.AuotmationRunning = false;
+
             ClanChestManager.SaveDataTask();
             ClanChestManager.CreateBackup();
 
@@ -412,8 +413,41 @@ namespace TBChestTracker
         }
         #endregion
 
+        #region Tesseract Loading Languages Functions
+        private Task LoadSpecficTesseractLanguagesAsync(string combined_languages) => Task.Run(() => LoadSpecficTesseractLanguages(combined_languages));    
+        private void LoadSpecficTesseractLanguages(string combined_languages)
+        {
+            tessy = new Tesseract(GlobalDeclarations.TesseractData, combined_languages, OcrEngineMode.Default);
+        }
+        private Task LoadAllTesseractLanguagesAsync() => Task.Run(() => LoadAllTesseractLanguages());   
+        private void LoadAllTesseractLanguages()
+        {
+
+            var tessdatafiles = System.IO.Directory.GetFiles(GlobalDeclarations.TesseractData, "*.traineddata");
+            StringBuilder languages = new StringBuilder();
+            for (var x = 0; x < tessdatafiles.Length - 1; x++)
+            {
+                var file = tessdatafiles[x];
+                file = file.Substring(file.LastIndexOf(@"\") + 1);
+                var language = file.Substring(0, file.LastIndexOf('.'));
+                if (x != tessdatafiles.Length - 1)
+                    languages.Append($"{language}+");
+                else
+                    languages.Append($"{language}");
+            }
+
+            //--- startup time takes longer when loading all languages inside tesseract.
+            //--- future, have selectable languages and option to have all languages loaded. 
+            // - "eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus"
+            tessy = new Tesseract(GlobalDeclarations.TesseractData, languages.ToString(), OcrEngineMode.Default);
+            languages = null;
+            tessdatafiles = null;
+            Debug.WriteLine($"All Tesseract Trained data has been successfully loaded.");
+        }
+        #endregion
+
         #region Main Window Functions
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             InputHooks.onKeyPressed += InputHooks_onKeyPressed;
             InputHooks.onKeyReleased += InputHooks_onKeyReleased;
@@ -472,6 +506,18 @@ namespace TBChestTracker
             {
 
             }
+
+            if (System.IO.Directory.Exists(GlobalDeclarations.TesseractData))
+            {
+                GlobalDeclarations.TessDataExists = true;
+                await LoadSpecficTesseractLanguagesAsync("eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus");
+            }
+            else
+            {
+                //-- tessdata folder needs to exist. And if not, should be prevented from even attempting to do any OCR.
+                MessageBox.Show($"No Tessdata directory exists. Download tessdata and ensure all traineddata is inside tessdata.");
+                GlobalDeclarations.TessDataExists = false;
+            }
         }
 
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -483,25 +529,10 @@ namespace TBChestTracker
             }
             ClanChestManager.ClearData();
             ClanChestSettings.Clear();
-        }
+            if(tessy != null) 
+                tessy.Dispose();
 
-        /*
-        private void NewClanDatabaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
         }
-
-        private void NewClanDatabaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            NewClanDatabaseWindow newClanDatabaseWindow = new NewClanDatabaseWindow();
-            if (newClanDatabaseWindow.ShowDialog() == true)
-            {
-                GlobalDeclarations.hasNewClanDatabaseCreated = true;
-                CommandManager.InvalidateRequerySuggested();
-                AppTitle = $"TotalBattle Chest Tracker v0.1.0 - {ClanDatabaseManager.ClanDatabase.Clanname}";
-            }
-        }
-        */
 
         private void LoadClanDatabaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -670,18 +701,18 @@ namespace TBChestTracker
 
         private void ManuallyCaptureScreenCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = (GlobalDeclarations.hasClanmatesBeenAdded &&  GlobalDeclarations.hasNewClanDatabaseCreated);
+            e.CanExecute = (GlobalDeclarations.hasClanmatesBeenAdded &&  GlobalDeclarations.hasNewClanDatabaseCreated && GlobalDeclarations.TessDataExists);
         }
 
         private void ManuallyCaptureScreenCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (!GlobalDeclarations.isBusyProcessingClanchests)
+            if (!GlobalDeclarations.isBusyProcessingClanchests && GlobalDeclarations.TessDataExists)
                 CaptureRegion();
         }
 
         private void StartAutomationCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            if (GlobalDeclarations.hasClanmatesBeenAdded && GlobalDeclarations.hasNewClanDatabaseCreated)
+            if (GlobalDeclarations.hasClanmatesBeenAdded && GlobalDeclarations.hasNewClanDatabaseCreated && GlobalDeclarations.TessDataExists)
                 e.CanExecute = true;
             else 
                 e.CanExecute = false;
@@ -690,12 +721,15 @@ namespace TBChestTracker
 
         private void StartAutomationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            StartAutomationThread();
+            if (!GlobalDeclarations.AuotmationRunning && GlobalDeclarations.TessDataExists)
+            {
+                StartAutomationThread();
+            }
         }
 
         private void StopAutomationCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            if (GlobalDeclarations.hasClanmatesBeenAdded && GlobalDeclarations.hasNewClanDatabaseCreated)
+            if (GlobalDeclarations.hasClanmatesBeenAdded && GlobalDeclarations.hasNewClanDatabaseCreated && GlobalDeclarations.TessDataExists)
                 e.CanExecute = true;
             else
                 e.CanExecute = false;
@@ -703,7 +737,8 @@ namespace TBChestTracker
 
         private void StopAutomationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            StopAutomation();
+            if(GlobalDeclarations.AuotmationRunning)
+                StopAutomation();
         }
         #endregion
 
