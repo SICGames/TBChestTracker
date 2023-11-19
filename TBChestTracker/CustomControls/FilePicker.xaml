@@ -73,7 +73,7 @@
                      FontSize="12" TextWrapping="NoWrap" VerticalContentAlignment="Center"
                      PreviewMouseLeftButtonDown="TextBox_PreviewMouseLeftButtonDown" SnapsToDevicePixels="True">
             </TextBox>
-            <Image Source="Images/folderIcon.png" Height="16" Width="16" HorizontalAlignment="Right" Margin="0,0,10,0"/>
+            <Image Source="../Images/folderIcon.png" Height="16" Width="16" HorizontalAlignment="Right" Margin="0,0,10,0"/>
         </Grid>
     </Grid>
 </UserControl>

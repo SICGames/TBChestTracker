@@ -22,7 +22,7 @@ namespace TBChestTracker
         LESS = 1,
     }
 
-    internal class ChestConditions : INotifyPropertyChanged
+    public class ChestConditions : INotifyPropertyChanged
     {
         private string _chestType = "Common";
         private string _chestComparator = "greater than";

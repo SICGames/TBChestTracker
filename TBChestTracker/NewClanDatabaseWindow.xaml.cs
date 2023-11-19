@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Newtonsoft;
+using TBChestTracker.Managers;
 
 namespace TBChestTracker
 {
@@ -24,29 +25,29 @@ namespace TBChestTracker
         public NewClanDatabaseWindow()
         {
             InitializeComponent();
-            this.DataContext = ClanDatabaseManager.ClanDatabase;
+            this.DataContext = ClanManager.Instance.ClanDatabaseManager.ClanDatabase;
         }
         private void CreateClanFolders(Action<bool> result)
         {
-            var clanname = ClanDatabaseManager.ClanDatabase.Clanname;
-            var mainpath = ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath;
+            var clanname = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname;
+            var mainpath = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath;
             if (String.IsNullOrEmpty(clanname) || clanname.Length < 3) 
             {
                 MessageBox.Show("Clan name must be more than three characters.");
                 result(false);
                 return;
             }
-            ClanDatabaseManager.ClanDatabase.ClanFolderPath = $"{mainpath}{clanname}";
-            ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder = $"{mainpath}{clanname}\\db";
-            ClanDatabaseManager.ClanDatabase.ClanChestReportFolderPath = $"{mainpath}{clanname}\\reports";
-            ClanDatabaseManager.ClanDatabase.ClanChestDatabaseExportFolderPath = $"{mainpath}{clanname}\\exports";
-            ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath = $"{mainpath}{clanname}\\backups";
+            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath = $"{mainpath}{clanname}";
+            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder = $"{mainpath}{clanname}\\db";
+            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestReportFolderPath = $"{mainpath}{clanname}\\reports";
+            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseExportFolderPath = $"{mainpath}{clanname}\\exports";
+            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath = $"{mainpath}{clanname}\\backups";
             
-            System.IO.Directory.CreateDirectory(ClanDatabaseManager.ClanDatabase.ClanFolderPath);
-            System.IO.Directory.CreateDirectory(ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder);
-            System.IO.Directory.CreateDirectory(ClanDatabaseManager.ClanDatabase.ClanChestReportFolderPath);
-            System.IO.Directory.CreateDirectory(ClanDatabaseManager.ClanDatabase.ClanChestDatabaseExportFolderPath);
-            System.IO.Directory.CreateDirectory(ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath);
+            System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath);
+            System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder);
+            System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestReportFolderPath);
+            System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseExportFolderPath);
+            System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath);
             result(true);
         }
 

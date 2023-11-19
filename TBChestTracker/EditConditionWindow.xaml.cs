@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TBChestTracker.Managers;
 
 namespace TBChestTracker
 {
@@ -29,7 +30,7 @@ namespace TBChestTracker
 
         private void ApplyBtn_Click(object sender, RoutedEventArgs e)
         {
-            foreach(var condition in ClanChestSettings.ChestRequirements.ChestConditions)
+            foreach(var condition in ClanManager.Instance.ClanChestSettings.ChestRequirements.ChestConditions)
             {
                 if (condition.ChestType.Equals(ChestConditions.ChestType, StringComparison.OrdinalIgnoreCase))
                 {

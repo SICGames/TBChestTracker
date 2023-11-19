@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
         mc:Ignorable="d"
-        Title="Export Clan Chest Window" Width="300" WindowStyle="ToolWindow" SizeToContent="Height" ResizeMode="NoResize">
+        Title="Export Clan Chest Window" Width="300" WindowStyle="ToolWindow" SizeToContent="Height" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions >
             <RowDefinition Height="50"/>
@@ -33,7 +33,20 @@
                         <ComboBoxItem Content="Delete"/>
                     </ComboBox>
                 </GroupBox>
-                
+                <GroupBox Header="Points Correction">
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Chest Points +/-" Margin="5"/>
+                            <TextBox Text="0" VerticalContentAlignment="Center" x:Name="ChestPointsValue" Margin="5" Width="75" Height="18"/>
+                        </StackPanel>
+                        <TextBlock 
+                            Text="Mistakes happen. In case, accidently claiming all instead of starting automation, correct by entering a number to give everyone added chest points." 
+                            TextWrapping="Wrap" 
+                            Margin="5" 
+                            FontWeight="Bold" 
+                            FontSize="10"/>
+                    </StackPanel>
+                </GroupBox>
             </StackPanel>
         </DockPanel>
         <DockPanel Grid.Row="2" Background="#eeeeee">

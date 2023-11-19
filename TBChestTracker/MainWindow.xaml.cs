@@ -35,6 +35,7 @@ using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 using TBChestTracker.Helpers;
+using TBChestTracker.Managers;
 
 namespace TBChestTracker
 {
@@ -55,7 +56,9 @@ namespace TBChestTracker
         System.Threading.Thread AutomationThread { get; set; }
         CaptureMode CaptureMode { get; set; }
         
-        public ClanChestManager ClanChestManager { get; set; }
+        public ClanManager ClanManager { get; private set; }
+
+        //public ClanChestManager ClanChestManager { get; set; }
 
         bool isClosing = false;
         bool stopAutomation = false;
@@ -96,10 +99,7 @@ namespace TBChestTracker
             this.Closing += MainWindow_Closing;
             recently_opened_files = new List<string>();
 
-            if(System.IO.Directory.Exists(ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath) == false)
-            {
-                System.IO.Directory.CreateDirectory(ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath);
-            }
+            
         }
 
         #region Image Processing Functions & Other Related Functions
@@ -280,8 +280,9 @@ namespace TBChestTracker
             stopAutomation = true;
             GlobalDeclarations.AuotmationRunning = false;
 
-            ClanChestManager.SaveDataTask();
-            ClanChestManager.CreateBackup();
+            ClanManager.Instance.ClanChestManager.SaveDataTask();
+            ClanManager.Instance.ClanChestManager.CreateBackup();
+            //ClanChestManager.CreateBackup();
 
             Debug.WriteLine("Automation Stopped.");
         }
@@ -309,12 +310,11 @@ namespace TBChestTracker
             {
                 if (GlobalDeclarations.canCaptureAgain)
                 {
-                    Thread.Sleep(3000); //-- could prevent the "From:" bug.
+                    Thread.Sleep(3500); //-- could prevent the "From:" bug.
                     CaptureRegion();
                     GlobalDeclarations.canCaptureAgain = false;
                     captureCounter++;
                     Debug.WriteLine($"Captured {captureCounter} Times.");
-                    
                 }
 
                 if (GlobalDeclarations.isAnyGiftsAvailable == false)
@@ -392,9 +392,10 @@ namespace TBChestTracker
 
             //-- here we process data.
             e.ScreenCapturedBitmap.Dispose();
-            
+
             if (CaptureMode == CaptureMode.CHESTS)
-                ClanChestManager.ProcessChestData(ocrResult.Words);
+                ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words);
+                //ClanChestManager.ProcessChestData(ocrResult.Words);
             
         }
         #endregion
@@ -416,9 +417,16 @@ namespace TBChestTracker
             Snapture.onFrameCaptured += Snapture_onFrameCaptured;
             Snapture.Start(FrameCapturingMethod.GDI);
             AppTitle = $"TotalBattle Chest Tracker v0.1.0 - Untitled";
-            ClanChestManager = new ClanChestManager();
-         
-            if(File.Exists("recent.lst"))
+            this.ClanManager = new ClanManager();
+
+            if (System.IO.Directory.Exists(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath) == false)
+            {
+                System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath);
+            }
+
+            //ClanChestManager = new ClanChestManager();
+
+            if (File.Exists("recent.lst"))
             {
                 using(var sr = File.OpenText("recent.lst"))
                 {
@@ -481,8 +489,10 @@ namespace TBChestTracker
             {
                 Debug.WriteLine("Successfully uninstalled input hooks.");
             }
-            ClanChestManager.ClearData();
-            ClanChestSettings.Clear();
+            ClanManager.Instance.Destroy();
+
+            //ClanChestManager.ClearData();
+            //ClanChestSettings.Clear();
             TesseractHelper.Destroy();
 
         }
@@ -496,19 +506,19 @@ namespace TBChestTracker
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Clan Databases | *.cdb";
             openFileDialog.RestoreDirectory = true;
-            openFileDialog.InitialDirectory = ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath;
+            openFileDialog.InitialDirectory = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath;
            
-            if (ClanChestSettings.ChestRequirements != null)
-                ClanChestSettings.Clear();
+            if (ClanManager.Instance.ClanChestSettings.ChestRequirements != null)
+                ClanManager.Instance.ClanChestSettings.Clear();
 
             if (openFileDialog.ShowDialog() == true)
             {
                 var file = openFileDialog.FileName;
-                ClanDatabaseManager.Load(file, ClanChestManager, result =>
+                ClanManager.Instance.ClanDatabaseManager.Load(file, ClanManager.ClanChestManager, result =>
                 {
                     if (result)
                     {
-                        AppTitle = $"TotalBattle Chest Tracker v0.1.0 - {ClanDatabaseManager.ClanDatabase.Clanname}";
+                        AppTitle = $"TotalBattle Chest Tracker v0.1.0 - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
                         if (!recently_opened_files.Contains(file, StringComparer.CurrentCultureIgnoreCase))
                         {
                             recently_opened_files.Add(file);
@@ -520,14 +530,14 @@ namespace TBChestTracker
                             RecentlyOpenedParent.Items.Add(mu);
                             using (var tw = File.CreateText("recent.lst"))
                             {
-                                foreach(var f in recently_opened_files)
+                                foreach (var f in recently_opened_files)
                                 {
                                     tw.WriteLine(f);
                                 }
                             }
                         }
 
-                       
+
                     }
                     else
                     {
@@ -544,11 +554,11 @@ namespace TBChestTracker
             if (tag != "CLEAR_HISTORY")
             {
                 var file = menuitem.Tag.ToString();
-                ClanDatabaseManager.Load(file, ClanChestManager, result =>
+                ClanManager.Instance.ClanDatabaseManager.Load(file, ClanManager.Instance.ClanChestManager, result =>
                 {
                     if (result)
                     {
-                        AppTitle = $"TotalBattle Chest Tracker v0.1.0 - {ClanDatabaseManager.ClanDatabase.Clanname}";
+                        AppTitle = $"TotalBattle Chest Tracker v0.1.0 - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
                     }
                     else
                     {
@@ -581,7 +591,7 @@ namespace TBChestTracker
 
         private void SaveClanDatabaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ClanDatabaseManager.Save();
+            ClanManager.Instance.ClanDatabaseManager.Save();
         }
 
         private void SaveAsClanDatabaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -609,7 +619,6 @@ namespace TBChestTracker
         {
             //List<ClanChestData> clanChestData = ClanChestManager.clanChestData;
             ExportWindow exportWindow = new ExportWindow();
-            exportWindow.mainwindow = this;
             exportWindow.ShowDialog();
         }
 
@@ -631,7 +640,6 @@ namespace TBChestTracker
         private void ManageClanmatesCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             AddClanmatesWindow addClanmatesWindow = new AddClanmatesWindow();
-            addClanmatesWindow.MainWindow = this;
             if (addClanmatesWindow.ShowDialog() == true)
             {
                 GlobalDeclarations.hasClanmatesBeenAdded = true;
@@ -706,7 +714,7 @@ namespace TBChestTracker
         private void ClanStatsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ClanStatisticsWindow clanStatisticsWindow = new ClanStatisticsWindow();
-            clanStatisticsWindow.ChestManager = ClanChestManager;
+            clanStatisticsWindow.ChestManager = ClanManager.Instance.ClanChestManager;
             clanStatisticsWindow.Show();    
         }
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace TBChestTracker
 {
-    internal class ChestRequirements : INotifyPropertyChanged
+    public class ChestRequirements : INotifyPropertyChanged
     {
         private bool pUseNoChestConditions = true;
         private bool pUseChestConditions = false;

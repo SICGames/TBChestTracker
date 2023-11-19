@@ -135,6 +135,9 @@
     <Compile Include="ClanManagementWindow.xaml.cs">
       <DependentUpon>ClanManagementWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ClanmateVerificationWindow.xaml.cs">
+      <DependentUpon>ClanmateVerificationWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\BooleanToWidthConverter.cs" />
     <Compile Include="CaptureRegionWindow.xaml.cs">
@@ -151,11 +154,11 @@
     <Compile Include="ClanData\ChestRequirements.cs" />
     <Compile Include="ClanData\ChestType.cs" />
     <Compile Include="ClanData\ClanChestData.cs" />
-    <Compile Include="ClanData\ClanChestManager.cs" />
+    <Compile Include="Managers\ClanChestManager.cs" />
     <Compile Include="ClanData\ClanChestReport.cs" />
     <Compile Include="ClanData\ClanChestSettings.cs" />
     <Compile Include="ClanData\ClanDatabase.cs" />
-    <Compile Include="ClanData\ClanDatabaseManager.cs" />
+    <Compile Include="Managers\ClanDatabaseManager.cs" />
     <Compile Include="ClanStatisticsWindow.xaml.cs">
       <DependentUpon>ClanStatisticsWindow.xaml</DependentUpon>
     </Compile>
@@ -167,6 +170,7 @@
     <Compile Include="Helpers\TesseractHelper.cs" />
     <Compile Include="Helpers\TessResult.cs" />
     <Compile Include="Helpers\Vector3.cs" />
+    <Compile Include="Managers\ClanManager.cs" />
     <Compile Include="Shared\CustomCommandBindings.cs" />
     <Compile Include="Converters\EnumToBooleanConverter.cs" />
     <Compile Include="ExportWindow.xaml.cs">
@@ -203,6 +207,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ClanmateVerificationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ClanStatisticsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -226,7 +234,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ClanData\ClanmateManager.cs" />
+    <Compile Include="Managers\ClanmateManager.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

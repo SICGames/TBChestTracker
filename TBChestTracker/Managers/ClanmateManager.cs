@@ -37,6 +37,20 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(Clanmates));   
             }
         }
+        private int _count = 0;
+        public int Count
+        {
+            get => _count;
+            set
+            {
+                _count = value;
+                OnPropertyChanged(nameof(Count));   
+            }
+        }
+        public void UpdateCount()
+        {
+            Count = _clanmates.Count;
+        }
         public ClanmateManager() 
         {
             if (_clanmates == null)
@@ -100,7 +114,6 @@ namespace TBChestTracker
                             writer.Write($"{_clanmates[c].Name}\n");
                     }
                 }
-                
                 writer.Close();
                 writer.Dispose();
             }

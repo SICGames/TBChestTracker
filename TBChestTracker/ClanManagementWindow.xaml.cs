@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using TBChestTracker.ClanData;
+using TBChestTracker.Managers;
 using Windows.UI.Xaml.Shapes;
 
 namespace TBChestTracker
@@ -35,7 +36,7 @@ namespace TBChestTracker
                 clans = new ObservableCollection<Clan>();
 
                 //-- build clans 
-                var clan_default_folder = ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath;
+                var clan_default_folder = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath;
                 var clan_directories = System.IO.Directory.GetDirectories(clan_default_folder);
                 foreach( var directory in clan_directories )
                 {
@@ -125,7 +126,7 @@ namespace TBChestTracker
             if (newClanDatabaseWindow.ShowDialog() == true)
             {
                 GlobalDeclarations.hasNewClanDatabaseCreated = true;
-                mainWindow.AppTitle = $"TotalBattle Chest Tracker v0.1.0 - {ClanDatabaseManager.ClanDatabase.Clanname}";
+                mainWindow.AppTitle = $"TotalBattle Chest Tracker v0.1.0 - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
                 this.Close();
             }
         }

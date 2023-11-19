@@ -25,6 +25,7 @@ namespace TBChestTracker
     public partial class FilePicker : System.Windows.Controls.UserControl
     {
 
+        public string DefaultFolder { get; set; }
         #region Dependency Properties
         public static readonly DependencyProperty FileProperty =
         DependencyProperty.Register(
@@ -153,6 +154,8 @@ typeof(RoutedEventHandler), typeof(FilePicker));
             dialog.Filter = this.Extensions;
             dialog.RestoreDirectory = true;
             dialog.DefaultExt = ".txt";
+            dialog.InitialDirectory = DefaultFolder;
+
             if (dialog.ShowDialog() == true)
             {
                 

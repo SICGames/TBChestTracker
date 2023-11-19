@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TBChestTracker.Managers;
 
 namespace TBChestTracker
 {
@@ -20,7 +22,7 @@ namespace TBChestTracker
     public partial class ExportWindow : Window
     {
      
-        public MainWindow mainwindow { get; set; }
+        
         public ExportWindow()
         {
             InitializeComponent();
@@ -47,7 +49,15 @@ namespace TBChestTracker
 
             var file = FilePicker01.File;
             var sortOption = (SortType)SortOptions.SelectedIndex;
-            await mainwindow.ClanChestManager.ExportDataAsync(file, sortOption);
+            var chest_points_value = ChestPointsValue.Text;
+            int chest_points = 0;
+            if(!Int32.TryParse(chest_points_value, out  chest_points))
+            {
+                MessageBox.Show("Chest Points Correction Value must be only numbers.");
+                return;
+            }
+            
+            await ClanManager.Instance.ClanChestManager.ExportDataAsync(file, chest_points, sortOption);
 
             switch (selectedExportIndex)
             {
@@ -64,12 +74,12 @@ namespace TBChestTracker
                 case 2: //-- Delete
                     {
                         //-- delete and rebuild.
-                        var clanchestfile = ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile;
+                        var clanchestfile = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile;
                         try
                         {
                             System.IO.File.Delete(clanchestfile);
-                            mainwindow.ClanChestManager.ClearData();
-                            mainwindow.ClanChestManager.BuildData();
+                            ClanManager.Instance.ClanChestManager.ClearData();
+                            ClanManager.Instance.ClanChestManager.BuildData();
                         }
                         catch(Exception ex)
                         {
@@ -80,6 +90,16 @@ namespace TBChestTracker
             }
 
             this.Close();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            FilePicker01.DefaultFolder = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseExportFolderPath;
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+
         }
     }
 }

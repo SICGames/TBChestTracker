@@ -10,6 +10,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TBChestTracker.Managers;
 using Windows.Media.Ocr;
 using Windows.Networking.Proximity;
 
@@ -20,8 +21,6 @@ namespace TBChestTracker
     {
         public List<ClanChestData> clanChestData { get; set; }
 
-        public ClanmateManager ClanmateManager { get; set; }
-
         public Dictionary<String, List<ClanChestData>> ClanChestDailyData;
         
         public ClanChestManager()
@@ -29,13 +28,12 @@ namespace TBChestTracker
 
             clanChestData = new List<ClanChestData>();  
             ClanChestDailyData = new Dictionary<string, List<ClanChestData>>();
-            ClanmateManager = new ClanmateManager(); 
         }
         public void ClearData()
         {
             ClanChestDailyData.Clear();
             clanChestData.Clear();
-            ClanmateManager.Clanmates.Clear();  
+            ClanManager.Instance.ClanmateManager.Clanmates.Clear();
         }
 
         public void RemoveChestData(string clanmatename)
@@ -113,7 +111,7 @@ namespace TBChestTracker
                         if (levelStartPos > 0)
                         {
                             chestobtained = chestobtained.Substring(levelStartPos).ToLower();
-                            
+                            type = ChestType.COMMON;
                             if (chestobtained.Contains("epic"))
                                 type = ChestType.EPIC;
                             else if (chestobtained.Contains("rare"))
@@ -122,8 +120,6 @@ namespace TBChestTracker
                                 type = ChestType.HEROIC;
                             else if (chestobtained.Contains("citadel"))
                                 type = ChestType.CITADEL;
-                            else
-                                type = ChestType.COMMON;
 
                             int level = 0;
 
@@ -132,7 +128,8 @@ namespace TBChestTracker
                                 //--- OCR reads 10 as io.Until perm fix. 
                                 level = 10;
                             }
-                            else if (chestobtained.Contains("-"))
+
+                            if (chestobtained.Contains("-"))
                             {
                                 string ancientlevel = chestobtained.Substring(chestobtained.IndexOf("-") - 2);
                                 ancientlevel = ancientlevel.Substring(0, ancientlevel.IndexOf(" "));
@@ -144,7 +141,6 @@ namespace TBChestTracker
                             {
                                 Regex r = new Regex(@"(\d+)", RegexOptions.Singleline); // new Regex(@"(\d+)(.?|\s)(\d+)");
                                 var match = r.Match(chestobtained);
-
                                 if (match.Success)
                                 {
                                     level = Int32.Parse(match.Value);
@@ -152,7 +148,7 @@ namespace TBChestTracker
                             }
 
                             tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, level)));
-                            var dbg_msg = $"--- ADDING level {level} {type.ToString()} from {clanmate} ----";
+                            var dbg_msg = $"--- ADDING level {level} {type.ToString()}  '{chestName}' from {clanmate} ----";
                             Debug.WriteLine(dbg_msg);
                             Loggy.Write(dbg_msg, LogType.LOG, "chests.log");
                         }
@@ -191,14 +187,14 @@ namespace TBChestTracker
         private void ProcessChestConditions(ref List<ChestData> chestdata)
         {
             //--- if chest requirements are using conditions, we use those conditions. If not, we continue.
-            if (ClanChestSettings.ChestRequirements.useChestConditions)
+            if (ClanManager.Instance.ClanChestSettings.ChestRequirements.useChestConditions)
             {
                 List<ChestData> validated = new List<ChestData>();
 
                 foreach (var ttmpChest in chestdata.ToList())
                 {
                     var isValidated = false;
-                    foreach (var condition in ClanChestSettings.ChestRequirements.ChestConditions)
+                    foreach (var condition in ClanManager.Instance.ClanChestSettings.ChestRequirements.ChestConditions)
                     {
                         var sChestType = ttmpChest.Chest.Type.ToString().ToLower();
 
@@ -269,7 +265,7 @@ namespace TBChestTracker
                 ProcessChestConditions(ref tmpchests);
                 List<ClanChestData> tmpchestdata = await CreateClanChestData(tmpchests);  
 
-                var names = ClanmateManager.Clanmates.Select(n => n.Name);
+                var names = ClanManager.Instance.ClanmateManager.Clanmates.Select(n => n.Name);
 
                 //-- do we need to insert new entry?
                 //-- causes midnight bug.
@@ -295,8 +291,8 @@ namespace TBChestTracker
                     {
                         Debug.WriteLine($"{tmpchest.Clanmate} doesn't exist within clanmates database.");
                         clanChestData.Add(new ClanChestData(tmpchest.Clanmate, tmpchest.chests));
-                        ClanmateManager.Add(tmpchest.Clanmate);
-                        ClanmateManager.Save(ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile);
+                        ClanManager.Instance.ClanmateManager.Add(tmpchest.Clanmate);
+                        ClanManager.Instance.ClanmateManager.Save(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile);
                     }
                     else
                         continue;
@@ -342,14 +338,14 @@ namespace TBChestTracker
         
         public async void BuildData()
         {
-            var clanmatefile = ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile;
-            var clanchestfile = ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile;
-            var chestrequirementfile = ClanDatabaseManager.ClanDatabase.ClanChestRequirementsFile;
+            var clanmatefile = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile;
+            var clanchestfile = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile;
+            var chestrequirementfile = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestRequirementsFile;
 
             string[] clanmates = null;
 
-            if (ClanmateManager.Clanmates != null)
-                ClanmateManager.Clanmates.Clear();
+            if (ClanManager.Instance.ClanmateManager.Clanmates != null)
+                ClanManager.Instance.ClanmateManager.Clanmates.Clear();
 
             if (!System.IO.File.Exists(clanmatefile))
             {
@@ -375,7 +371,7 @@ namespace TBChestTracker
                 {
                     if (!String.IsNullOrEmpty(clanmate))
                     {
-                        ClanmateManager.Add(clanmate);
+                        ClanManager.Instance.ClanmateManager.Add(clanmate);
                     }
                 }
             }
@@ -431,29 +427,33 @@ namespace TBChestTracker
             //-- load chest requirements
             if(!System.IO.File.Exists(chestrequirementfile))
             {
-                if(ClanChestSettings.ChestRequirements == null)
+                if(ClanManager.Instance.ClanChestSettings.ChestRequirements == null)
                 {
-                    ClanChestSettings.ChestRequirements = new ChestRequirements();
-                    ClanChestSettings.InitSettings();   
+                    ClanManager.Instance.ClanChestSettings.ChestRequirements = new ChestRequirements();
+                    ClanManager.Instance.ClanChestSettings.InitSettings();   
                 }
-                ClanChestSettings.SaveSettings(chestrequirementfile);
+                ClanManager.Instance.ClanChestSettings.SaveSettings(chestrequirementfile);
             }
             else
             {
-                if(ClanChestSettings.ChestRequirements == null)
-                    ClanChestSettings.ChestRequirements = new ChestRequirements();
+                if(ClanManager.Instance.ClanChestSettings.ChestRequirements == null)
+                    ClanManager.Instance.ClanChestSettings.ChestRequirements = new ChestRequirements();
 
-                ClanChestSettings.LoadSettings(chestrequirementfile);
+                ClanManager.Instance.ClanChestSettings.LoadSettings(chestrequirementfile);
             }
 
             return;
         }
 
-        public void SaveData()
+        public void SaveData(string filepath = "")
         {
             //-- write to file.
+            string file = String.Empty;
+            if (String.IsNullOrEmpty(filepath))
+                file = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile;
+            else
+                file = filepath;
 
-            string file = ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile;
             try
             {
                 using (var sw = File.CreateText(file))
@@ -472,7 +472,7 @@ namespace TBChestTracker
         public void CreateBackup()
         {
             DateTimeOffset dateTimeOffset = DateTimeOffset.Now;
-            string file = $"{ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath}//clanchest_backup_{dateTimeOffset.ToUnixTimeSeconds()}.db";
+            string file = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath}//clanchest_backup_{dateTimeOffset.ToUnixTimeSeconds()}.db";
             try
             {
                 using (var sw = File.CreateText(file))
@@ -492,8 +492,8 @@ namespace TBChestTracker
         {
             return Task.Run(()=>SaveData());
         }
-        public Task ExportDataAsync(string filename, SortType sortType) => Task.Run(() =>  ExportData(filename, sortType));
-        public void ExportData(string filename, SortType sortType = SortType.NONE)
+        public Task ExportDataAsync(string filename, int chest_points_value, SortType sortType) => Task.Run(() =>  ExportData(filename, chest_points_value, sortType));
+        public void ExportData(string filename, int chest_points_value = 0, SortType sortType = SortType.NONE)
         {
             if(!String.IsNullOrEmpty(filename)) 
             {
@@ -504,9 +504,11 @@ namespace TBChestTracker
                     header += "--------------------------------------------";
                     sw.WriteLine(header);
 
+                    
+
                     var count = 0;
                     List<ChestCountData> chestcountdata = new List<ChestCountData>();
-                    foreach (var clanmate in ClanmateManager.Clanmates)
+                    foreach (var clanmate in ClanManager.Instance.ClanmateManager.Clanmates)
                     {
                         chestcountdata.Add(new ChestCountData(clanmate.Name, 0));
                     }
@@ -552,10 +554,29 @@ namespace TBChestTracker
                         chestcountdata = sortedChestCountData;
                     }
 
+                    //-- add clan total percentage 
+                    var num_clanmates = ClanManager.Instance.ClanmateManager.Clanmates.Count;
+                    var num_clanmates_gifts = 0;
+                    foreach(var chest in chestcountdata)
+                    {
+                        if(chest.Count > 0)
+                        {
+                            num_clanmates_gifts += 1;
+                        }
+                    }
+                    var clanmates_chests_percent = ((double)num_clanmates_gifts / num_clanmates * 100.0);
+                    var statistics_message = $"Total Percentage of clan gifts: {clanmates_chests_percent}%\r\n";
+                    statistics_message += "--------------------------------------------";
+                    sw.WriteLine(statistics_message);
+
+
                     foreach (var chestcount in chestcountdata)
                     {
                         //--- 180 chests bug. Game doesn't like 180 number posted. Not sure why.
                         var chests = chestcount.Count == 180 ? chestcount.Count+1 : chestcount.Count;
+                        if (chest_points_value > 0 && chests > 0)
+                            chests += chest_points_value;
+
                         var content = $"{chestcount.Clanmate} - {chests} Chests";
                         sw.WriteLine(content);
                     }

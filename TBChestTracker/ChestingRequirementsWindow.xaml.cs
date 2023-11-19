@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TBChestTracker.Managers;
 
 namespace TBChestTracker
 {
@@ -22,10 +23,10 @@ namespace TBChestTracker
         public ChestingRequirementsWindow()
         {
             InitializeComponent();
-            if(ClanChestSettings.ChestRequirements ==  null) 
-                ClanChestSettings.InitSettings();
+            if(ClanManager.Instance.ClanChestSettings.ChestRequirements ==  null)
+                ClanManager.Instance.ClanChestSettings.InitSettings();
 
-            this.DataContext = ClanChestSettings.ChestRequirements;
+            this.DataContext = ClanManager.Instance.ClanChestSettings.ChestRequirements;
         }
 
         private void AddConditionBtn_Click(object sender, RoutedEventArgs e)
@@ -50,8 +51,8 @@ namespace TBChestTracker
         private void ApplyBtn_Click(object sender, RoutedEventArgs e)
         {
             //-- make changes.
-            var clanchestsettings = ClanDatabaseManager.ClanDatabase.ClanChestRequirementsFile;
-            ClanChestSettings.SaveSettings(clanchestsettings);
+            var clanchestsettings = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestRequirementsFile;
+            ClanManager.Instance.ClanChestSettings.SaveSettings(clanchestsettings);
             this.Close();
         }
 

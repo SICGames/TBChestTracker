@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TBChestTracker.Managers;
 
 namespace TBChestTracker
 {
@@ -25,7 +26,6 @@ namespace TBChestTracker
     {
 
         CollectionViewSource viewSource { get; set; }
-        public MainWindow MainWindow { get; set; }
         public bool clanmatesAdded { get; set; }
         public string previous_Clanmate_Name { get; set; }
 
@@ -41,8 +41,8 @@ namespace TBChestTracker
             var name = clanmatenameBox.Text;
             if(e.Key == Key.Enter)
             {
-                MainWindow.ClanChestManager.ClanmateManager.Add(name);
-
+                //-- ClanManager will handle everything now.
+                ClanManager.Instance.ClanmateManager.Add(name);
                 clanmatenameBox.Text = "";
                 clanmatesAdded = true;
             }
@@ -57,8 +57,10 @@ namespace TBChestTracker
                 openFileDialog.Filter = "Text Files | *.txt | DB Files | *.db";
                 if(openFileDialog.ShowDialog() ==  true)
                 {
-                    MainWindow.ClanChestManager.ClanmateManager.ImportFromFileAsync(openFileDialog.FileName);
-                    //ListClanMates01.ItemsSource = MainWindow.ClanChestManager.ClanmateManager.Clanmates;
+                    ClanManager.Instance.ClanmateManager.ImportFromFileAsync(openFileDialog.FileName);
+                    ClanManager.Instance.ClanmateManager.UpdateCount();
+                    //MainWindow.ClanChestManager.ClanmateManager.ImportFromFileAsync(openFileDialog.FileName);
+                    //MainWindow.ClanChestManager.ClanmateManager.UpdateCount();
                     clanmatesAdded =true;
                 }
             }
@@ -74,18 +76,24 @@ namespace TBChestTracker
 
         private void OkayButton_Click(object sender, RoutedEventArgs e)
         {
-            var clanmatefile = ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile;
-
+            var clanmatefile = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile;//ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile;
+            ClanManager.Instance.ClanmateManager.Save(clanmatefile);
+            ClanManager.Instance.ClanChestManager.BuildData();  
+            /*
             MainWindow.ClanChestManager.ClanmateManager.Save(clanmatefile);
             MainWindow.ClanChestManager.BuildData();    
+            */
+
             this.Close();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.DataContext = MainWindow.ClanChestManager.ClanmateManager;
-            
-            ListClanMates01.ItemsSource = MainWindow.ClanChestManager.ClanmateManager.Clanmates;
+            this.DataContext = ClanManager.Instance.ClanmateManager; //MainWindow.ClanChestManager.ClanmateManager;
+
+            ListClanMates01.ItemsSource = ClanManager.Instance.ClanmateManager.Clanmates; // MainWindow.ClanChestManager.ClanmateManager.Clanmates;
+            ClanManager.Instance.ClanmateManager.UpdateCount();
+            //MainWindow.ClanChestManager.ClanmateManager.UpdateCount();
             CollectionViewSource.GetDefaultView(ListClanMates01.ItemsSource).Filter = filter_clanmate;
             //--- reporting duplicates after adding new entry, saving and reopening this window.
         }
@@ -130,13 +138,12 @@ namespace TBChestTracker
 
                     foreach (var c in removalList.ToList())
                     {
-                        MainWindow.ClanChestManager.RemoveChestData(c.Name);
-                        MainWindow.ClanChestManager.ClanmateManager.Remove(c.Name);
-                        
+                        ClanManager.Instance.ClanChestManager.RemoveChestData(c.Name);
+                        ClanManager.Instance.ClanmateManager.Remove(c.Name);
                     }
                     removalList.Clear();
                     removalList = null;
-                    //ListClanMates01.ItemsSource = MainWindow.ClanmateManager.Clanmates;
+                    ClanManager.Instance.ClanmateManager.UpdateCount();
                 }
             }
         }
@@ -177,10 +184,10 @@ namespace TBChestTracker
                
                 //-- clanmate name changed.
                 var oldclanmateIndex = 0;
-                if (MainWindow.ClanChestManager.ClanChestDailyData.Count() > 0)
+                if (ClanManager.Instance.ClanChestManager.ClanChestDailyData.Count() > 0)
                 {
-                    oldclanmateIndex = MainWindow.ClanChestManager.clanChestData.FindIndex(n => n.Clanmate.Equals(previous_Clanmate_Name));
-                    foreach (var date in MainWindow.ClanChestManager.ClanChestDailyData.ToList())
+                    oldclanmateIndex = ClanManager.Instance.ClanChestManager.clanChestData.FindIndex(n => n.Clanmate.Equals(previous_Clanmate_Name));
+                    foreach (var date in ClanManager.Instance.ClanChestManager.ClanChestDailyData.ToList())
                     {
                         var newdata = date.Value.Where(name => name.Clanmate.Equals(clanmate_newname, StringComparison.CurrentCultureIgnoreCase)).ToList();
                         List<ClanChestData> clandata = new List<ClanChestData>();
@@ -193,14 +200,14 @@ namespace TBChestTracker
                         date.Value.RemoveAll(n => n.Clanmate.Equals(clanmate_newname, StringComparison.CurrentCultureIgnoreCase));
                     }
                     
-                    foreach (var clanmates in MainWindow.ClanChestManager.ClanmateManager.Clanmates.ToList())
+                    foreach (var clanmates in ClanManager.Instance.ClanmateManager.Clanmates.ToList())
                     {
                         if(clanmates.Name.Equals(clanmate_newname, StringComparison.CurrentCultureIgnoreCase))
                         {
-                            MainWindow.ClanChestManager.ClanmateManager.Clanmates.Remove(clanmates);
+                            ClanManager.Instance.ClanmateManager.Clanmates.Remove(clanmates);
                         }
                     }
-                    foreach(var date in MainWindow.ClanChestManager.ClanChestDailyData.ToList() )
+                    foreach(var date in ClanManager.Instance.ClanChestManager.ClanChestDailyData.ToList() )
                     {
                         var data = date.Value.Where(name => name.Clanmate.Equals(previous_Clanmate_Name, StringComparison.CurrentCultureIgnoreCase)).ToList();
                         foreach (var d in data)
@@ -224,9 +231,9 @@ namespace TBChestTracker
                 }
 
                 //-- now update clanchestdata.
-                if (MainWindow.ClanChestManager.clanChestData.Count() > 0)
+                if (ClanManager.Instance.ClanChestManager.clanChestData.Count() > 0)
                 {
-                    foreach (var clanchest in MainWindow.ClanChestManager.clanChestData.ToList())
+                    foreach (var clanchest in ClanManager.Instance.ClanChestManager.clanChestData.ToList())
                     {
                         if (clanchest.Clanmate.Equals(previous_Clanmate_Name, StringComparison.CurrentCultureIgnoreCase))
                             clanchest.Clanmate = clanmate_newname;
@@ -239,7 +246,7 @@ namespace TBChestTracker
                 previous_clanmatestatistic_data.Clear();
                 previous_clanmatestatistic_data = null;
 
-                MainWindow.ClanChestManager.SaveData();
+                ClanManager.Instance.ClanChestManager.SaveData();
 
                 Debug.WriteLine($"{previous_Clanmate_Name} changed to {clanmate_newname}");
             }
@@ -254,6 +261,12 @@ namespace TBChestTracker
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
 
+        }
+
+        private void VerifyClanmates_Click(object sender, RoutedEventArgs e)
+        {
+            ClanmateVerificationWindow window = new ClanmateVerificationWindow();   
+            window.ShowDialog();
         }
     }
 }

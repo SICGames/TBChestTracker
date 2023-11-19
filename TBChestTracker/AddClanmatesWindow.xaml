@@ -29,6 +29,7 @@
             <RowDefinition Height="32"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="32"/>
+            <RowDefinition Height="32"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -52,6 +53,8 @@
                            ToolTip="Delete selected clanmates" 
                            Margin="5,0,0,0"
                            PreviewMouseDown="DeleteSelectedItems_PreviewMouseDown"/>
+                    <Separator/>
+                    <Button Content="V" Height="20" Width="20" x:Name="VerifyClanmates" ToolTip="Verify Clanmates" Margin="5,0" Click="VerifyClanmates_Click"/>
                 </ToolBar>
             </ToolBarPanel>
         </StackPanel>
@@ -67,6 +70,7 @@
                 <Image Source="Images/searchIcon-gray.png" Height="16" Width="16" HorizontalAlignment="Right" Margin="0,0,10,0"/>
             </Grid>
         </Grid>
+        
         <Grid Grid.Row="2" Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -82,7 +86,11 @@
                 </ListBox>
             </DockPanel>
         </Grid>
-        <DockPanel Grid.Column="0" Grid.Row="3" Background="#ddddddff">
+        <StackPanel Orientation="Horizontal" Margin="5" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right">
+            <TextBlock Text="{Binding Count, Mode=TwoWay}" Margin="5,0" TextAlignment="Center" VerticalAlignment="Center" FontSize="10"/>
+            <TextBlock Text="Clanmates" Margin="5,0" VerticalAlignment="Center" FontWeight="Medium" FontSize="10"/>
+        </StackPanel>
+        <DockPanel Grid.Column="0" Grid.Row="4" Background="#ddddddff">
             <Button x:Name="OkayButton" Height="24" Width="64" Content="Save" HorizontalAlignment="Right" Margin="0,0,25,0" IsEnabled="{Binding clanmatesAdded, Mode=TwoWay}" Click="OkayButton_Click"/>
         </DockPanel>
     </Grid>

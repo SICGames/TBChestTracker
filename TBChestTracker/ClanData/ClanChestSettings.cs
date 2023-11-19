@@ -11,11 +11,11 @@ using System.Windows.Media;
 
 namespace TBChestTracker
 {
-    internal class ClanChestSettings
+    public class ClanChestSettings
     {
-        private static ChestRequirements pChestRequirements  = null;
+        private ChestRequirements pChestRequirements  = null;
 
-        public static ChestRequirements ChestRequirements 
+        public ChestRequirements ChestRequirements 
         { 
             get
             {
@@ -39,17 +39,17 @@ namespace TBChestTracker
             if(ChestRequirements == null)
                 ChestRequirements = new ChestRequirements();
         }
-        public static void Clear()
+        public void Clear()
         {
             ChestRequirements.ChestConditions.Clear();
         }
-        public static void InitSettings()
+        public void InitSettings()
         {
             ChestRequirements.useChestConditions = false;
             ChestRequirements.useNoChestConditions = true;
             ChestRequirements.ChestConditions = new System.Collections.ObjectModel.ObservableCollection<ChestConditions>();
         }
-        public static bool LoadSettings(string file)
+        public bool LoadSettings(string file)
         {
             using (StreamReader sr = File.OpenText(file))
             {
@@ -63,10 +63,8 @@ namespace TBChestTracker
                 else
                     return false;
             }
-
-            return true;
         }
-        public static void SaveSettings(string file)
+        public void SaveSettings(string file)
         {
             using (System.IO.StreamWriter sw = System.IO.File.CreateText(file))
             {

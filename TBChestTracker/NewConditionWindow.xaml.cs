@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TBChestTracker.Managers;
 
 namespace TBChestTracker
 {
@@ -31,7 +32,7 @@ namespace TBChestTracker
             chestcondition.ChestType = ChestTypeCondition.Text;
             chestcondition.Comparator = ComparatorCondition.Text;
             chestcondition.level = Int32.Parse(ChestLevelCondition.Text);
-            ClanChestSettings.ChestRequirements.ChestConditions.Add(chestcondition);
+            ClanManager.Instance.ClanChestSettings.ChestRequirements.ChestConditions.Add(chestcondition);
             this.Close();
         }
     }

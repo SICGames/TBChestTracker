@@ -236,7 +236,7 @@
         <DockPanel Grid.Row="0" LastChildFill="True">
             <Menu DockPanel.Dock="Top" Height="auto" VerticalAlignment="Top">
                 <MenuItem Header="File">
-                    <MenuItem Header="Clan Manager" x:Name="ClanManager" Command="Commands:CustomCommandBindings.ClanManager"/>
+                    <MenuItem Header="Clan Manager" x:Name="ClanManagerMenuItem" Command="Commands:CustomCommandBindings.ClanManager"/>
                     
                     <Separator/>
                     <MenuItem Header="Load Clan Database" x:Name="LoadClanDB" Command="Commands:CustomCommandBindings.LoadClanDatabase"/>

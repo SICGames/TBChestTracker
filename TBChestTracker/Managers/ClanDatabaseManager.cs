@@ -17,8 +17,8 @@ namespace TBChestTracker
     
     public class ClanDatabaseManager
     {
-        private static ClanDatabase _clandatabase = null;
-        public static ClanDatabase ClanDatabase
+        private ClanDatabase _clandatabase = null;
+        public ClanDatabase ClanDatabase
         {
             get
             {
@@ -36,19 +36,19 @@ namespace TBChestTracker
             }
         }
 
-        public static void Save()
+        public void Save()
         {
-            var saveFilePath = $"{ClanDatabaseManager.ClanDatabase.ClanFolderPath}\\clan.cdb";
+            var saveFilePath = $"{ClanDatabase.ClanFolderPath}\\clan.cdb";
             using (System.IO.StreamWriter sw = System.IO.File.CreateText(saveFilePath))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Formatting = Formatting.Indented;
-                serializer.Serialize(sw, ClanDatabaseManager.ClanDatabase);
+                serializer.Serialize(sw, ClanDatabase);
                 sw.Close();
                 sw.Dispose();
             }
         }
-        public static void Load(string file, ClanChestManager m_ClanChestManager, Action<bool> result)
+        public void Load(string file, ClanChestManager m_ClanChestManager, Action<bool> result)
         {
             m_ClanChestManager.ClearData();
 

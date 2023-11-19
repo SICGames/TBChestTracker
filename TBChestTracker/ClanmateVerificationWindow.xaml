@@ -1,0 +1,33 @@
+﻿<Window x:Class="TBChestTracker.ClanmateVerificationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TBChestTracker"
+        mc:Ignorable="d"
+        Title="Clanmate Verification" Height="450" SizeToContent="Width" Topmost="True" WindowStartupLocation="CenterScreen" Closing="Window_Closing" Loaded="Window_Loaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="45"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="32"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Height="24" VerticalAlignment="Top" Margin="10" Grid.Row="0">
+            <TextBlock Text="Verification clanmate file" VerticalAlignment="Center" Margin="5,0"/>
+            <TextBox x:Name="VerificationClanmateFile01" Text="{Binding VerificationFile, Mode=TwoWay}" Width="255" Height="20" PreviewMouseDown="VerificationClanmateFile01_PreviewMouseDown"/>
+            <Button x:Name="VerifyButton" Content="Verify" Height="20" Width="75" Margin="10,0" Click="VerifyButton_Click"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Orientation="Vertical">
+            <TextBlock Text="The names below will be removed from clanmate database." FontWeight="Bold" Foreground="Red" Margin="5"/>
+            <ListBox x:Name="ClanmatesDifferenceList" Height="320" ItemsSource="{Binding noClanmateExistsList, Mode=TwoWay}"/>
+        </StackPanel>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
+            <CheckBox Grid.Column="0" Content="Create Backup" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="15,0" IsChecked="{Binding CreateBackup, Mode=TwoWay}"/>
+            <Button Grid.Column="1" HorizontalAlignment="Right" Margin="25,0" Content="Proceed" Height="20" Width="75" x:Name="ProceedBtn" Click="ProceedBtn_Click"/>
+        </Grid>
+    </Grid>
+</Window>
