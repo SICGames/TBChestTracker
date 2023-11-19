@@ -34,6 +34,7 @@ using System.ComponentModel;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Navigation;
+using TBChestTracker.Helpers;
 
 namespace TBChestTracker
 {
@@ -75,9 +76,7 @@ namespace TBChestTracker
         }
 
         List<string> recently_opened_files { get; set; }
-
-
-        Tesseract tessy { get; set; }
+        
         #endregion
 
         #region PropertyChanged Event
@@ -105,7 +104,7 @@ namespace TBChestTracker
 
         #region Image Processing Functions & Other Related Functions
 
-        private Task<String[]> GetTextFromBitmap(System.Drawing.Bitmap bitmap)
+        private Task<TessResult> GetTextFromBitmap(System.Drawing.Bitmap bitmap)
         {
             Image<Gray, Byte> image = null;
             Image<Gray, Byte> imageOut = null;
@@ -126,20 +125,8 @@ namespace TBChestTracker
                 bitmapOut = imageOut.AsBitmap();
             }
             bitmapOut.Save("test-out-image-bw.jpg", ImageFormat.Jpeg);
-            tessy.SetImage(imageOut);
-            tessy.Recognize();
-            
-            var result = tessy.GetUTF8Text();
-            result = result.Replace("\r\n", ",");
-            string[] results = result.Split(',');
-            List<String> ocrResults = new List<string>();
-            foreach(var r in results.ToList())
-            {
-                if(!String.IsNullOrEmpty(r))
-                {
-                    ocrResults.Add(r);
-                }
-            }
+            var ocrResult = TesseractHelper.Read(imageOut);
+
             bitmapOut.Dispose();
             bitmapOut = null;
 
@@ -147,10 +134,9 @@ namespace TBChestTracker
             imageOut = null;
             image.Dispose();
             image = null;
-            results = null;
-
-            return Task.FromResult(ocrResults.ToArray());
+            return Task.FromResult(ocrResult);
         }
+
         private async Task<OcrResult> GetTextFromBitmap(System.Drawing.Bitmap bitmap, Language language)
         {
             Image<Gray, Byte> image = null;
@@ -408,44 +394,12 @@ namespace TBChestTracker
             e.ScreenCapturedBitmap.Dispose();
             
             if (CaptureMode == CaptureMode.CHESTS)
-                ClanChestManager.ProcessChestData(ocrResult);
+                ClanChestManager.ProcessChestData(ocrResult.Words);
             
         }
         #endregion
 
-        #region Tesseract Loading Languages Functions
-        private Task LoadSpecficTesseractLanguagesAsync(string combined_languages) => Task.Run(() => LoadSpecficTesseractLanguages(combined_languages));    
-        private void LoadSpecficTesseractLanguages(string combined_languages)
-        {
-            tessy = new Tesseract(GlobalDeclarations.TesseractData, combined_languages, OcrEngineMode.Default);
-        }
-        private Task LoadAllTesseractLanguagesAsync() => Task.Run(() => LoadAllTesseractLanguages());   
-        private void LoadAllTesseractLanguages()
-        {
-
-            var tessdatafiles = System.IO.Directory.GetFiles(GlobalDeclarations.TesseractData, "*.traineddata");
-            StringBuilder languages = new StringBuilder();
-            for (var x = 0; x < tessdatafiles.Length - 1; x++)
-            {
-                var file = tessdatafiles[x];
-                file = file.Substring(file.LastIndexOf(@"\") + 1);
-                var language = file.Substring(0, file.LastIndexOf('.'));
-                if (x != tessdatafiles.Length - 1)
-                    languages.Append($"{language}+");
-                else
-                    languages.Append($"{language}");
-            }
-
-            //--- startup time takes longer when loading all languages inside tesseract.
-            //--- future, have selectable languages and option to have all languages loaded. 
-            // - "eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus"
-            tessy = new Tesseract(GlobalDeclarations.TesseractData, languages.ToString(), OcrEngineMode.Default);
-            languages = null;
-            tessdatafiles = null;
-            Debug.WriteLine($"All Tesseract Trained data has been successfully loaded.");
-        }
-        #endregion
-
+     
         #region Main Window Functions
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -510,7 +464,7 @@ namespace TBChestTracker
             if (System.IO.Directory.Exists(GlobalDeclarations.TesseractData))
             {
                 GlobalDeclarations.TessDataExists = true;
-                await LoadSpecficTesseractLanguagesAsync("eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus");
+                await TesseractHelper.InitAsync(GlobalDeclarations.TesseractData, "eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus");
             }
             else
             {
@@ -529,8 +483,7 @@ namespace TBChestTracker
             }
             ClanChestManager.ClearData();
             ClanChestSettings.Clear();
-            if(tessy != null) 
-                tessy.Dispose();
+            TesseractHelper.Destroy();
 
         }
 

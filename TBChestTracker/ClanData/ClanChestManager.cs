@@ -57,11 +57,26 @@ namespace TBChestTracker
             SaveData();
             return;
         }
-        private Task<List<ChestData>> ProcessText(string[] result)
+        private Task<List<ChestData>> ProcessText(List<String> result)
         {
             List<ChestData> tmpchests = new List<ChestData>();
 
-            for (var x = 0; x < result.Length; x += 3)
+            //-- quick filter. 
+            //-- in Triumph Chests, divider creates dirty characters. 
+            
+            foreach(var data in result.ToList())
+            {
+                if (data.ToLower().Contains("chest") || data.ToLower().Contains("from:") || data.ToLower().Contains("source:"))
+                    continue;
+                else
+                {
+                    var dbg_msg = $"---- Successfully removed '{data}' invalid data from OCR results.";
+                    Debug.WriteLine(dbg_msg);
+                    result.Remove(data);
+                }
+            }
+
+            for (var x = 0; x < result.Count; x += 3)
             {
                 var word = result[x];
                 if (word == null)
@@ -93,11 +108,12 @@ namespace TBChestTracker
                     if (chestobtained.Contains("Source:"))
                     {
                         var levelStartPos = chestobtained.IndexOf("Level");
+                        ChestType type = ChestType.COMMON;
+
                         if (levelStartPos > 0)
                         {
                             chestobtained = chestobtained.Substring(levelStartPos).ToLower();
-                            ChestType type = ChestType.COMMON;
-
+                            
                             if (chestobtained.Contains("epic"))
                                 type = ChestType.EPIC;
                             else if (chestobtained.Contains("rare"))
@@ -136,44 +152,34 @@ namespace TBChestTracker
                             }
 
                             tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, level)));
+                            var dbg_msg = $"--- ADDING level {level} {type.ToString()} from {clanmate} ----";
+                            Debug.WriteLine(dbg_msg);
+                            Loggy.Write(dbg_msg, LogType.LOG, "chests.log");
                         }
                         else
                         {
+                            chestobtained = chestobtained.ToLower();
+                            type = ChestType.OTHER;
+
                             if (chestobtained.Contains("arena"))
-                            {
-                                tmpchests.Add(new ChestData(clanmate, new Chest(chestName, ChestType.ARENA, 5)));
-                                continue;
-                            }
+                                type = ChestType.ARENA;
                             else if (chestobtained.Contains("bank"))
-                            {
-                                tmpchests.Add(new ChestData(clanmate, new Chest(chestName, ChestType.BANK, 0)));
-                                continue;
-                            }
+                                type = ChestType.BANK;
                             else if (chestobtained.Contains("union"))
-                            {
-                                tmpchests.Add(new ChestData(clanmate, new Chest(chestName, ChestType.UNION_TRIUMPH, 0)));
-                                continue;
-                            }
+                                type = ChestType.UNION_TRIUMPH;
                             else if (chestobtained.Contains("mimic"))
-                            {
-                                tmpchests.Add(new ChestData(clanmate, new Chest(chestName, ChestType.MIMIC, 0)));
-                                continue;
-                            }
+                                type = ChestType.MIMIC;
                             else if (chestobtained.Contains("rise"))
-                            {
-                                tmpchests.Add(new ChestData(clanmate, new Chest(chestName, ChestType.ANCIENT_EVENT, 0)));
-                            }
+                                type = ChestType.ANCIENT_EVENT;
                             else if (chestobtained.Contains("story"))
-                            {
-                                tmpchests.Add(new ChestData(clanmate, new Chest(chestName, ChestType.STORY, 0)));
-                            }
+                                type = ChestType.STORY;
                             else if (chestobtained.Contains("wealth"))
-                                tmpchests.Add(new ChestData(clanmate, new Chest(chestName, ChestType.WEALTH, 0)));
-                            else
-                            {
-                                //-- good chance this could be an uncounted chest.
-                                tmpchests.Add(new ChestData(clanmate, new Chest(chestName, ChestType.OTHER, 0)));
-                            }
+                                type = ChestType.WEALTH;
+                            
+                            var dbg_msg = $"--- ADDING ({chestName}) {type.ToString()} Chest from {clanmate} ----";
+                            tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, 0)));
+                            Debug.WriteLine($"{dbg_msg}");
+                            Loggy.Write(dbg_msg, LogType.LOG,"chests.log");
                         }
                     }
                 }
@@ -203,8 +209,9 @@ namespace TBChestTracker
                                 if (ttmpChest.Chest.Level >= condition.level)
                                 {
                                     validated.Add(new ChestData(ttmpChest.Clanmate, ttmpChest.Chest));
-                                    Debug.WriteLine($"[[Level {ttmpChest.Chest.Level} ({ttmpChest.Chest.Type.ToString()}) {ttmpChest.Chest.Name} from {ttmpChest.Clanmate} validated.]]");
-                                    Loggy.Write($"[[Level {ttmpChest.Chest.Level} ({ttmpChest.Chest.Type.ToString()}) {ttmpChest.Chest.Name} from {ttmpChest.Clanmate} validated.]]", LogType.LOG);
+                                    var dbg_msg = $"[[Level {ttmpChest.Chest.Level} ({ttmpChest.Chest.Type.ToString()}) {ttmpChest.Chest.Name} from {ttmpChest.Clanmate} validated.]]";
+                                    Debug.WriteLine(dbg_msg);
+                                    Loggy.Write(dbg_msg, LogType.LOG, "chests.log");
 
                                     isValidated = true;
                                 }
@@ -242,7 +249,7 @@ namespace TBChestTracker
             return Task.FromResult(clanChestData);
         }
 
-        public async void ProcessChestData(string[] result)
+        public async void ProcessChestData(List<string> result)
         {
 
             /*
