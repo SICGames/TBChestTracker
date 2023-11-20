@@ -55,7 +55,7 @@ namespace TBChestTracker
             SaveData();
             return;
         }
-        private Task<List<ChestData>> ProcessText(List<String> result)
+        private List<ChestData> ProcessText(List<String> result)
         {
             List<ChestData> tmpchests = new List<ChestData>();
 
@@ -147,6 +147,10 @@ namespace TBChestTracker
                                 }
                             }
 
+                            //--- shouldn't be 0. Normally happens 1st chest that is a level 5. 
+                            if (level == 0)
+                                level = 5;
+
                             tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, level)));
                             var dbg_msg = $"--- ADDING level {level} {type.ToString()}  '{chestName}' from {clanmate} ----";
                             Debug.WriteLine(dbg_msg);
@@ -181,7 +185,7 @@ namespace TBChestTracker
                 }
             }
 
-            return Task.FromResult(tmpchests);
+            return tmpchests;
         }
 
         private void ProcessChestConditions(ref List<ChestData> chestdata)
@@ -225,7 +229,7 @@ namespace TBChestTracker
             }
             
         }
-        private Task<List<ClanChestData>> CreateClanChestData(List<ChestData> chestdata)
+        private List<ClanChestData> CreateClanChestData(List<ChestData> chestdata)
         {
             List<ClanChestData> clanChestData = new List<ClanChestData>();
             var clanmates = chestdata.GroupBy(clanmate => clanmate.Clanmate);
@@ -242,7 +246,7 @@ namespace TBChestTracker
                 }
                 clanChestData.Add(clanchestdata);
             }
-            return Task.FromResult(clanChestData);
+            return clanChestData;
         }
 
         public async void ProcessChestData(List<string> result)
@@ -261,9 +265,9 @@ namespace TBChestTracker
             if (!resulttext[0].Contains("No gifts"))
             {
                 GlobalDeclarations.isAnyGiftsAvailable = true;
-                List<ChestData> tmpchests = await ProcessText(resulttext);
+                List<ChestData> tmpchests = ProcessText(resulttext);
                 ProcessChestConditions(ref tmpchests);
-                List<ClanChestData> tmpchestdata = await CreateClanChestData(tmpchests);  
+                List<ClanChestData> tmpchestdata = CreateClanChestData(tmpchests);  
 
                 var names = ClanManager.Instance.ClanmateManager.Clanmates.Select(n => n.Name);
 

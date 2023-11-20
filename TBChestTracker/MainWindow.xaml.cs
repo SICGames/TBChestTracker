@@ -5,9 +5,6 @@ using System.Windows;
 using System.Windows.Documents;
 using Windows.Globalization;
 using Windows.Graphics.Imaging;
-using Windows.Media.Ocr;
-using Windows.Storage;
-using Windows.Storage.Streams;
 using System.Threading.Tasks;
 
 using Emgu;
@@ -55,7 +52,8 @@ namespace TBChestTracker
         System.Threading.Thread InputHookThread { get; set; }
         System.Threading.Thread AutomationThread { get; set; }
         CaptureMode CaptureMode { get; set; }
-        
+        bool isAutomationBusy = false;
+        int captureCounter = 0;
         public ClanManager ClanManager { get; private set; }
 
         //public ClanChestManager ClanChestManager { get; set; }
@@ -92,6 +90,7 @@ namespace TBChestTracker
         }
         #endregion
 
+        #region MainWindow()
         public MainWindow()
         {
             InitializeComponent();
@@ -101,6 +100,7 @@ namespace TBChestTracker
 
             
         }
+        #endregion
 
         #region Image Processing Functions & Other Related Functions
 
@@ -136,58 +136,6 @@ namespace TBChestTracker
             image = null;
             return Task.FromResult(ocrResult);
         }
-
-        private async Task<OcrResult> GetTextFromBitmap(System.Drawing.Bitmap bitmap, Language language)
-        {
-            Image<Gray, Byte> image = null;
-            Image<Gray, Byte> imageOut = null;
-            System.Drawing.Bitmap bitmapOut = null;
-            OcrResult result = null;
-            var brightness = 0.0d;
-            if (CaptureMode == CaptureMode.CLANMATES)
-            {
-                brightness = 0.5d;
-                image = bitmap.ToImage<Gray, Byte>();
-                imageOut = image.Mul(brightness) + brightness;
-                bitmapOut = imageOut.AsBitmap();
-            }
-            else
-            {
-                brightness = CLANCHEST_IMAGE_BRIGHTNESS;
-                image = bitmap.ToImage<Gray, Byte>();
-                imageOut = image.Mul(brightness) + brightness;
-                bitmapOut = imageOut.AsBitmap();
-            }
-
-            bitmapOut.Save("test-out-image-bw.jpg", ImageFormat.Jpeg);
-            using (var stream = new Windows.Storage.Streams.InMemoryRandomAccessStream())
-            {
-
-                bitmapOut.Save(stream.AsStream(), ImageFormat.Bmp);
-                var decoder = await Windows.Graphics.Imaging.BitmapDecoder.CreateAsync(stream).AsTask(); //-- Can not find component exception when size is == 0.
-                var bitmapSoftware = await decoder.GetSoftwareBitmapAsync();
-
-                var engine = OcrEngine.TryCreateFromUserProfileLanguages();
-                var ocrResult = await engine.RecognizeAsync(bitmapSoftware);
-                result = ocrResult;
-
-                //--- clean up
-                ocrResult = null;
-                engine = null;
-                bitmapSoftware.Dispose();
-                bitmapSoftware = null;
-                decoder = null;
-                stream.Dispose();
-            }
-
-            bitmapOut.Dispose();
-            bitmapOut = null;
-            imageOut.Dispose();
-            imageOut = null;
-            image.Dispose();
-            image = null;
-            return result;
-        }
         private void CaptureRegion()
         {
             //-- now everything is completely manual when capturing. CLI C++ doesn't do any while loop.
@@ -214,12 +162,6 @@ namespace TBChestTracker
 
         public void CaptureClanmates()
         {
-            var language = new Language("en");
-            if (!OcrEngine.IsLanguageSupported(language))
-            {
-                throw new Exception($"{language.ToString()} is not supported.");
-            }
-
             //-- now everything is completely manual when capturing. CLI C++ doesn't do any while loop.
             int sh = Snapture.ScreenHeight;
             int sw = Snapture.ScreenWidth;
@@ -239,32 +181,11 @@ namespace TBChestTracker
 
             Snapture.CaptureRegion(left, top, width, height);
         }
-        private void ProcessClanmates(OcrResult result)
-        {
-            var tmpclanmates = new List<Clanmate>();
-            foreach(var word in result.Lines)
-            {
-                Debug.WriteLine(word.Text);
-
-            }
-
-            /*
-            for(var x = 0; x < result.Lines.Count; x+=2)
-            {
-                var word = result.Lines[x].Text;
-                var clanmatename = result.Lines[x + 1].Text;
-                tmpclanmates.Add(new Clanmate(clanmatename));
-
-            }
-            foreach(var clanmatename in tmpclanmates)
-            {
-                Debug.WriteLine(clanmatename.Name);
-            }
-            */
-        }
+       
         #endregion
 
-        #region Automation Functions
+
+        #region Start Automation Thread
         void StartAutomationThread()
         {
             stopAutomation = false;
@@ -275,22 +196,9 @@ namespace TBChestTracker
 
             }));
         }
-        void StopAutomation()
-        {
-            stopAutomation = true;
-            GlobalDeclarations.AuotmationRunning = false;
+        #endregion
 
-            ClanManager.Instance.ClanChestManager.SaveDataTask();
-            ClanManager.Instance.ClanChestManager.CreateBackup();
-            //ClanChestManager.CreateBackup();
-
-            Debug.WriteLine("Automation Stopped.");
-        }
-
-        bool isAutomationBusy = false;
-        
-        int captureCounter = 0;
-
+        #region StartAutomation 
         void StartAutomationProcess()
         {
             //--- take snapshot.
@@ -336,6 +244,20 @@ namespace TBChestTracker
                 automatorClicks = 1;
             }
 
+        }
+        #endregion
+
+        #region StopAutomation
+        void StopAutomation()
+        {
+            stopAutomation = true;
+            GlobalDeclarations.AuotmationRunning = false;
+
+            ClanManager.Instance.ClanChestManager.SaveDataTask();
+            ClanManager.Instance.ClanChestManager.CreateBackup();
+            //ClanChestManager.CreateBackup();
+
+            Debug.WriteLine("Automation Stopped.");
         }
         #endregion
 
@@ -401,7 +323,7 @@ namespace TBChestTracker
         #endregion
 
      
-        #region Main Window Functions
+        #region Window Loaded
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             InputHooks.onKeyPressed += InputHooks_onKeyPressed;
@@ -481,7 +403,8 @@ namespace TBChestTracker
                 GlobalDeclarations.TessDataExists = false;
             }
         }
-
+        #endregion
+        #region Window Closing
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             isClosing = true;
@@ -496,7 +419,9 @@ namespace TBChestTracker
             TesseractHelper.Destroy();
 
         }
+        #endregion
 
+        #region Menu Command Functions
         private void LoadClanDatabaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute= true; 
@@ -701,8 +626,6 @@ namespace TBChestTracker
             if(GlobalDeclarations.AuotmationRunning)
                 StopAutomation();
         }
-        #endregion
-
         private void ClanStatsCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             if (GlobalDeclarations.hasClanmatesBeenAdded && GlobalDeclarations.hasNewClanDatabaseCreated)
@@ -732,5 +655,7 @@ namespace TBChestTracker
 
             }
         }
+        #endregion
+
     }
 }
