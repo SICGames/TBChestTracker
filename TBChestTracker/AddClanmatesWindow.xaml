@@ -87,7 +87,7 @@
             </DockPanel>
         </Grid>
         <StackPanel Orientation="Horizontal" Margin="5" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right">
-            <TextBlock Text="{Binding Count, Mode=TwoWay}" Margin="5,0" TextAlignment="Center" VerticalAlignment="Center" FontSize="10"/>
+            <TextBlock Text="{Binding NumClanmates, Mode=TwoWay}" Margin="5,0" TextAlignment="Center" VerticalAlignment="Center" FontSize="10"/>
             <TextBlock Text="Clanmates" Margin="5,0" VerticalAlignment="Center" FontWeight="Medium" FontSize="10"/>
         </StackPanel>
         <DockPanel Grid.Column="0" Grid.Row="4" Background="#ddddddff">

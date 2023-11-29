@@ -13,7 +13,7 @@ namespace TBChestTracker.Helpers
 {
     public class TesseractHelper
     {
-        private static Tesseract _tesseract = null;
+        private static Tesseract _tesseract;
         public static Tesseract GetTesseract() => _tesseract;
         public static Task<StringBuilder> LoadAllLanguagesAsync(string tessdata_path) => Task.Run(()=>LoadAllLanguages(tessdata_path));
         public static StringBuilder LoadAllLanguages(string tessdata_path)
@@ -43,6 +43,7 @@ namespace TBChestTracker.Helpers
         {
             try
             {
+                if(_tesseract == null)
                 _tesseract = new Tesseract(tessdata_path, languages, OcrEngineMode.Default);
             }
             catch(Exception e)
@@ -55,9 +56,20 @@ namespace TBChestTracker.Helpers
         }
         public static TessResult Read(IInputArray image)
         {
-            _tesseract.SetImage(image);
-            _tesseract.Recognize();
-            
+            try
+            {
+                if (image == null)
+                    return null;
+
+                _tesseract.SetImage(image);
+                _tesseract.Recognize();
+
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+
             var resultstr = _tesseract.GetUTF8Text();
             resultstr = resultstr.Replace("\r\n", ",");
             string[] results = resultstr.Split(',');

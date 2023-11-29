@@ -41,11 +41,6 @@ namespace TBChestTracker
     /// </summary>
     /// 
 
-    public enum CaptureMode
-    {
-        CHESTS = 0,
-        CLANMATES = 1
-    }
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         #region Declarations
@@ -108,27 +103,27 @@ namespace TBChestTracker
         {
             Image<Gray, Byte> image = null;
             Image<Gray, Byte> imageOut = null;
-            System.Drawing.Bitmap bitmapOut = null;
+            //System.Drawing.Bitmap bitmapOut = null;
             var brightness = 0.0d;
             if (CaptureMode == CaptureMode.CLANMATES)
             {
                 brightness = 0.5d;
                 image = bitmap.ToImage<Gray, Byte>();
                 imageOut = image.Mul(brightness) + brightness;
-                bitmapOut = imageOut.AsBitmap();
+                //bitmapOut = imageOut.AsBitmap();
             }
             else
             {
                 brightness = CLANCHEST_IMAGE_BRIGHTNESS;
                 image = bitmap.ToImage<Gray, Byte>();
                 imageOut = image.Mul(brightness) + brightness;
-                bitmapOut = imageOut.AsBitmap();
+                //bitmapOut = imageOut.AsBitmap();
             }
-            bitmapOut.Save("test-out-image-bw.jpg", ImageFormat.Jpeg);
+            //bitmapOut.Save("test-out-image-bw.jpg", ImageFormat.Jpeg);
             var ocrResult = TesseractHelper.Read(imageOut);
 
-            bitmapOut.Dispose();
-            bitmapOut = null;
+            //bitmapOut.Dispose();
+            //bitmapOut = null;
 
             imageOut.Dispose();
             imageOut = null;
@@ -213,13 +208,20 @@ namespace TBChestTracker
             Debug.WriteLine("Automation Started.");
             GlobalDeclarations.canCaptureAgain = true;
 
-            int automatorClicks = 1;
+
             while (!stopAutomation)
             {
+                int automatorClicks = 0;
+                
+
                 if (GlobalDeclarations.canCaptureAgain)
                 {
-                    Thread.Sleep(3500); //-- could prevent the "From:" bug.
+                    Thread.Sleep(1000); //-- could prevent the "From:" bug.
                     CaptureRegion();
+                    while (ClanManager.Instance.ClanChestManager.ChestProcessingState != ChestProcessingState.COMPLETED)
+                    {
+
+                    }
                     GlobalDeclarations.canCaptureAgain = false;
                     captureCounter++;
                     Debug.WriteLine($"Captured {captureCounter} Times.");
@@ -228,20 +230,15 @@ namespace TBChestTracker
                 if (GlobalDeclarations.isAnyGiftsAvailable == false)
                     continue;
 
-                while (true)
+                while(automatorClicks != 4)
                 {
                     Automator.LeftClick(x, y);
-                    if (automatorClicks == 4)
-                        break;
-                    else
-                        automatorClicks++;
-
-                    Thread.Sleep(50);
+                    automatorClicks++;
+                    Thread.Sleep(100);
                 }
                 
                 //-- canCaptureAgain not being switched back on.
                 GlobalDeclarations.canCaptureAgain = true;
-                automatorClicks = 1;
             }
 
         }
@@ -308,17 +305,14 @@ namespace TBChestTracker
         private async void Snapture_onFrameCaptured(object sender, FrameCapturedEventArgs e)
         {
             var ocrResult = await GetTextFromBitmap(e.ScreenCapturedBitmap); //LoadBitmap(e.ScreenCapturedBitmap, new Windows.Globalization.Language("en"));
-
             if (ocrResult == null)
-                throw new Exception("OCR text shouldn't be null or there's a problem.");
+                Debug.WriteLine($"--- OCR RESULT IS NULL. ---");
 
             //-- here we process data.
             e.ScreenCapturedBitmap.Dispose();
 
-            if (CaptureMode == CaptureMode.CHESTS)
+            if (CaptureMode == CaptureMode.CHESTS && ocrResult != null)
                 ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words);
-                //ClanChestManager.ProcessChestData(ocrResult.Words);
-            
         }
         #endregion
 
@@ -402,6 +396,9 @@ namespace TBChestTracker
                 MessageBox.Show($"No Tessdata directory exists. Download tessdata and ensure all traineddata is inside tessdata.");
                 GlobalDeclarations.TessDataExists = false;
             }
+
+            //var translation = Translator.Translate("I'm So Silly.", "en", "fr");
+
         }
         #endregion
         #region Window Closing

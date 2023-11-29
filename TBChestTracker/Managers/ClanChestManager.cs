@@ -20,20 +20,27 @@ namespace TBChestTracker
     public class ClanChestManager
     {
         public List<ClanChestData> clanChestData { get; set; }
-
         public Dictionary<String, List<ClanChestData>> ClanChestDailyData;
-        
+        private ChestProcessingState pChestProcessingState = ChestProcessingState.IDLE;
+
+        public ChestProcessingState ChestProcessingState
+        {
+            get => pChestProcessingState;
+            set => pChestProcessingState = value;   
+        }
+
         public ClanChestManager()
         {
 
             clanChestData = new List<ClanChestData>();  
             ClanChestDailyData = new Dictionary<string, List<ClanChestData>>();
+            ChestProcessingState = ChestProcessingState.IDLE;
         }
         public void ClearData()
         {
             ClanChestDailyData.Clear();
             clanChestData.Clear();
-            ClanManager.Instance.ClanmateManager.Clanmates.Clear();
+            ClanManager.Instance.ClanmateManager.Database.Clanmates.Clear();
         }
 
         public void RemoveChestData(string clanmatename)
@@ -258,18 +265,22 @@ namespace TBChestTracker
              * Need to make sure we don't need to start new entry in ClanChestDaily.
              * ClanChestData should be obsolete.
             */
+            Stopwatch sw = Stopwatch.StartNew();
+            sw.Start();
 
             GlobalDeclarations.isBusyProcessingClanchests = true;
             var resulttext = result;
+            
             //- doesn't handle expired gifts. Will patch soon.
             if (!resulttext[0].Contains("No gifts"))
             {
+                ChestProcessingState = ChestProcessingState.PROCESSING;
                 GlobalDeclarations.isAnyGiftsAvailable = true;
                 List<ChestData> tmpchests = ProcessText(resulttext);
                 ProcessChestConditions(ref tmpchests);
                 List<ClanChestData> tmpchestdata = CreateClanChestData(tmpchests);  
 
-                var names = ClanManager.Instance.ClanmateManager.Clanmates.Select(n => n.Name);
+                var names = ClanManager.Instance.ClanmateManager.Database.Clanmates.Select(n => n.Name);
 
                 //-- do we need to insert new entry?
                 //-- causes midnight bug.
@@ -327,9 +338,17 @@ namespace TBChestTracker
 
                 var datestr = DateTime.Now.ToString(@"MM-dd-yyyy");
                 ClanChestDailyData[datestr] = clanChestData;
+                ChestProcessingState = ChestProcessingState.COMPLETED;
+
+                sw.Stop();
+                var elapsed = sw.Elapsed;
+                var msg = $"--- Processing Chests Took: {elapsed}";
+
+                Debug.WriteLine(msg);
             }
             else
             {
+                ChestProcessingState = ChestProcessingState.IDLE;
                 GlobalDeclarations.isAnyGiftsAvailable = false;
                 Debug.WriteLine("No gifts available.");
             }
@@ -340,16 +359,14 @@ namespace TBChestTracker
             return;
         }
         
-        public async void BuildData()
+        public async void LoadData()
         {
             var clanmatefile = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile;
             var clanchestfile = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile;
             var chestrequirementfile = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestRequirementsFile;
 
-            string[] clanmates = null;
-
-            if (ClanManager.Instance.ClanmateManager.Clanmates != null)
-                ClanManager.Instance.ClanmateManager.Clanmates.Clear();
+            if (ClanManager.Instance.ClanmateManager.Database.Clanmates != null)
+                ClanManager.Instance.ClanmateManager.Database.Clanmates.Clear();
 
             if (!System.IO.File.Exists(clanmatefile))
             {
@@ -358,35 +375,7 @@ namespace TBChestTracker
             }
             else
             {
-                using (var sr = File.OpenText(clanmatefile))
-                {
-                    string data = await sr.ReadToEndAsync();
-                    if(data.Contains("\r\n")) 
-                    {
-                        data = data.Replace("\r\n", ",");
-                    }
-                    else 
-                        data = data.Replace("\n", ",");
-
-                    clanmates = data.Split(',');
-                }
-
-                foreach (var clanmate in clanmates)
-                {
-                    if (!String.IsNullOrEmpty(clanmate))
-                    {
-                        ClanManager.Instance.ClanmateManager.Add(clanmate);
-                    }
-                }
-            }
-
-            //--- build blank clanchestdata 
-            foreach (var clanmate in clanmates)
-            {
-                if (!String.IsNullOrEmpty(clanmate))
-                {
-                    clanChestData.Add(new ClanChestData(clanmate, null));
-                }
+                ClanManager.Instance.ClanmateManager.Load(clanmatefile);
             }
 
             //-- when adding new member, it pulls previous clan chest statistic data.
@@ -405,7 +394,37 @@ namespace TBChestTracker
                     ClanChestDailyData = (Dictionary<string, List<ClanChestData>>)serializer.Deserialize(sw, typeof(Dictionary<string, List<ClanChestData>>));
                 }
             }
+            //-- load chest requirements
+            if (!System.IO.File.Exists(chestrequirementfile))
+            {
+                if (ClanManager.Instance.ClanChestSettings.ChestRequirements == null)
+                {
+                    ClanManager.Instance.ClanChestSettings.ChestRequirements = new ChestRequirements();
+                    ClanManager.Instance.ClanChestSettings.InitSettings();
+                }
+                ClanManager.Instance.ClanChestSettings.SaveSettings(chestrequirementfile);
+            }
+            else
+            {
+                if (ClanManager.Instance.ClanChestSettings.ChestRequirements == null)
+                    ClanManager.Instance.ClanChestSettings.ChestRequirements = new ChestRequirements();
 
+                ClanManager.Instance.ClanChestSettings.LoadSettings(chestrequirementfile);
+            }
+            return;
+        }
+        public void BuildData()
+        {
+            LoadData(); 
+
+            //--- build blank clanchestdata 
+            foreach (var clanmate in ClanManager.Instance.ClanmateManager.Database.Clanmates)
+            {
+                if (!String.IsNullOrEmpty(clanmate.Name))
+                {
+                    clanChestData.Add(new ClanChestData(clanmate.Name, null));
+                }
+            }
             //--- midnight bug may occur here.
             var lastDate = ClanChestDailyData.Keys.Last();
             var dateStr = DateTime.Now.ToString(@"MM-dd-yyyy");
@@ -413,12 +432,12 @@ namespace TBChestTracker
             {
 
                 clanChestData = ClanChestDailyData[lastDate];
-                foreach (var member in clanmates)
+                foreach (var member in ClanManager.Instance.ClanmateManager.Database.Clanmates)
                 {
-                    var clanmate_exists = clanChestData.Exists(mate => mate.Clanmate.ToLower().Contains(member.ToLower()));
+                    var clanmate_exists = clanChestData.Exists(mate => mate.Clanmate.ToLower().Contains(member.Name.ToLower()));
                     if (!clanmate_exists)
                     {
-                        clanChestData.Add(new ClanChestData(member, null));
+                        clanChestData.Add(new ClanChestData(member.Name, null));
                     }
                 }
             }
@@ -426,25 +445,8 @@ namespace TBChestTracker
             {
                 ClanChestDailyData.Add(DateTime.Now.ToString(@"MM-dd-yyyy"), clanChestData);
             }
+
             GlobalDeclarations.hasClanmatesBeenAdded = true;
-
-            //-- load chest requirements
-            if(!System.IO.File.Exists(chestrequirementfile))
-            {
-                if(ClanManager.Instance.ClanChestSettings.ChestRequirements == null)
-                {
-                    ClanManager.Instance.ClanChestSettings.ChestRequirements = new ChestRequirements();
-                    ClanManager.Instance.ClanChestSettings.InitSettings();   
-                }
-                ClanManager.Instance.ClanChestSettings.SaveSettings(chestrequirementfile);
-            }
-            else
-            {
-                if(ClanManager.Instance.ClanChestSettings.ChestRequirements == null)
-                    ClanManager.Instance.ClanChestSettings.ChestRequirements = new ChestRequirements();
-
-                ClanManager.Instance.ClanChestSettings.LoadSettings(chestrequirementfile);
-            }
 
             return;
         }
@@ -512,7 +514,7 @@ namespace TBChestTracker
 
                     var count = 0;
                     List<ChestCountData> chestcountdata = new List<ChestCountData>();
-                    foreach (var clanmate in ClanManager.Instance.ClanmateManager.Clanmates)
+                    foreach (var clanmate in ClanManager.Instance.ClanmateManager.Database.Clanmates)
                     {
                         chestcountdata.Add(new ChestCountData(clanmate.Name, 0));
                     }
@@ -559,7 +561,7 @@ namespace TBChestTracker
                     }
 
                     //-- add clan total percentage 
-                    var num_clanmates = ClanManager.Instance.ClanmateManager.Clanmates.Count;
+                    var num_clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates.Count;
                     var num_clanmates_gifts = 0;
                     foreach(var chest in chestcountdata)
                     {

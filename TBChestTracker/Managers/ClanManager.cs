@@ -42,8 +42,8 @@ namespace TBChestTracker.Managers
             _clansettings.Clear();
             _chestmanager.ClearData();
             _databasemanager = null;
-            _clanmatemanager.Clanmates.Clear();
-            _clanmatemanager.Clanmates = null;
+            _clanmatemanager.Database.Clanmates.Clear();
+            _clanmatemanager.Database.Clanmates = null;
             _clanmatemanager = null;
             _databasemanager = null;
         }

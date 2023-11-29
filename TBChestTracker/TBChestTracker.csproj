@@ -127,6 +127,12 @@
     </ApplicationDefinition>
     <Compile Include="Arrays\IDataCollection.cs" />
     <Compile Include="Automation\Automator.cs" />
+    <Compile Include="Clanmate\Clanmate.cs" />
+    <Compile Include="Clanmate\ClanmateDatabase.cs" />
+    <Compile Include="Helpers\JsonHelper.cs" />
+    <Compile Include="Helpers\Translator.cs" />
+    <Compile Include="States\CaptureMode.cs" />
+    <Compile Include="States\ChestProcessingState.cs" />
     <Compile Include="ClanData\Clan.cs" />
     <Compile Include="ClanManagementWindow.xaml.cs">
       <DependentUpon>ClanManagementWindow.xaml</DependentUpon>
@@ -139,16 +145,16 @@
     <Compile Include="CaptureRegionWindow.xaml.cs">
       <DependentUpon>CaptureRegionWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ClanData\Chest.cs" />
-    <Compile Include="ClanData\ChestConditions.cs" />
-    <Compile Include="ClanData\ChestCountData.cs" />
-    <Compile Include="ClanData\ChestDailyData.cs" />
-    <Compile Include="ClanData\ChestData.cs" />
+    <Compile Include="Chest\Chest.cs" />
+    <Compile Include="Chest\ChestConditions.cs" />
+    <Compile Include="Chest\ChestCountData.cs" />
+    <Compile Include="Chest\ChestDailyData.cs" />
+    <Compile Include="Chest\ChestData.cs" />
     <Compile Include="ChestingRequirementsWindow.xaml.cs">
       <DependentUpon>ChestingRequirementsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ClanData\ChestRequirements.cs" />
-    <Compile Include="ClanData\ChestType.cs" />
+    <Compile Include="Chest\ChestRequirements.cs" />
+    <Compile Include="Chest\ChestType.cs" />
     <Compile Include="ClanData\ClanChestData.cs" />
     <Compile Include="Managers\ClanChestManager.cs" />
     <Compile Include="ClanData\ClanChestReport.cs" />
@@ -185,7 +191,7 @@
     <Compile Include="SelectRegionWindow.xaml.cs">
       <DependentUpon>SelectRegionWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ClanData\SortType.cs" />
+    <Compile Include="Chest\SortType.cs" />
     <Compile Include="Helpers\StringHelpers.cs" />
     <Page Include="AddClanmatesWindow.xaml">
       <SubType>Designer</SubType>

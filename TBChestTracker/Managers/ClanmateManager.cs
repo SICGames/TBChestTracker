@@ -14,16 +14,21 @@ using System.Windows;
 
 namespace TBChestTracker
 {
-    public class ClanmateManager : INotifyPropertyChanged
+    public class ClanmateManager 
     {
+        /*
+        #region OnPropertyChanged 
         public event PropertyChangedEventHandler PropertyChanged;
-
         protected void OnPropertyChanged(String propertyName)
         {
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
+        #endregion
+        */
+        public ClanmatesDatabase Database { get; private set; }
 
+        /*
         private ObservableCollection<Clanmate> _clanmates;
         public ObservableCollection<Clanmate> Clanmates
         {
@@ -47,34 +52,60 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(Count));   
             }
         }
+        */
         public void UpdateCount()
         {
-            Count = _clanmates.Count;
+            Database.NumClanmates = Database.Clanmates.Count;
         }
         public ClanmateManager() 
         {
+            /*
             if (_clanmates == null)
                 _clanmates = new ObservableCollection<Clanmate>();
+            */
+
+            if (Database == null)
+            {
+                Database = new ClanmatesDatabase();
+                Database.Clanmates = new ObservableCollection<Clanmate>();
+            }
         }
         public void Add(string name)
         {
             Application.Current.Dispatcher.Invoke((Action)delegate
             {
+                /*
                 _clanmates.Add(new Clanmate(name));
+                */
+
+                Database.Clanmates.Add(new Clanmate(name));
+                UpdateCount();
             });
+        }
+        public void AddAliases(string name, List<string> aliases)
+        {
+            foreach(var mate in Database.Clanmates.ToList())
+            {
+                if(mate.Name.ToLower().Equals(name.ToLower()))
+                {
+                    mate.Aliases = aliases;
+                }
+            }
+            UpdateCount();
         }
         public void Remove(string name)
         {
-            foreach(var c in _clanmates.ToList())
+            foreach(var c in Database.Clanmates.ToList())
             {
                 if (c.Name == name)
                 {
                     Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        _clanmates.Remove(c);
+                        Database.Clanmates.Remove(c);
                     });
                 }
             }
+            UpdateCount();  
         }
         public async void ImportFromFileAsync(string path)
         {
@@ -93,15 +124,85 @@ namespace TBChestTracker
                 data = data.Substring(0, data.LastIndexOf(","));
 
                 string[] dataCollection = data.Split(',');
-                _clanmates.Clear();
+                Database.Clanmates.Clear();
                 foreach (var c in dataCollection)
                 {
                     if(!String.IsNullOrEmpty(c))
-                        _clanmates.Add(new Clanmate(c));
+                        Database.Clanmates.Add(new Clanmate(c));
                 }
                 reader.Close();
+                UpdateCount();
             }
         }
+        public void Load(string path)
+        {
+            bool requiresUpdate = false;
+            string backuptext = String.Empty;
+
+            Database.Clanmates.Clear();
+            Database.NumClanmates = Database.Clanmates.Count;
+
+
+            using (StreamReader sr = File.OpenText(path))
+            {
+                var data = sr.ReadToEnd();
+                if (JsonHelper.isJson(data))
+                {
+                    Database = JsonConvert.DeserializeObject<ClanmatesDatabase>(data);
+                    sr.Close();
+                }
+                else
+                {
+                    requiresUpdate = true;
+                    backuptext = data;
+                    //--- we'd need to update it to new format.
+                    if (data.Contains("\r\n"))
+                        data = data.Replace("\r\n", ",");
+                    else
+                        data = data.Replace("\n", ",");
+
+                    data = data.Substring(0, data.LastIndexOf(","));
+                    string[] dataCollection = data.Split(',');
+
+                    Database.Version = 2;
+                    Database.Clanmates.Clear();
+                    foreach (var c in dataCollection)
+                    {
+                        if (!string.IsNullOrEmpty(c))
+                            Database.Clanmates.Add(new Clanmate(c));
+                    }
+
+                    UpdateCount();
+                    sr.Close();
+                }
+            }
+
+            if (requiresUpdate)
+            {
+                //-- create back up.
+
+                var backupfile = path.Substring(0, path.LastIndexOf("."));
+                backupfile += ".old";
+
+                using (StreamWriter bsw = File.CreateText(backupfile))
+                {
+                    bsw.Write(backuptext);
+                    bsw.Close();
+                }
+                Save(path);
+            }
+        }
+        
+        public void Save(string path)
+        {
+            using (StreamWriter sw = File.CreateText(path))
+            {
+                string jsondata = JsonConvert.SerializeObject(Database, Formatting.Indented);
+                sw.Write(jsondata);
+                sw.Close();
+            }
+        }
+        /*
         public void Save(string path)
         {
             using(StreamWriter writer = File.CreateText(path))
@@ -118,13 +219,6 @@ namespace TBChestTracker
                 writer.Dispose();
             }
         }
-    }
-
-    public class Clanmate
-    {
-        public string Name { get; set; }
-        public Clanmate() { }  
-        public Clanmate(string name) {  Name = name; }
-
+        */
     }
 }

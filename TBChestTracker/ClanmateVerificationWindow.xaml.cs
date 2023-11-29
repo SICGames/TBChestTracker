@@ -106,7 +106,7 @@ namespace TBChestTracker
 
         private void VerifyButton_Click(object sender, RoutedEventArgs e)
         {
-            var clanmates = ClanManager.Instance.ClanmateManager.Clanmates;
+            var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates;
             var no_mates = clanmates.Where(m => !verified_clanmates.Contains(m.Name)).Select(name => name.Name).ToList();
 
             foreach(var no_mate in no_mates)
@@ -143,7 +143,7 @@ namespace TBChestTracker
                 ClanManager.Instance.ClanChestManager.SaveData(backup_chestdata_file);
             }
             
-            foreach(var clanmate in ClanManager.Instance.ClanmateManager.Clanmates.ToList())
+            foreach(var clanmate in ClanManager.Instance.ClanmateManager.Database.Clanmates.ToList())
             {
                 bool exists = noClanmateExistsList.Contains(clanmate.Name, StringComparer.InvariantCultureIgnoreCase);
                 if(exists)
