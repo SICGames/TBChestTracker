@@ -47,14 +47,15 @@
                            ToolTip="Screen Capture Clanmates names." 
                            Margin="5,0,0,0"
                            PreviewMouseDown="LoadFromCapturing_PreviewMouseDown"/>
-                    <Separator/>
+                    <Separator Margin="5,3" Height="20"/>
+                    <Button Content="M" Height="20" Width="20" x:Name="MergeClanmate" ToolTip="Group A Clanmate with known Aliases." Margin="5,0" Click="MergeClanmate_Click"/>
+                    <Button Content="V" Height="20" Width="20" x:Name="VerifyClanmates" ToolTip="Verify Clanmates" Margin="5,0" Click="VerifyClanmates_Click"/>
+                    <Separator Margin="5,3" Height="20"/>
                     <Image Source="Images/trashIcon.png" Height="16" Width="16" 
                            x:Name="DeleteSelectedItems" 
                            ToolTip="Delete selected clanmates" 
                            Margin="5,0,0,0"
                            PreviewMouseDown="DeleteSelectedItems_PreviewMouseDown"/>
-                    <Separator/>
-                    <Button Content="V" Height="20" Width="20" x:Name="VerifyClanmates" ToolTip="Verify Clanmates" Margin="5,0" Click="VerifyClanmates_Click"/>
                 </ToolBar>
             </ToolBarPanel>
         </StackPanel>

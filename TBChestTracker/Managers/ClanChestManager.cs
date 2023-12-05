@@ -278,9 +278,10 @@ namespace TBChestTracker
                 GlobalDeclarations.isAnyGiftsAvailable = true;
                 List<ChestData> tmpchests = ProcessText(resulttext);
                 ProcessChestConditions(ref tmpchests);
-                List<ClanChestData> tmpchestdata = CreateClanChestData(tmpchests);  
+                List<ClanChestData> tmpchestdata = CreateClanChestData(tmpchests);
 
-                var names = ClanManager.Instance.ClanmateManager.Database.Clanmates.Select(n => n.Name);
+                var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates.ToList();
+                //var names = ClanManager.Instance.ClanmateManager.Database.Clanmates.Select(n => n.Name);
 
                 //-- do we need to insert new entry?
                 //-- causes midnight bug.
@@ -290,9 +291,9 @@ namespace TBChestTracker
                 if (dates.Count() == 0)
                 {
                     clanChestData.Clear();
-                    foreach (var name in names)
+                    foreach (var mate in clanmates)
                     {
-                        clanChestData.Add(new ClanChestData(name, null));
+                        clanChestData.Add(new ClanChestData(mate.Name, null));
                     }
 
                     ClanChestDailyData.Add(DateTime.Now.ToString(@"MM-dd-yyyy"), clanChestData);
@@ -301,13 +302,28 @@ namespace TBChestTracker
                 //-- make sure clanmate exists.
                 foreach (var tmpchest in tmpchestdata)
                 {
-                    bool exists = names.Contains(tmpchest.Clanmate, StringComparer.CurrentCultureIgnoreCase);
+                    bool alias_found = false;
+
+                    bool exists = clanmates.Select(mate_name => mate_name.Name).Contains(tmpchest.Clanmate, StringComparer.CurrentCultureIgnoreCase);
                     if (!exists)
                     {
-                        Debug.WriteLine($"{tmpchest.Clanmate} doesn't exist within clanmates database.");
-                        clanChestData.Add(new ClanChestData(tmpchest.Clanmate, tmpchest.chests));
-                        ClanManager.Instance.ClanmateManager.Add(tmpchest.Clanmate);
-                        ClanManager.Instance.ClanmateManager.Save(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile);
+                        foreach(var mate in clanmates)
+                        {
+                            if(mate.Aliases.Count > 0)
+                            {
+                                bool isAliasMatch = mate.Aliases.Contains(tmpchest.Clanmate, StringComparer.InvariantCultureIgnoreCase);
+                                clanChestData.Add(new ClanChestData(mate.Name, tmpchest.chests));
+                                Debug.WriteLine($"\t\t {mate.Name} alias detected and corrected.");
+                                alias_found = true;
+                            }
+                        }
+                        if (!alias_found)
+                        {
+                            Debug.WriteLine($"{tmpchest.Clanmate} doesn't exist within clanmates database.");
+                            clanChestData.Add(new ClanChestData(tmpchest.Clanmate, tmpchest.chests));
+                            ClanManager.Instance.ClanmateManager.Add(tmpchest.Clanmate);
+                            ClanManager.Instance.ClanmateManager.Save(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile);
+                        }
                     }
                     else
                         continue;
@@ -334,6 +350,7 @@ namespace TBChestTracker
                             }
                         }
                     }
+
                 }
 
                 var datestr = DateTime.Now.ToString(@"MM-dd-yyyy");

@@ -176,17 +176,12 @@ namespace TBChestTracker
                 var textbox = ((TextBox)sender);
                 var clanmate_newname = textbox.Text;
                 textbox.Visibility = Visibility.Collapsed;
-
-                var previous_chest = new List<ClanChestData>();
                 var previous_clanmatestatistic_data = new Dictionary<string, List<ClanChestData>>();    
              
                 //-- now let's fix clan daily chest data
-               
                 //-- clanmate name changed.
-                var oldclanmateIndex = 0;
                 if (ClanManager.Instance.ClanChestManager.ClanChestDailyData.Count() > 0)
                 {
-                    oldclanmateIndex = ClanManager.Instance.ClanChestManager.clanChestData.FindIndex(n => n.Clanmate.Equals(previous_Clanmate_Name));
                     foreach (var date in ClanManager.Instance.ClanChestManager.ClanChestDailyData.ToList())
                     {
                         var newdata = date.Value.Where(name => name.Clanmate.Equals(clanmate_newname, StringComparison.CurrentCultureIgnoreCase)).ToList();
@@ -207,6 +202,7 @@ namespace TBChestTracker
                             ClanManager.Instance.ClanmateManager.Database.Clanmates.Remove(clanmates);
                         }
                     }
+
                     foreach(var date in ClanManager.Instance.ClanChestManager.ClanChestDailyData.ToList() )
                     {
                         var data = date.Value.Where(name => name.Clanmate.Equals(previous_Clanmate_Name, StringComparison.CurrentCultureIgnoreCase)).ToList();
@@ -241,8 +237,6 @@ namespace TBChestTracker
                 }
 
                 //-- clean up
-                previous_chest.Clear();
-                previous_chest = null;
                 previous_clanmatestatistic_data.Clear();
                 previous_clanmatestatistic_data = null;
 
@@ -267,6 +261,111 @@ namespace TBChestTracker
         {
             ClanmateVerificationWindow window = new ClanmateVerificationWindow();   
             window.ShowDialog();
+        }
+
+        private void MergeClanmate_Click(object sender, RoutedEventArgs e)
+        {
+
+            //-- should create backup incase shit hits the fan.
+            var backup_file = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\clanchests.old";
+            ClanManager.Instance.ClanChestManager.SaveData(backup_file);
+
+            var selected = ListClanMates01.SelectedItems;
+            var parent_clanmate = ((Clanmate)selected[0]).Name;
+            var aliases = new List<string>();
+            for(var x = 1; x < selected.Count; x++)
+            {
+                var clanmate = ((Clanmate)selected[x]);
+                aliases.Add(clanmate.Name);
+            }
+            ClanManager.Instance.ClanmateManager.AddAliases(parent_clanmate, aliases);
+
+            //-- now we need to fix any aliases that may have done chests and place them into parent.
+            var parent_clanmatestatistic_data = new Dictionary<string, List<ClanChestData>>();
+            var alias_clanmatestatistic_data = new Dictionary<string, List<ClanChestData>>();
+            var hasDailyChestData = ClanManager.Instance.ClanChestManager.ClanChestDailyData.Count > 0;
+
+            if(hasDailyChestData)
+            {
+                foreach (var alias in aliases)
+                {
+                    //-- loop through aliases
+                    //-- grab chests done by aliases
+                    //-- stuff them into parent
+                    //-- remove aliases 
+                    //-- perform cleanup
+
+                    foreach (var date in ClanManager.Instance.ClanChestManager.ClanChestDailyData.ToList())
+                    {
+                        var chest_dates = date.Value.Where(name => name.Clanmate.Equals(alias, StringComparison.CurrentCultureIgnoreCase)).ToList();
+
+                        List<ClanChestData> chest_data = new List<ClanChestData>();
+                        foreach (var chest_date in chest_dates.ToList())
+                        {
+                            if (chest_date.chests != null)
+                            {
+                                chest_data.Add(new ClanChestData(alias, chest_date.chests));
+                                //--- exception will occur when more identical keys attempted to be added.
+                                if(alias_clanmatestatistic_data.ContainsKey(date.Key))
+                                {
+                                    alias_clanmatestatistic_data[date.Key].Add(chest_date);
+                                }
+                                else 
+                                    alias_clanmatestatistic_data.Add(date.Key, chest_data);
+                            }
+                        }
+
+                        date.Value.RemoveAll(n => n.Clanmate.Equals(alias, StringComparison.CurrentCultureIgnoreCase));
+                    }
+
+                    //-- clean up chest count.
+                    if (ClanManager.Instance.ClanChestManager.clanChestData.Count() > 0)
+                    {
+                        foreach (var clanchest in ClanManager.Instance.ClanChestManager.clanChestData.ToList())
+                        {
+                            if (clanchest.Clanmate.Equals(alias, StringComparison.CurrentCultureIgnoreCase))
+                                clanchest.Clanmate = parent_clanmate;
+                        }
+                    }
+
+                    //--- remove alias from clanmate list.
+                    foreach (var clanmate in ClanManager.Instance.ClanmateManager.Database.Clanmates.ToList())
+                    {
+                        if (clanmate.Name.Equals(alias, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            ClanManager.Instance.ClanmateManager.Database.Clanmates.Remove(clanmate);
+                        }
+                    }
+
+                }
+
+                foreach (var dailydata in ClanManager.Instance.ClanChestManager.ClanChestDailyData.ToList())
+                {
+                    var chest_dates = dailydata.Value.Where(name => name.Clanmate.Equals(parent_clanmate, StringComparison.CurrentCultureIgnoreCase)).ToList();
+                    foreach (var d in chest_dates)
+                    {
+                        foreach (var affected_date in alias_clanmatestatistic_data.ToList())
+                        {
+                            if (dailydata.Key == affected_date.Key)
+                            {
+                                var chests = affected_date.Value.Select(c => c.chests).ToList()[0];
+                                if (d.chests == null)
+                                    d.chests = new List<Chest>();
+
+                                if (chests != null)
+                                    d.chests.InsertRange(d.chests.Count,chests);
+                            }
+                        }
+                    }
+                }
+
+                alias_clanmatestatistic_data.Clear();
+                alias_clanmatestatistic_data = null;
+                ClanManager.Instance.ClanChestManager.SaveData();
+
+            }
+
+            //-- after that, we remove aliases from chest count database. 
         }
     }
 }

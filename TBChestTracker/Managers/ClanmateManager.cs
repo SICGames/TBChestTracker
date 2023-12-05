@@ -145,7 +145,7 @@ namespace TBChestTracker
 
             using (StreamReader sr = File.OpenText(path))
             {
-                var data = sr.ReadToEnd();
+                var data = StringHelpers.ConvertToUTF8(sr.ReadToEnd());
                 if (JsonHelper.isJson(data))
                 {
                     Database = JsonConvert.DeserializeObject<ClanmatesDatabase>(data);
@@ -197,28 +197,10 @@ namespace TBChestTracker
         {
             using (StreamWriter sw = File.CreateText(path))
             {
-                string jsondata = JsonConvert.SerializeObject(Database, Formatting.Indented);
+                string jsondata = StringHelpers.ConvertToUTF8(JsonConvert.SerializeObject(Database, Formatting.Indented));
                 sw.Write(jsondata);
                 sw.Close();
             }
         }
-        /*
-        public void Save(string path)
-        {
-            using(StreamWriter writer = File.CreateText(path))
-            {
-                var counter = 0;
-                for(var c = 0; c < _clanmates.Count; c++)
-                {
-                    if (!String.IsNullOrEmpty(_clanmates[c].Name))
-                    {
-                            writer.Write($"{_clanmates[c].Name}\n");
-                    }
-                }
-                writer.Close();
-                writer.Dispose();
-            }
-        }
-        */
     }
 }

@@ -131,6 +131,9 @@
     <Compile Include="Clanmate\ClanmateDatabase.cs" />
     <Compile Include="Helpers\JsonHelper.cs" />
     <Compile Include="Helpers\Translator.cs" />
+    <Compile Include="MergeClanmateWindow.xaml.cs">
+      <DependentUpon>MergeClanmateWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="States\CaptureMode.cs" />
     <Compile Include="States\ChestProcessingState.cs" />
     <Compile Include="ClanData\Clan.cs" />
@@ -241,6 +244,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="MergeClanmateWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="NewClanDatabaseWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

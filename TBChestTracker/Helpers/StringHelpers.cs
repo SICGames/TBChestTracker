@@ -41,5 +41,14 @@ namespace TBChestTracker
             }
             return -1;
         }
+        public static string ConvertToUTF8(string text)
+        {
+            return Convert(text, 65001);
+        }
+        public static string Convert(string text, int encodingId)
+        {
+            return Encoding.UTF8.GetString(Encoding.GetEncoding(encodingId).GetBytes(text));
+
+        }
     }
 }

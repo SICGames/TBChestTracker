@@ -1,0 +1,33 @@
+﻿<Window x:Class="TBChestTracker.MergeClanmateWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TBChestTracker"
+        mc:Ignorable="d"
+        Title="Merge Clanmates" Height="450" Width="240" Topmost="True" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="25"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Vertical" Margin="5">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Clanmate:"/>
+                <TextBlock Text="Bob" Margin="5,0"/>
+            </StackPanel>
+            <GroupBox Margin="10,5" Header="Known Aliases">
+                <StackPanel x:Name="AliasesContent">
+                    <TextBlock Text="SillyGoose" Margin="5,0"/>
+                    <TextBlock Text="BobTheBuilder" Margin="5,0"/>
+                    <TextBlock Text="SilverKing" Margin="5,0"/>
+                    <TextBlock Text="VPHoarder" Margin="5,0"/>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+        <DockPanel Grid.Row="1" Background="#dddd">
+            <Button x:Name="CreateClanmateGroupButton" Content="Merge" Width="80" Height="20" HorizontalAlignment="Right" Margin="0,0,25,0"/>
+        </DockPanel>
+
+    </Grid>
+</Window>
