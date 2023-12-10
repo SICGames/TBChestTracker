@@ -251,7 +251,7 @@ namespace TBChestTracker
             }
             return tmpchests;
         }
-        [Obsolete]
+        [Obsolete("Use ProcessText2 instead.")]
         private List<ChestData> ProcessText(List<String> result)
         {
 
