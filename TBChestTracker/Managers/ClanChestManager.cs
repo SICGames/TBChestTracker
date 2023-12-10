@@ -10,6 +10,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Markup;
 using TBChestTracker.Managers;
 using Windows.Media.Ocr;
 using Windows.Networking.Proximity;
@@ -62,30 +63,46 @@ namespace TBChestTracker
             SaveData();
             return;
         }
-        private List<ChestData> ProcessText(List<String> result)
+
+        private void FilterChestData(ref List<String> data, String[] words)
         {
+            var filtered = data.Where(d => ContainsAny(d, words));
+            data = filtered.ToList();
+        }
+        private bool ContainsAny(string str, IEnumerable<string> values)
+        {
+            if (!string.IsNullOrEmpty(str) || values.Any())
+            {
+                foreach (string value in values)
+                {
+                    if(str.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) != -1) 
+                        return true;
+                }
+                //-- if some how we came to this point, junk data exists.
+                var dbg_msg = $"---- Successfully removed '{str}' invalid data from OCR results.";
+                Debug.WriteLine(dbg_msg);
+            }
+            return false;
+        }
+        //-- ProcessChestData optimize chest data
+        private List<ChestData> ProcessText2(List<String> result)
+        {
+            //---Processing Chests Took: 00:00:00.0115509
+
             List<ChestData> tmpchests = new List<ChestData>();
 
             //-- quick filter. 
             //-- in Triumph Chests, divider creates dirty characters. 
-            
-            foreach(var data in result.ToList())
-            {
-                if (data.ToLower().Contains("chest") || data.ToLower().Contains("from:") || data.ToLower().Contains("source:"))
-                    continue;
-                else
-                {
-                    var dbg_msg = $"---- Successfully removed '{data}' invalid data from OCR results.";
-                    Debug.WriteLine(dbg_msg);
-                    result.Remove(data);
-                }
-            }
+            var filter_words = new string[] { "Chest", "From:", "Source:", "Gift" };
+
+            FilterChestData(ref result, filter_words);
 
             for (var x = 0; x < result.Count; x += 3)
             {
                 var word = result[x];
+
                 if (word == null)
-                    continue;
+                    break;
 
                 if (!word.Contains("Clan"))
                 {
@@ -97,7 +114,186 @@ namespace TBChestTracker
                     {
                         //-- OCR issue converts clan name: ADİĞE CALE
                         //-- into ADiöE CALE
+                        clanmate = clanmate.Substring(clanmate.IndexOf(" ") + 1);
+                        if (clanmate.Contains("From:"))
+                        {
+                            //-- error - shouldn't even have reached this point.
+                            //-- game actually causes this error from not rendering name fast enough 
+                            //-- hasbeen patched but throw exception just in case.
+                            var badname = 0;
+                            throw new Exception("Clanmate name is blank. Increase thread sleep timer to prevent this.");
+                        }
+                    }
 
+                    //-- building tmpchestdata
+                    if (chestobtained.Contains("Source:"))
+                    {
+                        var levelStartPos = chestobtained.IndexOf("Level");
+                        ChestType type = ChestType.COMMON;
+
+                        if (levelStartPos > 0)
+                        {
+                            chestobtained = chestobtained.Substring(levelStartPos).ToLower();
+                            type = ChestType.COMMON;
+                            if (chestobtained.Contains("epic"))
+                                type = ChestType.EPIC;
+                            else if (chestobtained.Contains("rare"))
+                                type = ChestType.RARE;
+                            else if (chestobtained.Contains("heroic"))
+                                type = ChestType.HEROIC;
+                            else if (chestobtained.Contains("citadel"))
+                                type = ChestType.CITADEL;
+
+                            int level = 0;
+
+                            if (chestobtained.Contains("io"))
+                            {
+                                //--- OCR reads 10 as io.Until perm fix. 
+                                level = 10;
+                            }
+
+                            if (chestobtained.Contains("-"))
+                            {
+                                string ancientlevel = chestobtained.Substring(chestobtained.IndexOf("-") - 2);
+                                ancientlevel = ancientlevel.Substring(0, ancientlevel.IndexOf(" "));
+                                var levels = ancientlevel.Split('-');
+                                type = ChestType.VAULT;
+                                level = Int32.Parse(levels[1]);
+                            }
+                            else
+                            {
+                                Regex r = new Regex(@"(\d+)", RegexOptions.Singleline); // new Regex(@"(\d+)(.?|\s)(\d+)");
+                                var match = r.Match(chestobtained);
+                                if (match.Success)
+                                {
+                                    level = Int32.Parse(match.Value);
+                                }
+                            }
+
+                            //--- shouldn't be 0. Normally happens 1st chest that is a level 5. 
+                            if (level == 0)
+                                level = 5;
+
+                            //-- filter chest if chest conditions enabled
+                            //--- if chest requirements are using conditions, we use those conditions. If not, we continue.
+                            if (ClanManager.Instance.ClanChestSettings.ChestRequirements.useChestConditions)
+                            {
+                                foreach (var condition in ClanManager.Instance.ClanChestSettings.ChestRequirements.ChestConditions)
+                                {
+                                    var typeStr = type.ToString().ToLower();
+
+                                    if (typeStr.Equals(condition.ChestType, StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        if (level >= condition.level)
+                                        {
+                                            tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, level)));
+                                            var dbgmsg = $"[[Level {level} ({type.ToString()}) {chestName} from {clanmate} validated.]]";
+                                            Debug.WriteLine(dbgmsg);
+                                            Loggy.Write(dbgmsg, LogType.LOG, "chests.log");
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+
+                                tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, level)));
+                                var dbg_msg = $"--- ADDING level {level} {type.ToString()}  '{chestName}' from {clanmate} ----";
+                                Debug.WriteLine(dbg_msg);
+                                Loggy.Write(dbg_msg, LogType.LOG, "chests.log");
+                            }
+                        }
+                        else
+                        {
+                            chestobtained = chestobtained.ToLower();
+                            type = ChestType.OTHER;
+                            if (chestobtained.Contains("arena"))
+                                type = ChestType.ARENA;
+                            else if (chestobtained.Contains("bank"))
+                                type = ChestType.BANK;
+                            else if (chestobtained.Contains("union"))
+                                type = ChestType.UNION_TRIUMPH;
+                            else if (chestobtained.Contains("mimic"))
+                                type = ChestType.MIMIC;
+                            else if (chestobtained.Contains("rise"))
+                                type = ChestType.ANCIENT_EVENT;
+                            else if (chestobtained.Contains("story"))
+                                type = ChestType.STORY;
+                            else if (chestobtained.Contains("wealth"))
+                                type = ChestType.WEALTH;
+
+                            if (ClanManager.Instance.ClanChestSettings.ChestRequirements.useChestConditions)
+                            {
+                                foreach (var condition in ClanManager.Instance.ClanChestSettings.ChestRequirements.ChestConditions)
+                                {
+                                    var typeStr = type.ToString().ToLower();
+
+                                    if (typeStr.Equals(condition.ChestType, StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, 0)));
+                                        var dbgmsg = $"[[({type.ToString()}) {chestName} from {clanmate} validated.]]";
+                                        Debug.WriteLine(dbgmsg);
+                                        Loggy.Write(dbgmsg, LogType.LOG, "chests.log");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, 0)));
+                                var dbgmsg = $"--- ADDING {type.ToString()}  '{chestName}' from {clanmate} ----";
+                                Debug.WriteLine(dbgmsg);
+                                Loggy.Write(dbgmsg, LogType.LOG, "chests.log");
+                            }
+                        }
+                    }
+                }
+            }
+            return tmpchests;
+        }
+
+
+        private List<ChestData> ProcessText(List<String> result)
+        {
+
+            //-- Processing Chests Took: 00:00:00.0147902
+
+            List<ChestData> tmpchests = new List<ChestData>();
+
+            //-- quick filter. 
+            //-- in Triumph Chests, divider creates dirty characters. 
+            foreach(var data in result.ToList())
+            {
+                bool bExists = data.Contains("Chest") ||
+                        data.Contains("From:") ||
+                    data.Contains("Source:") ||
+                    data.Contains("gift");
+
+                if (!bExists)
+                {
+                    var dbg_msg = $"---- Successfully removed '{data}' invalid data from OCR results.";
+                    Debug.WriteLine(dbg_msg);
+                    result.Remove(data);
+                }
+            }
+            
+            for (var x = 0; x < result.Count; x += 3)
+            {
+                var word = result[x];
+
+                if (word == null)
+                    break;
+
+                if (!word.Contains("Clan"))
+                {
+
+                    var chestName = result[x + 0];
+                    var clanmate = result[x + 1];
+                    var chestobtained = result[x + 2];
+
+                    if (clanmate.Contains("From:"))
+                    {
+                        //-- OCR issue converts clan name: ADİĞE CALE
+                        //-- into ADiöE CALE
                         clanmate = clanmate.Substring(clanmate.IndexOf(" ") + 1);
                         if (clanmate.Contains("From:"))
                         {
@@ -276,12 +472,11 @@ namespace TBChestTracker
             {
                 ChestProcessingState = ChestProcessingState.PROCESSING;
                 GlobalDeclarations.isAnyGiftsAvailable = true;
-                List<ChestData> tmpchests = ProcessText(resulttext);
-                ProcessChestConditions(ref tmpchests);
+                List<ChestData> tmpchests = ProcessText2(resulttext);
+                
                 List<ClanChestData> tmpchestdata = CreateClanChestData(tmpchests);
 
                 var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates.ToList();
-                //var names = ClanManager.Instance.ClanmateManager.Database.Clanmates.Select(n => n.Name);
 
                 //-- do we need to insert new entry?
                 //-- causes midnight bug.
