@@ -251,8 +251,7 @@ namespace TBChestTracker
             }
             return tmpchests;
         }
-
-
+        [Obsolete]
         private List<ChestData> ProcessText(List<String> result)
         {
 
@@ -391,7 +390,7 @@ namespace TBChestTracker
 
             return tmpchests;
         }
-
+        [Obsolete]
         private void ProcessChestConditions(ref List<ChestData> chestdata)
         {
             //--- if chest requirements are using conditions, we use those conditions. If not, we continue.
