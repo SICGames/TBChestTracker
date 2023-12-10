@@ -75,11 +75,12 @@ namespace TBChestTracker
             {
                 foreach (string value in values)
                 {
-                    if(str.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) != -1) 
+                    var bExists = str.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) != -1;
+                    if (bExists)
                         return true;
                 }
                 //-- if some how we came to this point, junk data exists.
-                var dbg_msg = $"---- Successfully removed '{str}' invalid data from OCR results.";
+                var dbg_msg = $"---- '{str}' from OCR results doesn't match specified values.";
                 Debug.WriteLine(dbg_msg);
             }
             return false;
