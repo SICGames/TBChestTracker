@@ -30,9 +30,9 @@ using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using System.Threading;
 using System.Windows.Controls;
-using System.Windows.Navigation;
 using TBChestTracker.Helpers;
 using TBChestTracker.Managers;
+using System.Reflection;
 
 namespace TBChestTracker
 {
@@ -50,14 +50,19 @@ namespace TBChestTracker
         bool isAutomationBusy = false;
         int captureCounter = 0;
         public ClanManager ClanManager { get; private set; }
-
-        //public ClanChestManager ClanChestManager { get; set; }
-
+        
         bool isClosing = false;
         bool stopAutomation = false;
         private double CLANCHEST_IMAGE_BRIGHTNESS = 0.75d;
 
-        private string pAppTitle = $"TotalBattle Chest Tracker v0.1.0 - Untitled";
+        public Version AppVersion
+        {
+            get
+            {
+                return Assembly.GetExecutingAssembly().GetName().Version;
+            }
+        }
+        private string pAppTitle = $"";
         public string AppTitle
         {
             get
@@ -73,6 +78,7 @@ namespace TBChestTracker
 
         List<string> recently_opened_files { get; set; }
         
+        ConsoleWindow consoleWindow { get; set; }
         #endregion
 
         #region PropertyChanged Event
@@ -92,8 +98,7 @@ namespace TBChestTracker
             this.DataContext = this;
             this.Closing += MainWindow_Closing;
             recently_opened_files = new List<string>();
-
-            
+            consoleWindow = new ConsoleWindow();
         }
         #endregion
 
@@ -205,10 +210,12 @@ namespace TBChestTracker
             var xClickPos = new Point(screenX_half * 0.711, screenY_half * 0.826);
             var x = (int)xClickPos.X * 2;
             var y = (int)xClickPos.Y;
+
+            com.HellStormGames.Logging.Console.Write("Automation Started");
+
             Debug.WriteLine("Automation Started.");
+            
             GlobalDeclarations.canCaptureAgain = true;
-
-
             while (!stopAutomation)
             {
                 int automatorClicks = 0;
@@ -224,7 +231,6 @@ namespace TBChestTracker
                     }
                     GlobalDeclarations.canCaptureAgain = false;
                     captureCounter++;
-                    Debug.WriteLine($"Captured {captureCounter} Times.");
                 }
 
                 if (GlobalDeclarations.isAnyGiftsAvailable == false)
@@ -252,9 +258,8 @@ namespace TBChestTracker
 
             ClanManager.Instance.ClanChestManager.SaveDataTask();
             ClanManager.Instance.ClanChestManager.CreateBackup();
-            //ClanChestManager.CreateBackup();
 
-            Debug.WriteLine("Automation Stopped.");
+            com.HellStormGames.Logging.Console.Write("Automation stopped.");
         }
         #endregion
 
@@ -273,7 +278,7 @@ namespace TBChestTracker
                 int hotkey = KeyInterop.VirtualKeyFromKey(Key.F6);
                 if (key == hotkey)
                 {
-                    Debug.WriteLine($"Snapshot taken.");
+                    // Debug.WriteLine($"Snapshot taken.");
                     CaptureRegion();
                     GlobalDeclarations.hasHotkeyBeenPressed = true;
                 }
@@ -306,7 +311,9 @@ namespace TBChestTracker
         {
             var ocrResult = await GetTextFromBitmap(e.ScreenCapturedBitmap); //LoadBitmap(e.ScreenCapturedBitmap, new Windows.Globalization.Language("en"));
             if (ocrResult == null)
-                Debug.WriteLine($"--- OCR RESULT IS NULL. ---");
+            {
+                com.HellStormGames.Logging.Console.Write("--- OCR RESULT IS NULL. ---");
+            }
 
             //-- here we process data.
             e.ScreenCapturedBitmap.Dispose();
@@ -324,7 +331,8 @@ namespace TBChestTracker
             InputHooks.onKeyReleased += InputHooks_onKeyReleased;
             if (InputHooks.Install())
             {
-                Debug.WriteLine("Installed Keyboard hooks successfully.");
+                com.HellStormGames.Logging.Console.Write("Installed Keyboard hooks successfully.");
+                //Debug.WriteLine("Installed Keyboard hooks successfully.");
             }
 
             InputHookThread = new System.Threading.Thread(new System.Threading.ThreadStart(DetectHotkey));
@@ -332,15 +340,13 @@ namespace TBChestTracker
 
             Snapture.onFrameCaptured += Snapture_onFrameCaptured;
             Snapture.Start(FrameCapturingMethod.GDI);
-            AppTitle = $"TotalBattle Chest Tracker v0.1.0 - Untitled";
+            AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - Untitled";
             this.ClanManager = new ClanManager();
 
             if (System.IO.Directory.Exists(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath) == false)
             {
                 System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath);
             }
-
-            //ClanChestManager = new ClanChestManager();
 
             if (File.Exists("recent.lst"))
             {
@@ -410,10 +416,8 @@ namespace TBChestTracker
                 Debug.WriteLine("Successfully uninstalled input hooks.");
             }
             ClanManager.Instance.Destroy();
-
-            //ClanChestManager.ClearData();
-            //ClanChestSettings.Clear();
             TesseractHelper.Destroy();
+            com.HellStormGames.Logging.Console.Destroy();
 
         }
         #endregion
@@ -440,7 +444,7 @@ namespace TBChestTracker
                 {
                     if (result)
                     {
-                        AppTitle = $"TotalBattle Chest Tracker v0.1.0 - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
+                        AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
                         if (!recently_opened_files.Contains(file, StringComparer.CurrentCultureIgnoreCase))
                         {
                             recently_opened_files.Add(file);
@@ -458,8 +462,6 @@ namespace TBChestTracker
                                 }
                             }
                         }
-
-
                     }
                     else
                     {
@@ -480,7 +482,7 @@ namespace TBChestTracker
                 {
                     if (result)
                     {
-                        AppTitle = $"TotalBattle Chest Tracker v0.1.0 - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
+                        AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
                     }
                     else
                     {
@@ -539,7 +541,6 @@ namespace TBChestTracker
 
         private void ExportClanDatabase_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            //List<ClanChestData> clanChestData = ClanChestManager.clanChestData;
             ExportWindow exportWindow = new ExportWindow();
             exportWindow.ShowDialog();
         }
@@ -654,5 +655,10 @@ namespace TBChestTracker
         }
         #endregion
 
+        private void ConsoleMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            consoleWindow.Show();
+            Debug.WriteLine("");
+        }
     }
 }

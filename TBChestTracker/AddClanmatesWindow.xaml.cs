@@ -208,7 +208,7 @@ namespace TBChestTracker
                         var data = date.Value.Where(name => name.Clanmate.Equals(previous_Clanmate_Name, StringComparison.CurrentCultureIgnoreCase)).ToList();
                         foreach (var d in data)
                         {
-                            Debug.WriteLine($"{d.Clanmate}");
+                            //Debug.WriteLine($"{d.Clanmate}");
                             d.Clanmate = clanmate_newname;
                             foreach(var affected_date in previous_clanmatestatistic_data.ToList())
                             {
@@ -241,8 +241,8 @@ namespace TBChestTracker
                 previous_clanmatestatistic_data = null;
 
                 ClanManager.Instance.ClanChestManager.SaveData();
-
-                Debug.WriteLine($"{previous_Clanmate_Name} changed to {clanmate_newname}");
+                com.HellStormGames.Logging.Console.Write($"{previous_Clanmate_Name} changed to {clanmate_newname}");
+                //Debug.WriteLine($"{previous_Clanmate_Name} changed to {clanmate_newname}");
             }
         }
 

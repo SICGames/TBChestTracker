@@ -55,6 +55,7 @@ namespace TBChestTracker
                     {
                         var name = data.Clanmate;
                         chestdata.Remove(data);
+                        com.HellStormGames.Logging.Console.Write($"{name} was successfully removed from clanchestdata.");
                         Debug.WriteLine($"{name} was successfully removed from clanchestdata.");
                     }
                 }
@@ -81,6 +82,7 @@ namespace TBChestTracker
                 }
                 //-- if some how we came to this point, junk data exists.
                 var dbg_msg = $"---- '{str}' from OCR results doesn't match specified values.";
+                com.HellStormGames.Logging.Console.Write(dbg_msg);
                 Debug.WriteLine(dbg_msg);
             }
             return false;
@@ -189,6 +191,7 @@ namespace TBChestTracker
                                         {
                                             tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, level)));
                                             var dbgmsg = $"[[Level {level} ({type.ToString()}) {chestName} from {clanmate} validated.]]";
+                                            com.HellStormGames.Logging.Console.Write(dbgmsg);
                                             Debug.WriteLine(dbgmsg);
                                             Loggy.Write(dbgmsg, LogType.LOG, "chests.log");
                                         }
@@ -200,6 +203,7 @@ namespace TBChestTracker
 
                                 tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, level)));
                                 var dbg_msg = $"--- ADDING level {level} {type.ToString()}  '{chestName}' from {clanmate} ----";
+                                com.HellStormGames.Logging.Console.Write(dbg_msg);
                                 Debug.WriteLine(dbg_msg);
                                 Loggy.Write(dbg_msg, LogType.LOG, "chests.log");
                             }
@@ -233,6 +237,7 @@ namespace TBChestTracker
                                     {
                                         tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, 0)));
                                         var dbgmsg = $"[[({type.ToString()}) {chestName} from {clanmate} validated.]]";
+                                        com.HellStormGames.Logging.Console.Write(dbgmsg);   
                                         Debug.WriteLine(dbgmsg);
                                         Loggy.Write(dbgmsg, LogType.LOG, "chests.log");
                                     }
@@ -242,6 +247,7 @@ namespace TBChestTracker
                             {
                                 tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, 0)));
                                 var dbgmsg = $"--- ADDING {type.ToString()}  '{chestName}' from {clanmate} ----";
+                                com.HellStormGames.Logging.Console.Write (dbgmsg);  
                                 Debug.WriteLine(dbgmsg);
                                 Loggy.Write(dbgmsg, LogType.LOG, "chests.log");
                             }
@@ -251,6 +257,8 @@ namespace TBChestTracker
             }
             return tmpchests;
         }
+
+        #region ProcessText -- OBSOLETE
         [Obsolete("Use ProcessText2 instead.")]
         private List<ChestData> ProcessText(List<String> result)
         {
@@ -271,6 +279,7 @@ namespace TBChestTracker
                 if (!bExists)
                 {
                     var dbg_msg = $"---- Successfully removed '{data}' invalid data from OCR results.";
+                    com.HellStormGames.Logging.Console.Write(dbg_msg);  
                     Debug.WriteLine(dbg_msg);
                     result.Remove(data);
                 }
@@ -356,6 +365,7 @@ namespace TBChestTracker
 
                             tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, level)));
                             var dbg_msg = $"--- ADDING level {level} {type.ToString()}  '{chestName}' from {clanmate} ----";
+                            com.HellStormGames.Logging.Console.Write(dbg_msg);  
                             Debug.WriteLine(dbg_msg);
                             Loggy.Write(dbg_msg, LogType.LOG, "chests.log");
                         }
@@ -381,6 +391,7 @@ namespace TBChestTracker
                             
                             var dbg_msg = $"--- ADDING ({chestName}) {type.ToString()} Chest from {clanmate} ----";
                             tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, 0)));
+                            com.HellStormGames.Logging.Console.Write(dbg_msg);
                             Debug.WriteLine($"{dbg_msg}");
                             Loggy.Write(dbg_msg, LogType.LOG,"chests.log");
                         }
@@ -390,6 +401,9 @@ namespace TBChestTracker
 
             return tmpchests;
         }
+        #endregion
+
+        #region ProcessChestConditions -- OBSOLETE 
         [Obsolete]
         private void ProcessChestConditions(ref List<ChestData> chestdata)
         {
@@ -415,7 +429,7 @@ namespace TBChestTracker
                                     var dbg_msg = $"[[Level {ttmpChest.Chest.Level} ({ttmpChest.Chest.Type.ToString()}) {ttmpChest.Chest.Name} from {ttmpChest.Clanmate} validated.]]";
                                     Debug.WriteLine(dbg_msg);
                                     Loggy.Write(dbg_msg, LogType.LOG, "chests.log");
-
+                                    com.HellStormGames.Logging.Console.Write(dbg_msg);
                                     isValidated = true;
                                 }
                             }
@@ -430,8 +444,9 @@ namespace TBChestTracker
                     chestdata = validated;
                 }
             }
-            
         }
+        #endregion
+
         private List<ClanChestData> CreateClanChestData(List<ChestData> chestdata)
         {
             List<ClanChestData> clanChestData = new List<ClanChestData>();
@@ -472,8 +487,8 @@ namespace TBChestTracker
             {
                 ChestProcessingState = ChestProcessingState.PROCESSING;
                 GlobalDeclarations.isAnyGiftsAvailable = true;
-                List<ChestData> tmpchests = ProcessText2(resulttext);
                 
+                List<ChestData> tmpchests = ProcessText2(resulttext);
                 List<ClanChestData> tmpchestdata = CreateClanChestData(tmpchests);
 
                 var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates.ToList();
@@ -509,6 +524,8 @@ namespace TBChestTracker
                                 bool isAliasMatch = mate.Aliases.Contains(tmpchest.Clanmate, StringComparer.InvariantCultureIgnoreCase);
                                 clanChestData.Add(new ClanChestData(mate.Name, tmpchest.chests));
                                 Debug.WriteLine($"\t\t {mate.Name} alias detected and corrected.");
+                                com.HellStormGames.Logging.Console.Write($"\t\t {mate.Name} alias detected and corrected.");
+                                    
                                 alias_found = true;
                             }
                         }
@@ -516,6 +533,7 @@ namespace TBChestTracker
                         {
                             Debug.WriteLine($"{tmpchest.Clanmate} doesn't exist within clanmates database.");
                             clanChestData.Add(new ClanChestData(tmpchest.Clanmate, tmpchest.chests));
+                            com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} doesn't exist within clanmates database.");
                             ClanManager.Instance.ClanmateManager.Add(tmpchest.Clanmate);
                             ClanManager.Instance.ClanmateManager.Save(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile);
                         }

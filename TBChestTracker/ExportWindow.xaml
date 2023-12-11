@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
         mc:Ignorable="d"
-        Title="Export Clan Chest Window" Width="300" WindowStyle="ToolWindow" SizeToContent="Height" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing">
+        Title="Export Clan Chest Window" Width="300" WindowStyle="ToolWindow" SizeToContent="Height" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions >
             <RowDefinition Height="50"/>

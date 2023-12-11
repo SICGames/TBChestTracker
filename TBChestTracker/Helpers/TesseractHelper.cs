@@ -44,14 +44,14 @@ namespace TBChestTracker.Helpers
             try
             {
                 if(_tesseract == null)
-                _tesseract = new Tesseract(tessdata_path, languages, OcrEngineMode.Default);
+                    _tesseract = new Tesseract(tessdata_path, languages, OcrEngineMode.Default);
             }
             catch(Exception e)
             {
                 Debug.WriteLine(e.Message);
                 return false;
             }
-
+            com.HellStormGames.Logging.Console.Write("Tesseract Initialized Successfully");
             return true;
         }
         public static TessResult Read(IInputArray image)

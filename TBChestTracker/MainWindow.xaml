@@ -257,6 +257,9 @@
                     <Separator/>
                     <MenuItem Header="Settings"/>
                 </MenuItem>
+                <MenuItem Header="Window">
+                    <MenuItem Header="Console" x:Name="ConsoleMenuButton" Click="ConsoleMenuButton_Click"/>
+                </MenuItem>
                 <MenuItem Header="Help">
                     <MenuItem Header="Tutorial"/>
                 </MenuItem>
