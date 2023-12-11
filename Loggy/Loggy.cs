@@ -29,7 +29,9 @@ namespace com.HellStormGames
                     DateTime dateTime = DateTime.Now;
                     string datestr = $"{dateTime.ToString(@"MM/dd/yy @ hh:mm:ss")}";
                     string typeStr = $"{type.ToString()}";
-                    tw.WriteLine($"[{typeStr}] [{datestr}] -> {message}");
+                    string text = $"[{typeStr}] [{datestr}] -> {message}";
+                    Console.Write(datestr);
+                    tw.WriteLine($"{text}");
                     tw.Close();
                     tw.Dispose();
                 }

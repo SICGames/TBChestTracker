@@ -51,7 +51,7 @@ namespace TBChestTracker.Helpers
                 Debug.WriteLine(e.Message);
                 return false;
             }
-            com.HellStormGames.Logging.Console.Write("Tesseract Initialized Successfully");
+            com.HellStormGames.Logging.Loggy.Write("Tesseract Initialized Successfully", com.HellStormGames.Logging.LogType.LOG);
             return true;
         }
         public static TessResult Read(IInputArray image)

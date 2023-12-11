@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,18 +12,12 @@ namespace com.HellStormGames.Logging
         private string _message = String.Empty;
         public string Message
         {
-            get => _message;
+            get => this._message; 
             set
             {
-                _message = value;
-                OnPropertyChanged(nameof(Message)); 
+                this._message = value;
+                onPropertyChanged(nameof(Message));
             }
-        }
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(String propertyName)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private static Console _instance = null;
@@ -32,7 +25,7 @@ namespace com.HellStormGames.Logging
         {
             get
             {
-                if(_instance == null )
+                if( _instance == null)
                     _instance = new Console();
                 return _instance;
             }
@@ -50,6 +43,16 @@ namespace com.HellStormGames.Logging
         {
             _instance.Message = String.Empty;
             _instance = null;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void onPropertyChanged(string propertyName)
+        {
+            if(PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
     }
 }

@@ -211,7 +211,7 @@ namespace TBChestTracker
             var x = (int)xClickPos.X * 2;
             var y = (int)xClickPos.Y;
 
-            com.HellStormGames.Logging.Console.Write("Automation Started");
+            com.HellStormGames.Logging.Loggy.Write("Automation Started", com.HellStormGames.Logging.LogType.LOG);
 
             Debug.WriteLine("Automation Started.");
             
@@ -259,7 +259,7 @@ namespace TBChestTracker
             ClanManager.Instance.ClanChestManager.SaveDataTask();
             ClanManager.Instance.ClanChestManager.CreateBackup();
 
-            com.HellStormGames.Logging.Console.Write("Automation stopped.");
+            com.HellStormGames.Logging.Loggy.Write("Automation stopped.", com.HellStormGames.Logging.LogType.LOG);
         }
         #endregion
 
@@ -312,7 +312,7 @@ namespace TBChestTracker
             var ocrResult = await GetTextFromBitmap(e.ScreenCapturedBitmap); //LoadBitmap(e.ScreenCapturedBitmap, new Windows.Globalization.Language("en"));
             if (ocrResult == null)
             {
-                com.HellStormGames.Logging.Console.Write("--- OCR RESULT IS NULL. ---");
+                com.HellStormGames.Logging.Loggy.Write("--- OCR RESULT IS NULL. ---", com.HellStormGames.Logging.LogType.LOG);
             }
 
             //-- here we process data.
@@ -331,7 +331,7 @@ namespace TBChestTracker
             InputHooks.onKeyReleased += InputHooks_onKeyReleased;
             if (InputHooks.Install())
             {
-                com.HellStormGames.Logging.Console.Write("Installed Keyboard hooks successfully.");
+                com.HellStormGames.Logging.Loggy.Write("Installed Keyboard hooks successfully.", com.HellStormGames.Logging.LogType.LOG);
                 //Debug.WriteLine("Installed Keyboard hooks successfully.");
             }
 

@@ -132,7 +132,6 @@
     <Compile Include="ConsoleWindow.xaml.cs">
       <DependentUpon>ConsoleWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Console\Console.cs" />
     <Compile Include="Helpers\JsonHelper.cs" />
     <Compile Include="Helpers\Translator.cs" />
     <Compile Include="MergeClanmateWindow.xaml.cs">

@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using com.HellStormGames.Logging;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -241,7 +242,7 @@ namespace TBChestTracker
                 previous_clanmatestatistic_data = null;
 
                 ClanManager.Instance.ClanChestManager.SaveData();
-                com.HellStormGames.Logging.Console.Write($"{previous_Clanmate_Name} changed to {clanmate_newname}");
+                Loggy.Write($"{previous_Clanmate_Name} changed to {clanmate_newname}", LogType.LOG);
                 //Debug.WriteLine($"{previous_Clanmate_Name} changed to {clanmate_newname}");
             }
         }
