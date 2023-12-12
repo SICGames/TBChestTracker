@@ -61,6 +61,7 @@ namespace TBChestTracker.Helpers
                 if (image == null)
                     return null;
 
+                //-- AccessViolationException -- Correupted Memory sometimes.
                 _tesseract.SetImage(image);
                 _tesseract.Recognize();
 

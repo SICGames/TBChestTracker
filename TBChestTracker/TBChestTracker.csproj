@@ -132,6 +132,8 @@
     <Compile Include="ConsoleWindow.xaml.cs">
       <DependentUpon>ConsoleWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Console\Console.cs" />
+    <Compile Include="Console\ConsoleData.cs" />
     <Compile Include="Helpers\JsonHelper.cs" />
     <Compile Include="Helpers\Translator.cs" />
     <Compile Include="MergeClanmateWindow.xaml.cs">
@@ -300,13 +302,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Emgu.CV">
-      <Version>4.7.0.5276</Version>
+      <Version>4.8.1.5350</Version>
     </PackageReference>
     <PackageReference Include="Emgu.CV.Bitmap">
-      <Version>4.7.0.5276</Version>
+      <Version>4.8.1.5350</Version>
     </PackageReference>
     <PackageReference Include="Emgu.CV.runtime.windows">
-      <Version>4.7.0.5276</Version>
+      <Version>4.8.1.5350</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.3</Version>

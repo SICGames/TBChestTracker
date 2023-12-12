@@ -1,17 +1,32 @@
-﻿using com.HellStormGames;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
+
 
 namespace com.HellStormGames.Logging
 {
     public class Console : INotifyPropertyChanged
     {
-        public List<LogData> LogData { get; set; }  
+        private ObservableCollection<LogData> _logData = null;
+        public ObservableCollection<LogData> LogData
+        {
+            get
+            {
+                return _logData;
+            }
+            set
+            {
+                _logData = value;
+                onPropertyChanged(nameof(LogData));
+            }
+        }
         
         private static Console _instance = null;
         public static Console Instance
@@ -21,7 +36,8 @@ namespace com.HellStormGames.Logging
                 if (_instance == null)
                 {
                     _instance = new Console();
-                    _instance.LogData = new List<LogData>();
+                    if(_instance.LogData == null) 
+                        _instance.LogData = new ObservableCollection<LogData>();    
                 }
                 return _instance;
             }
@@ -29,11 +45,11 @@ namespace com.HellStormGames.Logging
 
         public static void Write(string message)
         {
-            Write(message);
+            Write(message, "Common", LogType.INFO);
         }
         public static void Write(string message, string tag)
         {
-            Write(message, tag);
+            Write(message, tag, LogType.INFO);
         }
         public static void Write(string message, LogType type)
         {
@@ -41,13 +57,14 @@ namespace com.HellStormGames.Logging
         }
         public static void Write(string message, string Tag, LogType type = LogType.INFO)
         {
-            _instance.LogData.Add(new Logging.LogData(message, Tag, type));
-            //_instance.Message += $"{message}\n";
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                _instance.LogData.Add(new Logging.LogData(message, Tag, type));
+            }));
         }
         public static void Clear()
         {
             _instance.LogData.Clear();
-            //_instance.Message = String.Empty;
         }
         public static void Destroy()
         {

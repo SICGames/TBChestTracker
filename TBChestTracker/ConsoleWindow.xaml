@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Title="Console" Height="450" Width="800" 
         Topmost="True"
-        ResizeMode="CanResizeWithGrip" DataContext="{Binding Console.Instance}" WindowStartupLocation="CenterScreen" ShowInTaskbar="False" Closing="Window_Closing">
+        ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" ShowInTaskbar="False" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="24"/>
@@ -20,7 +20,7 @@
             </ToolBar>
         </ToolBarPanel>
         <DockPanel LastChildFill="True" Grid.Row="1">
-            <ListView x:Name="ConsoleView" ItemsSource="{Binding Path=LogData, Mode=TwoWay}">
+            <ListView x:Name="ConsoleView" ItemsSource="{Binding LogData, Mode=TwoWay}">
                 <ListView.View>
                     <GridView>
                         <GridView.Columns>

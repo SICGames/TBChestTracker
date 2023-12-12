@@ -322,6 +322,8 @@ namespace TBChestTracker
         #region Window Loaded
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            //com.HellStormGames.Logging.Console.Instance.LogData = new System.Collections.ObjectModel.ObservableCollection<com.HellStormGames.Logging.LogData>();
+
             InputHooks.onKeyPressed += InputHooks_onKeyPressed;
             InputHooks.onKeyReleased += InputHooks_onKeyReleased;
             if (InputHooks.Install())
@@ -388,7 +390,7 @@ namespace TBChestTracker
             if (System.IO.Directory.Exists(GlobalDeclarations.TesseractData))
             {
                 GlobalDeclarations.TessDataExists = true;
-                await TesseractHelper.InitAsync(GlobalDeclarations.TesseractData, "eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus");
+                await TesseractHelper.InitAsync(GlobalDeclarations.TesseractData, "eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus+pol+por+pus");
             }
             else
             {
@@ -456,6 +458,10 @@ namespace TBChestTracker
                                 }
                             }
                         }
+
+                        com.HellStormGames.Logging.Console.Write($"Loaded Clan ({ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}) Database Successfully.", 
+                            com.HellStormGames.Logging.LogType.INFO);
+
                     }
                     else
                     {
@@ -476,6 +482,9 @@ namespace TBChestTracker
                 {
                     if (result)
                     {
+                        com.HellStormGames.Logging.Console.Write($"Loaded Clan ({ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}) Database Successfully.",
+                            com.HellStormGames.Logging.LogType.INFO);
+
                         AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
                     }
                     else

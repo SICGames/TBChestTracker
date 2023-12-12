@@ -495,24 +495,34 @@ namespace TBChestTracker
                 }
 
                 //-- make sure clanmate exists.
-                foreach (var tmpchest in tmpchestdata)
+                var mate_index = 0;
+                foreach (var tmpchest in tmpchestdata.ToList())
                 {
                     bool alias_found = false;
-
                     bool exists = clanmates.Select(mate_name => mate_name.Name).Contains(tmpchest.Clanmate, StringComparer.CurrentCultureIgnoreCase);
                     if (!exists)
                     {
+                        com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} doesn't exist within clanmates database. Attempting to find Aliases.", "Unknown Clanmate", LogType.INFO);
+                        Debug.WriteLine($"{tmpchest.Clanmate} doesn't exist within clanmates database. Attempting to find Aliases.");
                         //-- attempt to check to see if the unfound clanmate is under an alias.
-                        foreach(var mate in clanmates)
+                        foreach (var mate in clanmates)
                         {
-                            if(mate.Aliases.Count > 0)
+                            if (mate.Aliases.Count > 0)
                             {
-                                bool isAliasMatch = mate.Aliases.Contains(tmpchest.Clanmate, StringComparer.InvariantCultureIgnoreCase);
-                                if (isAliasMatch)
+                                bool isMatch = mate.Aliases.Contains(tmpchest.Clanmate, StringComparer.InvariantCultureIgnoreCase);
+                                if (isMatch)
                                 {
-                                    clanChestData.Add(new ClanChestData(mate.Name, tmpchest.chests));
-                                    com.HellStormGames.Logging.Console.Write($"\t\t {mate.Name} alias detected and corrected.", LogType.INFO);
+                                    com.HellStormGames.Logging.Console.Write($"\t\t Unknown clanmate ({tmpchest.Clanmate}) belongs to {mate.Name} aliases.", LogType.INFO);
+                                    var parent_data = clanChestData.Select(pd => pd).Where(data => data.Clanmate.Equals(mate.Name, StringComparison.InvariantCultureIgnoreCase)).ToList()[0];
+                                    if (parent_data.chests == null)
+                                    {
+                                        parent_data.chests = new List<Chest>();
+                                    }
+                                    
+                                    tmpchestdata[mate_index].Clanmate = mate.Name; //--- unknown clanmate properly identified and been re-written with correct parent clan name.
+                                    
                                     alias_found = true;
+                                    break;
                                 }
                             }
                         }
@@ -526,7 +536,11 @@ namespace TBChestTracker
                         }
                     }
                     else
+                    {
+                        mate_index += 1;
                         continue;
+                    }
+
                 }
 
                 //-- update clanchestdata
@@ -539,6 +553,7 @@ namespace TBChestTracker
                     {
                         var m_chestdata = _chestdata[0];
 
+                        //--- chest data returning null after correcting parent clan name.
                         if (chestdata.Clanmate.Equals(m_chestdata.Clanmate, StringComparison.CurrentCultureIgnoreCase))
                         {
                             if (chestdata.chests == null)

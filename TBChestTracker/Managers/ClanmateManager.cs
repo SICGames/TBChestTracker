@@ -16,54 +16,14 @@ namespace TBChestTracker
 {
     public class ClanmateManager 
     {
-        /*
-        #region OnPropertyChanged 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(String propertyName)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-        #endregion
-        */
         public ClanmatesDatabase Database { get; private set; }
 
-        /*
-        private ObservableCollection<Clanmate> _clanmates;
-        public ObservableCollection<Clanmate> Clanmates
-        {
-            get 
-            { 
-                return _clanmates; 
-            }
-            set 
-            {
-                _clanmates = value;
-                OnPropertyChanged(nameof(Clanmates));   
-            }
-        }
-        private int _count = 0;
-        public int Count
-        {
-            get => _count;
-            set
-            {
-                _count = value;
-                OnPropertyChanged(nameof(Count));   
-            }
-        }
-        */
         public void UpdateCount()
         {
             Database.NumClanmates = Database.Clanmates.Count;
         }
         public ClanmateManager() 
         {
-            /*
-            if (_clanmates == null)
-                _clanmates = new ObservableCollection<Clanmate>();
-            */
-
             if (Database == null)
             {
                 Database = new ClanmatesDatabase();
@@ -74,10 +34,6 @@ namespace TBChestTracker
         {
             Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                /*
-                _clanmates.Add(new Clanmate(name));
-                */
-
                 Database.Clanmates.Add(new Clanmate(name));
                 UpdateCount();
             });
