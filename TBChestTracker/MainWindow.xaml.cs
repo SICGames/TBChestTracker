@@ -212,9 +212,6 @@ namespace TBChestTracker
             var y = (int)xClickPos.Y;
 
             com.HellStormGames.Logging.Loggy.Write("Automation Started", com.HellStormGames.Logging.LogType.LOG);
-
-            Debug.WriteLine("Automation Started.");
-            
             GlobalDeclarations.canCaptureAgain = true;
             while (!stopAutomation)
             {
@@ -278,7 +275,6 @@ namespace TBChestTracker
                 int hotkey = KeyInterop.VirtualKeyFromKey(Key.F6);
                 if (key == hotkey)
                 {
-                    // Debug.WriteLine($"Snapshot taken.");
                     CaptureRegion();
                     GlobalDeclarations.hasHotkeyBeenPressed = true;
                 }
@@ -312,7 +308,6 @@ namespace TBChestTracker
             var ocrResult = await GetTextFromBitmap(e.ScreenCapturedBitmap); //LoadBitmap(e.ScreenCapturedBitmap, new Windows.Globalization.Language("en"));
             if (ocrResult == null)
             {
-                com.HellStormGames.Logging.Loggy.Write("--- OCR RESULT IS NULL. ---", com.HellStormGames.Logging.LogType.LOG);
             }
 
             //-- here we process data.
@@ -332,7 +327,6 @@ namespace TBChestTracker
             if (InputHooks.Install())
             {
                 com.HellStormGames.Logging.Loggy.Write("Installed Keyboard hooks successfully.", com.HellStormGames.Logging.LogType.LOG);
-                //Debug.WriteLine("Installed Keyboard hooks successfully.");
             }
 
             InputHookThread = new System.Threading.Thread(new System.Threading.ThreadStart(DetectHotkey));
@@ -413,7 +407,7 @@ namespace TBChestTracker
             isClosing = true;
             if (InputHooks.Uninstall())
             {
-                Debug.WriteLine("Successfully uninstalled input hooks.");
+             
             }
             ClanManager.Instance.Destroy();
             TesseractHelper.Destroy();
@@ -658,7 +652,6 @@ namespace TBChestTracker
         private void ConsoleMenuButton_Click(object sender, RoutedEventArgs e)
         {
             consoleWindow.Show();
-            Debug.WriteLine("");
         }
     }
 }

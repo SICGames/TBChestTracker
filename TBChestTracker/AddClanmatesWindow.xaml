@@ -46,7 +46,12 @@
                            x:Name="LoadFromCapturing" 
                            ToolTip="Screen Capture Clanmates names." 
                            Margin="5,0,0,0"
-                           PreviewMouseDown="LoadFromCapturing_PreviewMouseDown"/>
+                           PreviewMouseDown="LoadFromCapturing_PreviewMouseDown" Visibility="Collapsed"/>
+                    <Image Source="Images/Select_ClanmateIcon.png" Height="16" Width="16" 
+                            x:Name="SelectClanmateNameMenuItem" 
+                            ToolTip="Select Clanmate name" 
+                            Margin="5,0,0,0"
+                            PreviewMouseDown="SelectClanmateNameMenuItem_PreviewMouseDown"/>
                     <Separator Margin="5,3" Height="20"/>
                     <Button Content="M" Height="20" Width="20" x:Name="MergeClanmate" ToolTip="Group A Clanmate with known Aliases." Margin="5,0" Click="MergeClanmate_Click"/>
                     <Button Content="V" Height="20" Width="20" x:Name="VerifyClanmates" ToolTip="Verify Clanmates" Margin="5,0" Click="VerifyClanmates_Click"/>

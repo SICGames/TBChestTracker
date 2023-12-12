@@ -19,6 +19,7 @@
                 
             </ToolBar>
         </ToolBarPanel>
+        
         <TextBox x:Name="ConsoleViewer" Grid.Row="1" IsReadOnly="True" Text="{Binding Message, Mode=TwoWay}" TextWrapping="Wrap" 
                  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" TextChanged="ConsoleViewer_TextChanged"/>
     </Grid>

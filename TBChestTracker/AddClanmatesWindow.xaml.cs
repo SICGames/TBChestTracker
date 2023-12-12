@@ -368,5 +368,10 @@ namespace TBChestTracker
 
             //-- after that, we remove aliases from chest count database. 
         }
+
+        private void SelectClanmateNameMenuItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
     }
 }

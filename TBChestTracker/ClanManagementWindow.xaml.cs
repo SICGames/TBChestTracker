@@ -105,7 +105,7 @@ namespace TBChestTracker
                 var clan = clans[selectedIndex];
                 try
                 {
-                    Debug.WriteLine($"--- DELETING CLAN DIRECTORY: {clan.FolderPath}");
+                    //Debug.WriteLine($"--- DELETING CLAN DIRECTORY: {clan.FolderPath}");
                     Directory.Delete(clan.FolderPath, true);
 
                     //--- remove from recent databases.
@@ -115,7 +115,7 @@ namespace TBChestTracker
                 }
                 catch( Exception ex )
                 {
-                    Debug.WriteLine($"--- EXCEPTION CAUGHT: {ex.Message}");
+                    //Debug.WriteLine($"--- EXCEPTION CAUGHT: {ex.Message}");
                 }
             }
         }
