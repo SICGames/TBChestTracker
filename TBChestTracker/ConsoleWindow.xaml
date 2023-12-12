@@ -19,8 +19,24 @@
                 
             </ToolBar>
         </ToolBarPanel>
-        
-        <TextBox x:Name="ConsoleViewer" Grid.Row="1" IsReadOnly="True" Text="{Binding Message, Mode=TwoWay}" TextWrapping="Wrap" 
-                 HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" TextChanged="ConsoleViewer_TextChanged"/>
+        <DockPanel LastChildFill="True" Grid.Row="1">
+            <ListView x:Name="ConsoleView" ItemsSource="{Binding Path=LogData, Mode=TwoWay}">
+                <ListView.View>
+                    <GridView>
+                        <GridView.Columns>
+                            <GridViewColumn Header="" Width="32">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Source="{Binding logTypeIcon, Mode=TwoWay}" Height="16" Width="16"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Tag" DisplayMemberBinding="{Binding Tag}" Width="100"/>
+                            <GridViewColumn Header="Message" DisplayMemberBinding="{Binding Message}" Width="640"/>
+                        </GridView.Columns>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </DockPanel>
     </Grid>
 </Window>

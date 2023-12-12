@@ -211,7 +211,7 @@ namespace TBChestTracker
             var x = (int)xClickPos.X * 2;
             var y = (int)xClickPos.Y;
 
-            com.HellStormGames.Logging.Loggy.Write("Automation Started", com.HellStormGames.Logging.LogType.LOG);
+            com.HellStormGames.Logging.Console.Write("Automation Started", com.HellStormGames.Logging.LogType.INFO);
             GlobalDeclarations.canCaptureAgain = true;
             while (!stopAutomation)
             {
@@ -256,7 +256,7 @@ namespace TBChestTracker
             ClanManager.Instance.ClanChestManager.SaveDataTask();
             ClanManager.Instance.ClanChestManager.CreateBackup();
 
-            com.HellStormGames.Logging.Loggy.Write("Automation stopped.", com.HellStormGames.Logging.LogType.LOG);
+            com.HellStormGames.Logging.Console.Write("Automation stopped.", com.HellStormGames.Logging.LogType.INFO);
         }
         #endregion
 
@@ -326,7 +326,7 @@ namespace TBChestTracker
             InputHooks.onKeyReleased += InputHooks_onKeyReleased;
             if (InputHooks.Install())
             {
-                com.HellStormGames.Logging.Loggy.Write("Installed Keyboard hooks successfully.", com.HellStormGames.Logging.LogType.LOG);
+                com.HellStormGames.Logging.Console.Write("Installed Keyboard hooks successfully.", com.HellStormGames.Logging.LogType.INFO);
             }
 
             InputHookThread = new System.Threading.Thread(new System.Threading.ThreadStart(DetectHotkey));

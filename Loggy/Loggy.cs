@@ -9,13 +9,6 @@ namespace com.HellStormGames
 {
     namespace Logging 
     { 
-        public enum LogType
-        {
-            LOG,
-            WARNING,
-            ERROR
-        }
-
         public class Loggy
         {
             public static void Write(string message, LogType logType)

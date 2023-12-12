@@ -42,7 +42,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Console.cs" />
+    <Compile Include="ConsoleData.cs" />
     <Compile Include="Loggy.cs" />
+    <Compile Include="LogType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -55,7 +55,7 @@ namespace TBChestTracker
                     {
                         var name = data.Clanmate;
                         chestdata.Remove(data);
-                        com.HellStormGames.Logging.Loggy.Write($"{name} was successfully removed from clanchestdata.", com.HellStormGames.Logging.LogType.LOG);
+                        com.HellStormGames.Logging.Console.Write($"{name} was successfully removed from clanchestdata.", com.HellStormGames.Logging.LogType.INFO);
                     }
                 }
             }
@@ -81,7 +81,7 @@ namespace TBChestTracker
                 }
                 //-- if some how we came to this point, junk data exists.
                 var dbg_msg = $"---- '{str}' from OCR results doesn't match specified values.";
-                com.HellStormGames.Logging.Loggy.Write(dbg_msg, com.HellStormGames.Logging.LogType.LOG);
+                com.HellStormGames.Logging.Console.Write(dbg_msg, com.HellStormGames.Logging.LogType.INFO);
             }
             return false;
         }
@@ -191,7 +191,7 @@ namespace TBChestTracker
                                         {
                                             tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, level)));
                                             var dbgmsg = $"[[Level {level} ({type.ToString()}) {chestName} from {clanmate} validated.]]";
-                                            com.HellStormGames.Logging.Loggy.Write(dbgmsg, com.HellStormGames.Logging.LogType.LOG);
+                                            com.HellStormGames.Logging.Console.Write(dbgmsg, com.HellStormGames.Logging.LogType.INFO);
                                         }
                                     }
                                 }
@@ -201,7 +201,7 @@ namespace TBChestTracker
 
                                 tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, level)));
                                 var dbg_msg = $"--- ADDING level {level} {type.ToString()}  '{chestName}' from {clanmate} ----";
-                                com.HellStormGames.Logging.Loggy.Write(dbg_msg, com.HellStormGames.Logging.LogType.LOG);
+                                com.HellStormGames.Logging.Console.Write(dbg_msg, com.HellStormGames.Logging.LogType.INFO);
                             }
                         }
                         else
@@ -233,7 +233,7 @@ namespace TBChestTracker
                                     {
                                         tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, 0)));
                                         var dbgmsg = $"[[({type.ToString()}) {chestName} from {clanmate} validated.]]";
-                                        com.HellStormGames.Logging.Loggy.Write(dbgmsg, com.HellStormGames.Logging.LogType.LOG);   
+                                        com.HellStormGames.Logging.Console.Write(dbgmsg, com.HellStormGames.Logging.LogType.INFO);   
                                     }
                                 }
                             }
@@ -241,7 +241,7 @@ namespace TBChestTracker
                             {
                                 tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, 0)));
                                 var dbgmsg = $"--- ADDING {type.ToString()}  '{chestName}' from {clanmate} ----";
-                                com.HellStormGames.Logging.Loggy.Write (dbgmsg, LogType.LOG);  
+                                com.HellStormGames.Logging.Console.Write (dbgmsg, LogType.INFO);  
                             }
                         }
                     }
@@ -271,7 +271,7 @@ namespace TBChestTracker
                 if (!bExists)
                 {
                     var dbg_msg = $"---- Successfully removed '{data}' invalid data from OCR results.";
-                    com.HellStormGames.Logging.Loggy.Write(dbg_msg, com.HellStormGames.Logging.LogType.LOG);  
+                    com.HellStormGames.Logging.Console.Write(dbg_msg, com.HellStormGames.Logging.LogType.INFO);  
                     result.Remove(data);
                 }
             }
@@ -356,7 +356,7 @@ namespace TBChestTracker
 
                             tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, level)));
                             var dbg_msg = $"--- ADDING level {level} {type.ToString()}  '{chestName}' from {clanmate} ----";
-                            com.HellStormGames.Logging.Loggy.Write(dbg_msg, com.HellStormGames.Logging.LogType.LOG);  
+                            com.HellStormGames.Logging.Console.Write(dbg_msg, com.HellStormGames.Logging.LogType.INFO);  
                         }
                         else
                         {
@@ -380,7 +380,7 @@ namespace TBChestTracker
                             
                             var dbg_msg = $"--- ADDING ({chestName}) {type.ToString()} Chest from {clanmate} ----";
                             tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, 0)));
-                            com.HellStormGames.Logging.Loggy.Write(dbg_msg, com.HellStormGames.Logging.LogType.LOG);
+                            com.HellStormGames.Logging.Console.Write(dbg_msg, com.HellStormGames.Logging.LogType.INFO);
                         }
                     }
                 }
@@ -414,7 +414,7 @@ namespace TBChestTracker
                                 {
                                     validated.Add(new ChestData(ttmpChest.Clanmate, ttmpChest.Chest));
                                     var dbg_msg = $"[[Level {ttmpChest.Chest.Level} ({ttmpChest.Chest.Type.ToString()}) {ttmpChest.Chest.Name} from {ttmpChest.Clanmate} validated.]]";
-                                    com.HellStormGames.Logging.Loggy.Write(dbg_msg, com.HellStormGames.Logging.LogType.LOG);
+                                    com.HellStormGames.Logging.Console.Write(dbg_msg, com.HellStormGames.Logging.LogType.INFO);
                                     isValidated = true;
                                 }
                             }
@@ -511,7 +511,7 @@ namespace TBChestTracker
                                 if (isAliasMatch)
                                 {
                                     clanChestData.Add(new ClanChestData(mate.Name, tmpchest.chests));
-                                    com.HellStormGames.Logging.Loggy.Write($"\t\t {mate.Name} alias detected and corrected.", LogType.LOG);
+                                    com.HellStormGames.Logging.Console.Write($"\t\t {mate.Name} alias detected and corrected.", LogType.INFO);
                                     alias_found = true;
                                 }
                             }
@@ -520,7 +520,7 @@ namespace TBChestTracker
                         if (!alias_found)
                         {
                             clanChestData.Add(new ClanChestData(tmpchest.Clanmate, tmpchest.chests));
-                            com.HellStormGames.Logging.Loggy.Write($"{tmpchest.Clanmate} doesn't exist within clanmates database.", LogType.LOG);
+                            com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} doesn't exist within clanmates database.", LogType.INFO);
                             ClanManager.Instance.ClanmateManager.Add(tmpchest.Clanmate);
                             ClanManager.Instance.ClanmateManager.Save(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile);
                         }

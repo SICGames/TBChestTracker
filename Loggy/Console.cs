@@ -1,5 +1,7 @@
-﻿using System;
+﻿using com.HellStormGames;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -9,39 +11,48 @@ namespace com.HellStormGames.Logging
 {
     public class Console : INotifyPropertyChanged
     {
-        private string _message = String.Empty;
-        public string Message
-        {
-            get => this._message; 
-            set
-            {
-                this._message = value;
-                onPropertyChanged(nameof(Message));
-            }
-        }
-
+        public List<LogData> LogData { get; set; }  
+        
         private static Console _instance = null;
         public static Console Instance
         {
             get
             {
-                if( _instance == null)
+                if (_instance == null)
+                {
                     _instance = new Console();
+                    _instance.LogData = new List<LogData>();
+                }
                 return _instance;
             }
         }
 
         public static void Write(string message)
         {
-            _instance.Message += $"{message}\n";
+            Write(message);
+        }
+        public static void Write(string message, string tag)
+        {
+            Write(message, tag);
+        }
+        public static void Write(string message, LogType type)
+        {
+            Write(message, "Common", type);
+        }
+        public static void Write(string message, string Tag, LogType type = LogType.INFO)
+        {
+            _instance.LogData.Add(new Logging.LogData(message, Tag, type));
+            //_instance.Message += $"{message}\n";
         }
         public static void Clear()
         {
-            _instance.Message = String.Empty;
+            _instance.LogData.Clear();
+            //_instance.Message = String.Empty;
         }
         public static void Destroy()
         {
-            _instance.Message = String.Empty;
+            _instance.LogData.Clear();
+            _instance.LogData = null;
             _instance = null;
         }
 

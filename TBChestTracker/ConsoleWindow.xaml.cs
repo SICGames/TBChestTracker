@@ -30,10 +30,5 @@ namespace TBChestTracker
             e.Cancel = true;
             this.Hide();
         }
-
-        private void ConsoleViewer_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            ConsoleViewer.ScrollToEnd();
-        }
     }
 }
