@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Runtime.InteropServices;
-using com.HellScape.ScreenCapture;
+using com.HellStormGames.ScreenCapture;
 
 namespace TBChestTracker
 {
@@ -59,8 +59,8 @@ namespace TBChestTracker
         public static void LeftClick(int x, int y)
         {
             //-- need to convert x, y
-            var mx = (x * 65535 / Snapture.ScreenWidth);
-            var my = (y * 65535 / Snapture.ScreenHeight);
+            var mx = (x * 65535 / Snapture.Instance.ScreenWidth);
+            var my = (y * 65535 / Snapture.Instance.ScreenHeight);
             mouse_event((int)(MouseEventFlags.MOVE | MouseEventFlags.ABSOLUTE), mx,my, 0, 0);    
             mouse_event((int)(MouseEventFlags.LEFTDOWN), mx, my, 0, 0);
             mouse_event((int)(MouseEventFlags.LEFTUP), mx, my, 0, 0);

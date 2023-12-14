@@ -97,6 +97,9 @@
   <PropertyGroup>
     <ApplicationIcon>appIcon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="System" />
@@ -134,10 +137,18 @@
     </Compile>
     <Compile Include="Console\Console.cs" />
     <Compile Include="Console\ConsoleData.cs" />
+    <Compile Include="Converters\MidPointValueConverter.cs" />
+    <Compile Include="CustomControls\DpiAwareImage.cs" />
+    <Compile Include="Helpers\BitmapHelper.cs" />
+    <Compile Include="Helpers\ImageDpiHelper.cs" />
+    <Compile Include="Helpers\IOHelper.cs" />
     <Compile Include="Helpers\JsonHelper.cs" />
     <Compile Include="Helpers\Translator.cs" />
     <Compile Include="MergeClanmateWindow.xaml.cs">
       <DependentUpon>MergeClanmateWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PreviewScreenshotWindow.xaml.cs">
+      <DependentUpon>PreviewScreenshotWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="States\CaptureMode.cs" />
     <Compile Include="States\ChestProcessingState.cs" />
@@ -269,9 +280,17 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="PreviewScreenshotWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="SelectRegionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -292,6 +311,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -411,6 +431,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Images\warningIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Tests\screenshot.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

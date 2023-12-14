@@ -15,7 +15,6 @@ using System.Drawing.Imaging;
 using Emgu.CV.Cuda;
 using System.Text;
 
-using com.HellScape.ScreenCapture;
 using CaptainHookSharp;
 using System.Diagnostics;
 using System.Windows.Input;
@@ -34,6 +33,9 @@ using TBChestTracker.Helpers;
 using TBChestTracker.Managers;
 using System.Reflection;
 
+using com.HellStormGames.ScreenCapture;
+using com.HellStormGames.Imaging;
+
 namespace TBChestTracker
 {
     /// <summary>
@@ -50,11 +52,10 @@ namespace TBChestTracker
         bool isAutomationBusy = false;
         int captureCounter = 0;
         public ClanManager ClanManager { get; private set; }
-        
         bool isClosing = false;
         bool stopAutomation = false;
         private double CLANCHEST_IMAGE_BRIGHTNESS = 0.75d;
-
+        public Snapture Snapture { get; private set; }  
         public Version AppVersion
         {
             get
@@ -333,9 +334,12 @@ namespace TBChestTracker
 
             InputHookThread = new System.Threading.Thread(new System.Threading.ThreadStart(DetectHotkey));
             InputHookThread.Start();
-
+            
+            Snapture = new Snapture();
             Snapture.onFrameCaptured += Snapture_onFrameCaptured;
             Snapture.Start(FrameCapturingMethod.GDI);
+            com.HellStormGames.Logging.Console.Write("Snapture Started.", com.HellStormGames.Logging.LogType.INFO);
+
             AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - Untitled";
             this.ClanManager = new ClanManager();
 
@@ -400,7 +404,6 @@ namespace TBChestTracker
             }
 
             //var translation = Translator.Translate("I'm So Silly.", "en", "fr");
-
         }
         #endregion
         #region Window Closing

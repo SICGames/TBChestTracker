@@ -371,7 +371,8 @@ namespace TBChestTracker
 
         private void SelectClanmateNameMenuItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-
+            PreviewScreenshotWindow previewWindow = new PreviewScreenshotWindow();
+            previewWindow.Show();
         }
     }
 }
