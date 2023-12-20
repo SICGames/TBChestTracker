@@ -1,12 +1,16 @@
 #pragma once
 #include "CaptainHookNative.h"
-
+#include <vcclr.h>
+#include <msclr/marshal.h>
 using namespace System;
+using namespace System::Runtime::InteropServices;
+using namespace msclr::interop;
 
 
 namespace CaptainHookSharp 
 {
-	public ref class InputHookEventArguments : EventArgs {
+	public ref class InputHookEventArguments : EventArgs 
+	{
 	public:
 		property int KeyCode;
 		InputHookEventArguments(int key) {
@@ -50,7 +54,34 @@ namespace CaptainHookSharp
 			}
 			return msg;
 		}
+		static bool Record() 
+		{
+			return InputHookNative::Instance().Record();
+		}
+		static bool StopRecoding() {
+			return InputHookNative::Instance().StopRocording();
+		}
+		static bool Play() {
+			return InputHookNative::Instance().Playback();
+		}
+		static bool LoadEventFile(String ^filename) 
+		{
+			marshal_context^ c = gcnew marshal_context();
+			const char* cFile = c->marshal_as<const char*>(filename);
+			bool result = InputHookNative::Instance().LoadEvent(cFile);
+			delete c;
+			return result;
 
+		}
+		static bool SaveEventFile(String ^filename) {
+		
+			marshal_context^ c = gcnew marshal_context();
+			const char* cFile = c->marshal_as<const char*>(filename);
+			bool result = InputHookNative::Instance().SaveEvent(cFile);
+			
+			delete c;
+			return result;
+		}
 	private:
 		
 	protected:

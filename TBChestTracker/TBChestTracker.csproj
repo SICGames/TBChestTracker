@@ -147,6 +147,9 @@
     <Compile Include="MergeClanmateWindow.xaml.cs">
       <DependentUpon>MergeClanmateWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PreviewCroppedImageViewer.xaml.cs">
+      <DependentUpon>PreviewCroppedImageViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PreviewScreenshotWindow.xaml.cs">
       <DependentUpon>PreviewScreenshotWindow.xaml</DependentUpon>
     </Compile>
@@ -277,6 +280,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="NewConditionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PreviewCroppedImageViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

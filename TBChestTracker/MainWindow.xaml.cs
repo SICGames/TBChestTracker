@@ -404,6 +404,7 @@ namespace TBChestTracker
             }
 
             //var translation = Translator.Translate("I'm So Silly.", "en", "fr");
+
         }
         #endregion
         #region Window Closing

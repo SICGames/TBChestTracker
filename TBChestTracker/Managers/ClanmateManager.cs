@@ -44,7 +44,7 @@ namespace TBChestTracker
             {
                 if(mate.Name.ToLower().Equals(name.ToLower()))
                 {
-                    mate.Aliases = aliases;
+                    mate.Aliases.InsertRange(mate.Aliases.Count, aliases);
                 }
             }
             UpdateCount();
