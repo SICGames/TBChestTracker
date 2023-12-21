@@ -109,28 +109,22 @@ namespace TBChestTracker
         {
             Image<Gray, Byte> image = null;
             Image<Gray, Byte> imageOut = null;
-            //System.Drawing.Bitmap bitmapOut = null;
             var brightness = 0.0d;
             if (CaptureMode == CaptureMode.CLANMATES)
             {
                 brightness = 0.5d;
                 image = bitmap.ToImage<Gray, Byte>();
                 imageOut = image.Mul(brightness) + brightness;
-                //bitmapOut = imageOut.AsBitmap();
+            
             }
             else
             {
                 brightness = CLANCHEST_IMAGE_BRIGHTNESS;
                 image = bitmap.ToImage<Gray, Byte>();
                 imageOut = image.Mul(brightness) + brightness;
-                //bitmapOut = imageOut.AsBitmap();
             }
-            //bitmapOut.Save("test-out-image-bw.jpg", ImageFormat.Jpeg);
             var ocrResult = TesseractHelper.Read(imageOut);
-
-            //bitmapOut.Dispose();
-            //bitmapOut = null;
-
+            
             imageOut.Dispose();
             imageOut = null;
             image.Dispose();
@@ -145,22 +139,27 @@ namespace TBChestTracker
             int x = sw / 2; //-- 1920 
             int y = sh / 2; //-- 1080
 
-            double topChestPerc = 0.69d; //--
-            double LeftChestPerc = 0.818d; //-- 1364 0.71d
-            double widthChestPerc = 0.45d; //-- 0.76d
-            
+            var leftChestPerc = 0.816d;
+            var topChestPerc = 0.7004d;
+            var widthChestPerc = 0.452d;
+            var heightChestPerc = 0.724d;
 
-            int left = (int)Math.Round(x * LeftChestPerc);
+            int left = (int)Math.Round(x * leftChestPerc);
             int top = (int)Math.Round(y * topChestPerc);
             int width = (int)Math.Round(x * widthChestPerc);
-            int height = (int)Math.Round(y * 0.6975);
+            int height = (int)Math.Round(y * heightChestPerc);
 
             CaptureMode = CaptureMode.CHESTS;
             Snapture.CaptureRegion(left, top, width, height);
             GlobalDeclarations.canCaptureAgain = false;
 
         }
-
+        public void CaptureDesktop()
+        {
+            CaptureMode = CaptureMode.CHESTS;
+            Snapture.CaptureDesktop();
+            GlobalDeclarations.canCaptureAgain = false;
+        }
         public void CaptureClanmates()
         {
             //-- now everything is completely manual when capturing. CLI C++ doesn't do any while loop.
@@ -208,8 +207,9 @@ namespace TBChestTracker
             //--- rinse and repeat UNTIL F8 key is pressed by user to end it.
             var screenX_half = Snapture.ScreenWidth / 2;
             var screenY_half = Snapture.ScreenHeight / 2;
-            var xClickPos = new Point(screenX_half * 0.711, screenY_half * 0.826);
-            var x = (int)xClickPos.X * 2;
+
+            var xClickPos = new Point((screenX_half * 0.706) * 2, screenY_half * 0.834);
+            var x = (int)xClickPos.X;
             var y = (int)xClickPos.Y;
 
             com.HellStormGames.Logging.Console.Write("Automation Started", com.HellStormGames.Logging.LogType.INFO);
@@ -274,6 +274,7 @@ namespace TBChestTracker
             {
                 int key = e.KeyCode;
                 int hotkey = KeyInterop.VirtualKeyFromKey(Key.F6);
+#if !SNAPTURE_DEBUG
                 if (key == hotkey)
                 {
                     CaptureRegion();
@@ -289,6 +290,13 @@ namespace TBChestTracker
                     StopAutomation();
                     GlobalDeclarations.hasHotkeyBeenPressed = true;
                 }
+#elif SNAPTURE_DEBUG
+                if(key == KeyInterop.VirtualKeyFromKey(Key.F2))
+                {
+                    CaptureRegion();
+                    GlobalDeclarations.hasHotkeyBeenPressed= true;
+                }
+#endif
             }
         }
         void DetectHotkey()
@@ -306,6 +314,30 @@ namespace TBChestTracker
         #region Snapture onFrameCaptured Event
         private async void Snapture_onFrameCaptured(object sender, FrameCapturedEventArgs e)
         {
+#if SNAPTURE_DEBUG
+            var outputpath = $@"{GlobalDeclarations.AppFolder}Test\SnaptureDebug.jpg";
+            System.Drawing.Bitmap debug_screenshot = e.ScreenCapturedBitmap;
+            debug_screenshot.Save($@"{outputpath}", ImageFormat.Jpeg);
+
+            var ocrResult = await GetTextFromBitmap(e.ScreenCapturedBitmap); //LoadBitmap(e.ScreenCapturedBitmap, new Windows.Globalization.Language("en"));
+            if (ocrResult == null)
+            {
+            }
+            foreach(var word in ocrResult.Words)
+            {
+                Debug.WriteLine($"{word}");
+            }
+            //-- simulate fake left mouse click by using MoveTo function.
+            var screenX_half = Snapture.ScreenWidth / 2;
+            var screenY_half = Snapture.ScreenHeight / 2;
+
+            var xClickPos = new Point((screenX_half * 0.706) * 2, screenY_half * 0.834);
+            var x = (int)xClickPos.X;
+            var y = (int)xClickPos.Y;
+
+            Automator.MoveTo((int)x, y);
+            e.ScreenCapturedBitmap.Dispose();
+#elif !SNAPTURE_DEBUG 
             var ocrResult = await GetTextFromBitmap(e.ScreenCapturedBitmap); //LoadBitmap(e.ScreenCapturedBitmap, new Windows.Globalization.Language("en"));
             if (ocrResult == null)
             {
@@ -316,15 +348,15 @@ namespace TBChestTracker
 
             if (CaptureMode == CaptureMode.CHESTS && ocrResult != null)
                 ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words);
+#endif
         }
-        #endregion
+#endregion
 
      
         #region Window Loaded
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //com.HellStormGames.Logging.Console.Instance.LogData = new System.Collections.ObjectModel.ObservableCollection<com.HellStormGames.Logging.LogData>();
-
+            
             InputHooks.onKeyPressed += InputHooks_onKeyPressed;
             InputHooks.onKeyReleased += InputHooks_onKeyReleased;
             if (InputHooks.Install())
@@ -337,7 +369,13 @@ namespace TBChestTracker
             
             Snapture = new Snapture();
             Snapture.onFrameCaptured += Snapture_onFrameCaptured;
+#if !SNAPTURE_DEBUG
+            Snapture.SetBitmapResolution((int)Snapture.MonitorInfo.Monitors[0].Dpi.X);
+#elif SNAPTURE_DEBUG
+            Snapture.SetBitmapResolution(96);
+#endif
             Snapture.Start(FrameCapturingMethod.GDI);
+
             com.HellStormGames.Logging.Console.Write("Snapture Started.", com.HellStormGames.Logging.LogType.INFO);
 
             AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - Untitled";
@@ -406,7 +444,7 @@ namespace TBChestTracker
             //var translation = Translator.Translate("I'm So Silly.", "en", "fr");
 
         }
-        #endregion
+#endregion
         #region Window Closing
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {

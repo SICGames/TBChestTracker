@@ -69,5 +69,12 @@ namespace TBChestTracker
         {
             return VkKeyScan(c);
         }
+
+        public static void MoveTo(int x, int y)
+        {
+            var mx = (x * 65535 / Snapture.Instance.ScreenWidth);
+            var my = (y * 65535 / Snapture.Instance.ScreenHeight);
+            mouse_event((int)(MouseEventFlags.MOVE | MouseEventFlags.ABSOLUTE), mx, my , 0, 0); 
+        }
     }
 }
