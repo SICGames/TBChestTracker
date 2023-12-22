@@ -13,7 +13,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using com.HellStormGames.ScreenCapture;
+using com.HellstormGames.Imaging.Extensions;
+
+using com.HellstormGames.ScreenCapture;
 using Emgu.CV;
 using Emgu.CV.Shape;
 using Emgu.CV.Structure;
@@ -64,6 +66,7 @@ namespace TBChestTracker
             //this.Hide();
             Snapture = new Snapture();
             Snapture.isDPIAware = true;
+            Snapture.SetBitmapResolution((int)Snapture.MonitorInfo.Monitors[0].Dpi.X);
             Snapture.onFrameCaptured += Snapture_onFrameCaptured;
             Snapture.Start(FrameCapturingMethod.GDI);
             
@@ -76,8 +79,8 @@ namespace TBChestTracker
             {
                 var bitmap = e.ScreenCapturedBitmap;
                 var file = $@"{IOHelper.ApplicationFolder}\PreviewScreenShot.jpg";
-                
-                PreviewImageSource =  BitmapHelper.ConvertFromBitmap(bitmap, (Int32)144, (Int32)144);
+
+                PreviewImageSource = bitmap.ToBitmapSource();  //BitmapHelper.ConvertFromBitmap(bitmap, (Int32)144, (Int32)144);
 
                 Debug.WriteLine($"Screenshot Bitmap DPI ({bitmap.HorizontalResolution}, {bitmap.VerticalResolution})");
                 Debug.WriteLine($"Preview Image DPI ({PreviewImageSource.DpiX}, {PreviewImageSource.DpiY})");
@@ -225,7 +228,7 @@ namespace TBChestTracker
                 SelectionRectangle = null;
 
                 //-- Now we have Tesseract read the cropped image.
-                System.Drawing.Bitmap result = BitmapHelper.ConvertFromBitmapSource(cropped_bitmap);
+                System.Drawing.Bitmap result = cropped_bitmap.ToBitmap();  //BitmapHelper.ConvertFromBitmapSource(cropped_bitmap);
 
                 if (result != null)
                 {

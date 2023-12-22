@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Runtime.InteropServices;
-using com.HellStormGames.ScreenCapture;
+using com.HellstormGames.ScreenCapture;
 
 namespace TBChestTracker
 {

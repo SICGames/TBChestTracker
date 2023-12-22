@@ -35,8 +35,9 @@ using TBChestTracker.Helpers;
 using TBChestTracker.Managers;
 using System.Reflection;
 
-using com.HellStormGames.ScreenCapture;
-using com.HellStormGames.Imaging;
+using com.HellstormGames.ScreenCapture;
+using com.HellstormGames.Imaging;
+using com.HellstormGames.Imaging.Extensions;
 
 namespace TBChestTracker
 {
@@ -57,6 +58,7 @@ namespace TBChestTracker
         bool isClosing = false;
         bool stopAutomation = false;
         private double CLANCHEST_IMAGE_BRIGHTNESS = 0.75d;
+
 
         private CaptainHook CaptainHook { get; set; }
 
@@ -112,6 +114,7 @@ namespace TBChestTracker
 
         private Task<TessResult> GetTextFromBitmap(System.Drawing.Bitmap bitmap)
         {
+            
             Image<Gray, Byte> image = null;
             Image<Gray, Byte> imageOut = null;
             var brightness = 0.0d;
@@ -134,7 +137,11 @@ namespace TBChestTracker
             imageOut = null;
             image.Dispose();
             image = null;
+            
+            
             return Task.FromResult(ocrResult);
+
+            
         }
         private void CaptureRegion()
         {
