@@ -102,6 +102,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework.Aero2" />
+    <Reference Include="Snapture">
+      <HintPath>..\..\Snapture\x64\Debug\Snapture.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
@@ -362,10 +365,6 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MercExchangeLokator\SnaptureCLI\SnaptureCLI.vcxproj">
-      <Project>{0a2a298d-74a5-43cc-8e1c-733fb4018c23}</Project>
-      <Name>SnaptureCLI</Name>
-    </ProjectReference>
     <ProjectReference Include="..\CaptainHookSharp\CaptainHookSharp.vcxproj">
       <Project>{22951a3b-96ba-4ecf-8b73-59361b9cc386}</Project>
       <Name>CaptainHookSharp</Name>
