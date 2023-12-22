@@ -101,6 +101,10 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CaptainHookSharp, Version=1.0.8755.35497, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\CaptainHookSharp\CaptainHookSharp\bin\x64\Debug\CaptainHookSharp.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="Snapture">
       <HintPath>..\..\Snapture\x64\Debug\Snapture.dll</HintPath>
@@ -365,10 +369,6 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CaptainHookSharp\CaptainHookSharp.vcxproj">
-      <Project>{22951a3b-96ba-4ecf-8b73-59361b9cc386}</Project>
-      <Name>CaptainHookSharp</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Loggy\Loggy.csproj">
       <Project>{0ceefd9b-aaea-4ee7-bffc-e1dec3589249}</Project>
       <Name>Loggy</Name>

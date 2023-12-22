@@ -15,7 +15,9 @@ using System.Drawing.Imaging;
 using Emgu.CV.Cuda;
 using System.Text;
 
-using CaptainHookSharp;
+using com.CaptainHookSharp;
+using CaptainHookInterlop = com.CaptainHookSharp.Interop;
+
 using System.Diagnostics;
 using System.Windows.Input;
 using Emgu.CV.OCR;
@@ -55,6 +57,9 @@ namespace TBChestTracker
         bool isClosing = false;
         bool stopAutomation = false;
         private double CLANCHEST_IMAGE_BRIGHTNESS = 0.75d;
+
+        private CaptainHook CaptainHook { get; set; }
+
         public Snapture Snapture { get; private set; }  
         public Version AppVersion
         {
@@ -261,56 +266,6 @@ namespace TBChestTracker
         }
         #endregion
 
-        #region InputHooks Events 
-        private void InputHooks_onKeyReleased(object sender, InputHookEventArguments e)
-        {
-            if (GlobalDeclarations.hasHotkeyBeenPressed)
-                GlobalDeclarations.hasHotkeyBeenPressed = false;
-        }
-
-        private void InputHooks_onKeyPressed(object sender, InputHookEventArguments e)
-        {
-            if (!GlobalDeclarations.hasHotkeyBeenPressed && !GlobalDeclarations.isBusyProcessingClanchests)
-            {
-                int key = e.KeyCode;
-                int hotkey = KeyInterop.VirtualKeyFromKey(Key.F6);
-#if !SNAPTURE_DEBUG
-                if (key == hotkey)
-                {
-                    CaptureRegion();
-                    GlobalDeclarations.hasHotkeyBeenPressed = true;
-                }
-                else if(key == KeyInterop.VirtualKeyFromKey(Key.F9))
-                {
-                    StartAutomationThread();
-                    GlobalDeclarations.hasHotkeyBeenPressed = true;
-                }
-                else if(key == KeyInterop.VirtualKeyFromKey(Key.F10))
-                {
-                    StopAutomation();
-                    GlobalDeclarations.hasHotkeyBeenPressed = true;
-                }
-#elif SNAPTURE_DEBUG
-                if(key == KeyInterop.VirtualKeyFromKey(Key.F2))
-                {
-                    CaptureRegion();
-                    GlobalDeclarations.hasHotkeyBeenPressed= true;
-                }
-#endif
-            }
-        }
-        void DetectHotkey()
-        {
-            while (!isClosing)
-            {
-                this.Dispatcher.Invoke(new Action(() =>
-                {
-                    InputHooks.InputMessages();
-                }));
-            }
-        }
-        #endregion
-
         #region Snapture onFrameCaptured Event
         private async void Snapture_onFrameCaptured(object sender, FrameCapturedEventArgs e)
         {
@@ -356,16 +311,12 @@ namespace TBChestTracker
         #region Window Loaded
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            CaptainHook = new CaptainHook();
+            CaptainHook.onKeyboardMessage += CaptainHook_onKeyboardMessage;
+            CaptainHook.onInstalled += CaptainHook_onInstalled;
+            CaptainHook.onError += CaptainHook_onError;
+            CaptainHook.Install();
             
-            InputHooks.onKeyPressed += InputHooks_onKeyPressed;
-            InputHooks.onKeyReleased += InputHooks_onKeyReleased;
-            if (InputHooks.Install())
-            {
-                com.HellStormGames.Logging.Console.Write("Installed Keyboard hooks successfully.", com.HellStormGames.Logging.LogType.INFO);
-            }
-
-            InputHookThread = new System.Threading.Thread(new System.Threading.ThreadStart(DetectHotkey));
-            InputHookThread.Start();
             
             Snapture = new Snapture();
             Snapture.onFrameCaptured += Snapture_onFrameCaptured;
@@ -444,12 +395,64 @@ namespace TBChestTracker
             //var translation = Translator.Translate("I'm So Silly.", "en", "fr");
 
         }
-#endregion
+
+        private void CaptainHook_onError(object sender, CaptainHook.HookErrorEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void CaptainHook_onInstalled(object sender, EventArgs e)
+        {
+            com.HellStormGames.Logging.Console.Write("Installed Keyboard hooks successfully.", com.HellStormGames.Logging.LogType.INFO);
+        }
+
+        private void CaptainHook_onKeyboardMessage(object sender, CaptainHook.KeyboardHookMessageEventArgs e)
+        {
+            int key = e.VirtKeyCode;
+            switch (e.MessageType)
+            {
+                case CaptainHookInterlop.KeyboardMessage.KeyDown:
+                    GlobalDeclarations.hasHotkeyBeenPressed = true;
+                    break;
+                case CaptainHookInterlop.KeyboardMessage.KeyUp:
+                    GlobalDeclarations.hasHotkeyBeenPressed = false;
+                    break;
+            }
+            
+            if (!GlobalDeclarations.hasHotkeyBeenPressed && !GlobalDeclarations.isBusyProcessingClanchests)
+            {
+                int hotkey = KeyInterop.VirtualKeyFromKey(Key.F6);
+#if !SNAPTURE_DEBUG
+                if (key == hotkey)
+                {
+                    CaptureRegion();
+                    GlobalDeclarations.hasHotkeyBeenPressed = true;
+                }
+                else if (key == KeyInterop.VirtualKeyFromKey(Key.F9))
+                {
+                    StartAutomationThread();
+                    GlobalDeclarations.hasHotkeyBeenPressed = true;
+                }
+                else if (key == KeyInterop.VirtualKeyFromKey(Key.F10))
+                {
+                    StopAutomation();
+                    GlobalDeclarations.hasHotkeyBeenPressed = true;
+                }
+#elif SNAPTURE_DEBUG
+                if(key == KeyInterop.VirtualKeyFromKey(Key.F2))
+                {
+                    CaptureRegion();
+                    GlobalDeclarations.hasHotkeyBeenPressed= true;
+                }
+#endif
+            }
+        }
+        #endregion
         #region Window Closing
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             isClosing = true;
-            if (InputHooks.Uninstall())
+            if (CaptainHook.Uninstall())
             {
              
             }
