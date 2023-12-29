@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
         xmlns:Commands="clr-namespace:Hellscape.Commands"
+        xmlns:Controls="clr-namespace:com.Konquest.UI;assembly=KonquestUI"
         mc:Ignorable="d"
-        Title="{Binding Path=AppTitle, Mode=TwoWay}" Width="800" Height="64" Loaded="Window_Loaded" SizeToContent="Height" Topmost="True" WindowStyle="ToolWindow" ResizeMode="NoResize"
+        Title="{Binding Path=AppTitle, Mode=TwoWay}" Width="800" Loaded="Window_Loaded" SizeToContent="Height" Topmost="True" WindowStyle="ToolWindow" ResizeMode="NoResize"
     xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2">
     <Window.CommandBindings>
         <CommandBinding Command="Commands:CustomCommandBindings.ClanManager" 
@@ -37,8 +38,8 @@
                         x:Name="ManageClanmatesCommand" 
                         CanExecute="ManageClanmatesCommand_CanExecute" 
                         Executed="ManageClanmatesCommand_Executed"/>
-        <CommandBinding Command="Commands:CustomCommandBindings.ManageClanchestSettings" 
-                        x:Name="ManageClanchestSettingsCommand" 
+        <CommandBinding Command="Commands:CustomCommandBindings.ManageClanChestSettings" 
+                        x:Name="ManageClanChestSettingsCommand" 
                         CanExecute="ManageClanchestSettingsCommand_CanExecute"
                         Executed="ManageClanchestSettingsCommand_Executed"/>
         <CommandBinding Command="Commands:CustomCommandBindings.ManuallyCaptureScreen" 
@@ -227,17 +228,16 @@
         </Style>
     </Window.Resources>
     <!--#endregion-->
-    
+
     <Grid Background="#dddddd">
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
-            <RowDefinition Height="28"/>
+            <RowDefinition Height="36"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" LastChildFill="True">
             <Menu DockPanel.Dock="Top" Height="auto" VerticalAlignment="Top">
                 <MenuItem Header="File">
                     <MenuItem Header="Clan Manager" x:Name="ClanManagerMenuItem" Command="Commands:CustomCommandBindings.ClanManager"/>
-                    
                     <Separator/>
                     <MenuItem Header="Load Clan Database" x:Name="LoadClanDB" Command="Commands:CustomCommandBindings.LoadClanDatabase"/>
                     <Separator/>
@@ -247,7 +247,6 @@
                     <MenuItem Header="Export Chest Data" Command="Commands:CustomCommandBindings.ExportClanDatabase"/>
                     <Separator/>
                     <MenuItem x:Name="RecentlyOpenedParent" Header="Recently Opened Databases">
-                        
                     </MenuItem>
                     <MenuItem Header="Quit" Command="Commands:CustomCommandBindings.QuitApplication"/>
                 </MenuItem>
@@ -265,38 +264,100 @@
                 </MenuItem>
             </Menu>
         </DockPanel>
-        <DockPanel Grid.Row="1">
-            <ToolBarTray DockPanel.Dock="Top" Height="32" IsLocked="True">
-                <ToolBar Style="{DynamicResource ToolBarStyle1}" Height="32" ToolBar.OverflowMode="Never" Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type ToolBarTray}}, Path=ActualWidth}" >
-                    <Button Height="24" Width="24" ToolTip="Manage Clan(s)" Margin="0,0,5,5" Command="Commands:CustomCommandBindings.ClanManager">
-                        <Image Source="Images/ClanManagerIcon.png" Stretch="UniformToFill"/>
-                    </Button>
-                    <Separator/>
-                    <Button Height="24" Width="24" ToolTip="Manage Clanmates" Margin="0,0,5,5" Command="Commands:CustomCommandBindings.ManageClanmates">
-                        <Image Source="Images/icons_main_menu_clan_1.png" Stretch="UniformToFill"/>
-                    </Button>
-                    <Button Height="24" Width="24" ToolTip="Manage Clan Chest Settings" Margin="0,0,5,5" Command="Commands:CustomCommandBindings.ManageClanchestSettings">
-                        <Image Source="Images/Icons_chest_1.png" Stretch="UniformToFill"/>
-                    </Button>
-                    <Button Height="24" Width="24" ToolTip="Manually Take Screenshot [F6]" Margin="0,0,5,5" Command="Commands:CustomCommandBindings.ManuallyCaptureScreen">
-                        <Image Source="Images/camera_64x64.png" Stretch="UniformToFill"/>
-                    </Button>
-                    <Separator/>
-                    <Button Height="24" Width="24" ToolTip="Start Automation [F9]" Margin="5,2,5,5" Command="Commands:CustomCommandBindings.StartAutomation">
-                        <Image Source="Images/StartAutomationIcon.png" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Button>
-                    <Button Height="24" Width="24" ToolTip="Stop Automation [F10]" Margin="0,0,5,5">
-                        <Image Source="Images/StopAutomation.png" Stretch="UniformToFill"/>
-                    </Button>
-                    <Separator/>
-                    <Button Height="24" Width="24" Command="Commands:CustomCommandBindings.ClanStats" ToolTip="View Clan Stats" Margin="5,0,5,5">
-                        <Image Source="Images/ClanStatsIcon.png" Stretch="UniformToFill"/>
-                    </Button>
-                    <Button Height="24" Width="24" ToolTip="Settings" Margin="0,0,5,5">
-                        <Image Source="Images/SettingsIcon01.png" Stretch="UniformToFill"/>
-                    </Button>
-                </ToolBar>
-            </ToolBarTray>
-        </DockPanel>
+        <ToolBarTray Grid.Row="1" Height="36" IsLocked="True">
+            <ToolBar Style="{DynamicResource ToolBarStyle1}" 
+                         Height="36" ToolBar.OverflowMode="Never"
+                         Grid.Row="1"
+                         Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type ToolBarTray}}, Path=ActualWidth}"
+                         VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Controls:ImageButton Background="Transparent"
+                                          Icon="pack://application:,,,/Images/ClanManagerIcon.png"
+                                          Height="24" Width="24" 
+                                          ToolTip="Manage Clan(s)"
+                                          Command="Commands:CustomCommandBindings.ClanManager" 
+                                          IsEnabled="True"
+                                          HoverBrush="LightBlue"
+                                          BorderThickness="1"
+                                          BorderBrush="AliceBlue"
+                                          Margin="0"
+                                          />
+                <Separator/>
+                <Controls:ImageButton Background="Transparent"
+                      Height="24" Width="24" 
+                      ToolTip="Manage Clan(s)"
+                      Command="Commands:CustomCommandBindings.ManageClanmates" 
+                      IsEnabled="True"
+                      HoverBrush="LightBlue"
+                      BorderThickness="1"
+                      BorderBrush="AliceBlue"
+                      Margin="0"
+                      Icon="Images/icons_main_menu_clan_1.png"/>
+                <Controls:ImageButton Background="Transparent"
+                                      Height="24" Width="24" 
+                                      ToolTip="Manage Clan Chest Settings"
+                                      Command="Commands:CustomCommandBindings.ManageClanChestSettings" 
+                                      IsEnabled="True"
+                                      HoverBrush="LightBlue"
+                                      BorderThickness="1"
+                                      BorderBrush="AliceBlue"
+                                      Margin="2,2"
+                                      Icon="Images/Icons_chest_1.png"/>
+
+                <Controls:ImageButton Background="Transparent"
+                                      Height="24" Width="24" 
+                                      ToolTip="Manually Capture Screen [F6]"
+                                      Command="Commands:CustomCommandBindings.ManuallyCaptureScreen" 
+                                      IsEnabled="True"
+                                      HoverBrush="LightBlue"
+                                      BorderThickness="1"
+                                      BorderBrush="AliceBlue"
+                                      Margin="2,2"
+                                      Icon="Images/camera_64x64.png"/>
+                <Separator/>
+
+                <Controls:ImageButton Background="Transparent"
+                                      Height="24" Width="24" 
+                                      ToolTip="Start Automation [F9]"
+                                      Command="Commands:CustomCommandBindings.StartAutomation" 
+                                      IsEnabled="True"
+                                      HoverBrush="LightBlue"
+                                      BorderThickness="1"
+                                      BorderBrush="AliceBlue"
+                                      Margin="2,2"
+                                      Icon="Images/StartAutomationIcon.png"/>
+                <Controls:ImageButton Background="Transparent"
+                       Height="24" Width="24" 
+                       ToolTip="Stop Automation [F10]"
+                       Command="Commands:CustomCommandBindings.StopAutomation" 
+                       IsEnabled="True"
+                       HoverBrush="LightBlue"
+                       BorderThickness="1"
+                       BorderBrush="AliceBlue"
+                       Margin="2,2"
+                       Icon="Images/StopAutomation.png"/>
+                <Separator/>
+                <Controls:ImageButton Background="Transparent"
+                                      Height="24" Width="24" 
+                                      ToolTip="Clan Statistics"
+                                      Command="Commands:CustomCommandBindings.ClanStats" 
+                                      IsEnabled="True"
+                                      HoverBrush="LightBlue"
+                                      BorderThickness="1"
+                                      BorderBrush="AliceBlue"
+                                      Margin="2,2"
+                                      Icon="Images/ClanStatsIcon.png"/>
+                <Controls:ImageButton Background="Transparent"
+                      Height="24" Width="24" 
+                      ToolTip="Settings"
+                      Command="" 
+                      IsEnabled="True"
+                      HoverBrush="LightBlue"
+                      BorderThickness="1"
+                      BorderBrush="AliceBlue"
+                      Margin="2,2"
+                      Icon="Images/SettingsIcon01.png"/>
+
+            </ToolBar>
+        </ToolBarTray>
     </Grid>
 </Window>

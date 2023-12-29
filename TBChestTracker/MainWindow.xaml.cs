@@ -714,5 +714,10 @@ namespace TBChestTracker
         {
             consoleWindow.Show();
         }
+
+        private void ImageButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

@@ -105,6 +105,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\CaptainHookSharp\CaptainHookSharp\bin\x64\Debug\CaptainHookSharp.dll</HintPath>
     </Reference>
+    <Reference Include="KonquestUI, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\KonquestUI\KonquestUI\bin\x64\Debug\KonquestUI.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="Snapture">
       <HintPath>..\..\Snapture\x64\Debug\Snapture.dll</HintPath>
@@ -153,11 +157,17 @@
     <Compile Include="MergeClanmateWindow.xaml.cs">
       <DependentUpon>MergeClanmateWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\GeneralSettingsPage.xaml.cs">
+      <DependentUpon>GeneralSettingsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PreviewCroppedImageViewer.xaml.cs">
       <DependentUpon>PreviewCroppedImageViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="PreviewScreenshotWindow.xaml.cs">
       <DependentUpon>PreviewScreenshotWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SettingsWindow.xaml.cs">
+      <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="States\CaptureMode.cs" />
     <Compile Include="States\ChestProcessingState.cs" />
@@ -289,6 +299,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\GeneralSettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="PreviewCroppedImageViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -298,6 +312,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SelectRegionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -405,7 +423,9 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\folder-icon.png" />
+    <Resource Include="Images\folder-icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\EditIcon.png">

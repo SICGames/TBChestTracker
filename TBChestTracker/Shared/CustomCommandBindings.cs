@@ -76,12 +76,15 @@ namespace Hellscape.Commands
                 typeof(CustomCommandBindings),
                 null
             );
-        public static readonly RoutedUICommand ManageClanchestSettings = new RoutedUICommand
+        public static readonly RoutedUICommand ManageClanChestSettings = new RoutedUICommand
             (
                 "Manage Clanchest Settings",
                 "Manage Clanchest Settings",
                 typeof(CustomCommandBindings),
-                null
+                new InputGestureCollection()
+                {
+                    new KeyGesture(Key.C, ModifierKeys.Control)
+                }
             );
         public static readonly RoutedUICommand ManuallyCaptureScreen = new RoutedUICommand
             (
