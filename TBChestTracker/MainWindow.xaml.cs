@@ -6,7 +6,6 @@ using System.Windows.Documents;
 using Windows.Globalization;
 using Windows.Graphics.Imaging;
 using System.Threading.Tasks;
-
 using Emgu;
 using Emgu.CV;
 using Emgu.Util;
@@ -14,10 +13,6 @@ using Emgu.CV.Structure;
 using System.Drawing.Imaging;
 using Emgu.CV.Cuda;
 using System.Text;
-
-using com.CaptainHookSharp;
-using CaptainHookInterlop = com.CaptainHookSharp.Interop;
-
 using System.Diagnostics;
 using System.Windows.Input;
 using Emgu.CV.OCR;
@@ -38,6 +33,8 @@ using System.Reflection;
 using com.HellstormGames.ScreenCapture;
 using com.HellstormGames.Imaging;
 using com.HellstormGames.Imaging.Extensions;
+using com.CaptainHookSharp;
+using CaptainHookInterlop = com.CaptainHookSharp.Interop;
 
 namespace TBChestTracker
 {
@@ -58,11 +55,9 @@ namespace TBChestTracker
         bool isClosing = false;
         bool stopAutomation = false;
         private double CLANCHEST_IMAGE_BRIGHTNESS = 0.75d;
-
-
         private CaptainHook CaptainHook { get; set; }
-
         public Snapture Snapture { get; private set; }  
+        
         public Version AppVersion
         {
             get
@@ -84,9 +79,42 @@ namespace TBChestTracker
             }
         }
 
+        private bool isAutomationPlayButtonEnabled = false;
+        private bool isAutomationPauseButtonEnabled = false;    
+        private bool isAutomationStopButtonEnabled = false;
+        private bool isCurrentClandatabase = false;
+
+        public bool IsCurrentClandatabase
+        {
+            get => isCurrentClandatabase;
+            set
+            {
+                isCurrentClandatabase = value;
+                OnPropertyChanged(nameof(IsCurrentClandatabase));
+            }
+        }
+        public bool IsAutomationPlayButtonEnabled
+        {
+            get => isAutomationPlayButtonEnabled;
+            set
+            {
+                isAutomationPlayButtonEnabled = value;
+                OnPropertyChanged(nameof(IsAutomationPlayButtonEnabled));   
+            }
+        }
+        public bool IsAutomationStopButtonEnabled
+        {
+            get => isAutomationStopButtonEnabled;
+            set
+            {
+                isAutomationStopButtonEnabled = value;
+                OnPropertyChanged(nameof(IsAutomationStopButtonEnabled));
+            }
+        }
+
         List<string> recently_opened_files { get; set; }
-        
         ConsoleWindow consoleWindow { get; set; }
+        
         #endregion
 
         #region PropertyChanged Event
@@ -196,12 +224,11 @@ namespace TBChestTracker
        
         #endregion
 
-
         #region Start Automation Thread
         void StartAutomationThread()
         {
             stopAutomation = false;
-            GlobalDeclarations.AuotmationRunning = true;
+            GlobalDeclarations.AutomationRunning = true;
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
                 Task automationTask = Task.Run(() => StartAutomationProcess());
@@ -264,7 +291,7 @@ namespace TBChestTracker
         void StopAutomation()
         {
             stopAutomation = true;
-            GlobalDeclarations.AuotmationRunning = false;
+            GlobalDeclarations.AutomationRunning = false;
 
             ClanManager.Instance.ClanChestManager.SaveDataTask();
             ClanManager.Instance.ClanChestManager.CreateBackup();
@@ -313,7 +340,6 @@ namespace TBChestTracker
 #endif
         }
 #endregion
-
      
         #region Window Loaded
         private async void Window_Loaded(object sender, RoutedEventArgs e)
@@ -455,6 +481,7 @@ namespace TBChestTracker
             }
         }
         #endregion
+
         #region Window Closing
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -471,6 +498,8 @@ namespace TBChestTracker
         #endregion
 
         #region Menu Command Functions
+
+        #region Load Clan Database
         private void LoadClanDatabaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute= true; 
@@ -514,6 +543,8 @@ namespace TBChestTracker
                         com.HellStormGames.Logging.Console.Write($"Loaded Clan ({ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}) Database Successfully.", 
                             com.HellStormGames.Logging.LogType.INFO);
 
+                        IsCurrentClandatabase = true;
+                        IsAutomationPlayButtonEnabled = true;
                     }
                     else
                     {
@@ -522,7 +553,9 @@ namespace TBChestTracker
                 });
             }
         }
+        #endregion
 
+        #region Recently Opened Databases Menu Item Click
         private void Mu_Click(object sender, RoutedEventArgs e)
         {
             var menuitem = sender as MenuItem;
@@ -538,6 +571,10 @@ namespace TBChestTracker
                             com.HellStormGames.Logging.LogType.INFO);
 
                         AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
+
+                        IsCurrentClandatabase = true;
+                        IsAutomationPlayButtonEnabled = true;
+
                     }
                     else
                     {
@@ -560,6 +597,9 @@ namespace TBChestTracker
                 }
             }
         }
+        #endregion
+
+        #region Save Clan database
         private void SaveClanDatabaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             if (GlobalDeclarations.hasNewClanDatabaseCreated)
@@ -567,12 +607,13 @@ namespace TBChestTracker
             else 
                 e.CanExecute = false;
         }
-
+        
         private void SaveClanDatabaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ClanManager.Instance.ClanDatabaseManager.Save();
         }
-
+        #endregion
+        #region Save Clan Database As
         private void SaveAsClanDatabaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             if(GlobalDeclarations.hasNewClanDatabaseCreated)
@@ -585,7 +626,9 @@ namespace TBChestTracker
         {
 
         }
+        #endregion
 
+        #region Export Clan Database
         private void ExportClanDatabase_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             if (GlobalDeclarations.hasNewClanDatabaseCreated && GlobalDeclarations.hasClanmatesBeenAdded)
@@ -594,12 +637,14 @@ namespace TBChestTracker
                 e.CanExecute = false;
         }
 
+        
         private void ExportClanDatabase_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ExportWindow exportWindow = new ExportWindow();
             exportWindow.ShowDialog();
         }
-
+        #endregion
+        #region Quit Application
         private void QuitApplication_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
@@ -609,7 +654,9 @@ namespace TBChestTracker
         {
             this.Close();
         }
+        #endregion
 
+        #region Manage Clanmates
         private void ManageClanmatesCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = GlobalDeclarations.hasNewClanDatabaseCreated;
@@ -623,12 +670,13 @@ namespace TBChestTracker
                 GlobalDeclarations.hasClanmatesBeenAdded = true;
             }
         }
+        #endregion
 
+        #region Manage Clan Chests Settings
         private void ManageClanchestSettingsCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = GlobalDeclarations.hasNewClanDatabaseCreated;
         }
-
         private void ManageClanchestSettingsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ChestingRequirementsWindow che = new ChestingRequirementsWindow();
@@ -637,48 +685,64 @@ namespace TBChestTracker
 
             }
         }
+        #endregion
 
+        #region Manually Capture
         private void ManuallyCaptureScreenCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = (GlobalDeclarations.hasClanmatesBeenAdded &&  GlobalDeclarations.hasNewClanDatabaseCreated && GlobalDeclarations.TessDataExists);
         }
-
         private void ManuallyCaptureScreenCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             if (!GlobalDeclarations.isBusyProcessingClanchests && GlobalDeclarations.TessDataExists)
                 CaptureRegion();
         }
+        #endregion
 
+        #region Start Automation
         private void StartAutomationCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            if (GlobalDeclarations.hasClanmatesBeenAdded && GlobalDeclarations.hasNewClanDatabaseCreated && GlobalDeclarations.TessDataExists)
-                e.CanExecute = true;
-            else 
-                e.CanExecute = false;
-
-        }
-
-        private void StartAutomationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            if (!GlobalDeclarations.AuotmationRunning && GlobalDeclarations.TessDataExists)
-            {
-                StartAutomationThread();
-            }
-        }
-
-        private void StopAutomationCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            if (GlobalDeclarations.hasClanmatesBeenAdded && GlobalDeclarations.hasNewClanDatabaseCreated && GlobalDeclarations.TessDataExists)
+            if (GlobalDeclarations.hasClanmatesBeenAdded
+                && GlobalDeclarations.hasNewClanDatabaseCreated
+                && GlobalDeclarations.TessDataExists)
                 e.CanExecute = true;
             else
                 e.CanExecute = false;
         }
+        private void StartAutomationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (!GlobalDeclarations.AutomationRunning
+                && GlobalDeclarations.TessDataExists)
+            {
+                StartAutomationThread();
+                IsAutomationStopButtonEnabled = true;
+                IsAutomationPlayButtonEnabled = false;
+            }
+        }
+        #endregion
 
+        #region Stop Automation
+        private void StopAutomationCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (GlobalDeclarations.hasClanmatesBeenAdded 
+                && GlobalDeclarations.hasNewClanDatabaseCreated 
+                && GlobalDeclarations.TessDataExists)
+                e.CanExecute = true;
+            else
+                e.CanExecute = false;
+        }
         private void StopAutomationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if(GlobalDeclarations.AuotmationRunning)
+            if (GlobalDeclarations.AutomationRunning)
+            {
                 StopAutomation();
+                IsAutomationStopButtonEnabled = false;
+                IsAutomationPlayButtonEnabled = true;
+            }
         }
+        #endregion
+
+        #region Clan Stats
         private void ClanStatsCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             if (GlobalDeclarations.hasClanmatesBeenAdded && GlobalDeclarations.hasNewClanDatabaseCreated)
@@ -693,7 +757,9 @@ namespace TBChestTracker
             clanStatisticsWindow.ChestManager = ClanManager.Instance.ClanChestManager;
             clanStatisticsWindow.Show();    
         }
+        #endregion
 
+        #region Clan Manager
         private void ClanManagerCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
@@ -705,7 +771,9 @@ namespace TBChestTracker
             clanManagementWindow.mainWindow = this; 
             if(clanManagementWindow.ShowDialog() == true)
             {
-
+                IsCurrentClandatabase = true;
+                IsAutomationPlayButtonEnabled = true;
+                
             }
         }
         #endregion
@@ -715,9 +783,6 @@ namespace TBChestTracker
             consoleWindow.Show();
         }
 
-        private void ImageButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
+        #endregion
     }
 }

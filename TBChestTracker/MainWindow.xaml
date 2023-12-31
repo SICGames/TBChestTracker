@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
         xmlns:Commands="clr-namespace:Hellscape.Commands"
-        xmlns:Controls="clr-namespace:com.Konquest.UI;assembly=KonquestUI"
+        xmlns:UIControls="clr-namespace:com.Konquest.UI;assembly=KonquestUI"
         mc:Ignorable="d"
         Title="{Binding Path=AppTitle, Mode=TwoWay}" Width="800" Loaded="Window_Loaded" SizeToContent="Height" Topmost="True" WindowStyle="ToolWindow" ResizeMode="NoResize"
     xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2">
@@ -270,7 +270,7 @@
                          Grid.Row="1"
                          Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type ToolBarTray}}, Path=ActualWidth}"
                          VerticalAlignment="Center" HorizontalAlignment="Center">
-                <Controls:ImageButton Background="Transparent"
+                <UIControls:ImageButton Background="Transparent"
                                           Icon="pack://application:,,,/Images/ClanManagerIcon.png"
                                           Height="24" Width="24" 
                                           ToolTip="Manage Clan(s)"
@@ -282,71 +282,71 @@
                                           Margin="0"
                                           />
                 <Separator/>
-                <Controls:ImageButton Background="Transparent"
+                <UIControls:ImageButton Background="Transparent"
                       Height="24" Width="24" 
                       ToolTip="Manage Clan(s)"
                       Command="Commands:CustomCommandBindings.ManageClanmates" 
-                      IsEnabled="True"
+                      IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=IsCurrentClandatabase}"
                       HoverBrush="LightBlue"
                       BorderThickness="1"
                       BorderBrush="AliceBlue"
                       Margin="0"
-                      Icon="Images/icons_main_menu_clan_1.png"/>
-                <Controls:ImageButton Background="Transparent"
+                      Icon="pack://application:,,,/Images/icons_main_menu_clan_1.png"/>
+                <UIControls:ImageButton Background="Transparent"
                                       Height="24" Width="24" 
                                       ToolTip="Manage Clan Chest Settings"
                                       Command="Commands:CustomCommandBindings.ManageClanChestSettings" 
-                                      IsEnabled="True"
+                                      IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=IsCurrentClandatabase}"
                                       HoverBrush="LightBlue"
                                       BorderThickness="1"
                                       BorderBrush="AliceBlue"
                                       Margin="2,2"
                                       Icon="Images/Icons_chest_1.png"/>
 
-                <Controls:ImageButton Background="Transparent"
+                <UIControls:ImageButton Background="Transparent"
                                       Height="24" Width="24" 
                                       ToolTip="Manually Capture Screen [F6]"
                                       Command="Commands:CustomCommandBindings.ManuallyCaptureScreen" 
-                                      IsEnabled="True"
+                                      IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=IsCurrentClandatabase}"
                                       HoverBrush="LightBlue"
                                       BorderThickness="1"
                                       BorderBrush="AliceBlue"
                                       Margin="2,2"
-                                      Icon="Images/camera_64x64.png"/>
+                                      Icon="pack://application:,,,/Images/camera_64x64.png"/>
                 <Separator/>
 
-                <Controls:ImageButton Background="Transparent"
+                <UIControls:ImageButton Background="Transparent"
                                       Height="24" Width="24" 
                                       ToolTip="Start Automation [F9]"
                                       Command="Commands:CustomCommandBindings.StartAutomation" 
-                                      IsEnabled="True"
+                                      IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=IsAutomationPlayButtonEnabled}"
                                       HoverBrush="LightBlue"
                                       BorderThickness="1"
                                       BorderBrush="AliceBlue"
                                       Margin="2,2"
-                                      Icon="Images/StartAutomationIcon.png"/>
-                <Controls:ImageButton Background="Transparent"
+                                      Icon="pack://application:,,,/Images/StartAutomationIcon.png"/>
+                <UIControls:ImageButton Background="Transparent"
                        Height="24" Width="24" 
                        ToolTip="Stop Automation [F10]"
                        Command="Commands:CustomCommandBindings.StopAutomation" 
-                       IsEnabled="True"
+                       IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=IsAutomationStopButtonEnabled}"
                        HoverBrush="LightBlue"
                        BorderThickness="1"
                        BorderBrush="AliceBlue"
                        Margin="2,2"
-                       Icon="Images/StopAutomation.png"/>
+                       Icon="pack://application:,,,/Images/StopAutomation.png"/>
                 <Separator/>
-                <Controls:ImageButton Background="Transparent"
+                <UIControls:ImageButton Background="Transparent"
                                       Height="24" Width="24" 
                                       ToolTip="Clan Statistics"
                                       Command="Commands:CustomCommandBindings.ClanStats" 
-                                      IsEnabled="True"
+                                      IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=IsCurrentClandatabase}"
                                       HoverBrush="LightBlue"
                                       BorderThickness="1"
                                       BorderBrush="AliceBlue"
                                       Margin="2,2"
-                                      Icon="Images/ClanStatsIcon.png"/>
-                <Controls:ImageButton Background="Transparent"
+                                      Icon="pack://application:,,,/Images/ClanStatsIcon.png"/>
+                <UIControls:ImageButton Background="Transparent"
                       Height="24" Width="24" 
                       ToolTip="Settings"
                       Command="" 
@@ -355,8 +355,7 @@
                       BorderThickness="1"
                       BorderBrush="AliceBlue"
                       Margin="2,2"
-                      Icon="Images/SettingsIcon01.png"/>
-
+                      Icon="pack://application:,,,/Images/SettingsIcon01.png"/>
             </ToolBar>
         </ToolBarTray>
     </Grid>
