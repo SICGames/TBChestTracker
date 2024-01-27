@@ -36,15 +36,13 @@ namespace TBChestTracker
                 {
                     condition.ChestType = ChestTypeCondition.Text;
                     condition.level = Int32.Parse(ChestLevelCondition.Text);
-                    condition.Comparator = ComparatorCondition.Text; 
                 }
             }
             this.Close();
         }
-        public void LoadChestCondition(string chesttype, string comparator,  Int32 level)
+        public void LoadChestCondition(string chesttype,  Int32 level)
         {
             ChestConditions.ChestType = chesttype;
-            ChestConditions.Comparator = comparator;
             ChestConditions.level = level;
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -61,11 +59,6 @@ namespace TBChestTracker
                 ChestTypeCondition.SelectedIndex = 4;
             else if (ChestConditions.ChestType.Equals("Arena", StringComparison.OrdinalIgnoreCase))
                 ChestTypeCondition.SelectedIndex = 5;
-
-            if (ChestConditions.Comparator.Equals("greater", StringComparison.OrdinalIgnoreCase))
-                ComparatorCondition.SelectedIndex = 0;
-            else if (ChestConditions.Comparator.Equals("less", StringComparison.OrdinalIgnoreCase))
-                ComparatorCondition.SelectedIndex = 1;
 
             if (ChestConditions.level == 5)
                 ChestLevelCondition.SelectedIndex = 0;

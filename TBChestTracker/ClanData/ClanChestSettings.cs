@@ -14,30 +14,38 @@ namespace TBChestTracker
     public class ClanChestSettings
     {
         private ChestRequirements pChestRequirements  = null;
+        private ClanRequirements pClanRequirements = null;
+
+        public ClanRequirements ClanRequirements
+        {
+            get
+            {
+                return pClanRequirements;
+            }
+            set
+            {
+                pClanRequirements = value;
+            }
+        }
 
         public ChestRequirements ChestRequirements 
         { 
             get
             {
-                if( pChestRequirements == null )
-                    pChestRequirements = new ChestRequirements();
-
-                
                 return pChestRequirements;
             }
             set
             {
-
-                if (pChestRequirements == null)
-                    pChestRequirements = new ChestRequirements();
                 pChestRequirements = value;
             }
         }
 
         public ClanChestSettings() 
         { 
-            if(ChestRequirements == null)
-                ChestRequirements = new ChestRequirements();
+            if(pChestRequirements == null)
+                pChestRequirements = new ChestRequirements();
+            if(pClanRequirements == null)
+                pClanRequirements = new ClanRequirements();
         }
         public void Clear()
         {
@@ -48,6 +56,11 @@ namespace TBChestTracker
             ChestRequirements.useChestConditions = false;
             ChestRequirements.useNoChestConditions = true;
             ChestRequirements.ChestConditions = new System.Collections.ObjectModel.ObservableCollection<ChestConditions>();
+
+            ClanRequirements.UseNoClanRequirements = true;
+            ClanRequirements.UseSpecifiedClanRequirements = false;
+            ClanRequirements.ClanSpecifiedRequirements = new System.Collections.ObjectModel.ObservableCollection<ClanSpecifiedRequirements>();
+
         }
         public bool LoadSettings(string file)
         {
@@ -55,11 +68,12 @@ namespace TBChestTracker
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Formatting = Formatting.Indented;
-                ChestRequirements = (ChestRequirements)serializer.Deserialize(sr, typeof(ChestRequirements));
-                if (ChestRequirements != null)
-                {
+                var clanChestSettings = new ClanChestSettings();
+                clanChestSettings = (ClanChestSettings)serializer.Deserialize(sr, typeof(ClanChestSettings));
+                this.pClanRequirements = clanChestSettings.ClanRequirements;
+                this.pChestRequirements = clanChestSettings.ChestRequirements;
+                if (pChestRequirements != null || pClanRequirements != null)
                     return true;
-                }
                 else
                     return false;
             }
@@ -70,7 +84,8 @@ namespace TBChestTracker
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Formatting = Formatting.Indented;
-                serializer.Serialize(sw, ChestRequirements);
+                //serializer.Serialize(sw, ChestRequirements);
+                serializer.Serialize(sw, this);
                 sw.Close();
                 sw.Dispose();
             }

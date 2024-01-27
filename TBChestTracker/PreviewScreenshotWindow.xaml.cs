@@ -77,6 +77,7 @@ namespace TBChestTracker
         {
             if(e.ScreenCapturedBitmap != null)
             {
+                
                 var bitmap = e.ScreenCapturedBitmap;
                 var file = $@"{IOHelper.ApplicationFolder}\PreviewScreenShot.jpg";
 

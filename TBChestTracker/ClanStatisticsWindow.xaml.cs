@@ -234,8 +234,21 @@ namespace TBChestTracker
             EndDate = lastDate.AddDays(-1);
             isready = true;
             LoadDateEntry(StartDate, EndDate);
-        }
 
+            Sort();
+        }
+        void Sort()
+        {
+            var data = CollectionViewSource.GetDefaultView(ClanStatsListView.ItemsSource);
+            using (data.DeferRefresh())
+            {
+                data.SortDescriptions.Clear();
+                if(AscSortRadioButton.IsChecked == true)
+                    data.SortDescriptions.Add(new SortDescription("Total", ListSortDirection.Ascending));
+                if(DescSortRadioButton.IsChecked == true)
+                    data.SortDescriptions.Add(new SortDescription("Total", ListSortDirection.Descending));
+            }
+        }
         bool Filter_Clanmate_Results(object item)
         {
             var filtered_name = FilterClanmate.Text;
@@ -255,6 +268,7 @@ namespace TBChestTracker
             {
                 if(ClanStatisticData !=  null) 
                     ClanStatisticData.Clear();
+
                 //var dateEntry = ChestManager.ClanChestDailyData.Where(d => d.Key.Equals(date)).ToList()[0];
                 var numDays = (enddate - startdate).TotalDays;
                 var dateRange = ChestManager.ClanChestDailyData.ToList().GetRange(0, (int)numDays + 1);
@@ -316,6 +330,7 @@ namespace TBChestTracker
             {
                 
             }
+
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -344,6 +359,16 @@ namespace TBChestTracker
         private void Close_MenuItem_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void AscSortRadioButton_Click(object sender, RoutedEventArgs e)
+        {
+            Sort();
+        }
+
+        private void DescSortRadioButton_Click(object sender, RoutedEventArgs e)
+        {
+            Sort();
         }
     }
 }

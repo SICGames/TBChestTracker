@@ -141,6 +141,8 @@
     </ApplicationDefinition>
     <Compile Include="Arrays\IDataCollection.cs" />
     <Compile Include="Automation\Automator.cs" />
+    <Compile Include="ClanData\ClanRequirements.cs" />
+    <Compile Include="ClanData\ClanSpecifiedRequirements.cs" />
     <Compile Include="Clanmate\Clanmate.cs" />
     <Compile Include="Clanmate\ClanmateDatabase.cs" />
     <Compile Include="ConsoleWindow.xaml.cs">
@@ -153,9 +155,13 @@
     <Compile Include="Helpers\ImageDpiHelper.cs" />
     <Compile Include="Helpers\IOHelper.cs" />
     <Compile Include="Helpers\JsonHelper.cs" />
+    <Compile Include="Helpers\Table.cs" />
     <Compile Include="Helpers\Translator.cs" />
     <Compile Include="MergeClanmateWindow.xaml.cs">
       <DependentUpon>MergeClanmateWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NewRequirementWindow.xaml.cs">
+      <DependentUpon>NewRequirementWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\GeneralSettingsPage.xaml.cs">
       <DependentUpon>GeneralSettingsPage.xaml</DependentUpon>
@@ -299,6 +305,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="NewRequirementWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\GeneralSettingsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -348,6 +358,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CsvHelper">
+      <Version>30.0.1</Version>
+    </PackageReference>
     <PackageReference Include="Emgu.CV">
       <Version>4.8.1.5350</Version>
     </PackageReference>

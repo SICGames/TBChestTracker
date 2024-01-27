@@ -1,15 +1,16 @@
-﻿<Window x:Class="TBChestTracker.NewConditionWindow"
+﻿<Window x:Class="TBChestTracker.NewRequirementWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
         mc:Ignorable="d"
-        Title="New Condition" Width="400" WindowStyle="ToolWindow" SizeToContent="Height" Topmost="True" DataContext="local:ClanChestSettings" WindowStartupLocation="CenterScreen">
+        Title="New Clan Requirement" SizeToContent="Height" Width="800" Topmost="True" WindowStyle="ToolWindow" ShowInTaskbar="False" WindowStartupLocation="CenterScreen">
     <Grid>
         <StackPanel Orientation="Vertical">
             <Grid Margin="0,5">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
@@ -20,8 +21,8 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Clan Chest Type" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBlock Grid.Row="0" Grid.Column="1" Text="Level" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <ComboBox Grid.Row="1" Grid.Column="0" SelectedIndex="0" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="ChestTypeCondition">
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="Minimal Level" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <ComboBox Grid.Row="1" Grid.Column="0" SelectedIndex="0" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="ChestTypeRequirement">
                     <ComboBoxItem Content="Common"/>
                     <ComboBoxItem Content="Rare"/>
                     <ComboBoxItem Content="Epic"/>
@@ -29,7 +30,7 @@
                     <ComboBoxItem Content="Arena"/>
                     <ComboBoxItem Content="Story"/>
                 </ComboBox>
-                <ComboBox Grid.Row="1" Grid.Column="1" Height="24" Width="50" HorizontalContentAlignment="Center" SelectedIndex="0" x:Name="ChestLevelCondition">
+                <ComboBox Grid.Row="1" Grid.Column="1" Height="24" Width="50" HorizontalContentAlignment="Center" SelectedIndex="0" x:Name="ChestLevelRequirement">
                     <ComboBoxItem Content="5"/>
                     <ComboBoxItem Content="10"/>
                     <ComboBoxItem Content="15"/>
@@ -37,6 +38,13 @@
                     <ComboBoxItem Content="25"/>
                     <ComboBoxItem Content="30"/>
                     <ComboBoxItem Content="35"/>
+                </ComboBox>
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="Per Day" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Row="0" Grid.Column="3" Text="AND / OR" HorizontalAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" Width="75" MaxLength="3" x:Name="ChestPerDayRequirementText"/>
+                <ComboBox Grid.Row="1" Grid.Column="3" Height="24" Width="75" HorizontalContentAlignment="Center" SelectedIndex="0" x:Name="ChestOperatorRequirement">
+                    <ComboBoxItem Content="AND"/>
+                    <ComboBoxItem Content="OR"/>
                 </ComboBox>
             </Grid>
             <StackPanel Grid.Row="2" Grid.ColumnSpan="3" Background="LightGray">

@@ -49,6 +49,10 @@ namespace TBChestTracker
                 return $"{ClanDatabaseFolder}\\chestrequirements.db";
             }
         }
+        public string ClanSettingsFile
+        {
+            get => $"{ClanDatabaseFolder}\\clansettings.db";
+        }
         public string ClanChestDatabaseBackupFile
         {
             get

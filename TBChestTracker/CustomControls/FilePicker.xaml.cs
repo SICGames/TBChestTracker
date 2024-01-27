@@ -26,6 +26,7 @@ namespace TBChestTracker
     {
 
         public string DefaultFolder { get; set; }
+        public int ExtensionFilterIndex { get; set; }
         #region Dependency Properties
         public static readonly DependencyProperty FileProperty =
         DependencyProperty.Register(
@@ -158,7 +159,8 @@ typeof(RoutedEventHandler), typeof(FilePicker));
 
             if (dialog.ShowDialog() == true)
             {
-                
+                this.ExtensionFilterIndex = dialog.FilterIndex;
+
                 this.File = dialog.FileName;
                 RoutedEventArgs args = new RoutedEventArgs(FilePicker.FileAcceptedEvent);
                 RaiseEvent(args);

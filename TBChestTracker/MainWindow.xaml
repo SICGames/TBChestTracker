@@ -279,8 +279,7 @@
                                           HoverBrush="LightBlue"
                                           BorderThickness="1"
                                           BorderBrush="AliceBlue"
-                                          Margin="0"
-                                          />
+                                          Margin="0" ImageSize="18,18"/>
                 <Separator/>
                 <UIControls:ImageButton Background="Transparent"
                       Height="24" Width="24" 
@@ -291,7 +290,7 @@
                       BorderThickness="1"
                       BorderBrush="AliceBlue"
                       Margin="0"
-                      Icon="pack://application:,,,/Images/icons_main_menu_clan_1.png"/>
+                      Icon="pack://application:,,,/Images/icons_main_menu_clan_1.png" ImageSize="18,18"/>
                 <UIControls:ImageButton Background="Transparent"
                                       Height="24" Width="24" 
                                       ToolTip="Manage Clan Chest Settings"
@@ -301,7 +300,7 @@
                                       BorderThickness="1"
                                       BorderBrush="AliceBlue"
                                       Margin="2,2"
-                                      Icon="Images/Icons_chest_1.png"/>
+                                      Icon="Images/Icons_chest_1.png" ImageSize="18,18"/>
 
                 <UIControls:ImageButton Background="Transparent"
                                       Height="24" Width="24" 
@@ -312,7 +311,7 @@
                                       BorderThickness="1"
                                       BorderBrush="AliceBlue"
                                       Margin="2,2"
-                                      Icon="pack://application:,,,/Images/camera_64x64.png"/>
+                                      Icon="pack://application:,,,/Images/camera_64x64.png" ImageSize="18,18"/>
                 <Separator/>
 
                 <UIControls:ImageButton Background="Transparent"
@@ -324,7 +323,7 @@
                                       BorderThickness="1"
                                       BorderBrush="AliceBlue"
                                       Margin="2,2"
-                                      Icon="pack://application:,,,/Images/StartAutomationIcon.png"/>
+                                      Icon="pack://application:,,,/Images/StartAutomationIcon.png" ImageSize="18,18"/>
                 <UIControls:ImageButton Background="Transparent"
                        Height="24" Width="24" 
                        ToolTip="Stop Automation [F10]"
@@ -334,7 +333,7 @@
                        BorderThickness="1"
                        BorderBrush="AliceBlue"
                        Margin="2,2"
-                       Icon="pack://application:,,,/Images/StopAutomation.png"/>
+                       Icon="pack://application:,,,/Images/StopAutomation.png" ImageSize="18,18"/>
                 <Separator/>
                 <UIControls:ImageButton Background="Transparent"
                                       Height="24" Width="24" 
@@ -345,7 +344,7 @@
                                       BorderThickness="1"
                                       BorderBrush="AliceBlue"
                                       Margin="2,2"
-                                      Icon="pack://application:,,,/Images/ClanStatsIcon.png"/>
+                                      Icon="pack://application:,,,/Images/ClanStatsIcon.png" ImageSize="18,18"/>
                 <UIControls:ImageButton Background="Transparent"
                       Height="24" Width="24" 
                       ToolTip="Settings"
@@ -355,7 +354,7 @@
                       BorderThickness="1"
                       BorderBrush="AliceBlue"
                       Margin="2,2"
-                      Icon="pack://application:,,,/Images/SettingsIcon01.png"/>
+                      Icon="pack://application:,,,/Images/SettingsIcon01.png" ImageSize="18,18"/>
             </ToolBar>
         </ToolBarTray>
     </Grid>

@@ -30,9 +30,9 @@ namespace TBChestTracker
             ChestConditions chestcondition = new ChestConditions();
 
             chestcondition.ChestType = ChestTypeCondition.Text;
-            chestcondition.Comparator = ComparatorCondition.Text;
             chestcondition.level = Int32.Parse(ChestLevelCondition.Text);
             ClanManager.Instance.ClanChestSettings.ChestRequirements.ChestConditions.Add(chestcondition);
+            this.DialogResult = true;
             this.Close();
         }
     }

@@ -54,7 +54,7 @@ namespace TBChestTracker
         public ClanManager ClanManager { get; private set; }
         bool isClosing = false;
         bool stopAutomation = false;
-        private double CLANCHEST_IMAGE_BRIGHTNESS = 0.75d;
+        private double CLANCHEST_IMAGE_BRIGHTNESS = 0.65d;
         private CaptainHook CaptainHook { get; set; }
         public Snapture Snapture { get; private set; }  
         
@@ -115,6 +115,8 @@ namespace TBChestTracker
         List<string> recently_opened_files { get; set; }
         ConsoleWindow consoleWindow { get; set; }
         
+        CancellationTokenSource CancellationTokenSource { get; set; }
+
         #endregion
 
         #region PropertyChanged Event
@@ -139,7 +141,6 @@ namespace TBChestTracker
         #endregion
 
         #region Image Processing Functions & Other Related Functions
-
         private Task<TessResult> GetTextFromBitmap(System.Drawing.Bitmap bitmap)
         {
             
@@ -229,16 +230,17 @@ namespace TBChestTracker
         {
             stopAutomation = false;
             GlobalDeclarations.AutomationRunning = true;
+            CancellationTokenSource = new CancellationTokenSource();
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
-                Task automationTask = Task.Run(() => StartAutomationProcess());
+                Task automationTask = Task.Run(() => StartAutomationProcess(CancellationTokenSource.Token));
 
             }));
         }
         #endregion
 
         #region StartAutomation 
-        void StartAutomationProcess()
+        void StartAutomationProcess(CancellationToken token)
         {
             //--- take snapshot.
             //--- mouse click 4 times on claim button
@@ -253,14 +255,21 @@ namespace TBChestTracker
 
             com.HellStormGames.Logging.Console.Write("Automation Started", com.HellStormGames.Logging.LogType.INFO);
             GlobalDeclarations.canCaptureAgain = true;
+
+            bool bCanceled = false;
             while (!stopAutomation)
             {
                 int automatorClicks = 0;
-                
+                if (token.IsCancellationRequested)
+                {
+                    bCanceled = true;
+                    break;
+                }
+                    
 
                 if (GlobalDeclarations.canCaptureAgain)
                 {
-                    Thread.Sleep(1000); //-- could prevent the "From:" bug.
+                    Thread.Sleep(1250); //-- could prevent the "From:" bug.
                     CaptureRegion();
                     while (ClanManager.Instance.ClanChestManager.ChestProcessingState != ChestProcessingState.COMPLETED)
                     {
@@ -283,6 +292,10 @@ namespace TBChestTracker
                 //-- canCaptureAgain not being switched back on.
                 GlobalDeclarations.canCaptureAgain = true;
             }
+            if(bCanceled)
+            {
+                StopAutomation();
+            }
 
         }
         #endregion
@@ -290,12 +303,14 @@ namespace TBChestTracker
         #region StopAutomation
         void StopAutomation()
         {
+            CancellationTokenSource.Cancel();
             stopAutomation = true;
             GlobalDeclarations.AutomationRunning = false;
 
             ClanManager.Instance.ClanChestManager.SaveDataTask();
             ClanManager.Instance.ClanChestManager.CreateBackup();
-
+            IsAutomationPlayButtonEnabled = true;
+            IsAutomationStopButtonEnabled = false;
             com.HellStormGames.Logging.Console.Write("Automation stopped.", com.HellStormGames.Logging.LogType.INFO);
         }
         #endregion
@@ -336,7 +351,15 @@ namespace TBChestTracker
             e.ScreenCapturedBitmap.Dispose();
 
             if (CaptureMode == CaptureMode.CHESTS && ocrResult != null)
-                ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words);
+                ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words, onError =>
+                {
+                    if (onError)
+                    {
+                        var result = MessageBox.Show("A critical error has occured during processing text from image. Stopping automation and saving chest data.", "OCR Error", MessageBoxButton.OK);
+                        if (result == MessageBoxResult.OK)
+                            StopAutomation();
+                    }
+                });
 #endif
         }
 #endregion
@@ -428,7 +451,8 @@ namespace TBChestTracker
             //var translation = Translator.Translate("I'm So Silly.", "en", "fr");
 
         }
-
+        #endregion
+        #region CaptionHook Events
         private void CaptainHook_onError(object sender, CaptainHook.HookErrorEventArgs e)
         {
             throw new NotImplementedException();
@@ -465,11 +489,14 @@ namespace TBChestTracker
                 {
                     StartAutomationThread();
                     GlobalDeclarations.hasHotkeyBeenPressed = true;
+                    IsAutomationPlayButtonEnabled = false;
+                    IsAutomationStopButtonEnabled = true;
                 }
                 else if (key == KeyInterop.VirtualKeyFromKey(Key.F10))
                 {
                     StopAutomation();
                     GlobalDeclarations.hasHotkeyBeenPressed = true;
+                   
                 }
 #elif SNAPTURE_DEBUG
                 if(key == KeyInterop.VirtualKeyFromKey(Key.F2))

@@ -4,11 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
+        xmlns:UIControls="clr-namespace:com.Konquest.UI;assembly=KonquestUI"
         mc:Ignorable="d"
         Title="Clan Chests Management" Height="600" Width="800" Topmost="True" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <Style x:Key="ConditionsListViewItemStyle" TargetType="ListViewItem">
             <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
+        </Style>
+        <Style x:Key="RequirementListViewItemStyle" x:Name="RequirementListViewItem" TargetType="ListViewItem">
+            <EventSetter Event="MouseDoubleClick" Handler="RequirementListViewItem_MouseDoubleClick"/>
         </Style>
     </Window.Resources>
     <Grid Background="#eeeeee">
@@ -20,46 +24,120 @@
             <TabControl>
                 <TabItem Header="Conditions">
                     <ScrollViewer>
-                        <Grid>
+                        <Grid Margin="5">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="100"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <GroupBox Header="Condition Options" Grid.Row="0">
+                            <TextBlock Grid.Row="0" Text="Chest conditions will only include clan chests if specified by their clan chest type and level of chest." FontWeight="Bold" Margin="10"/>
+                            <GroupBox Header="Condition Options" Grid.Row="1" Margin="0,5">
                                 <StackPanel Orientation="Vertical" Margin="10,5">
-                                    <RadioButton Content="Do not use" Margin="0,2" IsChecked="{Binding useNoChestConditions, Mode=TwoWay}"/>
-                                    <RadioButton Content="Use Specific Conditions" IsChecked="{Binding useChestConditions, Mode=TwoWay}"/>
-                                    <TextBlock Text="Using Specific Conditions will only count the types of clan chests specified if conditions are met." Margin="10,10" FontWeight="Bold" TextWrapping="Wrap"/>
+                                    <RadioButton Content="Do not use" Margin="0,2" IsChecked="{Binding ChestRequirements.useNoChestConditions, Mode=TwoWay}"/>
+                                    <RadioButton Content="Use Specific Conditions" IsChecked="{Binding ChestRequirements.useChestConditions, Mode=TwoWay}"/>
                                 </StackPanel>
                             </GroupBox>
-                            <Grid Grid.Row="1">
+                            <Grid Grid.Row="2">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="24"/>
                                 </Grid.ColumnDefinitions>
-                                <ListView Grid.Column="0" ItemsSource="{Binding ChestConditions}" ItemContainerStyle="{StaticResource ConditionsListViewItemStyle}">
+                                <ListView Grid.Column="0" ItemsSource="{Binding ChestRequirements.ChestConditions}" ItemContainerStyle="{StaticResource ConditionsListViewItemStyle}">
                                     <ListView.View>
                                         <GridView>
                                             <GridViewColumn Header="Clan Chest Type" Width="150" DisplayMemberBinding="{Binding ChestType, Mode=TwoWay}"/>
-                                            <GridViewColumn Header="Comparator" Width="100" DisplayMemberBinding="{Binding Comparator, Mode=TwoWay}"/>
-                                            <GridViewColumn Header="Value" Width="100" DisplayMemberBinding="{Binding level, Mode=TwoWay}"/>
+                                            <GridViewColumn Header="Minimal Level" Width="100" DisplayMemberBinding="{Binding level, Mode=TwoWay}"/>
                                         </GridView>
                                     </ListView.View>
                                 </ListView>
                                 <StackPanel Orientation="Vertical" Grid.Column="1">
-                                    <Button Height="16" Width="16" Margin="0,2" x:Name="AddConditionBtn" Click="AddConditionBtn_Click">
-                                        +
-                                    </Button>
-                                    <Button Height="16" Width="16" Margin="0,2" x:Name="RemoveConditionBtn" Click="RemoveConditionBtn_Click">
-                                        -
-                                    </Button>
-                                    <Button Height="16" Width="16" Margin="0,2" x:Name="ClearAllConditionsBtn" Click="ClearAllConditionsBtn_Click">
-                                        x
-                                    </Button>
+                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/PlusIcon.png" 
+                                                            Height="24" Width="24" 
+                                                            BorderBrush="DarkGray" BorderThickness="1" 
+                                                            HoverBrush="LightGray" 
+                                                            IsEnabled="True" Click="AddConditionBtn_Click" Margin="0,2"/>
+                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/MinusIcon.png" 
+                                                            Height="24" Width="24" 
+                                                            BorderBrush="DarkGray" BorderThickness="1" 
+                                                            HoverBrush="LightGray" 
+                                                            IsEnabled="True" Click="RemoveConditionBtn_Click" Margin="0,2"/>
+                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/trashIcon.png" 
+                                                            Height="24" Width="24" 
+                                                            BorderBrush="DarkGray" BorderThickness="1" 
+                                                            HoverBrush="LightGray" 
+                                                            IsEnabled="True" Click="ClearAllConditionsBtn_Click" Margin="0,2"/>
                                 </StackPanel>
                             </Grid>
                         </Grid>
                     </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Requirements">
+                    <Grid Margin="5,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock 
+                            Grid.Row="0" 
+                            Text="Requirements for clanmates to meet per day. In addition, will help sort out who's passing and who's failing in chest quota."
+                            Margin="5" FontWeight="Bold"/>
+                        <GroupBox Header="Requirement Options" Grid.Row="1">
+                            <StackPanel Orientation="Vertical">
+                                <RadioButton Content="None" 
+                                             IsChecked="{Binding ClanRequirements.UseNoClanRequirements, Mode=TwoWay}"/>
+                                <RadioButton x:Name="UseSpecifiedRequirementsRadio" Content="Use Specified Requirements" 
+                                             IsChecked="{Binding ClanRequirements.UseSpecifiedClanRequirements, Mode=TwoWay}"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Specified Requirements" Grid.Row="2" IsEnabled="{Binding ElementName=UseSpecifiedRequirementsRadio, Path=IsEnabled}" Margin="3,5">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="24"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+                                <StackPanel Orientation="Horizontal" Grid.Row="0">
+                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/PlusIcon.png" 
+                                                            Height="24" Width="24"
+                                                            Margin="3,0"
+                                                            BorderBrush="DarkGray"
+                                                            BorderThickness="1" HoverBrush="LightGray" x:Name="AddRequirementButton" Click="AddRequirementButton_Click"/>
+                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/MinusIcon.png" 
+                                                            Height="24" Width="24"
+                                                            Margin="3,0"
+                                                            BorderBrush="DarkGray"
+                                                            BorderThickness="1" HoverBrush="LightGray"
+                                                            x:Name="RemoveRequirementButton" Click="RemoveRequirementButton_Click"/>
+                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/trashIcon.png" 
+                                                            Height="24" Width="24"
+                                                            Margin="3,0"
+                                                            BorderBrush="DarkGray"
+                                                            BorderThickness="1" HoverBrush="LightGray"
+                                                            x:Name="ClearRequirementsButton" Click="ClearRequirementsButton_Click"/>
+                                </StackPanel>
+                                <ListView Grid.Row="1" ItemsSource="{Binding ClanRequirements.ClanSpecifiedRequirements}" ItemContainerStyle="{StaticResource RequirementListViewItemStyle}">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="Clan Chest Type" Width="200" DisplayMemberBinding="{Binding ChestType}"/>
+                                            <GridViewColumn Header="Minimal Level" Width="95" DisplayMemberBinding="{Binding ChestLevel}"/>
+                                            <GridViewColumn Header="Per Day" Width="50" DisplayMemberBinding="{Binding AmountPerDay}"/>
+                                            <GridViewColumn Header="AND/OR" Width="78" DisplayMemberBinding="{Binding ChestOperator}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <TextBlock Grid.Row="2" Text="AND / OR are operators used during export's total count. If Rankings are used, will aid in sorting who has exceeded required clan chest per week." TextWrapping="Wrap" FontWeight="Bold" FontStyle="Italic"/>
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Rankings">
+                    <Grid Margin="5">
+                        <TextBlock FontWeight="Bold"
+                            Text="Rankings are a fun way to motivate clanmates into pushing harder. Another way to feel rewarded. Only shows after export of clan chests." 
+                            TextWrapping="Wrap"/>
+                        
+                    </Grid>
                 </TabItem>
             </TabControl>
         </DockPanel>
