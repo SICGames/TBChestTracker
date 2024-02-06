@@ -96,7 +96,7 @@ namespace TBChestTracker
 
             //-- quick filter. 
             //-- in Triumph Chests, divider creates dirty characters. 
-            var filter_words = new string[] { "Chest", "From:","From :", "Source", "Gift" };
+            var filter_words = new string[] { "Chest", "From", "Source", "Gift" };
 
             //-- OCR Result exception from filtering resulted in:
             //-- From : [player_name]
@@ -137,16 +137,39 @@ namespace TBChestTracker
 
                     if (clanmate.Contains("From"))
                     {
-                        //-- OCR issue converts clan name: ADİĞE CALE
-                        //-- into ADiöE CALE
-                        clanmate = clanmate.Substring(clanmate.IndexOf(" ") + 1);
-                        if (clanmate.Contains("From:"))
+
+                        //--- clean up
+                        //--- Sometimes there's a From : Playername
+                        //--- Causing The Iroh Bug.
+                        try
                         {
-                            //-- error - shouldn't even have reached this point.
-                            //-- game actually causes this error from not rendering name fast enough 
-                            //-- hasbeen patched but throw exception just in case.
-                            var badname = 0;
-                            throw new Exception("Clanmate name is blank. Increase thread sleep timer to prevent this.");
+                            char c = clanmate.Substring(4, 1).ToCharArray()[0];
+                            var hex_value = Convert.ToByte(c).ToString("x2");
+
+                            if (hex_value == "3a")
+                            {
+                                //--- Looks like it's normal.
+                                clanmate = clanmate.Substring(clanmate.IndexOf(' ') + 1);
+                            }
+                            else if (hex_value == "ef")
+                            {
+                                //-- Iroh Bug
+                                clanmate = clanmate.Substring(clanmate.IndexOf(' ') + 1);
+                                com.HellStormGames.Logging.Console.Write($"Iroh Bug Resolved clanmate name to: {clanmate}.", "OCR BUG", LogType.INFO);
+                            }
+
+                            if (clanmate.Contains("From:"))
+                            {
+                                //-- error - shouldn't even have reached this point.
+                                //-- game actually causes this error from not rendering name fast enough 
+                                //-- hasbeen patched but throw exception just in case.
+                                var badname = 0;
+                                throw new Exception("Clanmate name is blank. Increase thread sleep timer to prevent this.");
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            throw new Exception(e.Message);
                         }
                     }
 
