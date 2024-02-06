@@ -169,7 +169,10 @@ namespace TBChestTracker
                         }
                         catch(Exception e)
                         {
-                            throw new Exception(e.Message);
+
+                            bError = true;
+                            com.HellStormGames.Logging.Console.Write($"OCR Exception Thrown: {e.Message}. Stopping.", "OCR FATAL", LogType.ERROR);
+                            break;
                         }
                     }
 
