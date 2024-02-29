@@ -233,6 +233,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
             <RowDefinition Height="36"/>
+            <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" LastChildFill="True">
             <Menu DockPanel.Dock="Top" Height="auto" VerticalAlignment="Top">
@@ -357,5 +358,11 @@
                       Icon="pack://application:,,,/Images/SettingsIcon01.png" ImageSize="18,18"/>
             </ToolBar>
         </ToolBarTray>
+        <StatusBar Grid.Row="2">
+            <DockPanel>
+                <TextBlock Text="{Binding ChestCountTotal}" Margin="5,0"/>
+                <TextBlock Text="Chests Counted" Margin="5,0"/>
+            </DockPanel>
+        </StatusBar>
     </Grid>
 </Window>

@@ -55,14 +55,14 @@ namespace TBChestTracker
         private bool m_bShowRareCryptsTotal = true;
         private bool m_bShowEpicCryptsTotal = true;
         private bool m_bShowCitadelsTotal = true;
-        private bool m_bShowArenasTotal = true;
-        private bool m_bShowUnionTriumphTotal = true;
-        private bool m_bShowVaultAncientsTotal = true;
-        private bool m_bShowHeroicsTotal = true;
-        private bool m_bShowAncientChestsTotal = true;
-        private bool m_bShowBanksTotal = true;
-        private bool m_bShowStoryChestsTotal = true;
-        private bool m_bShowAll = true;
+        private bool m_bShowArenasTotal = false;
+        private bool m_bShowUnionTriumphTotal = false;
+        private bool m_bShowVaultAncientsTotal = false;
+        private bool m_bShowHeroicsTotal = false;
+        private bool m_bShowAncientChestsTotal = false;
+        private bool m_bShowBanksTotal = false;
+        private bool m_bShowStoryChestsTotal = false;
+        private bool m_bShowAll = false;
         private bool m_bShowTotal = true;
 
         #region PropertyChanged Event
@@ -121,7 +121,7 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(bShowArenasTotal));
             }
         }
-        #endregion
+        
 
         public bool bShowUnionTriumphsTotal
         {
@@ -196,6 +196,7 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(bShowAll));
             }
         }
+        #endregion
 
         public ClanStatisticsWindow()
         {

@@ -38,46 +38,47 @@ namespace TBChestTracker
                 //-- build clans 
                 var clan_default_folder = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath;
                 var clan_directories = System.IO.Directory.GetDirectories(clan_default_folder);
-                foreach( var directory in clan_directories )
+                foreach (var directory in clan_directories)
                 {
                     Clan clan = new Clan();
                     clan.FolderPath = directory;
 
                     var path = $@"{directory}\";
                     var clandatabase = Directory.GetFiles(path, "*.cdb");
-                    using (StreamReader sr = File.OpenText(clandatabase[0]))
+                    if (clandatabase.Count() > 0)
                     {
-                        JsonSerializer serializer = new JsonSerializer();
-                        serializer.Formatting = Formatting.Indented;
-                        ClanDatabase clandb = (ClanDatabase)serializer.Deserialize(sr, typeof(ClanDatabase));
-                        if(clandb != null)
+                        using (StreamReader sr = File.OpenText(clandatabase[0]))
                         {
-                            clan.Name = clandb.Clanname;
+                            JsonSerializer serializer = new JsonSerializer();
+                            serializer.Formatting = Formatting.Indented;
+                            ClanDatabase clandb = (ClanDatabase)serializer.Deserialize(sr, typeof(ClanDatabase));
+                            if (clandb != null)
+                            {
+                                clan.Name = clandb.Clanname;
+                            }
+                            clandb = null;
+                            sr.Close();
                         }
-                        clandb = null;
-                        sr.Close();
-                    }
-                    var clanmates_file = $@"{directory}\db\clanmates.db";
-                    using (TextReader reader = new StreamReader(clanmates_file))
-                    {
-                        string data = reader.ReadToEnd();
-                        if (data.Contains("\r\n"))
+                        var clanmates_file = $@"{directory}\db\clanmates.db";
+                        if (File.Exists(clanmates_file))
                         {
-                            data = data.Replace("\r\n", ",");
+                            using (StreamReader sr = File.OpenText(clanmates_file))
+                            {
+                                var tmp_clanmates_db = new ClanmatesDatabase();
+
+                                var data = StringHelpers.ConvertToUTF8(sr.ReadToEnd());
+
+                                tmp_clanmates_db = JsonConvert.DeserializeObject<ClanmatesDatabase>(data);
+                                clan.Members = tmp_clanmates_db.Clanmates.Count;
+                                sr.Close();
+                            }
+
                         }
                         else
-                        {
-                            data = data.Replace("\n", ",");
-                        }
+                            clan.Members = 0;
 
-                        data = data.Substring(0, data.LastIndexOf(","));
-
-                        string[] dataCollection = data.Split(',');
-                        clan.Members = dataCollection.Count(c => !String.IsNullOrEmpty(c));
-                        reader.Close();
-                        dataCollection = null;
+                        clans.Add(clan);
                     }
-                    clans.Add(clan);    
                 }
             }
             ClansListView.ItemsSource = clans;  
@@ -92,6 +93,10 @@ namespace TBChestTracker
         {
             clans.Clear();
             clans = null;
+            if (GlobalDeclarations.hasNewClanDatabaseCreated)
+                DialogResult = true;
+            else
+                DialogResult = false;
         }
 
         private void DeleteClanBtn_Click(object sender, RoutedEventArgs e)
@@ -126,7 +131,7 @@ namespace TBChestTracker
             if (newClanDatabaseWindow.ShowDialog() == true)
             {
                 GlobalDeclarations.hasNewClanDatabaseCreated = true;
-                mainWindow.AppTitle = $"TotalBattle Chest Tracker v0.1.0 - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
+                mainWindow.AppTitle = $"TotalBattle Chest Tracker v0.1.5 - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
                 this.Close();
             }
         }

@@ -117,6 +117,20 @@ namespace TBChestTracker
         
         CancellationTokenSource CancellationTokenSource { get; set; }
 
+        private int _ChestCountTotal = 0;
+        public int ChestCountTotal
+        {
+            get
+            {
+                return _ChestCountTotal;
+            }
+            set
+            {
+                _ChestCountTotal = value;
+                OnPropertyChanged(nameof(ChestCountTotal));
+            }
+        }
+
         #endregion
 
         #region PropertyChanged Event
@@ -256,6 +270,8 @@ namespace TBChestTracker
             com.HellStormGames.Logging.Console.Write("Automation Started", com.HellStormGames.Logging.LogType.INFO);
             GlobalDeclarations.canCaptureAgain = true;
 
+            ChestCountTotal = 0;
+
             bool bCanceled = false;
             while (!stopAutomation)
             {
@@ -286,6 +302,11 @@ namespace TBChestTracker
                 {
                     Automator.LeftClick(x, y);
                     automatorClicks++;
+                    
+                    this.Dispatcher.BeginInvoke(new Action(() => {
+                        ChestCountTotal++;
+                        }));
+                    
                     Thread.Sleep(100);
                 }
                 
@@ -800,7 +821,6 @@ namespace TBChestTracker
             {
                 IsCurrentClandatabase = true;
                 IsAutomationPlayButtonEnabled = true;
-                
             }
         }
         #endregion

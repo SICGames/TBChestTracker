@@ -127,7 +127,7 @@ namespace TBChestTracker
                     catch(Exception e)
                     {
                     
-                        com.HellStormGames.Logging.Console.Write($"OCR Exception Thrown. Stopping.", "OCR FATAL", LogType.ERROR);
+                        com.HellStormGames.Logging.Console.Write($"OCR Exception Thrown: {e.Message}. Stopping.", "OCR FATAL", LogType.ERROR);
                         bError = true;
                         break;
                         //throw new Exception(e.Message);
@@ -143,21 +143,9 @@ namespace TBChestTracker
                         //--- Causing The Iroh Bug.
                         try
                         {
-                            char c = clanmate.Substring(4, 1).ToCharArray()[0];
-                            var hex_value = Convert.ToByte(c).ToString("x2");
 
-                            if (hex_value == "3a")
-                            {
-                                //--- Looks like it's normal.
-                                clanmate = clanmate.Substring(clanmate.IndexOf(' ') + 1);
-                            }
-                            else if (hex_value == "ef")
-                            {
-                                //-- Iroh Bug
-                                clanmate = clanmate.Substring(clanmate.IndexOf(' ') + 1);
-                                com.HellStormGames.Logging.Console.Write($"Iroh Bug Resolved clanmate name to: {clanmate}.", "OCR BUG", LogType.INFO);
-                            }
-
+                            //--- skip the space check and the odd symbol to get straight to the meat.
+                            clanmate = clanmate.Substring(clanmate.IndexOf(' ') + 1);   
                             if (clanmate.Contains("From:"))
                             {
                                 //-- error - shouldn't even have reached this point.
@@ -166,10 +154,10 @@ namespace TBChestTracker
                                 var badname = 0;
                                 throw new Exception("Clanmate name is blank. Increase thread sleep timer to prevent this.");
                             }
+                            
                         }
                         catch(Exception e)
                         {
-
                             bError = true;
                             com.HellStormGames.Logging.Console.Write($"OCR Exception Thrown: {e.Message}. Stopping.", "OCR FATAL", LogType.ERROR);
                             break;

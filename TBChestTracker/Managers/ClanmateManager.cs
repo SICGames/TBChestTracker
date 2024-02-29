@@ -98,7 +98,6 @@ namespace TBChestTracker
             Database.Clanmates.Clear();
             Database.NumClanmates = Database.Clanmates.Count;
 
-
             using (StreamReader sr = File.OpenText(path))
             {
                 var data = StringHelpers.ConvertToUTF8(sr.ReadToEnd());
