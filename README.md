@@ -17,13 +17,12 @@ Easily count clan chests with a hotkey and let the automation take control.
 - Buttons may not do anything because they haven't been programmed to do so.
 ## How to install
 - Download released zip file or installer
-- if zip file is downloaded, unzip zip file.
-- launch program
+- if zip file is downloaded, extract zipped contents into a folder and launch program.
 ## Launched Program and now what?
 - Click first button "Clan Manager" to create your clan database.
 - CLick on + icon to create new clan.
-- Once window closes, click on second button on the toolbar to start adding clanmates. 
-- Once clanmates been added, you can now save clan database to disk. File -> Save Clan Database
+- Once window closes, click on second button "Clanmate Manager" on the toolbar to start adding clanmates. 
+- Once clanmates been added, you can now save clan database to disk. File -> Save Clan Database. In future, will auto-save after new clan is created.
 - In Game, click on Clan button -> Chests - Press F9 to start Chest Count Automation Process.
 - When done, press F10 to stop Chest Count Automation Process.
 - clan statistics window will show you each clan chest counted.
