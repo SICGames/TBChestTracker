@@ -86,13 +86,7 @@ namespace Hellscape.Commands
                     new KeyGesture(Key.C, ModifierKeys.Control)
                 }
             );
-        public static readonly RoutedUICommand ManuallyCaptureScreen = new RoutedUICommand
-            (
-                "Manually Capture Screen",
-                "Manually Capture Screen",
-                typeof(CustomCommandBindings),
-                null
-            );
+      
         public static readonly RoutedUICommand StartAutomation = new RoutedUICommand
             (
                 "Start Automation Process",

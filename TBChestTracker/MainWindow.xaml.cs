@@ -407,8 +407,9 @@ namespace TBChestTracker
             com.HellStormGames.Logging.Console.Write("Snapture Started.", com.HellStormGames.Logging.LogType.INFO);
 
             AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - Untitled";
-            this.ClanManager = new ClanManager();
 
+            this.ClanManager = new ClanManager();
+            
             if (System.IO.Directory.Exists(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath) == false)
             {
                 System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath);
@@ -443,6 +444,7 @@ namespace TBChestTracker
                         recently_opened_files.Add(file);
                     }
                 }
+
                 //-- add seperator to recently opened clan databases.
                 Separator separator = new Separator();
                 RecentlyOpenedParent.Items.Add(separator);
@@ -469,6 +471,9 @@ namespace TBChestTracker
                 GlobalDeclarations.TessDataExists = false;
             }
 
+            StartPageWindow startPageWindow = new StartPageWindow();
+            startPageWindow.MainWindow = this;
+            startPageWindow.Show();
             //var translation = Translator.Translate("I'm So Silly.", "en", "fr");
 
         }
@@ -499,14 +504,8 @@ namespace TBChestTracker
             
             if (!GlobalDeclarations.hasHotkeyBeenPressed && !GlobalDeclarations.isBusyProcessingClanchests)
             {
-                int hotkey = KeyInterop.VirtualKeyFromKey(Key.F6);
 #if !SNAPTURE_DEBUG
-                if (key == hotkey)
-                {
-                    CaptureRegion();
-                    GlobalDeclarations.hasHotkeyBeenPressed = true;
-                }
-                else if (key == KeyInterop.VirtualKeyFromKey(Key.F9))
+                if (key == KeyInterop.VirtualKeyFromKey(Key.F9))
                 {
                     StartAutomationThread();
                     GlobalDeclarations.hasHotkeyBeenPressed = true;
@@ -554,11 +553,84 @@ namespace TBChestTracker
         }
         private void LoadClanDatabaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+          ShowLoadClanWindow(result =>
+          {
+
+          });
+        }
+        #endregion
+
+        #region Recently Opened Databases Menu Item Click
+        private void Mu_Click(object sender, RoutedEventArgs e)
+        {
+            var menuitem = sender as MenuItem;
+            var tag = menuitem.Tag.ToString();
+            if (tag != "CLEAR_HISTORY")
+            {
+                var file = menuitem.Tag.ToString();
+                LoadReentFile(file, null);
+            }
+            else
+            {
+                try
+                {
+                    System.IO.File.Delete("recent.lst");
+                    RecentlyOpenedParent.Items.Clear();
+                    recently_opened_files.Clear();
+
+                }
+                catch(Exception ex)
+                {
+
+                }
+            }
+        }
+        #endregion
+        #region LoadRecentFile
+        public void LoadReentFile(string file, Action<bool> response)
+        {
+            ClanManager.Instance.ClanDatabaseManager.Load(file, ClanManager.Instance.ClanChestManager, result =>
+            {
+                if (result)
+                {
+                    com.HellStormGames.Logging.Console.Write($"Loaded Clan ({ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}) Database Successfully.",
+                        com.HellStormGames.Logging.LogType.INFO);
+
+                    AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
+                    IsCurrentClandatabase = true;
+                    IsAutomationPlayButtonEnabled = true;
+                    response(true);
+                }
+                else
+                {
+                    MessageBox.Show("Something went horribly wrong. Database is not suppost to be blank.");
+                }
+            });
+        }
+
+        private void UpdateAppTitle()
+        {
+            AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
+        }
+        public void CreateNewClan(Action<bool> response)
+        {
+            NewClanDatabaseWindow newClanDatabaseWindow = new NewClanDatabaseWindow();
+            if (newClanDatabaseWindow.ShowDialog() == true)
+            {
+                GlobalDeclarations.hasNewClanDatabaseCreated = true;
+                UpdateAppTitle();
+                response(true);
+            }
+            else
+                response(false);
+        }
+        public void ShowLoadClanWindow(Action<bool> response)
+        {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Clan Databases | *.cdb";
             openFileDialog.RestoreDirectory = true;
             openFileDialog.InitialDirectory = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath;
-           
+
             if (ClanManager.Instance.ClanChestSettings.ChestRequirements != null)
                 ClanManager.Instance.ClanChestSettings.Clear();
 
@@ -569,7 +641,9 @@ namespace TBChestTracker
                 {
                     if (result)
                     {
-                        AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
+                        UpdateAppTitle();
+
+                        //AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
                         if (!recently_opened_files.Contains(file, StringComparer.CurrentCultureIgnoreCase))
                         {
                             recently_opened_files.Add(file);
@@ -588,65 +662,24 @@ namespace TBChestTracker
                             }
                         }
 
-                        com.HellStormGames.Logging.Console.Write($"Loaded Clan ({ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}) Database Successfully.", 
-                            com.HellStormGames.Logging.LogType.INFO);
-
-                        IsCurrentClandatabase = true;
-                        IsAutomationPlayButtonEnabled = true;
-                    }
-                    else
-                    {
-                        MessageBox.Show("Something went horribly wrong. Database is not suppost to be blank.");
-                    }
-                });
-            }
-        }
-        #endregion
-
-        #region Recently Opened Databases Menu Item Click
-        private void Mu_Click(object sender, RoutedEventArgs e)
-        {
-            var menuitem = sender as MenuItem;
-            var tag = menuitem.Tag.ToString();
-            if (tag != "CLEAR_HISTORY")
-            {
-                var file = menuitem.Tag.ToString();
-                ClanManager.Instance.ClanDatabaseManager.Load(file, ClanManager.Instance.ClanChestManager, result =>
-                {
-                    if (result)
-                    {
                         com.HellStormGames.Logging.Console.Write($"Loaded Clan ({ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}) Database Successfully.",
                             com.HellStormGames.Logging.LogType.INFO);
 
-                        AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
-
                         IsCurrentClandatabase = true;
                         IsAutomationPlayButtonEnabled = true;
-
+                        response(true);
                     }
                     else
                     {
                         MessageBox.Show("Something went horribly wrong. Database is not suppost to be blank.");
+                        response(false);
                     }
                 });
             }
             else
-            {
-                try
-                {
-                    System.IO.File.Delete("recent.lst");
-                    RecentlyOpenedParent.Items.Clear();
-                    recently_opened_files.Clear();
-
-                }
-                catch(Exception ex)
-                {
-
-                }
-            }
+                response(false);
         }
         #endregion
-
         #region Save Clan database
         private void SaveClanDatabaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -734,19 +767,7 @@ namespace TBChestTracker
             }
         }
         #endregion
-
-        #region Manually Capture
-        private void ManuallyCaptureScreenCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = (GlobalDeclarations.hasClanmatesBeenAdded &&  GlobalDeclarations.hasNewClanDatabaseCreated && GlobalDeclarations.TessDataExists);
-        }
-        private void ManuallyCaptureScreenCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            if (!GlobalDeclarations.isBusyProcessingClanchests && GlobalDeclarations.TessDataExists)
-                CaptureRegion();
-        }
-        #endregion
-
+   
         #region Start Automation
         private void StartAutomationCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {

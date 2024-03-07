@@ -1,0 +1,59 @@
+﻿<Window x:Class="TBChestTracker.ClanWizardWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TBChestTracker"
+        xmlns:ui="clr-namespace:TBChestTracker.UI"
+        mc:Ignorable="d"
+        Title="Clan Setup Wizard" Height="450" Width="800" ShowInTaskbar="False" WindowStartupLocation="CenterScreen" WindowStyle="ToolWindow" Topmost="True">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="64"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0" Background="Black">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="Clan Setup Wizard" Foreground="White" FontSize="24" FontWeight="Bold" Margin="10,15"/>
+            </Grid>
+        </DockPanel>
+        <DockPanel Grid.Row="1" Background="White">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="62"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!--#region  Milestone Control-->
+                <Grid Grid.Row="0" Margin="100,0,100,0">
+                    <ui:Milestone x:Name="MilestoneBar" Grid.Row="0" 
+                                  Background="Transparent" 
+                                  ProgressBackFill="#999" 
+                                  MinStep="0" MaxStep="2" Step="0" 
+                                  ProgressHeight="10" Height="48" 
+                                  ProgressFill="SkyBlue" MarkerSize="24">
+                    </ui:Milestone>
+                </Grid>
+                
+                <!--
+                <Canvas Grid.Row="0" Margin="25,0">
+                    <Rectangle Fill="#999" StrokeThickness="0" Canvas.Top="24" Canvas.Left="10" Height="8" Width="{Binding RelativeSource={RelativeSource AncestorType=Canvas}, Path=ActualWidth}"/>
+                    <Rectangle Fill="Blue" Stroke="Transparent" Canvas.Left="10" StrokeThickness="0" Canvas.Top="25" Height="6" Width="100"/>
+                    <Ellipse Fill="Blue" Height="20" Width="20" Canvas.Left="0" Canvas.Top="18" Stroke="#999" StrokeThickness="0"/>
+                    <TextBlock Text="Clan Name" FontWeight="Bold" Canvas.Top="36" FontSize="10" Canvas.Left="-12"/>
+                    <Ellipse Fill="#999" Height="20" Width="20" Canvas.Left="250" Canvas.Top="18" Stroke="#999" StrokeThickness="0"/>
+                    <TextBlock Text="Clanmates" FontWeight="Bold" Canvas.Top="36" FontSize="10" Canvas.Left="235"/>
+                </Canvas>
+                -->
+                
+                <!--#endregion-->
+                <!--#region  Page Viewer-->
+                <Frame x:Name="FRAME_VIEW" Grid.Row="1" Source="/Pages/ClanPage.xaml" Padding="10,15" ContentRendered="Frame_ContentRendered" NavigationUIVisibility="Hidden"/>
+                <!--#endregion-->
+            </Grid>
+        </DockPanel>
+    </Grid>
+</Window>

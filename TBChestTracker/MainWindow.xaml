@@ -42,10 +42,6 @@
                         x:Name="ManageClanChestSettingsCommand" 
                         CanExecute="ManageClanchestSettingsCommand_CanExecute"
                         Executed="ManageClanchestSettingsCommand_Executed"/>
-        <CommandBinding Command="Commands:CustomCommandBindings.ManuallyCaptureScreen" 
-                        x:Name="ManuallyCaptureScreenCommand" 
-                        CanExecute="ManuallyCaptureScreenCommand_CanExecute"
-                        Executed="ManuallyCaptureScreenCommand_Executed"/>
         <CommandBinding Command="Commands:CustomCommandBindings.StartAutomation" 
                         x:Name="StartAutomationCommand" 
                         CanExecute="StartAutomationCommand_CanExecute"
@@ -284,7 +280,7 @@
                 <Separator/>
                 <UIControls:ImageButton Background="Transparent"
                       Height="24" Width="24" 
-                      ToolTip="Manage Clan(s)"
+                      ToolTip="Manage Clanmates(s)"
                       Command="Commands:CustomCommandBindings.ManageClanmates" 
                       IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=IsCurrentClandatabase}"
                       HoverBrush="LightBlue"
@@ -303,16 +299,6 @@
                                       Margin="2,2"
                                       Icon="Images/Icons_chest_1.png" ImageSize="18,18"/>
 
-                <UIControls:ImageButton Background="Transparent"
-                                      Height="24" Width="24" 
-                                      ToolTip="Manually Capture Screen [F6]"
-                                      Command="Commands:CustomCommandBindings.ManuallyCaptureScreen" 
-                                      IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=IsCurrentClandatabase}"
-                                      HoverBrush="LightBlue"
-                                      BorderThickness="1"
-                                      BorderBrush="AliceBlue"
-                                      Margin="2,2"
-                                      Icon="pack://application:,,,/Images/camera_64x64.png" ImageSize="18,18"/>
                 <Separator/>
 
                 <UIControls:ImageButton Background="Transparent"
