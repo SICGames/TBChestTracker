@@ -131,7 +131,9 @@ namespace TBChestTracker
             if (newClanDatabaseWindow.ShowDialog() == true)
             {
                 GlobalDeclarations.hasNewClanDatabaseCreated = true;
-                mainWindow.AppTitle = $"TotalBattle Chest Tracker v0.1.5 - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
+                AppContext.Instance.UpdateCurrentProject($"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}");
+                AppContext.Instance.UpdateApplicationTitle();
+                
                 this.Close();
             }
         }

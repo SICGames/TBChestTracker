@@ -48,89 +48,27 @@ namespace TBChestTracker
         #region Declarations
         System.Threading.Thread InputHookThread { get; set; }
         System.Threading.Thread AutomationThread { get; set; }
+        private double CLANCHEST_IMAGE_BRIGHTNESS = 0.65d;
         CaptureMode CaptureMode { get; set; }
         bool isAutomationBusy = false;
         int captureCounter = 0;
-        public ClanManager ClanManager { get; private set; }
-        bool isClosing = false;
         bool stopAutomation = false;
-        private double CLANCHEST_IMAGE_BRIGHTNESS = 0.65d;
-        private CaptainHook CaptainHook { get; set; }
-        public Snapture Snapture { get; private set; }  
         
-        public Version AppVersion
-        {
-            get
-            {
-                return Assembly.GetExecutingAssembly().GetName().Version;
-            }
-        }
-        private string pAppTitle = $"";
-        public string AppTitle
-        {
-            get
-            {
-                return pAppTitle;
-            }
-            set
-            {
-                pAppTitle = value;
-                OnPropertyChanged(nameof(AppTitle));
-            }
-        }
+        public SettingsManager SettingsManager { get; set; }
 
-        private bool isAutomationPlayButtonEnabled = false;
-        private bool isAutomationPauseButtonEnabled = false;    
-        private bool isAutomationStopButtonEnabled = false;
-        private bool isCurrentClandatabase = false;
+        public ClanManager ClanManager { get; private set; }
+        private CaptainHook CaptainHook { get; set; }
+        public Snapture Snapture { get; private set; }
 
-        public bool IsCurrentClandatabase
-        {
-            get => isCurrentClandatabase;
-            set
-            {
-                isCurrentClandatabase = value;
-                OnPropertyChanged(nameof(IsCurrentClandatabase));
-            }
-        }
-        public bool IsAutomationPlayButtonEnabled
-        {
-            get => isAutomationPlayButtonEnabled;
-            set
-            {
-                isAutomationPlayButtonEnabled = value;
-                OnPropertyChanged(nameof(IsAutomationPlayButtonEnabled));   
-            }
-        }
-        public bool IsAutomationStopButtonEnabled
-        {
-            get => isAutomationStopButtonEnabled;
-            set
-            {
-                isAutomationStopButtonEnabled = value;
-                OnPropertyChanged(nameof(IsAutomationStopButtonEnabled));
-            }
-        }
+        public AppContext appContext = new AppContext();
 
         List<string> recently_opened_files { get; set; }
         ConsoleWindow consoleWindow { get; set; }
-        
         CancellationTokenSource CancellationTokenSource { get; set; }
 
-        private int _ChestCountTotal = 0;
-        public int ChestCountTotal
-        {
-            get
-            {
-                return _ChestCountTotal;
-            }
-            set
-            {
-                _ChestCountTotal = value;
-                OnPropertyChanged(nameof(ChestCountTotal));
-            }
-        }
-
+        SettingsWindow SettingsWindow { get; set; }
+        OCRWizardWindow OCRWizardWindow { get; set; }
+        StartPageWindow startPageWindow {  get; set; }  
         #endregion
 
         #region PropertyChanged Event
@@ -146,8 +84,9 @@ namespace TBChestTracker
         #region MainWindow()
         public MainWindow()
         {
+           
+           
             InitializeComponent();
-            this.DataContext = this;
             this.Closing += MainWindow_Closing;
             recently_opened_files = new List<string>();
             consoleWindow = new ConsoleWindow();
@@ -183,8 +122,6 @@ namespace TBChestTracker
             
             
             return Task.FromResult(ocrResult);
-
-            
         }
         private void CaptureRegion()
         {
@@ -205,7 +142,17 @@ namespace TBChestTracker
             int height = (int)Math.Round(y * heightChestPerc);
 
             CaptureMode = CaptureMode.CHESTS;
-            Snapture.CaptureRegion(left, top, width, height);
+
+            var capture_region = SettingsManager.Instance.Settings.OCRSettings.SuggestedAreaOfInterest;
+
+            //Snapture.CaptureRegion(left, top, width, height);
+            int ca_x = (int)capture_region.x;
+            int ca_y = (int)capture_region.y;
+            int ca_width = (int)capture_region.width - ca_x;
+            int ca_height = (int)capture_region.height - ca_y;
+
+            Snapture.CaptureRegion(ca_x, ca_y, ca_width, ca_height);
+
             GlobalDeclarations.canCaptureAgain = false;
 
         }
@@ -259,7 +206,7 @@ namespace TBChestTracker
             //--- take snapshot.
             //--- mouse click 4 times on claim button
             //--- take snapshot 
-            //--- rinse and repeat UNTIL F8 key is pressed by user to end it.
+            //--- rinse and repeat UNTIL F10 key is pressed by user to end it.
             var screenX_half = Snapture.ScreenWidth / 2;
             var screenY_half = Snapture.ScreenHeight / 2;
 
@@ -267,10 +214,12 @@ namespace TBChestTracker
             var x = (int)xClickPos.X;
             var y = (int)xClickPos.Y;
 
+            var claim_button = SettingsManager.Instance.Settings.OCRSettings.ClaimChestButtons[0];
+
             com.HellStormGames.Logging.Console.Write("Automation Started", com.HellStormGames.Logging.LogType.INFO);
             GlobalDeclarations.canCaptureAgain = true;
 
-            ChestCountTotal = 0;
+            appContext.ChestCountTotal = 0;
 
             bool bCanceled = false;
             while (!stopAutomation)
@@ -281,7 +230,6 @@ namespace TBChestTracker
                     bCanceled = true;
                     break;
                 }
-                    
 
                 if (GlobalDeclarations.canCaptureAgain)
                 {
@@ -300,11 +248,11 @@ namespace TBChestTracker
 
                 while(automatorClicks != 4)
                 {
-                    Automator.LeftClick(x, y);
+                    Automator.LeftClick(claim_button.X, claim_button.Y);
                     automatorClicks++;
                     
                     this.Dispatcher.BeginInvoke(new Action(() => {
-                        ChestCountTotal++;
+                        appContext.ChestCountTotal++;
                         }));
                     
                     Thread.Sleep(100);
@@ -330,8 +278,8 @@ namespace TBChestTracker
 
             ClanManager.Instance.ClanChestManager.SaveDataTask();
             ClanManager.Instance.ClanChestManager.CreateBackup();
-            IsAutomationPlayButtonEnabled = true;
-            IsAutomationStopButtonEnabled = false;
+            appContext.IsAutomationPlayButtonEnabled = true;
+            appContext.IsAutomationStopButtonEnabled = false;
             com.HellStormGames.Logging.Console.Write("Automation stopped.", com.HellStormGames.Logging.LogType.INFO);
         }
         #endregion
@@ -388,12 +336,13 @@ namespace TBChestTracker
         #region Window Loaded
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            
+            this.DataContext = appContext;
             CaptainHook = new CaptainHook();
             CaptainHook.onKeyboardMessage += CaptainHook_onKeyboardMessage;
             CaptainHook.onInstalled += CaptainHook_onInstalled;
             CaptainHook.onError += CaptainHook_onError;
             CaptainHook.Install();
-            
             
             Snapture = new Snapture();
             Snapture.onFrameCaptured += Snapture_onFrameCaptured;
@@ -406,14 +355,29 @@ namespace TBChestTracker
 
             com.HellStormGames.Logging.Console.Write("Snapture Started.", com.HellStormGames.Logging.LogType.INFO);
 
-            AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - Untitled";
+            SettingsManager = new SettingsManager();
+            
+            SettingsManager.Load();
 
+            //-- init appContext
+
+            appContext.IsAutomationPlayButtonEnabled = false;
+            appContext.IsCurrentClandatabase = false;
+            appContext.IsAutomationStopButtonEnabled = false;
+            appContext.UpdateApplicationTitle();
+            
             this.ClanManager = new ClanManager();
             
             if (System.IO.Directory.Exists(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath) == false)
             {
                 System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath);
             }
+
+            startPageWindow = new StartPageWindow();    
+            startPageWindow.MainWindow = this;
+            startPageWindow.Show();
+
+            OCRWizardWindow = new OCRWizardWindow();
 
             if (File.Exists("recent.lst"))
             {
@@ -470,14 +434,22 @@ namespace TBChestTracker
                 MessageBox.Show($"No Tessdata directory exists. Download tessdata and ensure all traineddata is inside tessdata.");
                 GlobalDeclarations.TessDataExists = false;
             }
-
-            StartPageWindow startPageWindow = new StartPageWindow();
-            startPageWindow.MainWindow = this;
-            startPageWindow.Show();
+         
             //var translation = Translator.Translate("I'm So Silly.", "en", "fr");
-
         }
         #endregion
+
+        public void ShowWindow()
+        {
+            this.Show();
+            if(GlobalDeclarations.IsFirstRun)
+            {
+                //-- prompt the user to set up OCR for the first time.
+                if(OCRWizardWindow != null)
+                    OCRWizardWindow.Show();
+            }
+        }
+        
         #region CaptionHook Events
         private void CaptainHook_onError(object sender, CaptainHook.HookErrorEventArgs e)
         {
@@ -509,8 +481,8 @@ namespace TBChestTracker
                 {
                     StartAutomationThread();
                     GlobalDeclarations.hasHotkeyBeenPressed = true;
-                    IsAutomationPlayButtonEnabled = false;
-                    IsAutomationStopButtonEnabled = true;
+                    appContext.IsAutomationPlayButtonEnabled = false;
+                    appContext.IsAutomationStopButtonEnabled = true;
                 }
                 else if (key == KeyInterop.VirtualKeyFromKey(Key.F10))
                 {
@@ -532,15 +504,18 @@ namespace TBChestTracker
         #region Window Closing
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            isClosing = true;
+            appContext.isAppClosing = true;
             if (CaptainHook.Uninstall())
             {
              
             }
+            
             ClanManager.Instance.Destroy();
             TesseractHelper.Destroy();
             com.HellStormGames.Logging.Console.Destroy();
-
+            SettingsManager.Dispose();
+            
+                
         }
         #endregion
 
@@ -596,9 +571,11 @@ namespace TBChestTracker
                     com.HellStormGames.Logging.Console.Write($"Loaded Clan ({ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}) Database Successfully.",
                         com.HellStormGames.Logging.LogType.INFO);
 
-                    AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
-                    IsCurrentClandatabase = true;
-                    IsAutomationPlayButtonEnabled = true;
+                    appContext.UpdateCurrentProject($"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}");
+                    appContext.UpdateApplicationTitle();
+                    
+                    appContext.IsCurrentClandatabase = true;
+                    appContext.IsAutomationPlayButtonEnabled = true;
                     response(true);
                 }
                 else
@@ -608,17 +585,14 @@ namespace TBChestTracker
             });
         }
 
-        private void UpdateAppTitle()
-        {
-            AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
-        }
         public void CreateNewClan(Action<bool> response)
         {
             NewClanDatabaseWindow newClanDatabaseWindow = new NewClanDatabaseWindow();
             if (newClanDatabaseWindow.ShowDialog() == true)
             {
                 GlobalDeclarations.hasNewClanDatabaseCreated = true;
-                UpdateAppTitle();
+                appContext.UpdateCurrentProject($"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}");
+                appContext.UpdateApplicationTitle();
                 response(true);
             }
             else
@@ -641,7 +615,8 @@ namespace TBChestTracker
                 {
                     if (result)
                     {
-                        UpdateAppTitle();
+                        appContext.UpdateCurrentProject($"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}");
+                        appContext.UpdateApplicationTitle();
 
                         //AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
                         if (!recently_opened_files.Contains(file, StringComparer.CurrentCultureIgnoreCase))
@@ -665,8 +640,8 @@ namespace TBChestTracker
                         com.HellStormGames.Logging.Console.Write($"Loaded Clan ({ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}) Database Successfully.",
                             com.HellStormGames.Logging.LogType.INFO);
 
-                        IsCurrentClandatabase = true;
-                        IsAutomationPlayButtonEnabled = true;
+                        appContext.IsCurrentClandatabase = true;
+                        appContext.IsAutomationPlayButtonEnabled = true;
                         response(true);
                     }
                     else
@@ -784,8 +759,8 @@ namespace TBChestTracker
                 && GlobalDeclarations.TessDataExists)
             {
                 StartAutomationThread();
-                IsAutomationStopButtonEnabled = true;
-                IsAutomationPlayButtonEnabled = false;
+                appContext.IsAutomationStopButtonEnabled = true;
+                appContext.IsAutomationPlayButtonEnabled = false;
             }
         }
         #endregion
@@ -805,8 +780,8 @@ namespace TBChestTracker
             if (GlobalDeclarations.AutomationRunning)
             {
                 StopAutomation();
-                IsAutomationStopButtonEnabled = false;
-                IsAutomationPlayButtonEnabled = true;
+                appContext.IsAutomationStopButtonEnabled = false;
+                appContext.IsAutomationPlayButtonEnabled = true;
             }
         }
         #endregion
@@ -840,17 +815,78 @@ namespace TBChestTracker
             clanManagementWindow.mainWindow = this; 
             if(clanManagementWindow.ShowDialog() == true)
             {
-                IsCurrentClandatabase = true;
-                IsAutomationPlayButtonEnabled = true;
+                appContext.IsCurrentClandatabase = true;
+                appContext.IsAutomationPlayButtonEnabled = true;
             }
         }
         #endregion
 
+        #region Show Console
         private void ConsoleMenuButton_Click(object sender, RoutedEventArgs e)
         {
             consoleWindow.Show();
         }
 
         #endregion
+
+        #region Validate Chest Data Integrity
+        private void ValidateChestData_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (GlobalDeclarations.hasClanmatesBeenAdded)
+                e.CanExecute = true;
+            else 
+                e.CanExecute = false;
+        }
+
+        private void ValidateChestData_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ValidateChestDataWindow validateChestDataWindow = new ValidateChestDataWindow();
+            validateChestDataWindow.Show();
+        }
+        #endregion
+
+        #region Manage Settings
+        private void ManageSettingsCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+        private void ManageSettingsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (SettingsWindow == null)
+                SettingsWindow = new SettingsWindow();
+
+            SettingsWindow.Show();
+        }
+        #endregion
+        #region OCR Wizard
+        private void OCRWizard_Click(object sender, RoutedEventArgs e)
+        {
+            OCRWizardWindow ocrWizardWindow = new OCRWizardWindow();
+            ocrWizardWindow.Show();
+        }
+
+        #endregion
+
+        #endregion
+
+        private void ConsoleButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(consoleWindow != null) consoleWindow.Show();
+            else
+            {
+                consoleWindow = new ConsoleWindow();
+                consoleWindow.Show();
+            }
+        }
+
+        private void OCRWizardButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (OCRWizardWindow != null)
+                OCRWizardWindow = null;
+
+            OCRWizardWindow = new OCRWizardWindow();
+            OCRWizardWindow.Show();
+
+        }
     }
 }

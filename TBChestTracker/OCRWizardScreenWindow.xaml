@@ -1,0 +1,159 @@
+﻿<Window x:Class="TBChestTracker.OCRWizardScreenWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TBChestTracker"
+        xmlns:ui="clr-namespace:TBChestTracker.UI"
+        mc:Ignorable="d"
+        Title="OCRWizardScreenWindow" Height="450" Width="800" 
+        Topmost="True" WindowState="Maximized" 
+        AllowsTransparency="True" WindowStyle="None" Background="Transparent"
+        PreviewKeyDown="Window_PreviewKeyDown" Loaded="Window_Loaded" Closing="Window_Closing">
+    <Window.Resources>
+        <local:MidpointValueConverter x:Key="MidValue"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Canvas x:Name="CANVAS" Grid.Column="0" Grid.Row="0" Background="Transparent" SnapsToDevicePixels="True" 
+                UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality">
+            <!-- 
+            <Image x:Name="PreviewImage" Loaded="PreviewImage_Loaded"
+       SnapsToDevicePixels="True" UseLayoutRounding="True" 
+       Width="{Binding ElementName=CANVAS, Path=ActualWidth}"
+       Height="{Binding ElementName=CANVAS, Path=ActualHeight}"
+       Stretch="None" RenderOptions.BitmapScalingMode="HighQuality"/>
+            -->
+            <Canvas Grid.Column="0" Grid.Row="0" x:Name="CloseCanvas">
+                <Rectangle x:Name="CloseTextBacking" Width="200" Height="32" Fill="#111" Opacity="0.75" Canvas.Top="8" Stroke="#222" SnapsToDevicePixels="True">
+                    <Canvas.Left>
+                        <MultiBinding Converter="{StaticResource MidValue}">
+                            <Binding ElementName="CANVAS" Path="ActualWidth"/>
+                            <Binding ElementName="CloseTextBacking" Path="ActualWidth"/>
+                        </MultiBinding>
+                    </Canvas.Left>
+                </Rectangle>
+                <TextBlock x:Name="CloseText" Text="Press ESC button to Exit" Foreground="White" Canvas.Top="16" SnapsToDevicePixels="True">
+    <Canvas.Left>
+        <MultiBinding Converter="{StaticResource MidValue}">
+            <Binding ElementName="CANVAS" Path="ActualWidth"/>
+            <Binding ElementName="CloseText" Path="ActualWidth"/>
+        </MultiBinding>
+    </Canvas.Left>
+                </TextBlock>
+            </Canvas>
+            
+            <Canvas x:Name="ErrorDialogCanvas" Grid.Column="0" Grid.Row="0" Visibility="Hidden">
+                <Rectangle x:Name="ErrorDialogRectangle" Width="350" Height="75" Fill="#111" Opacity="1" Canvas.Top="150" Stroke="#222" SnapsToDevicePixels="True">
+                    <Canvas.Left>
+                        <MultiBinding Converter="{StaticResource MidValue}">
+                            <Binding ElementName="CANVAS" Path="ActualWidth"/>
+                            <Binding ElementName="ErrorDialogRectangle" Path="ActualWidth"/>
+                        </MultiBinding>
+                    </Canvas.Left>
+                </Rectangle>
+                <TextBlock x:Name="ErrorText" Text="You are not currently on Chests tab in game. Please try again" TextWrapping="Wrap" Foreground="White" Canvas.Top="180" SnapsToDevicePixels="True">
+                <Canvas.Left>
+                    <MultiBinding Converter="{StaticResource MidValue}">
+                        <Binding ElementName="CANVAS" Path="ActualWidth"/>
+                        <Binding ElementName="ErrorText" Path="ActualWidth"/>
+                    </MultiBinding>
+                </Canvas.Left>
+                </TextBlock>
+            </Canvas>
+            <Canvas x:Name="ProgressCanvas" Grid.Column="0" Grid.Row="0" Visibility="Hidden">
+                <Rectangle x:Name="ProgressRectangle" RadiusX="10" RadiusY="10" Width="350" Height="100" Fill="#111" Opacity="1" Canvas.Top="250" Stroke="#222" SnapsToDevicePixels="True">
+                    <Canvas.Left>
+                        <MultiBinding Converter="{StaticResource MidValue}">
+                            <Binding ElementName="CANVAS" Path="ActualWidth"/>
+                            <Binding ElementName="ProgressRectangle" Path="ActualWidth"/>
+                        </MultiBinding>
+                    </Canvas.Left>
+                </Rectangle>
+                <TextBlock x:Name="ProgressText" Text="{Binding StatusMessage, Mode=TwoWay}" FontWeight="Bold" Width="300" TextAlignment="Center" Height="24" VerticalAlignment="Center" TextWrapping="Wrap" Foreground="White" Canvas.Top="275" SnapsToDevicePixels="True">
+                    <Canvas.Left>
+                        <MultiBinding Converter="{StaticResource MidValue}">
+                            <Binding ElementName="CANVAS" Path="ActualWidth"/>
+                            <Binding ElementName="ProgressText" Path="ActualWidth"/>
+                        </MultiBinding>
+                    </Canvas.Left>
+                </TextBlock>
+                <ProgressBar x:Name="ProcessProgressBar" Canvas.Top="310" SnapsToDevicePixels="True" Width="250" IsIndeterminate="True">
+                    <Canvas.Left>
+                        <MultiBinding Converter="{StaticResource MidValue}">
+                            <Binding ElementName="CANVAS" Path="ActualWidth"/>
+                            <Binding ElementName="ProcessProgressBar" Path="ActualWidth"/>
+                        </MultiBinding>
+                    </Canvas.Left>
+                </ProgressBar>
+            </Canvas>
+        </Canvas>
+
+        <Grid x:Name="ResultsDialog" Height="225" Width="400" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="20,200" Visibility="Hidden">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Rectangle Grid.Column="0" Grid.Row="0" Fill="#000" Opacity="1" Stroke="#111" RadiusX="10" RadiusY="10"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="36"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="36"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Foreground="White" FontWeight="Bold" Text="OCR Wizard" TextAlignment="Center" Height="24" Margin="0,5"/>
+                <Grid Grid.Row="1" Grid.Column="0" Background="#222">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="64"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Image Grid.Row="0" Width="32" HorizontalAlignment="Center" VerticalAlignment="Center" Height="32" Grid.Column="0" Source="Images/infoIcon.png"/>
+                    <Grid Grid.Column="1" Grid.Row="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0"  Margin="10,5"
+                            Text="Looks like you're good to go. Red Squares on the text indicates where the OCR will read from to build chest data. Red Circles indicate where automated mouse clicks will be. If you are unhappy with the results, you can manually edit the Area of Interest the OCR reads from."
+                            FontSize="12" Foreground="White"
+                            TextWrapping="Wrap" VerticalAlignment="Center"/>
+                    </Grid>
+                </Grid>
+                <Grid Grid.Row="2" Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border CornerRadius="0,0,10,10">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" 
+VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" ButtonBase.Click="StackPanel_Click">
+                            <ui:FancyButton Background="#0055ff" 
+                                            Height="24" Width="75" Tag="Yes" 
+                                            BorderBrush="#0066ff" 
+                                            HilightBrush="#0099ff" 
+                                            Foreground="White" RenderMode="TEXT" Corners="10" Text="OK" Margin="5,0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

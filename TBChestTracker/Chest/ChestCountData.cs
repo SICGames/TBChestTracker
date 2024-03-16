@@ -25,8 +25,8 @@ namespace TBChestTracker
     {
         public string Clanmate { get; set; }
         public List<ChestTypeData> ChestTypes { get; set; }
-
         public int Count { get; set; }
+
         public ChestCountData() 
         { 
             ChestTypes = new List<ChestTypeData>();
@@ -35,7 +35,6 @@ namespace TBChestTracker
         {
             Clanmate = clanmate;
             ChestTypes = new List<ChestTypeData>();
-
             Count = count;
         }
     }

@@ -25,5 +25,8 @@ namespace TBChestTracker
         }
         public static bool TessDataExists { get; set; }
         public static bool AutomationRunning = false;
+
+        public static bool IsFirstRun = false;
+
     }
 }

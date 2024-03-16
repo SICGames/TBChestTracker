@@ -4,25 +4,39 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
+        xmlns:ui="clr-namespace:TBChestTracker.UI"
         mc:Ignorable="d"
         Title="Settings" Height="450" Width="800" Topmost="True">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TabControl Grid.Row="0">
-            <TabItem Header="General">
-                
-            </TabItem>
-            <TabItem Header="Snapture">
-                
-            </TabItem>
-            <TabItem Header="Hotkeys">
-                
-            </TabItem>
-            <TabItem Header="Automation">
-                
-            </TabItem>
-        </TabControl>
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical" Background="#111" Width="200">
+            <ui:FancyButton RenderMode="TEXT" Text="General" Height="36" Foreground="White" Background="#111" BorderBrush="#000" FontWeight="Bold" HilightBrush="#555"/>
+            <ui:FancyButton RenderMode="TEXT" Text="Onscreen Character Recongition" Height="36" Foreground="White" Background="#111" BorderBrush="#000" FontWeight="Bold" HilightBrush="#555"/>
+        </StackPanel>
+        <Grid Grid.Row="0" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Frame Grid.Row="0" Grid.Column="0"/>
+            <StackPanel Orientation="Horizontal" Height="42" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <ui:FancyButton Width="100" Height="24" 
+                                Background="#0077ff" 
+                                HilightBrush="#00AAff" 
+                                Text="Save" RenderMode="TEXT" 
+                                BorderBrush="#0066ff" 
+                                Corners="5"
+                                Margin="10,0" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

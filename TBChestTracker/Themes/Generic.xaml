@@ -3,33 +3,158 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:TBChestTracker.UI">
     <Style TargetType="{x:Type local:FancyButton}">
+        <Style.Resources>
+            <SolidColorBrush x:Key="BackgroundColor" Color="#111"/>
+            <SolidColorBrush x:Key="ForegroundColor" Color="#fff"/>
+            <SolidColorBrush x:Key="BorderBrush" Color="Transparent"/>
+            <SolidColorBrush x:Key="Mouse.Over.BackgroundColor" Color="#aaa"/>
+            <SolidColorBrush x:Key="Mouse.Over.BorderColor" Color="#888"/>
+            <SolidColorBrush x:Key="Disabled.ForegroundColor" Color="#999"/>
+            <SolidColorBrush x:Key="Disabled.BackgroundColor" Color="Transparent"/>
+        </Style.Resources>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Padding" Value="1"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:FancyButton}">
-                    <Border Background="{TemplateBinding Background}"
+                    <Border x:Name="BORDER" Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="32"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Rectangle x:Name="RECT" Grid.ColumnSpan="2" Fill="{TemplateBinding HilightBrush}" StrokeThickness="0" Opacity="0"/>
-                            <Image Grid.Column="0" Width="16" Source="{TemplateBinding ImageSource}" Stretch="Uniform" Margin="2" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="{TemplateBinding Text}" 
-                                       Foreground="{TemplateBinding Foreground}" 
-                                       FontSize="{TemplateBinding FontSize}" 
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Center"
-                                       FontWeight="{TemplateBinding FontWeight}" FontStyle="{TemplateBinding FontStyle}" FontFamily="{TemplateBinding FontFamily}"/>
-                            
-                        </Grid>
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding Corners}" 
+                            SnapsToDevicePixels="True">
+                            <Grid Margin="{TemplateBinding Padding}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition x:Name="GridColumn01" Width="*"/>
+                                    <ColumnDefinition x:Name="SEPERATOR" Width="2"/>
+                                    <ColumnDefinition x:Name="GridColumn02" Width="*"/>
+                                </Grid.ColumnDefinitions>
+                            <Rectangle x:Name="RECT" Fill="{TemplateBinding HilightBrush}" Opacity="0" Grid.ColumnSpan="3" 
+                                       RadiusX="{Binding RelativeSource={RelativeSource AncestorType=local:FancyButton}, Path=Corners.TopLeft}"
+                                       RadiusY="{Binding RelativeSource={RelativeSource AncestorType=local:FancyButton}, Path=Corners.TopRight}"/>
+                            <Grid Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="32"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="32"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Image x:Name="IMAGE"
+                                            Grid.Column="0" Grid.Row="0" Height="16" Source="{TemplateBinding ImageSource}"
+                                            Visibility="Visible"
+                                            Stretch="Uniform" Margin="2" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Rectangle x:Name="SEPERATOR_RECTANGLE" Fill="#bbb"
+                                            Opacity="0.05"
+                                            Height="16"
+                                            Visibility="Collapsed" 
+                                            Stroke="Transparent" 
+                                            StrokeThickness="0"
+                                            Grid.Column="1"/>
+                                <TextBlock x:Name="TEXT" Grid.Column="2" Text="{TemplateBinding Text}" 
+                                            Foreground="{TemplateBinding Foreground}" 
+                                            FontSize="{TemplateBinding FontSize}" 
+                                            Visibility="Visible"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Center"
+                                            FontWeight="{TemplateBinding FontWeight}" FontStyle="{TemplateBinding FontStyle}" FontFamily="{TemplateBinding FontFamily}"/>
+                            </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Opacity" TargetName="RECT" Value="1"/>
                         </Trigger>
+                        <Trigger Property="RenderMode" Value="IMAGE">
+                            <Setter Property="Visibility" TargetName="IMAGE" Value="Visible"/>
+                            <Setter Property="Visibility" TargetName="TEXT" Value="Collapsed"/>
+                            <Setter Property="Width" TargetName="GridColumn01" Value="32"/>
+                            <Setter Property="Width" TargetName="GridColumn02" Value="0"/>
+                        </Trigger>
+                        <Trigger Property="RenderMode" Value="TEXT">
+                            <Setter Property="Visibility" TargetName="IMAGE" Value="Collapsed"/>
+                            <Setter Property="Visibility" TargetName="TEXT" Value="Visible"/>
+                            <Setter Property="Width" TargetName="GridColumn01" Value="0"/>
+                            <Setter Property="Width" TargetName="GridColumn02" Value="*"/>
+                        </Trigger>
+                        <Trigger Property="RenderMode" Value="IMAGE_TEXT">
+                            <Setter Property="Visibility" TargetName="IMAGE" Value="Visible"/>
+                            <Setter Property="Visibility" TargetName="TEXT" Value="Visible"/>
+                            <Setter Property="Width" TargetName="GridColumn01" Value="32"/>
+                            <Setter Property="Width" TargetName="GridColumn02" Value="*"/>
+                        </Trigger>
+                        <Trigger Property="ShowSeperator" Value="True">
+                            <Setter Property="Visibility" TargetName="SEPERATOR_RECTANGLE" Value="Visible"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" TargetName="TEXT" Value="{StaticResource Disabled.ForegroundColor}"/>
+                        </Trigger>
                     </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:FancyImageButton}">
+        <Setter Property="Padding" Value="3"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:FancyImageButton}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border x:Name="FILL_BORDER" Grid.Column="0" Grid.Row="0" 
+                                    BorderBrush="{TemplateBinding HighlightStrokeBrush}" 
+                                    Background="{TemplateBinding HighlightBrush}"
+                                    Opacity="{TemplateBinding HighlightOpacity}" 
+                                    BorderThickness="{TemplateBinding HighlightStrokeThickness}" 
+                                    CornerRadius="{TemplateBinding Corners}" Visibility="Hidden"/>
+                            <Viewbox Grid.Column="0" Grid.Row="0" x:Name="PRESENTER" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}">
+                                <Image x:Name="ICON" Source="{TemplateBinding ImageSource}" Stretch="UniformToFill"/>
+                            </Viewbox>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Visibility" TargetName="FILL_BORDER" Value="Visible"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:FancyNavigationButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:FancyNavigationButton}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Rectangle x:Name="ACTIVE_LIGHT" Grid.Column="0" Grid.Row="0"/>
+                            <Viewbox x:Name="IMAGE_VIEWBOX" Grid.Row="0" Margin="{TemplateBinding Padding}" 
+                                     Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Visible">
+                                
+                            </Viewbox>
+                            <ContentPresenter x:Name="PRESENTER" Grid.Row="0" Grid.Column="2" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Grid>
+                    </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

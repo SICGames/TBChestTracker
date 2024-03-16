@@ -7,21 +7,6 @@ using System.Threading.Tasks;
 
 namespace TBChestTracker
 {
-    public enum ChestConditionType
-    {
-        COMMON = 0,
-        RARE = 1,
-        EPIC  = 2,
-        CITADEL = 3,
-        AREA  = 4,
-        STORY = 5
-    }
-    public enum ChestConditionComparator
-    {
-        GREATER = 0,
-        LESS = 1,
-    }
-
     public class ChestConditions : INotifyPropertyChanged
     {
         private string _chestType = "Common";

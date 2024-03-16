@@ -34,7 +34,6 @@ namespace TBChestTracker
         {
             InitializeComponent();
             viewSource = new CollectionViewSource();
-            
         }
 
         private void clanmatenameBox_PreviewKeyUp(object sender, KeyEventArgs e)
@@ -90,7 +89,7 @@ namespace TBChestTracker
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.DataContext = ClanManager.Instance.ClanmateManager.Database; //MainWindow.ClanChestManager.ClanmateManager;
+            this.DataContext = ClanManager.Instance.ClanmateManager.Database; 
 
             ListClanMates01.ItemsSource = ClanManager.Instance.ClanmateManager.Database.Clanmates; // MainWindow.ClanChestManager.ClanmateManager.Clanmates;
             ClanManager.Instance.ClanmateManager.UpdateCount();

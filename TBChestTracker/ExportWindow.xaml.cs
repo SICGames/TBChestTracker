@@ -16,21 +16,51 @@ using TBChestTracker.Managers;
 using CsvHelper;
 using System.IO;
 using System.Globalization;
+using System.ComponentModel;
 
 namespace TBChestTracker
 {
     /// <summary>
     /// Interaction logic for ExportWindow.xaml
     /// </summary>
-    public partial class ExportWindow : Window
+    public partial class ExportWindow : Window, INotifyPropertyChanged
     {
 
         int extensionFilterIndex = 0;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(String propertyName)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private bool useTotalCountMethod = true;
+        public bool UseTotalCountMethod
+        {
+            get => useTotalCountMethod;
+            set
+            {
+                useTotalCountMethod = value;
+                OnPropertyChanged(nameof(UseTotalCountMethod));
+            }
+        }
+        private bool useSpecificCountMethod = true;
+        public bool UseSpecificCountMethod
+        {
+            get => useSpecificCountMethod;
+            set
+            {
+                useSpecificCountMethod = value;
+                OnPropertyChanged(nameof(UseSpecificCountMethod));
+            }
+        }
 
         public ExportWindow()
         {
             InitializeComponent();
             exportBtn.IsEnabled = false;
+            this.DataContext = this;
         }
 
         private void FilePicker01_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -63,10 +93,14 @@ namespace TBChestTracker
                 {
                     var headers = new List<String>();
                     headers.Add("Clanmate");
-                    foreach (var types in chestdata[0].ChestTypes)
+                    if (chestdata[0].ChestTypes.Count > 0)
                     {
-                        headers.Add(types.Chest.ToString());
+                        foreach (var types in chestdata[0].ChestTypes)
+                        {
+                            headers.Add(types.Chest.ToString());
+                        }
                     }
+
                     headers.Add("Total");
 
                     foreach (var heading in headers)
@@ -78,11 +112,15 @@ namespace TBChestTracker
                     foreach (var item in chestdata)
                     {
                         csv.WriteField(item.Clanmate);
-                        
-                        foreach (var type in item.ChestTypes)
+
+                        if (item.ChestTypes.Count > 0)
                         {
-                            csv.WriteField(type.Total);
+                            foreach (var type in item.ChestTypes)
+                            {
+                                csv.WriteField(type.Total);
+                            }
                         }
+
                         csv.WriteField(item.Count);
                         csv.NextRecord();
                         
@@ -96,14 +134,13 @@ namespace TBChestTracker
         }
         private async void exportBtn_Click(object sender, RoutedEventArgs e)
         {
-        
 
+            
             var file = FilePicker01.File;
             var sortOption = (SortType)SortOptions.SelectedIndex;
             var chest_points_value = ChestPointsValue.Text;
             var selectedExportIndex = ExportOptions.SelectedIndex;
             int chest_points = 0;
-
             var selectedFileExtension = FilePicker01.ExtensionFilterIndex;
 
             if(!Int32.TryParse(chest_points_value, out  chest_points))
@@ -118,7 +155,20 @@ namespace TBChestTracker
             else if(ShowIndividual.IsChecked == true) 
                 count_method = 1;
 
-            var chestcountdata = await ClanManager.Instance.ClanChestManager.BuildChestCountDataAsync(sortOption);
+            var clansettings = ClanManager.Instance.ClanChestSettings;
+            List<ChestCountData> chestcountdata = null;
+            if (clansettings.ClanRequirements.UseSpecifiedClanRequirements)
+            {
+                chestcountdata = await ClanManager.Instance.ClanChestManager.BuildSpecificChestCountDataAsync(sortOption);
+            }
+            else if(clansettings.ChestPointsSettings.UseChestPoints)
+            {
+                chestcountdata = await ClanManager.Instance.ClanChestManager.BuildChestPointsDataAsync(sortOption);
+            }
+            else if(!clansettings.ClanRequirements.UseSpecifiedClanRequirements && !clansettings.ChestPointsSettings.UseChestPoints)
+            {
+                chestcountdata = await ClanManager.Instance.ClanChestManager.BuildAllChestCountDataAsync(sortOption);
+            }
 
             if (selectedFileExtension == 0)
             {
@@ -164,6 +214,23 @@ namespace TBChestTracker
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             FilePicker01.DefaultFolder = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseExportFolderPath;
+            var useChestPoints = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.UseChestPoints;
+            var useSpecificChests = ClanManager.Instance.ClanChestSettings.ChestRequirements.useChestConditions || ClanManager.Instance.ClanChestSettings.ClanRequirements.UseSpecifiedClanRequirements;
+            if(useChestPoints)
+            {
+                UseTotalCountMethod = true;
+                UseSpecificCountMethod = false;
+            }
+            else if(useSpecificChests)
+            {
+                UseTotalCountMethod = false;
+                UseSpecificCountMethod = true;
+            }
+            else
+            {
+                UseTotalCountMethod = true;
+                UseSpecificCountMethod = false;
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

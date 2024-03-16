@@ -4,8 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
+        xmlns:ui="clr-namespace:TBChestTracker.UI"
         mc:Ignorable="d"
         Title="Export Clan Chest Window" Width="300" WindowStyle="ToolWindow" SizeToContent="Height" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
+  
     <Grid>
         <Grid.RowDefinitions >
             <RowDefinition Height="50"/>
@@ -49,10 +51,10 @@
                 </GroupBox>
                 <GroupBox Header="Chest Counting Method">
                     <StackPanel Orientation="Vertical" Margin="5">
-                        <RadioButton x:Name="ShowTotal" Content="Show Total" Margin="0,3" IsChecked="True"/>
-                        <RadioButton x:Name="ShowIndividual" Margin="0,3">
+                        <RadioButton x:Name="ShowTotal" Content="Show Total" Margin="0,3" IsChecked="True" IsEnabled="{Binding UseTotalCountMethod}"/>
+                        <RadioButton x:Name="ShowIndividual" Margin="0,3" IsEnabled="{Binding UseSpecificCountMethod}">
                             <RadioButton.Content>
-                                <TextBlock Text="Show Individual Amount specified in Clan Requirements" TextWrapping="Wrap"/>
+                                <TextBlock Text="Show Individual Amount specified in Clan Requirements" TextWrapping="Wrap" />
                             </RadioButton.Content>
                         </RadioButton>
                     </StackPanel>
@@ -60,10 +62,13 @@
             </StackPanel>
         </DockPanel>
         <DockPanel Grid.Row="2" Background="#eeeeee">
-            <Button x:Name="exportBtn" Content="Export" Width="64" Height="24" 
-                    VerticalAlignment="Center" HorizontalAlignment="Right"
-                    Click="exportBtn_Click"
-                    Margin="0,0,20,0"/>
+            <ui:FancyButton x:Name="exportBtn" Width="75" Height="24" 
+                            VerticalAlignment="Center" 
+                            HorizontalAlignment="Right" 
+                            RenderMode="TEXT" 
+                            Text="Export" 
+                            Click="exportBtn_Click"
+                            Corners="10" BorderBrush="Transparent" BorderThickness="0" Background="#0077ff" HilightBrush="#00aaff" Foreground="White" Margin="10,0"/>
         </DockPanel>
     </Grid>
 </Window>

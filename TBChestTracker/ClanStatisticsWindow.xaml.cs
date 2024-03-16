@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TBChestTracker.Managers;
 
 namespace TBChestTracker
 {
@@ -64,6 +65,7 @@ namespace TBChestTracker
         private bool m_bShowStoryChestsTotal = false;
         private bool m_bShowAll = false;
         private bool m_bShowTotal = true;
+        private bool m_bShowTotalPoints = true;
 
         #region PropertyChanged Event
         public event PropertyChangedEventHandler PropertyChanged;
@@ -187,6 +189,16 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(bShowTotal));  
             }
         }
+
+        public bool bShowTotalPoints
+        {
+            get => m_bShowTotalPoints;
+            set
+            {
+                m_bShowTotalPoints = value;
+                OnPropertyChanged(nameof(bShowTotalPoints));    
+            }
+        }
         public bool bShowAll
         {
             get => m_bShowAll;
@@ -244,10 +256,18 @@ namespace TBChestTracker
             using (data.DeferRefresh())
             {
                 data.SortDescriptions.Clear();
-                if(AscSortRadioButton.IsChecked == true)
-                    data.SortDescriptions.Add(new SortDescription("Total", ListSortDirection.Ascending));
-                if(DescSortRadioButton.IsChecked == true)
-                    data.SortDescriptions.Add(new SortDescription("Total", ListSortDirection.Descending));
+                if (AscSortRadioButton.IsChecked == true)
+                {
+
+                    var sortPath = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.UseChestPoints == true ? "Points" : "Total";
+
+                    data.SortDescriptions.Add(new SortDescription(sortPath, ListSortDirection.Ascending));
+                }
+                if (DescSortRadioButton.IsChecked == true)
+                {
+                    var sortPath = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.UseChestPoints == true ? "Points" : "Total";
+                    data.SortDescriptions.Add(new SortDescription(sortPath, ListSortDirection.Descending));
+                }
             }
         }
         bool Filter_Clanmate_Results(object item)
@@ -279,9 +299,10 @@ namespace TBChestTracker
                     foreach (var entry in date.Value)
                     {
                         int commoncryptstotal, rarecryptstotal, epiccryptstotal, citadelsstotal,
-                          arenastotal, uniontriumphstotal, vaultancienttotal, ancientchests, heroicstotal, bankstotal, storycheststotal, total, otherTotal;
+                          arenastotal, uniontriumphstotal, vaultancienttotal, ancientchests, heroicstotal, bankstotal, storycheststotal, total, otherTotal, totalPoints;
+
                         commoncryptstotal = rarecryptstotal = epiccryptstotal = citadelsstotal = arenastotal =
-                    heroicstotal = bankstotal = uniontriumphstotal = vaultancienttotal = ancientchests = storycheststotal = total = otherTotal = 0;
+                    heroicstotal = bankstotal = uniontriumphstotal = vaultancienttotal = ancientchests = storycheststotal = total = otherTotal = totalPoints = 0;
 
                         var clanmate = entry.Clanmate;
                         //var chests = dateEntry.Value.Where(name => name.Clanmate.Equals(clanmate)).Select(chest => chest.chests).ToList()[0];
@@ -302,6 +323,8 @@ namespace TBChestTracker
                             storycheststotal = chests.Where(common => common.Type == ChestType.STORY).Count();
                             otherTotal = chests.Where(common => common.Type == ChestType.OTHER).Count();    
                             total = commoncryptstotal + rarecryptstotal + epiccryptstotal + citadelsstotal + arenastotal + uniontriumphstotal + heroicstotal + vaultancienttotal + bankstotal + storycheststotal + otherTotal;
+                            var points = date.Value.Where(name => name.Clanmate.Equals(clanmate, StringComparison.CurrentCultureIgnoreCase)).Select(p => p.Points).FirstOrDefault();
+                            totalPoints = points;
                         }
 
                         bool alreadyExists = ClanStatisticData.Where(mate => mate.Clanmate.Equals(clanmate)).Count() > 0 ? true : false;
@@ -320,10 +343,11 @@ namespace TBChestTracker
                             updateStats.AncientChestsTotal += ancientchests;
                             updateStats.StoryChestsTotal += storycheststotal;
                             updateStats.Total += total;
+                            updateStats.Points += totalPoints;
                         }
                         else
                             ClanStatisticData.Add(new TBChestTracker.ClanStatisticData(clanmate, commoncryptstotal, rarecryptstotal, epiccryptstotal, citadelsstotal,
-                            arenastotal, uniontriumphstotal, vaultancienttotal, heroicstotal, ancientchests, storycheststotal, bankstotal, total));
+                            arenastotal, uniontriumphstotal, vaultancienttotal, heroicstotal, ancientchests, storycheststotal, bankstotal, total, totalPoints));
                     }
                 }
             }

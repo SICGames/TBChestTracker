@@ -142,6 +142,8 @@
     </ApplicationDefinition>
     <Compile Include="Arrays\IDataCollection.cs" />
     <Compile Include="Automation\Automator.cs" />
+    <Compile Include="Chest\ChestPointsData.cs" />
+    <Compile Include="Chest\ChestPointsSettings.cs" />
     <Compile Include="ClanData\ClanRequirements.cs" />
     <Compile Include="ClanData\ClanSpecifiedRequirements.cs" />
     <Compile Include="Clanmate\Clanmate.cs" />
@@ -162,11 +164,21 @@
     <Compile Include="Helpers\JsonHelper.cs" />
     <Compile Include="Helpers\Table.cs" />
     <Compile Include="Helpers\Translator.cs" />
+    <Compile Include="Managers\SettingsManager.cs" />
     <Compile Include="MergeClanmateWindow.xaml.cs">
       <DependentUpon>MergeClanmateWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="NewChestPointWindow.xaml.cs">
+      <DependentUpon>NewChestPointWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="NewRequirementWindow.xaml.cs">
       <DependentUpon>NewRequirementWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="OCRWizardScreenWindow.xaml.cs">
+      <DependentUpon>OCRWizardScreenWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="OCRWizardWindow.xaml.cs">
+      <DependentUpon>OCRWizardWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\ClanPage.xaml.cs">
       <DependentUpon>ClanPage.xaml</DependentUpon>
@@ -183,6 +195,12 @@
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Settings\AOIRect.cs" />
+    <Compile Include="Settings\Marker.cs" />
+    <Compile Include="Settings\MarkerCollection.cs" />
+    <Compile Include="Settings\OCRSettings.cs" />
+    <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Shared\AppContext.cs" />
     <Compile Include="StartPageWindow.xaml.cs">
       <DependentUpon>StartPageWindow.xaml</DependentUpon>
     </Compile>
@@ -249,11 +267,16 @@
     <Compile Include="Chest\SortType.cs" />
     <Compile Include="Helpers\StringHelpers.cs" />
     <Compile Include="UI\FancyButton.cs" />
+    <Compile Include="UI\FancyImageButton.cs" />
+    <Compile Include="UI\FancyNavigationButton.cs" />
     <Compile Include="UI\Milestone.xaml.cs">
       <DependentUpon>Milestone.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\MilestoneStep.xaml.cs">
       <DependentUpon>MilestoneStep.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ValidateChestDataWindow.xaml.cs">
+      <DependentUpon>ValidateChestDataWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="AddClanmatesWindow.xaml">
       <SubType>Designer</SubType>
@@ -315,6 +338,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="NewChestPointWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="NewClanDatabaseWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -328,6 +355,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="NewRequirementWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="OCRWizardScreenWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="OCRWizardWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -371,6 +406,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ValidateChestDataWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -390,6 +429,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include=".FIRSTRUN">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -401,7 +443,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper">
-      <Version>30.0.1</Version>
+      <Version>31.0.2</Version>
     </PackageReference>
     <PackageReference Include="Emgu.CV">
       <Version>4.8.1.5350</Version>
@@ -415,6 +457,9 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.3</Version>
     </PackageReference>
+    <PackageReference Include="WriteableBitmapEx">
+      <Version>1.6.8</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Images\camera_64x64.png">
@@ -425,7 +470,22 @@
     <Content Include="Images\close-button.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\ConsoleIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ConsoleIcon_disabled.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\icons_chest_1_disabled.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\icons_main_menu_clan_1_disabled.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\NewFileIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\NewFileIcon_disabled.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\NewIcon.png">
@@ -434,7 +494,40 @@
     <Content Include="Images\NewWizardIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\OCR_Icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\OCR_Icon_disabled.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\plusButton.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refs\chest_window_chests_active.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refs\chest_window_claim_button.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refs\chest_window_ref_bottom_left.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refs\chest_window_ref_bottom_right.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refs\chest_window_ref_top_left.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refs\chest_window_ref_top_right.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refs\Open_Chest_Button_RefImage.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\saveIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\saveIcon_disabled.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\SettingsIcon01.png">
@@ -463,6 +556,12 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Images\StartAutomationIcon_disabled.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\StopAutomation_disabled.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\trashIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -519,6 +618,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\infoIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\trashIcon_disabled.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\warningIcon.png">

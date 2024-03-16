@@ -12,6 +12,7 @@ namespace TBChestTracker
 
         public string Clanmate { get; set; }
         public List<Chest> chests { get; set; }
+        public int Points { get; set; }
         public ClanChestData()
         {
 
@@ -20,6 +21,12 @@ namespace TBChestTracker
         {
             Clanmate = name;
             this.chests = chests;
+        }
+        public ClanChestData(string name, List<Chest> chests, int points)
+        {
+            this.Clanmate = name;
+            this.chests = chests;
+            this.Points = points;
         }
     }
 }

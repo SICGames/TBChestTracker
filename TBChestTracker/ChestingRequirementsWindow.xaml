@@ -131,12 +131,68 @@
                         </GroupBox>
                     </Grid>
                 </TabItem>
-                <TabItem Header="Rankings">
+                <TabItem Header="Chest Points">
                     <Grid Margin="5">
-                        <TextBlock FontWeight="Bold"
-                            Text="Rankings are a fun way to motivate clanmates into pushing harder. Another way to feel rewarded. Only shows after export of clan chests." 
-                            TextWrapping="Wrap"/>
-                        
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" 
+                                    Text="Chest Points will be converted during exporting chest data. Each clan chest has a specified value attached to them, if your clan prefers this method."
+                                    Margin="5" FontWeight="Bold"/>
+                        <GroupBox Header="Chest Points Options" Grid.Row="1">
+                            <StackPanel Orientation="Vertical">
+                                <RadioButton Content="None" 
+                      IsChecked="{Binding ChestPointsSettings.DontUseChestPoints, Mode=TwoWay}"/>
+                                <RadioButton x:Name="UseChestPointsRadio" Content="Use Chest Points" 
+                      IsChecked="{Binding ChestPointsSettings.UseChestPoints, Mode=TwoWay}"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Specify Chest Points" Grid.Row="2" IsEnabled="{Binding ElementName=UseSpecifiedRequirementsRadio, Path=IsEnabled}" Margin="3,5">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="24"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+                                <StackPanel Orientation="Horizontal" Grid.Row="0">
+                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/PlusIcon.png" 
+                                     Height="24" Width="24"
+                                     Margin="3,0"
+                                     BorderBrush="DarkGray"
+                                     BorderThickness="1" HoverBrush="LightGray" x:Name="AddChestPointButton" Click="AddChestPointButton_Click"/>
+                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/MinusIcon.png" 
+                                     Height="24" Width="24"
+                                     Margin="3,0"
+                                     BorderBrush="DarkGray"
+                                     BorderThickness="1" HoverBrush="LightGray"
+                                     x:Name="RemoveChestPointButton" Click="RemoveChestPointButton_Click"/>
+                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/trashIcon.png" 
+                                     Height="24" Width="24"
+                                     Margin="3,0"
+                                     BorderBrush="DarkGray"
+                                     BorderThickness="1" HoverBrush="LightGray"
+                                     x:Name="ClearChestPointsButton" Click="ClearChestPointsButton_Click"/>
+                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/saveIcon.png" 
+                                                            Height="24" Width="24"
+                                                            Margin="3,0"
+                                                            BorderBrush="DarkGray"
+                                                            BorderThickness="1" HoverBrush="LightGray"
+                                                            x:Name="ExportChestPointsToFile" Click="ExportChestPointsToFile_Click"/>
+
+                                </StackPanel>
+                                <ListView Grid.Row="1" ItemsSource="{Binding ChestPointsSettings.ChestPoints}" ItemContainerStyle="{StaticResource RequirementListViewItemStyle}">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="Clan Chest Type" Width="200" DisplayMemberBinding="{Binding ChestType}"/>
+                                            <GridViewColumn Header="Level" Width="95" DisplayMemberBinding="{Binding Level}"/>
+                                            <GridViewColumn Header="Point" Width="50" DisplayMemberBinding="{Binding PointValue}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                            </Grid>
+                        </GroupBox>
                     </Grid>
                 </TabItem>
             </TabControl>

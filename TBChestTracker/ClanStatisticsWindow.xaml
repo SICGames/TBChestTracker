@@ -172,7 +172,11 @@
                             </GridViewColumn>
                             <GridViewColumn Width="{Binding Path=bShowTotal, Converter={StaticResource BooleanToWidthConverter}, ConverterParameter=100}" 
                                             DisplayMemberBinding="{Binding Path=Total}">
-                            <GridViewColumnHeader  Visibility="{Binding Path=bShowTotal, Converter={StaticResource BooleanToVisibilityConverter}}" Content="Total"/>
+                                <GridViewColumnHeader  Visibility="{Binding Path=bShowTotal, Converter={StaticResource BooleanToVisibilityConverter}}" Content="Total"/>
+                            </GridViewColumn>
+                            <GridViewColumn Width="{Binding Path=bShowTotalPoints, Converter={StaticResource BooleanToWidthConverter}, ConverterParameter=100}" 
+                DisplayMemberBinding="{Binding Path=Points}">
+                                <GridViewColumnHeader  Visibility="{Binding Path=bShowTotalPoints, Converter={StaticResource BooleanToVisibilityConverter}}" Content="Total Points"/>
                             </GridViewColumn>
                         </GridView.Columns>
                     </GridView>

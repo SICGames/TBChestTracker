@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TBChestTracker"
              mc:Ignorable="d" 
-             d:DesignHeight="50" d:DesignWidth="300" Height="{Binding Height}" Width="{Binding Width}" SnapsToDevicePixels="True">
+             x:Name="uc"
+             d:DesignHeight="50" d:DesignWidth="300" Height="{Binding ActualHeight}" Width="{Binding ActualWidth}" SnapsToDevicePixels="True">
     <UserControl.Resources>
         <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
         <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA"/>
@@ -53,7 +54,7 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    <Grid Height="{Binding Height}" Width="{Binding Width}">
+    <Grid Height="{Binding ElementName=uc, Path=ActualHeight}" Width="{Binding ElementName=uc, Path=ActualWidth}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>

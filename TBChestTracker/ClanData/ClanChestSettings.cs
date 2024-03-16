@@ -15,6 +15,7 @@ namespace TBChestTracker
     {
         private ChestRequirements pChestRequirements  = null;
         private ClanRequirements pClanRequirements = null;
+        private ChestPointsSettings pChestPointsSettings = null;
 
         public ClanRequirements ClanRequirements
         {
@@ -40,12 +41,26 @@ namespace TBChestTracker
             }
         }
 
+        public ChestPointsSettings ChestPointsSettings
+        {
+            get
+            {
+                return pChestPointsSettings;
+            }
+            set
+            {
+                pChestPointsSettings = value;
+            }
+        }
+
         public ClanChestSettings() 
         { 
             if(pChestRequirements == null)
                 pChestRequirements = new ChestRequirements();
             if(pClanRequirements == null)
                 pClanRequirements = new ClanRequirements();
+            if(pChestPointsSettings == null)
+                pChestPointsSettings = new ChestPointsSettings();
         }
         public void Clear()
         {
@@ -61,6 +76,9 @@ namespace TBChestTracker
             ClanRequirements.UseSpecifiedClanRequirements = false;
             ClanRequirements.ClanSpecifiedRequirements = new System.Collections.ObjectModel.ObservableCollection<ClanSpecifiedRequirements>();
 
+            ChestPointsSettings.UseChestPoints = false;
+            ChestPointsSettings.DontUseChestPoints = true;
+            ChestPointsSettings.ChestPoints = new System.Collections.ObjectModel.ObservableCollection<ChestPoints> { };
         }
         public bool LoadSettings(string file)
         {
@@ -72,7 +90,9 @@ namespace TBChestTracker
                 clanChestSettings = (ClanChestSettings)serializer.Deserialize(sr, typeof(ClanChestSettings));
                 this.pClanRequirements = clanChestSettings.ClanRequirements;
                 this.pChestRequirements = clanChestSettings.ChestRequirements;
-                if (pChestRequirements != null || pClanRequirements != null)
+                this.pChestPointsSettings = clanChestSettings.ChestPointsSettings;
+
+                if (pChestRequirements != null || pClanRequirements != null || pChestPointsSettings != null)
                     return true;
                 else
                     return false;

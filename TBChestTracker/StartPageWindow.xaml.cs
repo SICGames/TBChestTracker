@@ -31,12 +31,29 @@ namespace TBChestTracker
             InitializeComponent();
 
             RecentFiles = new ObservableCollection<String>();
+            IsFirstRun();
         }
 
         private void CloseBtn_Click(object sender, RoutedEventArgs e)
         {
+            MainWindow.ShowWindow();
             this.Close();
         }
+
+        #region Check If FIRST RUN file exist
+        private void IsFirstRun()
+        {
+            if (File.Exists(".FIRSTRUN"))
+            {
+                //--- this is first run.
+                GlobalDeclarations.IsFirstRun = true;
+            }
+            else
+            {
+                GlobalDeclarations.IsFirstRun = false;
+            }
+        }
+        #endregion
 
         private void LoadRecentFilesList()
         {
@@ -70,12 +87,17 @@ namespace TBChestTracker
                 }
             }
         }
-        
+
         private void Lvi_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             var menuitem = sender as ListViewItem;
             var tag = menuitem.Tag.ToString();
-            MainWindow.LoadReentFile(tag, result => this.Close());
+            MainWindow.LoadReentFile(tag, result =>
+            {
+                MainWindow.ShowWindow();
+                this.Close();
+            });
+        
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -89,6 +111,7 @@ namespace TBChestTracker
                 RecentFiles.Clear(); 
             
             RecentFiles = null;
+            MainWindow = null;
         }
 
         private void NewClanWizard()
@@ -106,14 +129,20 @@ namespace TBChestTracker
                     MainWindow.CreateNewClan(result =>
                     {
                         if (result)
+                        {
+                            MainWindow.ShowWindow();
                             this.Close();
+                        }
                     });
                     break;
                 case "LOAD":
                     MainWindow.ShowLoadClanWindow(result =>
                     {
                         if (result)
+                        {
+                            MainWindow.ShowWindow();
                             this.Close();
+                        }
                     });
                     break;
                 case "NEW_WIZARD":

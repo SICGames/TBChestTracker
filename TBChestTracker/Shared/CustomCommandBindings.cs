@@ -49,6 +49,16 @@ namespace Hellscape.Commands
                     new KeyGesture(Key.A, ModifierKeys.Control | ModifierKeys.Shift)
                 }
             );
+        public static readonly RoutedUICommand ValidateChestData = new RoutedUICommand
+            (
+                "Validate Chest Data Integrity",
+                "Validate Chest Data Integrity",
+                typeof(CustomCommandBindings),
+                new InputGestureCollection()
+                {
+                    new KeyGesture(Key.V, ModifierKeys.Control | ModifierKeys.Shift)
+                }
+            );
         public static readonly RoutedUICommand ExportClanDatabase = new RoutedUICommand
             (
                 "Export CLan Database",
@@ -104,5 +114,10 @@ namespace Hellscape.Commands
                 "Clan Statistics", typeof(CustomCommandBindings), null
             );
 
+        public static readonly RoutedUICommand ManageSettings = new RoutedUICommand
+            (
+                "Settings",
+                "Settings", typeof(CustomCommandBindings), null
+            );
     }
 }

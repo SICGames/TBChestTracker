@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,7 +37,6 @@ namespace TBChestTracker
 
             }
         }
-
         private void RemoveConditionBtn_Click(object sender, RoutedEventArgs e)
         {
             var item = ((ListViewItem)sender).Content as ChestConditions;
@@ -90,6 +91,47 @@ namespace TBChestTracker
         {
             var item = ((ListViewItem)sender).Content as ClanSpecifiedRequirements;
 
+        }
+
+        private void AddChestPointButton_Click(object sender, RoutedEventArgs e)
+        {
+            NewChestPointWindow newChestPointWindow = new NewChestPointWindow();
+            if(newChestPointWindow.ShowDialog() == true)
+            {
+
+            }
+        }
+
+        private void RemoveChestPointButton_Click(object sender, RoutedEventArgs e)
+        {
+            var item = ((ListViewItem)sender).Content as ChestPoints;
+            ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints.Remove(item);
+        }
+
+        private void ClearChestPointsButton_Click(object sender, RoutedEventArgs e)
+        {
+            ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints.Clear();
+        }
+
+        private void ExportChestPointsToFile_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog sf = new SaveFileDialog();
+            sf.RestoreDirectory = true;
+            sf.Filter = "Text File|*.txt";
+            sf.OverwritePrompt = true;
+            if(sf.ShowDialog() == true)
+            {
+                using (StreamWriter sw = File.CreateText(sf.FileName))
+                {
+                    var points = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints;
+                    foreach (var point in points)
+                    {
+                        var line = $"{point.ChestType} {point.Level} - {point.PointValue}";
+                        sw.WriteLine(line);
+                    }
+                    sw.Close();
+                }
+            }
         }
     }
 }

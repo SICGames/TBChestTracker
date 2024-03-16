@@ -185,6 +185,27 @@ namespace TBChestTracker
 
                             int level = 0;
 
+                            var levelStr = chestobtained.Substring(chestobtained.IndexOf(' ') + 1);
+                            levelStr = levelStr.Substring(0, levelStr.IndexOf(" "));
+                            var levels = levelStr.Split('-');
+
+                            if (levels.Count() == 1)
+                            {
+                                if (!levels[0].Contains("io"))
+                                    level = Int32.Parse(levels[0]);
+                                else
+                                    level = 10;
+                            }
+                            else if (levels.Count() > 1)
+                            {
+                                //--- chest will implend new int array.
+                                if (!levels[0].Contains("io"))
+                                    level = Int32.Parse(levels[0]);
+                                else
+                                    level = 10;
+                            }
+
+                            /*
                             if (chestobtained.Contains("io"))
                             {
                                 //--- OCR reads 10 as io.Until perm fix. 
@@ -208,7 +229,7 @@ namespace TBChestTracker
                                     level = Int32.Parse(match.Value);
                                 }
                             }
-
+                            */
                             //--- shouldn't be 0. Normally happens 1st chest that is a level 5. 
                             if (level == 0)
                                 level = 5;
@@ -304,6 +325,8 @@ namespace TBChestTracker
                 {
                     clanchestdata.chests.Add(name.Chest);
                 }
+
+               
                 clanChestData.Add(clanchestdata);
             }
             return clanChestData;
@@ -352,7 +375,7 @@ namespace TBChestTracker
                     clanChestData.Clear();
                     foreach (var mate in clanmates)
                     {
-                        clanChestData.Add(new ClanChestData(mate.Name, null));
+                        clanChestData.Add(new ClanChestData(mate.Name, null,0));
                     }
 
                     ClanChestDailyData.Add(DateTime.Now.ToString(@"MM-dd-yyyy"), clanChestData);
@@ -393,7 +416,7 @@ namespace TBChestTracker
 
                         if (!alias_found)
                         {
-                            clanChestData.Add(new ClanChestData(tmpchest.Clanmate, tmpchest.chests));
+                            clanChestData.Add(new ClanChestData(tmpchest.Clanmate, tmpchest.chests, tmpchest.Points));
                             com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} doesn't exist within clanmates database.", "Clanmate Not Found", LogType.WARNING);
                             ClanManager.Instance.ClanmateManager.Add(tmpchest.Clanmate);
                             ClanManager.Instance.ClanmateManager.Save(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile);
@@ -421,10 +444,31 @@ namespace TBChestTracker
                         if (chestdata.Clanmate.Equals(m_chestdata.Clanmate, StringComparison.CurrentCultureIgnoreCase))
                         {
                             if (chestdata.chests == null)
+                            {
                                 chestdata.chests = new List<Chest>();
+                                chestdata.Points = 0;
+                            }
 
                             foreach (var m_chest in m_chestdata.chests.ToList())
                             {
+                                if (ClanManager.Instance.ClanChestSettings.ChestPointsSettings.UseChestPoints)
+                                {
+                                    var pointvalues = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints;
+                                    foreach (var pointvalue in pointvalues)
+                                    {
+                                        var chest_type = m_chest.Type.ToString();
+                                        var level = m_chest.Level;
+                                        if (chest_type.ToLower() == pointvalue.ChestType.ToLower())
+                                        {
+                                            var chest_level = pointvalue.Level;
+                                            if (level == chest_level)
+                                            {
+                                                chestdata.Points += pointvalue.PointValue;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
                                 chestdata.chests.Add(m_chest);
                             }
                         }
@@ -594,15 +638,134 @@ namespace TBChestTracker
         public Task ExportDataAsync(string filename,  List<ChestCountData> chestcountdata, int chest_points_value, int countmethod) => 
             Task.Run(() =>  ExportData(filename, chestcountdata, chest_points_value,  countmethod));
 
-        public Task<List<ChestCountData>> BuildChestCountDataAsync(SortType sortType = SortType.NONE)
-        {
-            return Task.FromResult(Task.Run(()=> BuildChestCountData(sortType)).Result);
-        }
        
-        public List<ChestCountData> BuildChestCountData(SortType sortType = SortType.NONE)
+       
+        public Task<List<ChestCountData>> BuildAllChestCountDataAsync(SortType sortType = SortType.NONE) => 
+            Task.FromResult(Task.Run(() => BuildAllChestCountData(SortType.NONE)).Result);
+
+        public List<ChestCountData> BuildAllChestCountData(SortType sortType = SortType.NONE)
         {
             List<ChestCountData> chestcountdata = new List<ChestCountData>();
 
+            //-- Start to initialize Chest Count Data.
+            var index = 0;
+            foreach (var clanmate in ClanManager.Instance.ClanmateManager.Database.Clanmates)
+            {
+                chestcountdata.Add(new ChestCountData(clanmate.Name, 0));
+                index++;
+            }
+           
+            foreach (var data in ClanChestDailyData)
+            {
+                var clanchestdata = data.Value;
+                foreach (var chestcount in chestcountdata)
+                {
+                    var chestdata = clanchestdata.Where(name => name.Clanmate.Equals(chestcount.Clanmate)).ToList();
+
+                    //--- found clanmate
+                    if (chestdata.Count > 0)
+                    {
+                        var m_chestdata = chestdata[0];
+
+                        if (m_chestdata.chests == null)
+                        {
+                            chestcount.Count += 0;
+                        }
+                        else
+                        {
+                            chestcount.Count += m_chestdata.chests.Count();
+                        }
+                    }
+                }
+            }
+
+
+            ClanChestDataComparator clanChestDataComparator = new ClanChestDataComparator();
+            List<ChestCountData> sortedChestCountData = new List<ChestCountData>();
+            if (sortType == SortType.ASCENDING)
+            {
+                sortedChestCountData = chestcountdata.OrderBy(i => i.Count).ToList();
+            }
+            else if (sortType == SortType.DESENDING)
+            {
+                sortedChestCountData = chestcountdata.OrderByDescending(i => i.Count).ToList();
+            }
+
+            if (sortedChestCountData.Count > 0)
+            {
+                chestcountdata.Clear();
+                chestcountdata = sortedChestCountData;
+            }
+
+            return chestcountdata;
+        }
+
+        public Task<List<ChestCountData>> BuildChestPointsDataAsync(SortType sortType = SortType.NONE) => 
+            Task.FromResult(Task.Run(()=> BuildChestPointsData(sortType)).Result);
+
+        public List<ChestCountData> BuildChestPointsData(SortType sortType = SortType.NONE)
+        {
+            List<ChestCountData> chestcountdata = new List<ChestCountData>();
+
+            //-- Start to initialize Chest Count Data.
+            foreach (var clanmate in ClanManager.Instance.ClanmateManager.Database.Clanmates)
+            {
+                chestcountdata.Add(new ChestCountData(clanmate.Name, 0));
+            }
+
+            foreach (var data in ClanChestDailyData)
+            {
+                var clanchestdata = data.Value;
+                foreach (var chestcount in chestcountdata)
+                {
+                    var chestdata = clanchestdata.Where(name => name.Clanmate.Equals(chestcount.Clanmate)).ToList();
+
+                    //--- found clanmate
+                    if (chestdata.Count > 0)
+                    {
+
+                        var m_chestdata = chestdata[0];
+
+                        if (m_chestdata.chests == null)
+                        {
+                            chestcount.Count += 0;
+                        }
+                        else
+                        {
+                            chestcount.Count += m_chestdata.Points;
+                        }
+                    }
+                }
+            }
+
+
+            ClanChestDataComparator clanChestDataComparator = new ClanChestDataComparator();
+            List<ChestCountData> sortedChestCountData = new List<ChestCountData>();
+            if (sortType == SortType.ASCENDING)
+            {
+                sortedChestCountData = chestcountdata.OrderBy(i => i.Count).ToList();
+            }
+            else if (sortType == SortType.DESENDING)
+            {
+                sortedChestCountData = chestcountdata.OrderByDescending(i => i.Count).ToList();
+            }
+
+            if (sortedChestCountData.Count > 0)
+            {
+                chestcountdata.Clear();
+                chestcountdata = sortedChestCountData;
+            }
+
+            return chestcountdata;
+        }
+
+        public Task<List<ChestCountData>> BuildSpecificChestCountDataAsync(SortType sortType = SortType.NONE)
+        {
+            return Task.FromResult(Task.Run(() => BuildSpecificChestCountData(sortType)).Result);
+        }
+        public List<ChestCountData> BuildSpecificChestCountData(SortType sortType = SortType.NONE)
+        {
+            List<ChestCountData> chestcountdata = new List<ChestCountData>();
             var requirements = ClanManager.Instance.ClanChestSettings.ClanRequirements.ClanSpecifiedRequirements;
 
             //-- Start to initialize Chest Count Data.
@@ -615,7 +778,6 @@ namespace TBChestTracker
                 {
                     chestcountdata[index].ChestTypes.Add(new ChestTypeData(requirement.ChestType, 0));
                 }
-
                 index++;
             }
 
@@ -626,7 +788,6 @@ namespace TBChestTracker
                 {
                     var chestdata = clanchestdata.Where(name => name.Clanmate.Equals(chestcount.Clanmate)).ToList();
 
-                    
                     //--- found clanmate
                     if (chestdata.Count > 0)
                     {
@@ -662,7 +823,7 @@ namespace TBChestTracker
                                 }
                             }
                         }
-
+                        
                         var chests_total = 0;
                         foreach (var chesttypes in chestcount.ChestTypes)
                         {
@@ -672,6 +833,7 @@ namespace TBChestTracker
                     }
                 }
             }
+      
 
             ClanChestDataComparator clanChestDataComparator = new ClanChestDataComparator();
             List<ChestCountData> sortedChestCountData = new List<ChestCountData>();

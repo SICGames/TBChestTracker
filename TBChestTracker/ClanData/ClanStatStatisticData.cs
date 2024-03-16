@@ -21,8 +21,9 @@ namespace TBChestTracker
         public int StoryChestsTotal { get; set; }
         public int BanksTotal { get; set; }
         public int Total { get; set; }
+        public int Points { get; set; }
         public ClanStatisticData(string clanmate, int commoncryptstotal, int rarecryptstotal, int epicryptstotal, int citadelstotal,
-            int arenastotal, int uniontriumphcheststotal, int vaultancienttotal, int heroicstotal, int ancientchesttotal, int storycheststotal, int bankstotal, int total)
+            int arenastotal, int uniontriumphcheststotal, int vaultancienttotal, int heroicstotal, int ancientchesttotal, int storycheststotal, int bankstotal, int total, int points)
         {
             Clanmate = clanmate;
             CommonCryptsTotal = commoncryptstotal;
@@ -37,6 +38,7 @@ namespace TBChestTracker
             StoryChestsTotal = storycheststotal;
             BanksTotal = bankstotal;
             Total = total;
+            Points = points;
         }
     }
 }
