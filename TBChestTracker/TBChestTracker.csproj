@@ -159,11 +159,15 @@
     <Compile Include="Console\ConsoleData.cs" />
     <Compile Include="Converters\MidPointValueConverter.cs" />
     <Compile Include="CustomControls\DpiAwareImage.cs" />
+    <Compile Include="EditChestPointValueWindow.xaml.cs">
+      <DependentUpon>EditChestPointValueWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\ImageDpiHelper.cs" />
     <Compile Include="Helpers\IOHelper.cs" />
     <Compile Include="Helpers\JsonHelper.cs" />
     <Compile Include="Helpers\Table.cs" />
     <Compile Include="Helpers\Translator.cs" />
+    <Compile Include="Managers\ClanChestProcessResult.cs" />
     <Compile Include="Managers\SettingsManager.cs" />
     <Compile Include="MergeClanmateWindow.xaml.cs">
       <DependentUpon>MergeClanmateWindow.xaml</DependentUpon>
@@ -180,11 +184,24 @@
     <Compile Include="OCRWizardWindow.xaml.cs">
       <DependentUpon>OCRWizardWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="OCRWizard\OCRWizardEventArgs.cs" />
     <Compile Include="Pages\ClanPage.xaml.cs">
       <DependentUpon>ClanPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\GeneralSettingsPage.xaml.cs">
       <DependentUpon>GeneralSettingsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\OCRWizard\OCRWizard_Failed.xaml.cs">
+      <DependentUpon>OCRWizard_Failed.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\OCRWizard\OCRWizard_GiftsTab.xaml.cs">
+      <DependentUpon>OCRWizard_GiftsTab.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\OCRWizard\OCRWizard_Successful.xaml.cs">
+      <DependentUpon>OCRWizard_Successful.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\OCRWizard\OCRWizard_WelcomePage.xaml.cs">
+      <DependentUpon>OCRWizard_WelcomePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="PreviewCroppedImageViewer.xaml.cs">
       <DependentUpon>PreviewCroppedImageViewer.xaml</DependentUpon>
@@ -196,6 +213,7 @@
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings\AOIRect.cs" />
+    <Compile Include="Settings\GeneralSettings.cs" />
     <Compile Include="Settings\Marker.cs" />
     <Compile Include="Settings\MarkerCollection.cs" />
     <Compile Include="Settings\OCRSettings.cs" />
@@ -269,6 +287,7 @@
     <Compile Include="UI\FancyButton.cs" />
     <Compile Include="UI\FancyImageButton.cs" />
     <Compile Include="UI\FancyNavigationButton.cs" />
+    <Compile Include="UI\FancyPicker.cs" />
     <Compile Include="UI\Milestone.xaml.cs">
       <DependentUpon>Milestone.xaml</DependentUpon>
     </Compile>
@@ -307,6 +326,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ConsoleWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EditChestPointValueWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -371,6 +394,22 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\GeneralSettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\OCRWizard\OCRWizard_Failed.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\OCRWizard\OCRWizard_GiftsTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\OCRWizard\OCRWizard_Successful.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\OCRWizard\OCRWizard_WelcomePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -457,6 +496,12 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.3</Version>
     </PackageReference>
+    <PackageReference Include="WindowsAPICodePack-Core">
+      <Version>1.1.2</Version>
+    </PackageReference>
+    <PackageReference Include="WindowsAPICodePack-Shell">
+      <Version>1.1.1</Version>
+    </PackageReference>
     <PackageReference Include="WriteableBitmapEx">
       <Version>1.6.8</Version>
     </PackageReference>
@@ -473,19 +518,7 @@
     <Content Include="Images\ConsoleIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\ConsoleIcon_disabled.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\icons_chest_1_disabled.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\icons_main_menu_clan_1_disabled.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Images\NewFileIcon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\NewFileIcon_disabled.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\NewIcon.png">
@@ -494,10 +527,16 @@
     <Content Include="Images\NewWizardIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\OCR_Icon.png">
+    <Content Include="Images\OCRWizard\Chests_Highlighted.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\OCR_Icon_disabled.png">
+    <Content Include="Images\OCRWizard\ErrorIcon_Large.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\OCRWizard\Green-CheckMark.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\OCR_Icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\plusButton.png">
@@ -527,9 +566,6 @@
     <Content Include="Images\saveIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\saveIcon_disabled.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Images\SettingsIcon01.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -556,12 +592,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Images\StartAutomationIcon_disabled.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\StopAutomation_disabled.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Images\trashIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -618,9 +648,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\infoIcon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\trashIcon_disabled.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\warningIcon.png">

@@ -48,9 +48,44 @@ namespace TBChestTracker.UI
     /// </summary>
     public class FancyImageButton : ButtonBase
     {
+        protected bool IsGrayscaled => ImageSource is FormatConvertedBitmap;
         static FancyImageButton()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(FancyImageButton), new FrameworkPropertyMetadata(typeof(FancyImageButton)));
+            IsEnabledProperty.OverrideMetadata(typeof(FancyImageButton), new FrameworkPropertyMetadata(true, IsEnabledPropertyChanged));
+        }
+
+        private static void IsEnabledPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if(d is FancyImageButton s && s.IsEnabled == s.IsGrayscaled)
+            {
+                s.UpdateImageSource();
+            }
+        }
+        protected void UpdateImageSource()
+        {
+            if (ImageSource == null) 
+                return;
+
+            if(IsEnabled)
+            {
+                if(IsGrayscaled)
+                {
+                    ImageSource = ((FormatConvertedBitmap)ImageSource).Source;
+                    OpacityMask = null;
+                }
+            }
+            else
+            {
+                if(!IsGrayscaled)
+                {
+                    if(ImageSource is BitmapSource bitmapImage)
+                    {
+                        ImageSource = new FormatConvertedBitmap(bitmapImage, PixelFormats.Gray8, null, 0);
+                        OpacityMask = new ImageBrush(bitmapImage);
+                    }
+                }
+            }
         }
 
         public static readonly DependencyProperty HighlightBrushProperty = DependencyProperty.Register("HighlightBrush", typeof(Brush), typeof(FancyImageButton),
@@ -63,7 +98,6 @@ namespace TBChestTracker.UI
             new FrameworkPropertyMetadata(1.0));
         public static readonly DependencyProperty ImageSourceProperty = DependencyProperty.Register("ImageSource", typeof(ImageSource), typeof(FancyImageButton), null);
         public static readonly DependencyProperty ImageSourcesProperty = DependencyProperty.Register("ImageSources", typeof(ObservableCollection<BitmapImage>), typeof(FancyImageButton), null);
-
         public static readonly DependencyProperty CornersProperty = DependencyProperty.Register("Corners", typeof(CornerRadius), typeof(FancyImageButton),
             new FrameworkPropertyMetadata(new CornerRadius(0, 0, 0, 0)));
 

@@ -13,11 +13,13 @@ namespace TBChestTracker
     {
         private bool disposedValue;
 
+        public GeneralSettings GeneralSettings { get; private set; }
         public OCRSettings OCRSettings { get; set; }
      
         public Settings() 
         {
             OCRSettings = new OCRSettings();
+            GeneralSettings = new GeneralSettings();
         }
         protected virtual void Dispose(bool disposing)
         {
@@ -26,7 +28,10 @@ namespace TBChestTracker
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects)
-                    OCRSettings = null;
+
+                    OCRSettings.Dispose();
+                    GeneralSettings = null;
+
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer

@@ -23,7 +23,7 @@ namespace TBChestTracker
         private string pAppTitle = $"";
 
         private int _ChestCountTotal = 0;
-
+        
         #endregion
 
         #region AppContext() & Instance
@@ -36,7 +36,8 @@ namespace TBChestTracker
         }
         #endregion
         public bool isAppClosing = false;
-        #region
+        
+        #region Public Declarations
         public Version AppVersion
         {
             get
@@ -129,6 +130,10 @@ namespace TBChestTracker
             }
         }
 
+        public static string AppFolder
+        {
+            get => $@"{System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\";
+        }
 
         #endregion
 

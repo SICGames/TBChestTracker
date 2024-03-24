@@ -11,69 +11,73 @@
         Topmost="True" ShowInTaskbar="False" WindowStartupLocation="CenterScreen" 
         Background="Black" RenderOptions.BitmapScalingMode="HighQuality"
         WindowStyle="None" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="32"/>
+    </WindowChrome.WindowChrome>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="32"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="24"/>
-        </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="32"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="Start Page" Foreground="White" Margin="15,5" FontWeight="Bold" FontSize="16"/>
-            <ui:FancyButton Grid.Column="1" 
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="24"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="32"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Start Page" Foreground="White" Margin="15,5" FontWeight="Bold" FontSize="16"/>
+                <ui:FancyButton Grid.Column="1" 
                             Background="Red" 
                             BorderBrush="#ff33" 
                             HilightBrush="#ff33"
                             BorderThickness="0"
-                            ImageSource="/Images/close-button.png" RenderMode="IMAGE" x:Name="CloseBtn" Click="CloseBtn_Click"/>
-            
-            <!-- 
+                            ImageSource="/Images/close-button.png" RenderMode="IMAGE" x:Name="CloseBtn" Click="CloseBtn_Click" WindowChrome.IsHitTestVisibleInChrome="True"/>
+
+                <!-- 
             <controls:ImageButton Grid.Column="1" 
                       Background="Red" BorderBrush="Red" 
                       HoverBrush="#ff55" Icon="/Images/close-button.png" BorderThickness="1" x:Name="CloseBtn" Click="CloseBtn_Click"/>
             -->
-            
-                
-        </Grid>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
 
-            <!--#region  Menu -->
-            <Grid Grid.Column="0" VerticalAlignment="Top">
-                <StackPanel Orientation="Vertical" Margin="5,10" ButtonBase.Click="StackPanel_Click">
-                    <!--#region  Mockup Menu Buttons -->
-                    <ui:FancyButton RenderMode="IMAGE_TEXT" ImageSource="/Images/NewIcon.png" Text="New Clan Database..." Corners="0" ShowSeperator="False" Tag="NEW"
+
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!--#region  Menu -->
+                <Grid Grid.Column="0" VerticalAlignment="Top">
+                    <StackPanel Orientation="Vertical" Margin="5,10" ButtonBase.Click="StackPanel_Click">
+                        <!--#region  Mockup Menu Buttons -->
+                        <ui:FancyButton RenderMode="IMAGE_TEXT" ImageSource="/Images/NewIcon.png" Text="New Clan Database..." Corners="0" ShowSeperator="False" Tag="NEW"
                 Foreground="White" 
                 FontWeight="Bold" FontSize="14" HilightBrush="#222" Height="50" IsEnabled="True"/>
-                    <ui:FancyButton ImageSource="/Images/NewWizardIcon.png" Text="Clan Setup Wizard..." RenderMode="IMAGE_TEXT" Tag="NEW_WIZARD"
+                        <ui:FancyButton ImageSource="/Images/NewWizardIcon.png" Text="Clan Setup Wizard..." RenderMode="IMAGE_TEXT" Tag="NEW_WIZARD"
                 Foreground="White" 
                 FontWeight="Bold" FontSize="14" HilightBrush="#222" Height="50" Visibility="Collapsed"/>
-                    <ui:FancyButton ImageSource="/Images/folderIcon.png" Text="Load Clan Database..." Tag="LOAD"
+                        <ui:FancyButton ImageSource="/Images/folderIcon.png" Text="Load Clan Database..." Tag="LOAD"
                                     Foreground="White" 
                                     FontWeight="Bold" FontSize="14" HilightBrush="#222" Height="50"/>
-                    <!--#endregion-->
-                </StackPanel>
-            </Grid>
-            <!--#endregion-->
-            <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="48"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <TextBlock Text="Recent Opened Clan Databases" Foreground="White" FontWeight="Bold" FontSize="20" Grid.Column="0" Margin="15,10"/>
-                <ListView x:Name="recentFilesView" Grid.Row="1" Background="#111" BorderBrush="Transparent" BorderThickness="0" Margin="10,5" Foreground="White" FontWeight="Bold">
+                        <!--#endregion-->
+                    </StackPanel>
+                </Grid>
+                <!--#endregion-->
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="48"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Recent Opened Clan Databases" Foreground="White" FontWeight="Bold" FontSize="20" Grid.Column="0" Margin="15,10"/>
+                    <ListView x:Name="recentFilesView" Grid.Row="1" Background="#111" BorderBrush="Transparent" BorderThickness="0" Margin="10,5" Foreground="White" FontWeight="Bold">
 
-                </ListView>
-            </Grid>
-            <!--#region  Recent Files-->
+                    </ListView>
+                </Grid>
+                <!--#region  Recent Files-->
 
-            <!--#endregion-->
-    </Grid>
-    </Grid>
+                <!--#endregion-->
+            </Grid>
+        </Grid>
+    
 </Window>

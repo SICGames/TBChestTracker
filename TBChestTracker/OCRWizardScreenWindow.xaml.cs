@@ -23,6 +23,7 @@ using TBChestTracker.Helpers;
 using Emgu.CV.OCR;
 using System.ComponentModel;
 using TBChestTracker.UI;
+using System.Windows.Controls.Primitives;
 
 namespace TBChestTracker
 {
@@ -35,34 +36,35 @@ namespace TBChestTracker
         #region Global Declarations
         private Snapture Snapture = null;
         BitmapSource PreviewImageSource { get; set; }
-
         List<System.Drawing.Rectangle> CornerRectangles = new List<System.Drawing.Rectangle>();
         Image<Bgr, Byte> ChestWindowChestsActiveRefImage { get; set; }
         Image<Bgr, byte> OpenChestRefImage { get; set; }
-
         private List<string> ref_image_files = null;
         private List<Image<Bgr, Byte>> ref_images = null;
-
         System.Drawing.Bitmap CapturedBitmap = null;
-
         private WriteableBitmap writeableBitmap = null;
         private Image WritableImage = null;
         private Dpi dpi = null;
-
         private AOIRect AreaOfInterest = null;
         private AOIRect SuggestedAreaOfInterest = null;
         private List<sys_drawing.Point> OpenChestButtonPositions;
-
         private double Thickness = 5;
-        
         private bool canExit = true;
-        
         bool isPlayerOnChestsTab = false;
         bool canRender = false;
-
         private CancellationTokenSource cancellationTokenSource = null;
         private Tesseract.Character[] Letters {  get; set; }
+
+        private int max_retry_attempts = 5;
+        private int retry_attempts = 0;
+
+        private double min_treshold_gifts_tab = 0.0;
+        private double max_treshold_gifts_tab = 0.9;
+
         private String pStatusMessage = "Processing...";
+
+        public OCRWizardWindow ocrWindow { get; set; }
+
         public String StatusMessage
         {
             get
@@ -87,6 +89,18 @@ namespace TBChestTracker
             onOCRWizardCancelled?.Invoke(this, e);
         }
 
+        public event EventHandler onOCRWizardCompleted;
+        protected virtual void OCRWizardCompleted(EventArgs e)
+        {
+            onOCRWizardCompleted?.Invoke(this, e);
+        }
+
+        public event EventHandler<OCRWizardEventArgs> onOCRWizardFailed;
+        protected virtual void OCRWizardFailed(OCRWizardEventArgs e)
+        {
+            onOCRWizardFailed?.Invoke(this, e);
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(String propertyName)
         {
@@ -94,11 +108,7 @@ namespace TBChestTracker
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public event EventHandler onOCRWizardCompleted;
-        protected virtual void OCRWizardCompleted(EventArgs e)
-        {
-            onOCRWizardCompleted?.Invoke(this, e);    
-        }
+      
 
         #endregion
 
@@ -136,31 +146,37 @@ namespace TBChestTracker
 
             this.onOCRWizardCancelled += OCRWizardScreenWindow_onOCRWizardCancelled;
             this.onOCRWizardCompleted += OCRWizardScreenWindow_onOCRWizardCompleted;
-
+            this.onOCRWizardFailed += OCRWizardScreenWindow_onOCRWizardFailed;
+            
+            StatusMessage = $"Checking If player viewing Chests Tab...";
+            
             Snapture.CaptureDesktop();
         }
-      
+
+
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            ref_image_files.Clear();
-            foreach(var refImage in ref_images)
+            ref_image_files?.Clear();
+            if (ref_images != null)
             {
-                refImage.Dispose();
+                foreach (var refImage in ref_images)
+                {
+                    refImage?.Dispose();
+                }
+                ref_images?.Clear();
             }
-            ref_images.Clear();
 
-            ChestWindowChestsActiveRefImage.Dispose();
-            OpenChestRefImage.Dispose();
-            OpenChestButtonPositions.Clear();
-            SuggestedAreaOfInterest.Dispose();
-            AreaOfInterest.Dispose();
-            
+            ChestWindowChestsActiveRefImage?.Dispose();
+            OpenChestRefImage?.Dispose();
+            OpenChestButtonPositions?.Clear();
+            SuggestedAreaOfInterest?.Dispose();
+            AreaOfInterest?.Dispose();
             WritableImage = null;
             writeableBitmap = null;
             Letters = null;
-            Snapture.Dispose();
-            this.DialogResult = isCompleted;
-
+            Snapture?.Dispose();
+            if(this != null && this.IsLoaded)
+                this.DialogResult = isCompleted;
         }
         private void StackPanel_Click(object sender, RoutedEventArgs e)
         {
@@ -182,7 +198,6 @@ namespace TBChestTracker
         private void OCRWizardScreenWindow_onOCRWizardCancelled(object sender, EventArgs e)
         {
             isCompleted = false;
-
             Cleanup();
             this.Close();
         }
@@ -211,13 +226,32 @@ namespace TBChestTracker
                 MessageBox.Show($@"Attempted to delete .FIRSTRUN file but couldn't. Please manually delete the file from the installation folder: Program Files\SicGames\TotalBattle Chest Tracker.");
             }
             isCompleted = true;
-            this.Close();
+
+            if(ocrWindow != null)
+            {
+                ocrWindow.OCRWizardSuccesful();
+                ocrWindow.Show();
+            }
         }
+
+        private void OCRWizardScreenWindow_onOCRWizardFailed(object sender, OCRWizardEventArgs e)
+        {
+            isCompleted = false;
+            //--- must let user into manual OCR configuration.
+            if(ocrWindow != null)
+            {
+                this.DialogResult = false;
+                ocrWindow.OCRWizardFailed();
+                this.Close();
+            }
+
+        }
+
+
         #endregion
         #region Snapture onFrameCaptured function
         private void Snapture_onFrameCaptured(object sender, FrameCapturedEventArgs e)
         {
-            //this.Hide();
 
             if (e.ScreenCapturedBitmap != null)
             {
@@ -243,10 +277,10 @@ namespace TBChestTracker
 
 
         #region Wizardary Stuff
-        private Task<System.Drawing.Rectangle> performTemplateMatchingAsync(sys_drawing.Bitmap bitmap, Image<Bgr, byte> refImage, double threshold, double sizeX = 32, double sizeY = 32) =>
-           Task.Run(() => performTemplateMatching(bitmap, refImage, threshold, sizeX, sizeY));
+        private Task<System.Drawing.Rectangle> performTemplateMatchingAsync(sys_drawing.Bitmap bitmap, Image<Bgr, byte> refImage, double minThreshold, double threshold, double sizeX = 32, double sizeY = 32) =>
+           Task.Run(() => performTemplateMatching(bitmap, refImage, minThreshold, threshold, sizeX, sizeY));
 
-        private System.Drawing.Rectangle performTemplateMatching(sys_drawing.Bitmap bitmap, Image<Bgr, byte> refImage, double threshold, double sizeX = 32, double sizeY = 32)
+        private System.Drawing.Rectangle performTemplateMatching(sys_drawing.Bitmap bitmap, Image<Bgr, byte> refImage, double minThreshold, double threshold,  double sizeX = 32, double sizeY = 32)
         {
             if (cancellationTokenSource.Token.IsCancellationRequested)
                 return new sys_drawing.Rectangle();
@@ -265,12 +299,13 @@ namespace TBChestTracker
 
                 using (Image<Gray, float> resultImage = src.MatchTemplate(refImage, TemplateMatchingType.CcoeffNormed))
                 {
-                    //CvInvoke.Threshold(resultImage, resultImage, threshold, 1, ThresholdType.ToZero);
+                    if(minThreshold > 0.0)
+                        CvInvoke.Threshold(resultImage, resultImage, minThreshold, 1, ThresholdType.ToZero);
+                    
                     resultImage.MinMax(out minValues, out maxValues, out minLocations, out maxLocations);
 
                     if (maxValues[0] > threshold)
                     {
-
                         System.Windows.Point maxLocationsPoint = new System.Windows.Point(maxLocations[0].X,
                                 maxLocations[0].Y);
 
@@ -358,18 +393,18 @@ namespace TBChestTracker
             return Task.FromResult(matches);
         }
 
-        private Task<bool> CheckIfPlayerOnChestsWindowTaskAsync(System.Drawing.Bitmap bitmap, double threshold)
-            => Task.Run(() => CheckIfPlayerOnChestsWindowTask(bitmap, threshold));
+        private Task<bool> CheckIfPlayerOnChestsWindowTaskAsync(System.Drawing.Bitmap bitmap, double minThreshold, double threshold)
+            => Task.Run(() => CheckIfPlayerOnChestsWindowTask(bitmap, minThreshold, threshold));
 
 
-        private bool CheckIfPlayerOnChestsWindowTask(System.Drawing.Bitmap bitmap, double threshold)
+        private bool CheckIfPlayerOnChestsWindowTask(System.Drawing.Bitmap bitmap, double minThreshold, double threshold)
         {
             //-- should detect if player is on Chests Window.
             if (cancellationTokenSource.Token.IsCancellationRequested)
                 return false;
 
             bool isActive = false;
-            System.Drawing.Rectangle rect_result = performTemplateMatching(bitmap, ChestWindowChestsActiveRefImage, threshold);
+            System.Drawing.Rectangle rect_result = performTemplateMatching(bitmap, ChestWindowChestsActiveRefImage, minThreshold, threshold);
             if (rect_result.X > 0 && rect_result.Y > 0)
             {
                 isActive = true;
@@ -462,38 +497,61 @@ namespace TBChestTracker
             }
         }
 
+        private void retry()
+        {
+            Snapture.CaptureDesktop();
+        }
         private async void PerformORCWizard(sys_drawing.Bitmap bitmap, CancellationToken cancellationToken)
         {
+            bool mustRetry = false;
             try
             {
+                await this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    ErrorDialogCanvas.Visibility = Visibility.Hidden;
+                    ProgressCanvas.Visibility = Visibility.Visible;
+                }));
+
 
                 if (cancellationToken.IsCancellationRequested)
                 {
                     OCRWizardCanceled(new EventArgs());
+                    return;
                 }
-
-                StatusMessage = $"Checking If player viewing Chests Tab...";
-                var result = await CheckIfPlayerOnChestsWindowTaskAsync(bitmap, 0.9);
+                //var result = await CheckIfPlayerOnChestsWindowTaskAsync(bitmap, 0.3, 0.9);
+                var result = await CheckIfPlayerOnChestsWindowTaskAsync(bitmap, min_treshold_gifts_tab, max_treshold_gifts_tab);
                 if (result)
                 {
-                    await this.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        ErrorDialogCanvas.Visibility = Visibility.Hidden;
-                        ProgressCanvas.Visibility = Visibility.Visible;
-                    }));
                     isPlayerOnChestsTab = true;
-                    Debug.WriteLine($"Player on Chest Window Tab");
+                    Debug.WriteLine($"Player on Gifts Window Tab");
                 }
                 else
                 {
-                    await this.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        ErrorDialogCanvas.Visibility = Visibility;
-                        ProgressCanvas.Visibility = Visibility.Hidden;
-                    }));
-                    isPlayerOnChestsTab = false;
+                    isPlayerOnChestsTab= false;
                 }
 
+                if(!isPlayerOnChestsTab)
+                {
+                    Debug.WriteLine($"Player is not on Gifts Tab");
+                    
+                    await this.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        retry_attempts++;
+                        StatusMessage = $"Retrying ({retry_attempts} out of {max_retry_attempts}) times.";
+
+                        if (retry_attempts == max_retry_attempts)
+                        {
+                            ErrorDialogCanvas.Visibility = Visibility.Visible;
+                            ProgressCanvas.Visibility = Visibility.Hidden;
+                            OCRWizardFailed(new OCRWizardEventArgs());
+                            return;
+                        }
+                        
+                        Thread.Sleep(5000);
+                        //-- retry again.
+                        mustRetry = true;
+                    }), System.Windows.Threading.DispatcherPriority.Render);
+                }
 
                 if (isPlayerOnChestsTab)
                 {
@@ -506,7 +564,7 @@ namespace TBChestTracker
                     foreach (var refImage in ref_images)
                     {
 
-                        var rect = await performTemplateMatchingAsync(bitmap, refImage, 0.6);
+                        var rect = await performTemplateMatchingAsync(bitmap, refImage, 0.0, 0.6);
                         if (rect.Height != 0 && rect.Width != 0)
                         {
                             CornerRectangles.Add(rect);
@@ -588,18 +646,20 @@ namespace TBChestTracker
                     PreviewImageSource = null;
                     CapturedBitmap.Dispose();
                     CornerRectangles.Clear();
-
                     
                     CloseCanvas.Visibility = Visibility.Hidden;
-                    ResultsDialog.Visibility = Visibility.Visible;
+                    //ResultsDialog.Visibility = Visibility.Visible;
                     canExit = false;
+                    PrepareClose();
                     return;
                 }
-                else
+
+                if(mustRetry)
                 {
-                    Debug.WriteLine($"Boo boo happened");
+                    min_treshold_gifts_tab += 0.1;
                     PreviewImageSource = null;
-                    CapturedBitmap.Dispose();
+                   // CapturedBitmap.Dispose();
+                    retry();
                 }
             }
             catch (Exception ex)
@@ -607,12 +667,19 @@ namespace TBChestTracker
                 if (cancellationToken.IsCancellationRequested)
                 {
                     OCRWizardCanceled(new EventArgs());
+                    return;
                 }
             }
         }
+
         private void StartOCRWizard(ref sys_drawing.Bitmap bitmap, CancellationToken token)
         {
             PerformORCWizard(bitmap, token);
+        }
+
+        private void RetryIsPlayerOnGiftsTab()
+        {
+
         }
         #endregion
 
@@ -625,8 +692,6 @@ namespace TBChestTracker
                 "Images/Refs/chest_window_ref_bottom_left.png",
                 "Images/Refs/chest_window_ref_bottom_right.png"
             });
-
-            this.Hide();
 
             var ref_file_not_found = false;
             foreach(var refFile in ref_image_files)

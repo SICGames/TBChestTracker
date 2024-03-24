@@ -26,6 +26,9 @@ namespace TBChestTracker
         private string _statusMessage = "Please wait while validating chest data...";
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        private int chestErrors = 0;
+
         protected void OnPropertyChanged(String propertyName)
         {
             if (PropertyChanged != null)
@@ -48,74 +51,114 @@ namespace TBChestTracker
             this.DataContext = this;
         }
 
+        private bool ValidateChestDataChestTypes(ref Dictionary<string, List<ClanChestData>> chestdata)
+        {
+            
+            foreach (var dates in chestdata.Keys)
+            {
+                var data = chestdata[dates];
+                foreach (var _data in data)
+                {
+                    var chests = _data.chests;
+                    if(chests != null)
+                    {
+                        foreach(var chest in chests)
+                        {
+                            var chesttype = chest.Type;
+                            var chestSource = chest.Name;
+                            if(chestSource.ToLower().Contains("jormungandr"))
+                            {
+                                if (chesttype == ChestType.OTHER)
+                                {
+                                    chest.Type = ChestType.JORMUNGANDR;
+                                    chestErrors++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
         //--- should be a task
         private void BeginValidatingChestData(CancellationToken token)
         {
             //--- get chest data 
+            //--- itlerate through chests and correct any mistakes.
+            //--- if ChestType.OTHER is not suppose to be ChestType.OTHER, needs to be corrected.
             //--- check if Use Chest Point System is used
             //--- If not, nothing to do
             //--- if so, check to see if chests add up to value obtained 
             //--- if not, replace point value
             //--- alert or change status to completed and close
             var chestsettings = ClanManager.Instance.ClanChestSettings;
-            var isRepairCompleted = false;
-            var chestpointErrors = 0;
+            
+            var chestdata = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
 
             if (!chestsettings.ChestPointsSettings.UseChestPoints)
             {
                 EndValidatingChestData("There's nothing to do.",true, false);
                 return;
             }
-
-            var chestdata = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
-            var chestpointsvalues = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints;
-            if(token.IsCancellationRequested)
+            if (token.IsCancellationRequested)
             {
                 return;
             }
 
-            foreach (var dates in chestdata.Keys)
+            var chestpointsvalues = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints;
+
+            //--- Validate ChestType Data.
+            StatusMessage = "Validating Chest data types...";
+            
+            var chestTypeRepaired = ValidateChestDataChestTypes(ref chestdata);
+
+            if (chestTypeRepaired)
             {
-                
-                var data = chestdata[dates];
-                foreach(var _data in data)
+                StatusMessage = "Validating other chest data...";
+                foreach (var dates in chestdata.Keys)
                 {
-                    var clanmate_points = _data.Points;
-                    var chests = _data.chests;
-                    var total_chest_points = 0;
-                    if (chests != null)
+
+                    var data = chestdata[dates];
+                    foreach (var _data in data)
                     {
-                        foreach (var chest in chests)
+                        var clanmate_points = _data.Points;
+                        var chests = _data.chests;
+                        var total_chest_points = 0;
+                        if (chests != null)
                         {
-                            foreach (var chestpointvalue in chestpointsvalues)
+                            foreach (var chest in chests)
                             {
-                                if (chest.Type.ToString().ToLower() == chestpointvalue.ChestType.ToLower())
+                                foreach (var chestpointvalue in chestpointsvalues)
                                 {
-                                    if (chest.Level == chestpointvalue.Level)
+                                    if (chest.Type.ToString().ToLower() == chestpointvalue.ChestType.ToLower())
                                     {
-                                        total_chest_points += chestpointvalue.PointValue;
-                                        break;
+                                        if (chest.Level == chestpointvalue.Level)
+                                        {
+                                            total_chest_points += chestpointvalue.PointValue;
+                                            break;
+                                        }
                                     }
                                 }
                             }
-                        }
-                        if (clanmate_points != total_chest_points)
-                        {
-                            _data.Points = total_chest_points;
-                            chestpointErrors++;
+                            if (clanmate_points != total_chest_points)
+                            {
+                                _data.Points = total_chest_points;
+                                chestErrors++;
+                            }
                         }
                     }
                 }
             }
-            isRepairCompleted = true;
-            if(chestpointErrors > 0)
+            
+            if(chestErrors > 0)
             {
-                EndValidatingChestData($"Chest Data Points has been successfully fixed.", true, true);
+                EndValidatingChestData($"Chest Data has been successfully fixed.", true, true);
                 return;
             }
             else
             {
-                EndValidatingChestData($"Chest Data Points looks fine.", true, false);
+                EndValidatingChestData($"Chest Data looks fine.", true, false);
             }
         }
         private void EndValidatingChestData(string message, bool isCompleted, bool isRepaired)

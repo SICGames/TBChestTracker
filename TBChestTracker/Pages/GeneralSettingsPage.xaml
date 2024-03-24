@@ -4,9 +4,10 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:TBChestTracker.Pages"
+      xmlns:ui="clr-namespace:TBChestTracker.UI"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="GeneralSettingsPage">
+      Title="GeneralSettingsPage" Loaded="Page_Loaded" Unloaded="Page_Unloaded">
     <Grid Background="White">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
@@ -16,9 +17,38 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0" Margin="10">
-            <TextBlock Text="Clan Directory Path"/>
-            <TextBlock Text="Tesseract Data Path"/>
-            <TextBlock Text="Use Languages"/>
+            <TextBlock Text="Clan Directory Path" Margin="0,5"/>
+            <TextBlock Text="Tesseract Data Path" Margin="0,5"/>
+            <TextBlock Text="Use Languages" Margin="0,5"/>
+        </StackPanel>
+        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="1" Margin="5">
+            <ui:FancyPicker Margin="0,10,0,5" ToolTip="Root directory where all newly created clans will be stored."
+                            Height="18" BorderBrush="#aaa" Source="{Binding ClanRootFolder}"
+                            Corners="10" 
+                            BorderThickness="1" Padding="1" Background="#fff" Foreground="#000" Click="FancyPicker_Click"/>
+
+            <ui:FancyPicker Margin="0,1,0,5" ToolTip="Where all the Tesseract Learned Data Models are stored."
+                Height="18" BorderBrush="#aaa" 
+                Corners="10" 
+                BorderThickness="1" Padding="1" Background="#fff" Foreground="#000" Source="{Binding TessDataFolder}" Click="FancyPicker_Click"/>
+
+            <UniformGrid  Columns="4" HorizontalAlignment="Left" Margin="0,5,0,5" x:Name="CHECKBOXES_PARENT">
+                <CheckBox Content="English" Margin="3,5" Tag="eng"/>
+                <CheckBox Content="French" Margin="3,5" Tag="fra"/>
+                <CheckBox Content="Spanish" Margin="3,5" Tag="spa"/>
+                <CheckBox Content="Arabic" Margin="3,5" Tag="ara"/>
+                <CheckBox Content="Turkish" Margin="3,5" Tag="tur"/>
+                <CheckBox Content="Taditional Chinese" Margin="3,5" Tag="chi_tra"/>
+                <CheckBox Content="Simplified Chinese" Margin="3,5" Tag="chi_sim"/>
+                <CheckBox Content="Korean" Margin="3,5" Tag="kor"/>
+                <CheckBox Content="Ukranian" Margin="3,5" Tag="ukr"/>
+                <CheckBox Content="Russian" Margin="3,5" Tag="rus"/>
+                <CheckBox Content="Polish" Margin="3,5" Tag="pol"/>
+                <CheckBox Content="German" Margin="3,5" Tag="ger"/>
+                <CheckBox Content="Japanese" Margin="3,5" Tag="jpn"/>
+                <CheckBox Content="All" Margin="3,5"/>
+            </UniformGrid>
+            <TextBlock Text="* Using ALL will lead to longer startup time." FontWeight="Bold"/>
         </StackPanel>
     </Grid>
 </Page>

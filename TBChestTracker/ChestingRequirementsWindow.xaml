@@ -14,6 +14,9 @@
         <Style x:Key="RequirementListViewItemStyle" x:Name="RequirementListViewItem" TargetType="ListViewItem">
             <EventSetter Event="MouseDoubleClick" Handler="RequirementListViewItem_MouseDoubleClick"/>
         </Style>
+        <Style x:Key="ChestPointsListViewItemStyle" x:Name="ChestPointsListViewItem" TargetType="ListViewItem">
+            <EventSetter x:Name="ChestPointsListViewItem" Event="MouseDoubleClick" Handler="ChestPointsListViewItem_MouseDoubleClick"/>
+        </Style>
     </Window.Resources>
     <Grid Background="#eeeeee">
         <Grid.RowDefinitions>
@@ -174,6 +177,12 @@
                                      BorderBrush="DarkGray"
                                      BorderThickness="1" HoverBrush="LightGray"
                                      x:Name="ClearChestPointsButton" Click="ClearChestPointsButton_Click"/>
+                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/EditIcon.png" 
+                                        Height="24" Width="24"
+                                        Margin="3,0"
+                                        BorderBrush="DarkGray"
+                                        BorderThickness="1" HoverBrush="LightGray"
+                                        x:Name="EditChestPoints" Click="EditChestPoints_Click"/>
                                     <UIControls:ImageButton Icon="pack://application:,,,/Images/saveIcon.png" 
                                                             Height="24" Width="24"
                                                             Margin="3,0"
@@ -182,7 +191,8 @@
                                                             x:Name="ExportChestPointsToFile" Click="ExportChestPointsToFile_Click"/>
 
                                 </StackPanel>
-                                <ListView Grid.Row="1" ItemsSource="{Binding ChestPointsSettings.ChestPoints}" ItemContainerStyle="{StaticResource RequirementListViewItemStyle}">
+                                <ListView Grid.Row="1" x:Name="ChestPointsListView" ItemsSource="{Binding ChestPointsSettings.ChestPoints}" 
+                                          ItemContainerStyle="{StaticResource ChestPointsListViewItemStyle}">
                                     <ListView.View>
                                         <GridView>
                                             <GridViewColumn Header="Clan Chest Type" Width="200" DisplayMemberBinding="{Binding ChestType}"/>

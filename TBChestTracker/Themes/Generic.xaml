@@ -1,7 +1,8 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:TBChestTracker.UI">
+    xmlns:local="clr-namespace:TBChestTracker.UI"
+    xmlns:root="clr-namespace:TBChestTracker">
     <Style TargetType="{x:Type local:FancyButton}">
         <Style.Resources>
             <SolidColorBrush x:Key="BackgroundColor" Color="#111"/>
@@ -132,10 +133,14 @@
     </Style>
 
     <Style TargetType="{x:Type local:FancyNavigationButton}">
+        <Style.Resources>
+            <root:BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <SolidColorBrush x:Key="MouseOverBackgroundColor" Color="#0055ff" Opacity="0.5"/>
+        </Style.Resources>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:FancyNavigationButton}">
-                    <Border Background="{TemplateBinding Background}"
+                    <Border x:Name="BORDER" Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
                         <Grid>
@@ -147,14 +152,81 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <Rectangle x:Name="ACTIVE_LIGHT" Grid.Column="0" Grid.Row="0"/>
+                            <Border x:Name="FILL" Grid.ColumnSpan="3" Grid.Row="0" Background="{TemplateBinding HoverBrush}" Opacity="0.5" Visibility="Hidden"/>
+                            <Rectangle x:Name="ACTIVE_LIGHT"  Width="5" 
+                                       Fill="{TemplateBinding ActiveBrush}" 
+                                       Grid.Column="0" Grid.Row="0" 
+                                       Visibility="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:FancyNavigationButton}}, 
+                                Path=IsActive, Converter={StaticResource BoolToVisibilityConverter}}"
+                                       RadiusX="2" RadiusY="2">
+                            </Rectangle>
                             <Viewbox x:Name="IMAGE_VIEWBOX" Grid.Row="0" Margin="{TemplateBinding Padding}" 
                                      Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Visible">
                                 
                             </Viewbox>
-                            <ContentPresenter x:Name="PRESENTER" Grid.Row="0" Grid.Column="2" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            <ContentPresenter x:Name="PRESENTER" Focusable="False"
+                                              Grid.Row="0" Grid.Column="2" 
+                                              Content="{TemplateBinding Text}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                         </Grid>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Visibility" Value="Visible" TargetName="FILL"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:FancyPicker}">
+        <Style.Resources>
+            <SolidColorBrush x:Key="MouseOverBackgroundColor" Color="CornflowerBlue"/>
+        </Style.Resources>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:FancyPicker}">
+                    <Border x:Name="MAIN_BORDER" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding Corners}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBox x:Name="TEXT_FIELD" Grid.Row="0" Grid.Column="0" Margin="3,1" IsReadOnly="True">
+                                <TextBox.Style>
+                                    <Style TargetType="{x:Type TextBox}">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type TextBox}">
+                                                    <Border x:Name="border" Background="Transparent" BorderBrush="Transparent" 
+                                                            BorderThickness="0" SnapsToDevicePixels="True">
+                                                        <ScrollViewer x:Name="PART_ContentHost" 
+                                                                      Focusable="false" 
+                                                                      HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                            <Viewbox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}">
+                                <Image x:Name="FOLDER_ICON" Source="pack://application:,,,/Images/folder-icon.png" Stretch="UniformToFill" Margin="0,0,10,0"/>
+                            </Viewbox>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" Value="{StaticResource MouseOverBackgroundColor}"  TargetName="MAIN_BORDER"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

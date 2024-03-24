@@ -25,6 +25,7 @@ namespace TBChestTracker
         ANCIENT_EVENT,
         STORY,
         OTHER,
-        WEALTH
+        WEALTH,
+        JORMUNGANDR
     }
 }

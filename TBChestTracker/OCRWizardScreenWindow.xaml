@@ -67,7 +67,7 @@
                 </Canvas.Left>
                 </TextBlock>
             </Canvas>
-            <Canvas x:Name="ProgressCanvas" Grid.Column="0" Grid.Row="0" Visibility="Hidden">
+            <Canvas x:Name="ProgressCanvas" Grid.Column="0" Grid.Row="0" Visibility="Visible">
                 <Rectangle x:Name="ProgressRectangle" RadiusX="10" RadiusY="10" Width="350" Height="100" Fill="#111" Opacity="1" Canvas.Top="250" Stroke="#222" SnapsToDevicePixels="True">
                     <Canvas.Left>
                         <MultiBinding Converter="{StaticResource MidValue}">

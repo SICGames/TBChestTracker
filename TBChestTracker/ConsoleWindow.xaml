@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Title="Console" Height="450" Width="800" 
         Topmost="True"
-        ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" ShowInTaskbar="False" Closing="Window_Closing">
+        ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" ShowInTaskbar="False" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="24"/>

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:TBChestTracker"
         xmlns:ui="clr-namespace:TBChestTracker.UI"
         mc:Ignorable="d"
-        Title="Settings" Height="450" Width="800" Topmost="True">
+        Title="Settings" Height="450" Width="800" Topmost="True" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
@@ -15,9 +15,17 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical" Background="#111" Width="200">
-            <ui:FancyButton RenderMode="TEXT" Text="General" Height="36" Foreground="White" Background="#111" BorderBrush="#000" FontWeight="Bold" HilightBrush="#555"/>
-            <ui:FancyButton RenderMode="TEXT" Text="Onscreen Character Recongition" Height="36" Foreground="White" Background="#111" BorderBrush="#000" FontWeight="Bold" HilightBrush="#555"/>
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical" Background="#111" Width="200" ButtonBase.Click="StackPanel_Click">
+            <ui:FancyNavigationButton 
+                ActiveBrush="#eee" ActiveBackgroundBrush="#444" HoverBrush="#555"
+                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                Text="General" Height="36" Foreground="White" Background="#111" 
+                BorderBrush="#000" FontWeight="Bold" IsActive="True"/>
+            <ui:FancyNavigationButton 
+                ActiveBrush="#eee" ActiveBackgroundBrush="#444" HoverBrush="#555"
+                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                Text="OCR" Height="36" Foreground="White" Background="#111" 
+                BorderBrush="#000" FontWeight="Bold"/>
         </StackPanel>
         <Grid Grid.Row="0" Grid.Column="1">
             <Grid.RowDefinitions>
@@ -27,7 +35,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Frame Grid.Row="0" Grid.Column="0"/>
+            <Frame Grid.Row="0" Grid.Column="0" NavigationUIVisibility="Hidden" Source="/Pages/GeneralSettingsPage.xaml" />
             <StackPanel Orientation="Horizontal" Height="42" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <ui:FancyButton Width="100" Height="24" 
                                 Background="#0077ff" 

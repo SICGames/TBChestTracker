@@ -47,6 +47,7 @@
                     <MenuItem Header="Show Arena Chests Total" IsChecked="{Binding bShowArenasTotal}" IsCheckable="True"/>
                     <MenuItem Header="Show Union Truimph Chest Chests Total" IsChecked="{Binding bShowUnionTriumphsTotal}" IsCheckable="True"/>
                     <MenuItem Header="Show Ancient Chests Total" IsCheckable="True" IsChecked="{Binding bShowAncientChestsTotal}"/>
+                    <MenuItem Header="Show Jormungandr Shop Chests Total" IsCheckable="True" IsChecked="{Binding bShowJormungandrShopChestsTotal}"/>
                     <MenuItem Header="Show Story Chests Total" IsCheckable="True" IsChecked="{Binding bShowStoryChestsTotal}"/>
                     <MenuItem Header="Show Bank Gifts Total" IsCheckable="True" IsChecked="{Binding bShowBanksTotal}"/>
                     <MenuItem Header="Show Total" IsCheckable="True" IsChecked="{Binding bShowTotal}"/>
@@ -161,6 +162,10 @@
                             <GridViewColumn Width="{Binding Path=bShowAncientChestsTotal, Converter={StaticResource BooleanToWidthConverter}, ConverterParameter=100}" 
                                             DisplayMemberBinding="{Binding Path=AncientChestsTotal}">
                                 <GridViewColumnHeader  Visibility="{Binding Path=bShowAncientChestsTotal, Converter={StaticResource BooleanToVisibilityConverter}}" Content="Ancient Chests"/>
+                            </GridViewColumn>
+                            <GridViewColumn Width="{Binding Path=bShowJormungandrShopChestsTotal, Converter={StaticResource BooleanToWidthConverter}, ConverterParameter=100}" 
+                                            DisplayMemberBinding="{Binding Path=JormungandrShopChestsTotal}">
+                                <GridViewColumnHeader  Visibility="{Binding Path=bShowJormungandrShopChestsTotal, Converter={StaticResource BooleanToVisibilityConverter}}" Content="Jormungandr Shop"/>
                             </GridViewColumn>
                             <GridViewColumn Width="{Binding Path=bShowStoryChestsTotal, Converter={StaticResource BooleanToWidthConverter}, ConverterParameter=100}" 
                                             DisplayMemberBinding="{Binding Path=StoryChestsTotal}">

@@ -21,8 +21,6 @@ namespace TBChestTracker
     /// </summary>
     public partial class NewChestPointWindow : Window, INotifyPropertyChanged
     {
-
-
         private int pointvalue = 0;
         public int PointValue
         {
@@ -60,7 +58,6 @@ namespace TBChestTracker
 
         private void AddBtn_Click(object sender, RoutedEventArgs e)
         {
-
             ChestPoints chestPoints = new ChestPoints();
             chestPoints.ChestType = ChestTypeBox.Text;
             chestPoints.Level = Level;

@@ -6,19 +6,38 @@
         xmlns:local="clr-namespace:TBChestTracker"
         xmlns:ui="clr-namespace:TBChestTracker.UI"
         mc:Ignorable="d"
-        Title="OCR Wizard" Height="200" Width="320" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" Topmost="True" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing">
+        Title="OCR Wizard" Height="350" Width="500" WindowStyle="None" WindowStartupLocation="CenterScreen" Topmost="True" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="32" ResizeBorderThickness="0"/>
+    </WindowChrome.WindowChrome>
     <Grid Background="#222">
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Foreground="White" FontWeight="Bold" FontSize="12" Text="OCR Wizard" Margin="15,0" VerticalAlignment="Center"/>
-        <TextBlock Grid.Row="1" Foreground="White" TextWrapping="Wrap" Margin="10,15"
-                   Text="In order to make sure you're getting accurate results, you must complete this OCR Wizard. To begin, click the 'Next' Button."/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0" Grid.Column="0" Foreground="White" FontWeight="Bold" FontSize="12" Text="OCR Wizard" Margin="15,0" VerticalAlignment="Center"/>
+            <ui:FancyImageButton Background="Red" 
+                                 HighlightStrokeBrush="#ff5555" 
+                                 HighlightStrokeThickness="1" 
+                                 ImageSource="Images/close-button.png" 
+                                 Grid.Column="1" Width="32" 
+                                 HighlightBrush="#ff3333" 
+                                 BorderBrush="Transparent" 
+                                 BorderThickness="0" IsEnabled="True" 
+                                 x:Name="CloseButton" Click="CloseButton_Click" WindowChrome.IsHitTestVisibleInChrome="True"/>
+        </Grid>
+        <Frame x:Name="OCRWizardGuideViewer" Grid.Row="1" Background="#111" Source="/Pages/OCRWizard/OCRWizard_WelcomePage.xaml" NavigationUIVisibility="Hidden"/>
         <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right">
-            <ui:FancyButton Background="#0077ff" HilightBrush="#0099ff" Foreground="White" FontWeight="Bold" Corners="5" IsEnabled="True" RenderMode="TEXT" Text="Next" Width="65" Height="20" VerticalAlignment="Center" Margin="15,5" Click="Button_Click"/>
-            
+            <ui:FancyButton Background="#0077ff" HilightBrush="#0099ff" Foreground="White" FontWeight="Bold" Corners="5" IsEnabled="True" RenderMode="TEXT" Text="Next" Width="65" Height="20" VerticalAlignment="Center" Margin="15,5" x:Name="NextButton" Click="NextButton_Click" Visibility="Visible"/>
+            <ui:FancyButton Background="#0077ff" HilightBrush="#0099ff" Foreground="White" FontWeight="Bold" Corners="5" IsEnabled="True" RenderMode="TEXT" Text="Begin" Width="65" Height="20" VerticalAlignment="Center" Margin="15,5" x:Name="BeginButton" Click="BeginButton_Click" Visibility="Collapsed"/>
+            <ui:FancyButton Background="#0077ff" HilightBrush="#0099ff" Foreground="White" FontWeight="Bold" Corners="5" IsEnabled="True" RenderMode="TEXT" Text="Edit Manually" Width="100" Height="20" VerticalAlignment="Center" Margin="15,5" x:Name="ManualEditButton" Click="ManualEditButton_Click" Visibility="Collapsed"/>
+            <ui:FancyButton Background="#0077ff" HilightBrush="#0099ff" Foreground="White" FontWeight="Bold" Corners="5" IsEnabled="True" RenderMode="TEXT" Text="Done" Width="65" Height="20" VerticalAlignment="Center" Margin="15,5" x:Name="DoneButton" Click="DoneButton_Click" Visibility="Collapsed"/>
         </StackPanel>
     </Grid>
 </Window>

@@ -1,0 +1,36 @@
+﻿<Page x:Class="TBChestTracker.Pages.OCRWizard.OCRWizard_Failed"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:TBChestTracker.Pages.OCRWizard"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="OCRWizard_Failed">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <!-- Side Banner Goes here -->
+        <Image Grid.Column="0" Grid.Row="0" Source="../../Images/OCRWizard/ErrorIcon_Large.png" Height="100" Margin="20,0"/>
+        <Grid Grid.Row="0" Grid.Column="1" Margin="5,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="OCR Wizard had a oopsie" Grid.Row="0" Foreground="White" FontWeight="Bold" FontSize="24"/>
+            <TextBlock 
+      Text="Unfortunately, OCR Wizard could not automatically detect the proper region to read chest data from. The reason is still unknown, but our chief Wizard Robots are working on it. You can manually suggest where you will want the OCR to read from. "
+      TextWrapping="Wrap"
+      Grid.Row="1" Foreground="White"
+      Margin="10,5"/>
+        </Grid>
+        <!-- Title -->
+
+    </Grid>
+</Page>

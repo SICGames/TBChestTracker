@@ -16,6 +16,7 @@ using System.IO;
 using TBChestTracker.Managers;
 using TBChestTracker.UI;
 using System.Runtime.CompilerServices;
+using System.Windows.Shell;
 
 namespace TBChestTracker
 {
@@ -103,6 +104,7 @@ namespace TBChestTracker
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             LoadRecentFilesList();
+            
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

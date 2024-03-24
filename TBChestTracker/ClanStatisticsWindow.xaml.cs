@@ -61,6 +61,8 @@ namespace TBChestTracker
         private bool m_bShowVaultAncientsTotal = false;
         private bool m_bShowHeroicsTotal = false;
         private bool m_bShowAncientChestsTotal = false;
+        private bool m_bShowJormungadrShopChestsTotal = false;
+
         private bool m_bShowBanksTotal = false;
         private bool m_bShowStoryChestsTotal = false;
         private bool m_bShowAll = false;
@@ -123,8 +125,6 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(bShowArenasTotal));
             }
         }
-        
-
         public bool bShowUnionTriumphsTotal
         {
             get => m_bShowUnionTriumphTotal;
@@ -160,7 +160,18 @@ namespace TBChestTracker
                 m_bShowAncientChestsTotal = value;
                 OnPropertyChanged(nameof(bShowAncientChestsTotal));
             }
-
+        }
+        public bool bShowJormungandrShopChestsTotal
+        {
+            get
+            {
+                return m_bShowJormungadrShopChestsTotal;
+            }
+            set
+            {
+                m_bShowJormungadrShopChestsTotal = value;
+                OnPropertyChanged(nameof(bShowJormungandrShopChestsTotal));
+            }
         }
         public bool bShowStoryChestsTotal
         {
@@ -189,7 +200,6 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(bShowTotal));  
             }
         }
-
         public bool bShowTotalPoints
         {
             get => m_bShowTotalPoints;
@@ -299,10 +309,10 @@ namespace TBChestTracker
                     foreach (var entry in date.Value)
                     {
                         int commoncryptstotal, rarecryptstotal, epiccryptstotal, citadelsstotal,
-                          arenastotal, uniontriumphstotal, vaultancienttotal, ancientchests, heroicstotal, bankstotal, storycheststotal, total, otherTotal, totalPoints;
+                          arenastotal, uniontriumphstotal, vaultancienttotal, ancientchests, jormungandrtotal, heroicstotal, bankstotal, storycheststotal, total, otherTotal, totalPoints;
 
                         commoncryptstotal = rarecryptstotal = epiccryptstotal = citadelsstotal = arenastotal =
-                    heroicstotal = bankstotal = uniontriumphstotal = vaultancienttotal = ancientchests = storycheststotal = total = otherTotal = totalPoints = 0;
+                    heroicstotal = bankstotal = uniontriumphstotal = vaultancienttotal = ancientchests = jormungandrtotal = storycheststotal = total = otherTotal = totalPoints = 0;
 
                         var clanmate = entry.Clanmate;
                         //var chests = dateEntry.Value.Where(name => name.Clanmate.Equals(clanmate)).Select(chest => chest.chests).ToList()[0];
@@ -320,6 +330,7 @@ namespace TBChestTracker
                             vaultancienttotal = chests.Where(common => common.Type == ChestType.VAULT).Count();
                             bankstotal = chests.Where(common => common.Type == ChestType.BANK).Count();
                             ancientchests = chests.Where(common => common.Type == ChestType.ANCIENT_EVENT).Count();
+                            jormungandrtotal = chests.Where(c => c.Type == ChestType.JORMUNGANDR).Count();  
                             storycheststotal = chests.Where(common => common.Type == ChestType.STORY).Count();
                             otherTotal = chests.Where(common => common.Type == ChestType.OTHER).Count();    
                             total = commoncryptstotal + rarecryptstotal + epiccryptstotal + citadelsstotal + arenastotal + uniontriumphstotal + heroicstotal + vaultancienttotal + bankstotal + storycheststotal + otherTotal;
@@ -341,13 +352,14 @@ namespace TBChestTracker
                             updateStats.VaultAncientsTotal += vaultancienttotal;    
                             updateStats.BanksTotal += bankstotal;
                             updateStats.AncientChestsTotal += ancientchests;
+                            updateStats.JormungandrShopChestsTotal += jormungandrtotal;
                             updateStats.StoryChestsTotal += storycheststotal;
                             updateStats.Total += total;
                             updateStats.Points += totalPoints;
                         }
                         else
                             ClanStatisticData.Add(new TBChestTracker.ClanStatisticData(clanmate, commoncryptstotal, rarecryptstotal, epiccryptstotal, citadelsstotal,
-                            arenastotal, uniontriumphstotal, vaultancienttotal, heroicstotal, ancientchests, storycheststotal, bankstotal, total, totalPoints));
+                            arenastotal, uniontriumphstotal, vaultancienttotal, heroicstotal, ancientchests, jormungandrtotal, storycheststotal, bankstotal, total, totalPoints));
                     }
                 }
             }

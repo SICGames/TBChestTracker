@@ -50,25 +50,21 @@ namespace TBChestTracker
         System.Threading.Thread AutomationThread { get; set; }
         private double CLANCHEST_IMAGE_BRIGHTNESS = 0.65d;
         CaptureMode CaptureMode { get; set; }
-        bool isAutomationBusy = false;
         int captureCounter = 0;
-        bool stopAutomation = false;
-        
         public SettingsManager SettingsManager { get; set; }
-
         public ClanManager ClanManager { get; private set; }
         private CaptainHook CaptainHook { get; set; }
         public Snapture Snapture { get; private set; }
 
-        public AppContext appContext = new AppContext();
+        public AppContext appContext { get; private set; }
 
         List<string> recently_opened_files { get; set; }
         ConsoleWindow consoleWindow { get; set; }
         CancellationTokenSource CancellationTokenSource { get; set; }
-
         SettingsWindow SettingsWindow { get; set; }
         OCRWizardWindow OCRWizardWindow { get; set; }
         StartPageWindow startPageWindow {  get; set; }  
+        ClanChestProcessResult clanChestProcessResult { get; set; }
         #endregion
 
         #region PropertyChanged Event
@@ -84,9 +80,9 @@ namespace TBChestTracker
         #region MainWindow()
         public MainWindow()
         {
-           
-           
             InitializeComponent();
+            appContext = new AppContext();
+            this.DataContext = appContext;
             this.Closing += MainWindow_Closing;
             recently_opened_files = new List<string>();
             consoleWindow = new ConsoleWindow();
@@ -96,7 +92,6 @@ namespace TBChestTracker
         #region Image Processing Functions & Other Related Functions
         private Task<TessResult> GetTextFromBitmap(System.Drawing.Bitmap bitmap)
         {
-            
             Image<Gray, Byte> image = null;
             Image<Gray, Byte> imageOut = null;
             var brightness = 0.0d;
@@ -105,7 +100,6 @@ namespace TBChestTracker
                 brightness = 0.5d;
                 image = bitmap.ToImage<Gray, Byte>();
                 imageOut = image.Mul(brightness) + brightness;
-            
             }
             else
             {
@@ -120,12 +114,12 @@ namespace TBChestTracker
             image.Dispose();
             image = null;
             
-            
             return Task.FromResult(ocrResult);
         }
         private void CaptureRegion()
         {
             //-- now everything is completely manual when capturing. CLI C++ doesn't do any while loop.
+            /* OLD & OBSOLETE 
             int sh = Snapture.ScreenHeight;
             int sw = Snapture.ScreenWidth;
             int x = sw / 2; //-- 1920 
@@ -140,12 +134,11 @@ namespace TBChestTracker
             int top = (int)Math.Round(y * topChestPerc);
             int width = (int)Math.Round(x * widthChestPerc);
             int height = (int)Math.Round(y * heightChestPerc);
+            */
 
             CaptureMode = CaptureMode.CHESTS;
-
             var capture_region = SettingsManager.Instance.Settings.OCRSettings.SuggestedAreaOfInterest;
-
-            //Snapture.CaptureRegion(left, top, width, height);
+            
             int ca_x = (int)capture_region.x;
             int ca_y = (int)capture_region.y;
             int ca_width = (int)capture_region.width - ca_x;
@@ -162,6 +155,7 @@ namespace TBChestTracker
             Snapture.CaptureDesktop();
             GlobalDeclarations.canCaptureAgain = false;
         }
+        
         public void CaptureClanmates()
         {
             //-- now everything is completely manual when capturing. CLI C++ doesn't do any while loop.
@@ -189,7 +183,7 @@ namespace TBChestTracker
         #region Start Automation Thread
         void StartAutomationThread()
         {
-            stopAutomation = false;
+            
             GlobalDeclarations.AutomationRunning = true;
             CancellationTokenSource = new CancellationTokenSource();
             this.Dispatcher.BeginInvoke(new Action(() =>
@@ -207,12 +201,15 @@ namespace TBChestTracker
             //--- mouse click 4 times on claim button
             //--- take snapshot 
             //--- rinse and repeat UNTIL F10 key is pressed by user to end it.
+            
+            /* Obsolete 
             var screenX_half = Snapture.ScreenWidth / 2;
             var screenY_half = Snapture.ScreenHeight / 2;
 
             var xClickPos = new Point((screenX_half * 0.706) * 2, screenY_half * 0.834);
             var x = (int)xClickPos.X;
             var y = (int)xClickPos.Y;
+            */
 
             var claim_button = SettingsManager.Instance.Settings.OCRSettings.ClaimChestButtons[0];
 
@@ -222,8 +219,10 @@ namespace TBChestTracker
             appContext.ChestCountTotal = 0;
 
             bool bCanceled = false;
-            while (!stopAutomation)
+
+            while (true)
             {
+
                 int automatorClicks = 0;
                 if (token.IsCancellationRequested)
                 {
@@ -237,30 +236,28 @@ namespace TBChestTracker
                     CaptureRegion();
                     while (ClanManager.Instance.ClanChestManager.ChestProcessingState != ChestProcessingState.COMPLETED)
                     {
-
                     }
-                    GlobalDeclarations.canCaptureAgain = false;
                     captureCounter++;
                 }
 
-                if (GlobalDeclarations.isAnyGiftsAvailable == false)
-                    continue;
-
-                while(automatorClicks != 4)
+                if (clanChestProcessResult.Result == ClanChestProcessEnum.SUCCESS)
                 {
-                    Automator.LeftClick(claim_button.X, claim_button.Y);
-                    automatorClicks++;
-                    
-                    this.Dispatcher.BeginInvoke(new Action(() => {
-                        appContext.ChestCountTotal++;
+                    while (automatorClicks != 4)
+                    {
+                        Automator.LeftClick(claim_button.X, claim_button.Y);
+                        automatorClicks++;
+
+                        this.Dispatcher.BeginInvoke(new Action(() => {
+                            appContext.ChestCountTotal++;
                         }));
-                    
-                    Thread.Sleep(100);
+                        Thread.Sleep(100);
+                    }
+
+                    //-- canCaptureAgain not being switched back on.
+                    GlobalDeclarations.canCaptureAgain = true;
                 }
-                
-                //-- canCaptureAgain not being switched back on.
-                GlobalDeclarations.canCaptureAgain = true;
             }
+
             if(bCanceled)
             {
                 StopAutomation();
@@ -273,9 +270,9 @@ namespace TBChestTracker
         void StopAutomation()
         {
             CancellationTokenSource.Cancel();
-            stopAutomation = true;
+            
             GlobalDeclarations.AutomationRunning = false;
-
+            GlobalDeclarations.isBusyProcessingClanchests = false;
             ClanManager.Instance.ClanChestManager.SaveDataTask();
             ClanManager.Instance.ClanChestManager.CreateBackup();
             appContext.IsAutomationPlayButtonEnabled = true;
@@ -287,6 +284,7 @@ namespace TBChestTracker
         #region Snapture onFrameCaptured Event
         private async void Snapture_onFrameCaptured(object sender, FrameCapturedEventArgs e)
         {
+
 #if SNAPTURE_DEBUG
             var outputpath = $@"{GlobalDeclarations.AppFolder}Test\SnaptureDebug.jpg";
             System.Drawing.Bitmap debug_screenshot = e.ScreenCapturedBitmap;
@@ -311,24 +309,36 @@ namespace TBChestTracker
             Automator.MoveTo((int)x, y);
             e.ScreenCapturedBitmap.Dispose();
 #elif !SNAPTURE_DEBUG 
+
             var ocrResult = await GetTextFromBitmap(e.ScreenCapturedBitmap); //LoadBitmap(e.ScreenCapturedBitmap, new Windows.Globalization.Language("en"));
             if (ocrResult == null)
             {
+
             }
 
             //-- here we process data.
             e.ScreenCapturedBitmap.Dispose();
 
             if (CaptureMode == CaptureMode.CHESTS && ocrResult != null)
-                ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words, onError =>
+            {
+               clanChestProcessResult = ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words, onError =>
                 {
                     if (onError)
                     {
                         var result = MessageBox.Show("A critical error has occured during processing text from image. Stopping automation and saving chest data.", "OCR Error", MessageBoxButton.OK);
                         if (result == MessageBoxResult.OK)
+                        {
+                            com.HellStormGames.Logging.Console.Write($"Error Occured Processing Chests. Auotmation Stopped.", "Automation Result", com.HellStormGames.Logging.LogType.ERROR);
                             StopAutomation();
+                        }
                     }
                 });
+                if(clanChestProcessResult.Result == ClanChestProcessEnum.NO_GIFTS)
+                {
+                    StopAutomation();
+                    com.HellStormGames.Logging.Console.Write($"There are no more gifts to collect.", "Automation Result", com.HellStormGames.Logging.LogType.INFO);
+                }
+            }
 #endif
         }
 #endregion
@@ -337,7 +347,7 @@ namespace TBChestTracker
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             
-            this.DataContext = appContext;
+            
             CaptainHook = new CaptainHook();
             CaptainHook.onKeyboardMessage += CaptainHook_onKeyboardMessage;
             CaptainHook.onInstalled += CaptainHook_onInstalled;
@@ -543,7 +553,7 @@ namespace TBChestTracker
             if (tag != "CLEAR_HISTORY")
             {
                 var file = menuitem.Tag.ToString();
-                LoadReentFile(file, null);
+                LoadReentFile(file, result => { });
             }
             else
             {

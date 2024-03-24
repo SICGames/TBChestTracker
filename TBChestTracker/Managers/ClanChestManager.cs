@@ -143,7 +143,6 @@ namespace TBChestTracker
                         //--- Causing The Iroh Bug.
                         try
                         {
-
                             //--- skip the space check and the odd symbol to get straight to the meat.
                             clanmate = clanmate.Substring(clanmate.IndexOf(' ') + 1);   
                             if (clanmate.Contains("From:"))
@@ -205,37 +204,13 @@ namespace TBChestTracker
                                     level = 10;
                             }
 
-                            /*
-                            if (chestobtained.Contains("io"))
-                            {
-                                //--- OCR reads 10 as io.Until perm fix. 
-                                level = 10;
-                            }
-
-                            if (chestobtained.Contains("-"))
-                            {
-                                string ancientlevel = chestobtained.Substring(chestobtained.IndexOf("-") - 2);
-                                ancientlevel = ancientlevel.Substring(0, ancientlevel.IndexOf(" "));
-                                var levels = ancientlevel.Split('-');
-                                type = ChestType.VAULT;
-                                level = Int32.Parse(levels[1]);
-                            }
-                            else
-                            {
-                                Regex r = new Regex(@"(\d+)", RegexOptions.Singleline); // new Regex(@"(\d+)(.?|\s)(\d+)");
-                                var match = r.Match(chestobtained);
-                                if (match.Success)
-                                {
-                                    level = Int32.Parse(match.Value);
-                                }
-                            }
-                            */
                             //--- shouldn't be 0. Normally happens 1st chest that is a level 5. 
                             if (level == 0)
                                 level = 5;
 
                             //-- filter chest if chest conditions enabled
                             //--- if chest requirements are using conditions, we use those conditions. If not, we continue.
+                            
                             if (ClanManager.Instance.ClanChestSettings.ChestRequirements.useChestConditions)
                             {
                                 foreach (var condition in ClanManager.Instance.ClanChestSettings.ChestRequirements.ChestConditions)
@@ -279,6 +254,8 @@ namespace TBChestTracker
                                 type = ChestType.STORY;
                             else if (chestobtained.Contains("wealth"))
                                 type = ChestType.WEALTH;
+                            else if (chestobtained.Contains("jörmungandr") || chestobtained.Contains("jormungandr"))
+                                type = ChestType.JORMUNGANDR;
 
                             if (ClanManager.Instance.ClanChestSettings.ChestRequirements.useChestConditions)
                             {
@@ -325,14 +302,12 @@ namespace TBChestTracker
                 {
                     clanchestdata.chests.Add(name.Chest);
                 }
-
-               
                 clanChestData.Add(clanchestdata);
             }
             return clanChestData;
         }
 
-        public async void ProcessChestData(List<string> result, System.Action<bool> onError)
+        public ClanChestProcessResult ProcessChestData(List<string> result, System.Action<bool> onError)
         {
 
             /*
@@ -341,159 +316,145 @@ namespace TBChestTracker
              * Need to make sure we don't need to start new entry in ClanChestDaily.
              * ClanChestData should be obsolete.
             */
-            Stopwatch sw = Stopwatch.StartNew();
-            sw.Start();
 
             GlobalDeclarations.isBusyProcessingClanchests = true;
             var resulttext = result;
-            
-            //- doesn't handle expired gifts. Will patch soon.
-            if (!resulttext[0].Contains("No gifts"))
-            {
-                ChestProcessingState = ChestProcessingState.PROCESSING;
-                GlobalDeclarations.isAnyGiftsAvailable = true;
-                
-                List<ChestData> tmpchests = ProcessText2(resulttext);
 
-                if(tmpchests == null)
-                {
-                    onError(true);
-                    return;
-                }
-
-                List<ClanChestData> tmpchestdata = CreateClanChestData(tmpchests);
-
-                var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates.ToList();
-
-                //-- do we need to insert new entry?
-                //-- causes midnight bug.
-                var currentdate = DateTime.Now.ToString(@"MM-dd-yyyy");
-                var dates = ClanChestDailyData.Where(x => x.Key.Equals(currentdate));
-
-                if (dates.Count() == 0)
-                {
-                    clanChestData.Clear();
-                    foreach (var mate in clanmates)
-                    {
-                        clanChestData.Add(new ClanChestData(mate.Name, null,0));
-                    }
-
-                    ClanChestDailyData.Add(DateTime.Now.ToString(@"MM-dd-yyyy"), clanChestData);
-                }
-
-                //-- make sure clanmate exists.
-                var mate_index = 0;
-                foreach (var tmpchest in tmpchestdata.ToList())
-                {
-                    bool alias_found = false;
-                    bool exists = clanmates.Select(mate_name => mate_name.Name).Contains(tmpchest.Clanmate, StringComparer.CurrentCultureIgnoreCase);
-                    if (!exists)
-                    {
-                        com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} doesn't exist within clanmates database. Attempting to find Aliases.", "Unknown Clanmate", LogType.WARNING);
-                        Debug.WriteLine($"{tmpchest.Clanmate} doesn't exist within clanmates database. Attempting to find Aliases.");
-                        //-- attempt to check to see if the unfound clanmate is under an alias.
-                        foreach (var mate in clanmates)
-                        {
-                            if (mate.Aliases.Count > 0)
-                            {
-                                bool isMatch = mate.Aliases.Contains(tmpchest.Clanmate, StringComparer.InvariantCultureIgnoreCase);
-                                if (isMatch)
-                                {
-                                    com.HellStormGames.Logging.Console.Write($"\t\t Unknown clanmate ({tmpchest.Clanmate}) belongs to {mate.Name} aliases.","Unknown Clanmate", LogType.INFO);
-                                    var parent_data = clanChestData.Select(pd => pd).Where(data => data.Clanmate.Equals(mate.Name, StringComparison.InvariantCultureIgnoreCase)).ToList()[0];
-                                    if (parent_data.chests == null)
-                                    {
-                                        parent_data.chests = new List<Chest>();
-                                    }
-                                    
-                                    tmpchestdata[mate_index].Clanmate = mate.Name; //--- unknown clanmate properly identified and been re-written with correct parent clan name.
-                                    
-                                    alias_found = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (!alias_found)
-                        {
-                            clanChestData.Add(new ClanChestData(tmpchest.Clanmate, tmpchest.chests, tmpchest.Points));
-                            com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} doesn't exist within clanmates database.", "Clanmate Not Found", LogType.WARNING);
-                            ClanManager.Instance.ClanmateManager.Add(tmpchest.Clanmate);
-                            ClanManager.Instance.ClanmateManager.Save(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile);
-                        }
-                    }
-                    else
-                    {
-                        mate_index += 1;
-                        continue;
-                    }
-
-                }
-
-                //-- update clanchestdata
-                foreach (var chestdata in clanChestData)
-                {
-                    var _chestdata = tmpchestdata.Where(name => name.Clanmate.Equals(chestdata.Clanmate,
-                        StringComparison.CurrentCultureIgnoreCase)).Select(chests => chests).ToList();
-
-                    if (_chestdata.Count > 0)
-                    {
-                        var m_chestdata = _chestdata[0];
-
-                        //--- chest data returning null after correcting parent clan name.
-                        if (chestdata.Clanmate.Equals(m_chestdata.Clanmate, StringComparison.CurrentCultureIgnoreCase))
-                        {
-                            if (chestdata.chests == null)
-                            {
-                                chestdata.chests = new List<Chest>();
-                                chestdata.Points = 0;
-                            }
-
-                            foreach (var m_chest in m_chestdata.chests.ToList())
-                            {
-                                if (ClanManager.Instance.ClanChestSettings.ChestPointsSettings.UseChestPoints)
-                                {
-                                    var pointvalues = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints;
-                                    foreach (var pointvalue in pointvalues)
-                                    {
-                                        var chest_type = m_chest.Type.ToString();
-                                        var level = m_chest.Level;
-                                        if (chest_type.ToLower() == pointvalue.ChestType.ToLower())
-                                        {
-                                            var chest_level = pointvalue.Level;
-                                            if (level == chest_level)
-                                            {
-                                                chestdata.Points += pointvalue.PointValue;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                                chestdata.chests.Add(m_chest);
-                            }
-                        }
-                    }
-
-                }
-
-                var datestr = DateTime.Now.ToString(@"MM-dd-yyyy");
-                ClanChestDailyData[datestr] = clanChestData;
-                ChestProcessingState = ChestProcessingState.COMPLETED;
-
-                sw.Stop();
-                var elapsed = sw.Elapsed;
-                var msg = $"--- Processing Chests Took: {elapsed}";
-            }
-            else
+            if (resulttext[0].ToLower().Contains("no gifts"))
             {
                 ChestProcessingState = ChestProcessingState.IDLE;
                 GlobalDeclarations.isAnyGiftsAvailable = false;
+                return new ClanChestProcessResult("No Gifts", 404, ClanChestProcessEnum.NO_GIFTS);
             }
 
+            ChestProcessingState = ChestProcessingState.PROCESSING;
+            GlobalDeclarations.isAnyGiftsAvailable = true;
+            List<ChestData> tmpchests = ProcessText2(resulttext);
+
+            if (tmpchests == null)
+            {
+                onError(true);
+                return new ClanChestProcessResult("Temp chests is null.", 0, ClanChestProcessEnum.ERROR);
+            }
+
+            List<ClanChestData> tmpchestdata = CreateClanChestData(tmpchests);
+            var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates.ToList();
+
+            //-- do we need to insert new entry?
+            //-- causes midnight bug.
+            var currentdate = DateTime.Now.ToString(@"MM-dd-yyyy");
+            var dates = ClanChestDailyData.Where(x => x.Key.Equals(currentdate));
+
+            if (dates.Count() == 0)
+            {
+                clanChestData.Clear();
+                foreach (var mate in clanmates)
+                {
+                    clanChestData.Add(new ClanChestData(mate.Name, null, 0));
+                }
+                ClanChestDailyData.Add(DateTime.Now.ToString(@"MM-dd-yyyy"), clanChestData);
+            }
+
+            //-- make sure clanmate exists.
+            var mate_index = 0;
+            foreach (var tmpchest in tmpchestdata.ToList())
+            {
+                bool alias_found = false;
+                bool exists = clanmates.Select(mate_name => mate_name.Name).Contains(tmpchest.Clanmate, StringComparer.CurrentCultureIgnoreCase);
+                if (!exists)
+                {
+                    com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} doesn't exist within clanmates database. Attempting to find Aliases.", "Unknown Clanmate", LogType.WARNING);
+                    Debug.WriteLine($"{tmpchest.Clanmate} doesn't exist within clanmates database. Attempting to find Aliases.");
+                    //-- attempt to check to see if the unfound clanmate is under an alias.
+                    foreach (var mate in clanmates)
+                    {
+                        if (mate.Aliases.Count > 0)
+                        {
+                            bool isMatch = mate.Aliases.Contains(tmpchest.Clanmate, StringComparer.InvariantCultureIgnoreCase);
+                            if (isMatch)
+                            {
+                                com.HellStormGames.Logging.Console.Write($"\t\t Unknown clanmate ({tmpchest.Clanmate}) belongs to {mate.Name} aliases.", "Unknown Clanmate", LogType.INFO);
+                                var parent_data = clanChestData.Select(pd => pd).Where(data => data.Clanmate.Equals(mate.Name, StringComparison.InvariantCultureIgnoreCase)).ToList()[0];
+                                if (parent_data.chests == null)
+                                {
+                                    parent_data.chests = new List<Chest>();
+                                }
+
+                                tmpchestdata[mate_index].Clanmate = mate.Name; //--- unknown clanmate properly identified and been re-written with correct parent clan name.
+
+                                alias_found = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!alias_found)
+                    {
+                        clanChestData.Add(new ClanChestData(tmpchest.Clanmate, tmpchest.chests, tmpchest.Points));
+                        com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} doesn't exist within clanmates database.", "Clanmate Not Found", LogType.WARNING);
+                        ClanManager.Instance.ClanmateManager.Add(tmpchest.Clanmate);
+                        ClanManager.Instance.ClanmateManager.Save(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile);
+                    }
+                }
+                else
+                {
+                    mate_index += 1;
+                    continue;
+                }
+            }
+
+            //-- update clanchestdata
+            foreach (var chestdata in clanChestData)
+            {
+                var _chestdata = tmpchestdata.Where(name => name.Clanmate.Equals(chestdata.Clanmate,
+                    StringComparison.CurrentCultureIgnoreCase)).Select(chests => chests).ToList();
+
+                if (_chestdata.Count > 0)
+                {
+                    var m_chestdata = _chestdata[0];
+
+                    //--- chest data returning null after correcting parent clan name.
+                    if (chestdata.Clanmate.Equals(m_chestdata.Clanmate, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        if (chestdata.chests == null)
+                        {
+                            chestdata.chests = new List<Chest>();
+                            chestdata.Points = 0;
+                        }
+
+                        foreach (var m_chest in m_chestdata.chests.ToList())
+                        {
+                            if (ClanManager.Instance.ClanChestSettings.ChestPointsSettings.UseChestPoints)
+                            {
+                                var pointvalues = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints;
+                                foreach (var pointvalue in pointvalues)
+                                {
+                                    var chest_type = m_chest.Type.ToString();
+                                    var level = m_chest.Level;
+                                    if (chest_type.ToLower() == pointvalue.ChestType.ToLower())
+                                    {
+                                        var chest_level = pointvalue.Level;
+                                        if (level == chest_level)
+                                        {
+                                            chestdata.Points += pointvalue.PointValue;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            chestdata.chests.Add(m_chest);
+                        }
+                    }
+                }
+            }
+
+            var datestr = DateTime.Now.ToString(@"MM-dd-yyyy");
+            ClanChestDailyData[datestr] = clanChestData;
+            ChestProcessingState = ChestProcessingState.COMPLETED;
             GlobalDeclarations.isBusyProcessingClanchests = false;
             GlobalDeclarations.canCaptureAgain = true;
 
-            return;
+            return new ClanChestProcessResult("Success", 200, ClanChestProcessEnum.SUCCESS);
         }
         
         public async void LoadData()
