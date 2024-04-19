@@ -1,4 +1,7 @@
 # TBChestTracker - Total Battle Chest Tracker
+
+## Important News
+Once version 1.0 is released to general public, this project won't get a lot of attention/updates. 
 ## Description
 Easily count clan chests with a hotkey and let the automation take control. 
 ## Features
@@ -17,8 +20,7 @@ Easily count clan chests with a hotkey and let the automation take control.
 - Portion of the screen may not be successfully screen shot for OCR to read it correctly. NO customization at this time has been added. If everything works, MATH works then.
 - Buttons may not do anything because they haven't been programmed to do so.
 ## How to install
-- Download released zip file or installer
-- if zip file is downloaded, extract zipped contents into a folder and launch program.
+- Download installer from releases section.
 ## Launched Program and now what?
 - Click first button "Clan Manager" to create your clan database.
 - CLick on + icon to create new clan.
