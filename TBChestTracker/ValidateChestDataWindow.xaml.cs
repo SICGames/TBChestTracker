@@ -20,6 +20,8 @@ namespace TBChestTracker
     /// <summary>
     /// Interaction logic for ValidateChestDataWindow.xaml
     /// </summary>
+    /// 
+
     public partial class ValidateChestDataWindow : Window, INotifyPropertyChanged
     {
         private CancellationTokenSource _cancellationTokenSource;
@@ -110,27 +112,50 @@ namespace TBChestTracker
 
             //--- Validate ChestType Data.
             StatusMessage = "Validating Chest data types...";
-            
             var chestTypeRepaired = ValidateChestDataChestTypes(ref chestdata);
+
+            var numClanmates = ClanManager.Instance.ClanmateManager.Database.NumClanmates;
 
             if (chestTypeRepaired)
             {
                 StatusMessage = "Validating other chest data...";
                 foreach (var dates in chestdata.Keys)
                 {
-
                     var data = chestdata[dates];
+                    
+                    /*
+                     -- to implement in future. 
+                     -- Goal is to remove duplicates from clan chest data. 
+                    var cleaned_data = data.Distinct(new ClanChestComparer()).ToList();
+                    if (data.Count() != cleaned_data.Count())
+                    {
+                        chestErrors++;
+                        data = cleaned_data;
+                    }
+                    */
+
                     foreach (var _data in data)
                     {
                         var clanmate_points = _data.Points;
                         var chests = _data.chests;
+
                         var total_chest_points = 0;
+
                         if (chests != null)
                         {
                             foreach (var chest in chests)
                             {
                                 foreach (var chestpointvalue in chestpointsvalues)
                                 {
+                                    var chestname = chest.Name;
+                                    if (chestpointvalue.ChestType.ToLower() == "custom")
+                                    {
+                                        if (chestname.ToLower().Equals(chestpointvalue.ChestName.ToLower()))
+                                        {
+                                            total_chest_points += chestpointvalue.PointValue;
+                                            break;
+                                        }
+                                    }
                                     if (chest.Type.ToString().ToLower() == chestpointvalue.ChestType.ToLower())
                                     {
                                         if (chest.Level == chestpointvalue.Level)
@@ -147,10 +172,12 @@ namespace TBChestTracker
                                 chestErrors++;
                             }
                         }
+
                     }
                 }
             }
             
+            //--- now we fix duplicates inside clanchests.db file
             if(chestErrors > 0)
             {
                 EndValidatingChestData($"Chest Data has been successfully fixed.", true, true);
@@ -165,8 +192,11 @@ namespace TBChestTracker
         {
             //--- we wrap things up by placing checkmark icon and hide progress bar
             StatusMessage = message;
-            if(isRepaired)
+            if (isRepaired)
+            {
+                ClanManager.Instance.ClanChestManager.CreateBackup();
                 ClanManager.Instance.ClanChestManager.SaveData();
+            }
 
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)

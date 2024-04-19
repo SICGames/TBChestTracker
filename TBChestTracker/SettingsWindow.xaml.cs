@@ -20,6 +20,7 @@ namespace TBChestTracker
     /// </summary>
     public partial class SettingsWindow : Window
     {
+        
         public SettingsWindow()
         {
             InitializeComponent();
@@ -42,7 +43,7 @@ namespace TBChestTracker
             }
 
             source.IsActive = !source.IsActive;
-
+            SettingsNavigationView.Navigate(source.NavigationSource);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -53,6 +54,12 @@ namespace TBChestTracker
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
 
+        }
+
+        private void FancyButton_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsManager.Instance.Save();
+            this.Close();
         }
     }
 }

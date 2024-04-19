@@ -98,6 +98,7 @@ namespace TBChestTracker.Pages
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
             var result = BuildSelectedLanguagesToString();
+            SettingsManager.Instance.Settings.GeneralSettings.Languages = result;
         }
     }
 }

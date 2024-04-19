@@ -110,7 +110,7 @@
       <HintPath>..\..\KonquestUI\KonquestUI\bin\x64\Release\KonquestUI.dll</HintPath>
     </Reference>
     <Reference Include="PresentationFramework.Aero2" />
-    <Reference Include="Snapture, Version=1.0.8769.28508, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="Snapture, Version=1.0.8873.38934, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Snapture\x64\Release\Snapture.dll</HintPath>
     </Reference>
@@ -144,6 +144,9 @@
     <Compile Include="Automation\Automator.cs" />
     <Compile Include="Chest\ChestPointsData.cs" />
     <Compile Include="Chest\ChestPointsSettings.cs" />
+    <Compile Include="Chest\ChestRef.cs" />
+    <Compile Include="Chest\RefEnum.cs" />
+    <Compile Include="ClanData\ClanChestComparer.cs" />
     <Compile Include="ClanData\ClanRequirements.cs" />
     <Compile Include="ClanData\ClanSpecifiedRequirements.cs" />
     <Compile Include="Clanmate\Clanmate.cs" />
@@ -157,6 +160,7 @@
     </Compile>
     <Compile Include="Console\Console.cs" />
     <Compile Include="Console\ConsoleData.cs" />
+    <Compile Include="Converters\ChestRefConverter.cs" />
     <Compile Include="Converters\MidPointValueConverter.cs" />
     <Compile Include="CustomControls\DpiAwareImage.cs" />
     <Compile Include="EditChestPointValueWindow.xaml.cs">
@@ -188,7 +192,7 @@
     <Compile Include="Pages\ClanPage.xaml.cs">
       <DependentUpon>ClanPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\GeneralSettingsPage.xaml.cs">
+    <Compile Include="Pages\Settings\GeneralSettingsPage.xaml.cs">
       <DependentUpon>GeneralSettingsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\OCRWizard\OCRWizard_Failed.xaml.cs">
@@ -203,6 +207,12 @@
     <Compile Include="Pages\OCRWizard\OCRWizard_WelcomePage.xaml.cs">
       <DependentUpon>OCRWizard_WelcomePage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\Settings\HotkeySettingsPage.xaml.cs">
+      <DependentUpon>HotkeySettingsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Settings\OCRSettingsPage.xaml.cs">
+      <DependentUpon>OCRSettingsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PreviewCroppedImageViewer.xaml.cs">
       <DependentUpon>PreviewCroppedImageViewer.xaml</DependentUpon>
     </Compile>
@@ -214,6 +224,8 @@
     </Compile>
     <Compile Include="Settings\AOIRect.cs" />
     <Compile Include="Settings\GeneralSettings.cs" />
+    <Compile Include="Settings\HotKey.cs" />
+    <Compile Include="Settings\HotKeySettings.cs" />
     <Compile Include="Settings\Marker.cs" />
     <Compile Include="Settings\MarkerCollection.cs" />
     <Compile Include="Settings\OCRSettings.cs" />
@@ -287,7 +299,10 @@
     <Compile Include="UI\FancyButton.cs" />
     <Compile Include="UI\FancyImageButton.cs" />
     <Compile Include="UI\FancyNavigationButton.cs" />
+    <Compile Include="UI\FancyNumericValue.cs" />
     <Compile Include="UI\FancyPicker.cs" />
+    <Compile Include="UI\FancyTagBox.cs" />
+    <Compile Include="UI\FancyTagItem.cs" />
     <Compile Include="UI\Milestone.xaml.cs">
       <DependentUpon>Milestone.xaml</DependentUpon>
     </Compile>
@@ -393,7 +408,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\GeneralSettingsPage.xaml">
+    <Page Include="Pages\Settings\GeneralSettingsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -410,6 +425,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\OCRWizard\OCRWizard_WelcomePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Settings\HotkeySettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Settings\OCRSettingsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -542,25 +565,46 @@
     <Content Include="Images\plusButton.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\Refs\chest_window_chests_active.png">
+    <Content Include="Images\Refs\chest_window_chests_active-2160.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\Refs\chest_window_claim_button.png">
+    <Content Include="Images\Refs\chest_window_chests_active-1080.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\Refs\chest_window_ref_bottom_left.png">
+    <Content Include="Images\Refs\chest_window_claim_button-1080.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\Refs\chest_window_ref_bottom_right.png">
+    <Content Include="Images\Refs\chest_window_claim_button-2160.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\Refs\chest_window_ref_top_left.png">
+    <Content Include="Images\Refs\chest_window_ref_bottom_left-2160.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\Refs\chest_window_ref_top_right.png">
+    <Content Include="Images\Refs\chest_window_ref_bottom_left-1080.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\Refs\Open_Chest_Button_RefImage.jpg">
+    <Content Include="Images\Refs\chest_window_ref_bottom_right-1080.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refs\chest_window_ref_bottom_right-2160.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refs\chest_window_ref_top_left-2160.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refs\chest_window_ref_top_left-1080.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refs\chest_window_ref_top_right-2160.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refs\chest_window_ref_top_right-1080.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refs\Open_Chest_Button_RefImage-2160.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refs\Open_Chest_Button_RefImage-1080.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\saveIcon.png">

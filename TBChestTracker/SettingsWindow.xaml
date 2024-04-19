@@ -1,10 +1,11 @@
-﻿<Window x:Class="TBChestTracker.SettingsWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
         xmlns:ui="clr-namespace:TBChestTracker.UI"
+        xmlns:Pages="clr-namespace:TBChestTracker.Pages" x:Class="TBChestTracker.SettingsWindow"
         mc:Ignorable="d"
         Title="Settings" Height="450" Width="800" Topmost="True" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
@@ -20,12 +21,17 @@
                 ActiveBrush="#eee" ActiveBackgroundBrush="#444" HoverBrush="#555"
                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
                 Text="General" Height="36" Foreground="White" Background="#111" 
-                BorderBrush="#000" FontWeight="Bold" IsActive="True"/>
+                BorderBrush="#000" FontWeight="Bold" IsActive="True" NavigationSource="/Pages/Settings/GeneralSettingsPage.xaml"/>
             <ui:FancyNavigationButton 
                 ActiveBrush="#eee" ActiveBackgroundBrush="#444" HoverBrush="#555"
                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
                 Text="OCR" Height="36" Foreground="White" Background="#111" 
-                BorderBrush="#000" FontWeight="Bold"/>
+                BorderBrush="#000" FontWeight="Bold" NavigationSource="/Pages/Settings/OCRSettingsPage.xaml"/>
+            <ui:FancyNavigationButton 
+                ActiveBrush="#eee" ActiveBackgroundBrush="#444" HoverBrush="#555"
+                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                Text="Hot Keys" Height="36" Foreground="White" Background="#111" 
+                BorderBrush="#000" FontWeight="Bold" NavigationSource="/Pages/Settings/HotkeySettingsPage.xaml"/>
         </StackPanel>
         <Grid Grid.Row="0" Grid.Column="1">
             <Grid.RowDefinitions>
@@ -35,7 +41,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Frame Grid.Row="0" Grid.Column="0" NavigationUIVisibility="Hidden" Source="/Pages/GeneralSettingsPage.xaml" />
+            <Frame Grid.Row="0" Grid.Column="0" x:Name="SettingsNavigationView" NavigationUIVisibility="Hidden" Source="/Pages/Settings/GeneralSettingsPage.xaml" />
             <StackPanel Orientation="Horizontal" Height="42" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <ui:FancyButton Width="100" Height="24" 
                                 Background="#0077ff" 
@@ -43,7 +49,7 @@
                                 Text="Save" RenderMode="TEXT" 
                                 BorderBrush="#0066ff" 
                                 Corners="5"
-                                Margin="10,0" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
+                                Margin="10,0" VerticalAlignment="Center" Foreground="White" FontWeight="Bold" Click="FancyButton_Click"/>
             </StackPanel>
         </Grid>
     </Grid>

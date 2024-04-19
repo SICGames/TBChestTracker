@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -9,10 +11,39 @@ using Newtonsoft;
 namespace TBChestTracker
 {
     [System.Serializable]
-    public class OCRSettings : IDisposable
+    public class OCRSettings : INotifyPropertyChanged
     {
-        private bool disposedValue;
+        
+        private double _GlobalBrightness;
 
+        public double GlobalBrightness
+        {
+            get
+            {
+                return _GlobalBrightness;
+            }
+            set
+            {
+                _GlobalBrightness = value;
+                OnPropertyChanged(nameof(GlobalBrightness));
+            }
+        }
+
+        private ObservableCollection<string> _tags = new ObservableCollection<string>();
+        public ObservableCollection<String> Tags 
+        {
+            get {
+         
+                return _tags;
+            }
+            set {
+                _tags = value;
+                OnPropertyChanged(nameof(Tags));
+            }
+        }
+        
+
+        public string CaptureMethod { get; set; }
         public AOIRect AreaOfInterest { get; set; }
         public AOIRect SuggestedAreaOfInterest { get; set; }
         public List<Point> ClaimChestButtons {  get; set; }    
@@ -23,37 +54,12 @@ namespace TBChestTracker
             ClaimChestButtons = new List<Point>();
         }
 
-        protected virtual void Dispose(bool disposing)
+        protected void OnPropertyChanged(string propertyName)
         {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects)
-                    ClaimChestButtons.Clear();
-                    ClaimChestButtons = null;
-                    SuggestedAreaOfInterest.Dispose();
-                    AreaOfInterest.Dispose();
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                disposedValue = true;
-            }
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~OCRSettings()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
     }
 }

@@ -13,10 +13,12 @@ namespace TBChestTracker
 {
     public class ClanChestSettings
     {
+        
         private ChestRequirements pChestRequirements  = null;
         private ClanRequirements pClanRequirements = null;
         private ChestPointsSettings pChestPointsSettings = null;
-
+        
+        public int Version { get; set; }
         public ClanRequirements ClanRequirements
         {
             get
@@ -110,5 +112,6 @@ namespace TBChestTracker
                 sw.Dispose();
             }
         }
+       
     }
 }

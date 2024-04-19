@@ -95,47 +95,22 @@ namespace TBChestTracker
             Image<Gray, Byte> image = null;
             Image<Gray, Byte> imageOut = null;
             var brightness = 0.0d;
-            if (CaptureMode == CaptureMode.CLANMATES)
-            {
-                brightness = 0.5d;
-                image = bitmap.ToImage<Gray, Byte>();
-                imageOut = image.Mul(brightness) + brightness;
-            }
-            else
-            {
-                brightness = CLANCHEST_IMAGE_BRIGHTNESS;
-                image = bitmap.ToImage<Gray, Byte>();
-                imageOut = image.Mul(brightness) + brightness;
-            }
+
+            brightness = SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness;
+            image = bitmap.ToImage<Gray, Byte>();
+            imageOut = image.Mul(brightness) + brightness;
+
             var ocrResult = TesseractHelper.Read(imageOut);
-            
+
             imageOut.Dispose();
             imageOut = null;
             image.Dispose();
             image = null;
-            
+
             return Task.FromResult(ocrResult);
         }
         private void CaptureRegion()
         {
-            //-- now everything is completely manual when capturing. CLI C++ doesn't do any while loop.
-            /* OLD & OBSOLETE 
-            int sh = Snapture.ScreenHeight;
-            int sw = Snapture.ScreenWidth;
-            int x = sw / 2; //-- 1920 
-            int y = sh / 2; //-- 1080
-
-            var leftChestPerc = 0.816d;
-            var topChestPerc = 0.7004d;
-            var widthChestPerc = 0.452d;
-            var heightChestPerc = 0.724d;
-
-            int left = (int)Math.Round(x * leftChestPerc);
-            int top = (int)Math.Round(y * topChestPerc);
-            int width = (int)Math.Round(x * widthChestPerc);
-            int height = (int)Math.Round(y * heightChestPerc);
-            */
-
             CaptureMode = CaptureMode.CHESTS;
             var capture_region = SettingsManager.Instance.Settings.OCRSettings.SuggestedAreaOfInterest;
             
@@ -154,28 +129,6 @@ namespace TBChestTracker
             CaptureMode = CaptureMode.CHESTS;
             Snapture.CaptureDesktop();
             GlobalDeclarations.canCaptureAgain = false;
-        }
-        
-        public void CaptureClanmates()
-        {
-            //-- now everything is completely manual when capturing. CLI C++ doesn't do any while loop.
-            int sh = Snapture.ScreenHeight;
-            int sw = Snapture.ScreenWidth;
-            int x = sw / 2; //-- 1920 
-            int y = sh / 2; //-- 1080
-
-            double topClanmatePerc = 0.7026;
-            double leftClanmatePerc = 0.716d;
-            double widthClanmatePerc = 0.7338d;
-            double heightClanmatePerc = 0.6667;
-            int left = (int)Math.Round(x * leftClanmatePerc);
-            int top = (int)Math.Round(y * topClanmatePerc);
-            int width = (int)Math.Round(x * widthClanmatePerc);
-            int height = (int)Math.Round(y * heightClanmatePerc);
-
-            CaptureMode = CaptureMode.CLANMATES;
-
-            Snapture.CaptureRegion(left, top, width, height);
         }
        
         #endregion
@@ -197,19 +150,6 @@ namespace TBChestTracker
         #region StartAutomation 
         void StartAutomationProcess(CancellationToken token)
         {
-            //--- take snapshot.
-            //--- mouse click 4 times on claim button
-            //--- take snapshot 
-            //--- rinse and repeat UNTIL F10 key is pressed by user to end it.
-            
-            /* Obsolete 
-            var screenX_half = Snapture.ScreenWidth / 2;
-            var screenY_half = Snapture.ScreenHeight / 2;
-
-            var xClickPos = new Point((screenX_half * 0.706) * 2, screenY_half * 0.834);
-            var x = (int)xClickPos.X;
-            var y = (int)xClickPos.Y;
-            */
 
             var claim_button = SettingsManager.Instance.Settings.OCRSettings.ClaimChestButtons[0];
 
@@ -284,32 +224,6 @@ namespace TBChestTracker
         #region Snapture onFrameCaptured Event
         private async void Snapture_onFrameCaptured(object sender, FrameCapturedEventArgs e)
         {
-
-#if SNAPTURE_DEBUG
-            var outputpath = $@"{GlobalDeclarations.AppFolder}Test\SnaptureDebug.jpg";
-            System.Drawing.Bitmap debug_screenshot = e.ScreenCapturedBitmap;
-            debug_screenshot.Save($@"{outputpath}", ImageFormat.Jpeg);
-
-            var ocrResult = await GetTextFromBitmap(e.ScreenCapturedBitmap); //LoadBitmap(e.ScreenCapturedBitmap, new Windows.Globalization.Language("en"));
-            if (ocrResult == null)
-            {
-            }
-            foreach(var word in ocrResult.Words)
-            {
-                Debug.WriteLine($"{word}");
-            }
-            //-- simulate fake left mouse click by using MoveTo function.
-            var screenX_half = Snapture.ScreenWidth / 2;
-            var screenY_half = Snapture.ScreenHeight / 2;
-
-            var xClickPos = new Point((screenX_half * 0.706) * 2, screenY_half * 0.834);
-            var x = (int)xClickPos.X;
-            var y = (int)xClickPos.Y;
-
-            Automator.MoveTo((int)x, y);
-            e.ScreenCapturedBitmap.Dispose();
-#elif !SNAPTURE_DEBUG 
-
             var ocrResult = await GetTextFromBitmap(e.ScreenCapturedBitmap); //LoadBitmap(e.ScreenCapturedBitmap, new Windows.Globalization.Language("en"));
             if (ocrResult == null)
             {
@@ -339,7 +253,6 @@ namespace TBChestTracker
                     com.HellStormGames.Logging.Console.Write($"There are no more gifts to collect.", "Automation Result", com.HellStormGames.Logging.LogType.INFO);
                 }
             }
-#endif
         }
 #endregion
      
@@ -365,9 +278,16 @@ namespace TBChestTracker
 
             com.HellStormGames.Logging.Console.Write("Snapture Started.", com.HellStormGames.Logging.LogType.INFO);
 
+            startPageWindow = new StartPageWindow();
+            startPageWindow.MainWindow = this;
+            startPageWindow.Show();
+
             SettingsManager = new SettingsManager();
-            
-            SettingsManager.Load();
+            if(GlobalDeclarations.IsFirstRun)
+                SettingsManager.Instance.BuildDefaultConfiguration();
+            else 
+                SettingsManager.Load();
+
 
             //-- init appContext
 
@@ -382,10 +302,6 @@ namespace TBChestTracker
             {
                 System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath);
             }
-
-            startPageWindow = new StartPageWindow();    
-            startPageWindow.MainWindow = this;
-            startPageWindow.Show();
 
             OCRWizardWindow = new OCRWizardWindow();
 
@@ -433,10 +349,11 @@ namespace TBChestTracker
 
             }
 
-            if (System.IO.Directory.Exists(GlobalDeclarations.TesseractData))
+            if (System.IO.Directory.Exists(SettingsManager.Instance.Settings.GeneralSettings.TessDataFolder))
             {
                 GlobalDeclarations.TessDataExists = true;
-                await TesseractHelper.InitAsync(GlobalDeclarations.TesseractData, "eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus+pol+por+pus");
+                var languages = SettingsManager.Instance.Settings.GeneralSettings.Languages;
+                await TesseractHelper.InitAsync(SettingsManager.Instance.Settings.GeneralSettings.TessDataFolder, languages);
             }
             else
             {
@@ -444,8 +361,6 @@ namespace TBChestTracker
                 MessageBox.Show($"No Tessdata directory exists. Download tessdata and ensure all traineddata is inside tessdata.");
                 GlobalDeclarations.TessDataExists = false;
             }
-         
-            //var translation = Translator.Translate("I'm So Silly.", "en", "fr");
         }
         #endregion
 
@@ -471,44 +386,69 @@ namespace TBChestTracker
             com.HellStormGames.Logging.Console.Write("Installed Keyboard hooks successfully.", com.HellStormGames.Logging.LogType.INFO);
         }
 
+        string keyInput = $"";
+
+        private Key previousKey = Key.None;
+        private Key newKey = Key.None;
+        String keyStr = $"";
         private void CaptainHook_onKeyboardMessage(object sender, CaptainHook.KeyboardHookMessageEventArgs e)
         {
-            int key = e.VirtKeyCode;
-            switch (e.MessageType)
-            {
-                case CaptainHookInterlop.KeyboardMessage.KeyDown:
-                    GlobalDeclarations.hasHotkeyBeenPressed = true;
-                    break;
-                case CaptainHookInterlop.KeyboardMessage.KeyUp:
-                    GlobalDeclarations.hasHotkeyBeenPressed = false;
-                    break;
-            }
-            
-            if (!GlobalDeclarations.hasHotkeyBeenPressed && !GlobalDeclarations.isBusyProcessingClanchests)
-            {
-#if !SNAPTURE_DEBUG
-                if (key == KeyInterop.VirtualKeyFromKey(Key.F9))
+            if(!GlobalDeclarations.IsConfiguringHotKeys) { 
+                
+                int vkey = e.VirtKeyCode;
+                var key = KeyInterop.KeyFromVirtualKey(vkey);
+                var bIsNewKey = false;
+                
+                //--- to allow customized hot keys, will reuire update.
+                bool keyDown = e.MessageType == CaptainHookInterlop.KeyboardMessage.KeyDown ? true : false;
+                if(keyDown)
                 {
-                    StartAutomationThread();
-                    GlobalDeclarations.hasHotkeyBeenPressed = true;
-                    appContext.IsAutomationPlayButtonEnabled = false;
-                    appContext.IsAutomationStopButtonEnabled = true;
+                    newKey = key;
+                    if (previousKey != newKey)
+                    {
+                        bIsNewKey = true;
+                        previousKey = newKey;
+                    }
+                    else
+                        bIsNewKey = false;
+
+                    if(bIsNewKey)
+                    {
+                        if (String.IsNullOrEmpty(keyStr))
+                            keyStr = key.ToString();
+                        else
+                            keyStr += $"+{key.ToString()}";
+                    }
                 }
-                else if (key == KeyInterop.VirtualKeyFromKey(Key.F10))
+                else
                 {
-                    StopAutomation();
-                    GlobalDeclarations.hasHotkeyBeenPressed = true;
-                   
+                    if(keyStr.Equals(SettingsManager.Instance.Settings.HotKeySettings.StartAutomationKeys))
+                    {
+                        StartAutomationThread();
+                        GlobalDeclarations.hasHotkeyBeenPressed = true;
+                        appContext.IsAutomationPlayButtonEnabled = false;
+                        appContext.IsAutomationStopButtonEnabled = true;
+
+                        keyStr = String.Empty;
+                        previousKey = Key.None;
+                        newKey = Key.None;
+                    }
+                    else if(keyStr.Equals(SettingsManager.Instance.Settings.HotKeySettings.StopAutomationKeys))
+                    {
+                        StopAutomation();
+                        GlobalDeclarations.hasHotkeyBeenPressed = true;
+                        keyStr = String.Empty;
+                        previousKey = Key.None;
+                        newKey = Key.None;
+                       
+                    }
+                    keyStr = String.Empty;
+                    bIsNewKey = false;
+
                 }
-#elif SNAPTURE_DEBUG
-                if(key == KeyInterop.VirtualKeyFromKey(Key.F2))
-                {
-                    CaptureRegion();
-                    GlobalDeclarations.hasHotkeyBeenPressed= true;
-                }
-#endif
             }
         }
+
         #endregion
 
         #region Window Closing
@@ -862,9 +802,7 @@ namespace TBChestTracker
         }
         private void ManageSettingsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (SettingsWindow == null)
-                SettingsWindow = new SettingsWindow();
-
+            SettingsWindow = new SettingsWindow();
             SettingsWindow.Show();
         }
         #endregion

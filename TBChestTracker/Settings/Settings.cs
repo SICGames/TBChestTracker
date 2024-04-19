@@ -15,11 +15,13 @@ namespace TBChestTracker
 
         public GeneralSettings GeneralSettings { get; private set; }
         public OCRSettings OCRSettings { get; set; }
-     
+        public HotKeySettings HotKeySettings { get; set; }
+
         public Settings() 
         {
             OCRSettings = new OCRSettings();
             GeneralSettings = new GeneralSettings();
+            HotKeySettings = new HotKeySettings();
         }
         protected virtual void Dispose(bool disposing)
         {
@@ -28,8 +30,8 @@ namespace TBChestTracker
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects)
-
-                    OCRSettings.Dispose();
+                    HotKeySettings = null;
+                    OCRSettings = null;
                     GeneralSettings = null;
 
                 }

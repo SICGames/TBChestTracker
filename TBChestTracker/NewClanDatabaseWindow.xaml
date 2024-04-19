@@ -19,13 +19,16 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="25"/>
                     <RowDefinition Height="25"/>
+                    <RowDefinition Height="25"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Clan Name" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Text="{Binding Path=Clanname, Mode=TwoWay}" Grid.Column="1"  Grid.Row="0" Height="20" Width="200" HorizontalAlignment="Left"/>
+                <TextBlock Text="Clan Abbreviations" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0"/>
+                <TextBox Text="{Binding Path=ClanAbbreviations, Mode=TwoWay}" Grid.Column="1"  Grid.Row="0" Height="20" Width="75" HorizontalAlignment="Left" MaxLength="4" Margin="5,0"/>
+                <TextBlock Text="Clan Name" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0"/>
+                <TextBox Text="{Binding Path=Clanname, Mode=TwoWay}" Grid.Column="1"  Grid.Row="1" Height="20" Width="200" HorizontalAlignment="Left" Margin="5,0"/>
             </Grid>
         </StackPanel>
         <DockPanel Grid.Row="1" Background="#eeeeee">

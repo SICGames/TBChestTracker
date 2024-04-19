@@ -48,6 +48,7 @@ namespace TBChestTracker
             {
                 //--- this is first run.
                 GlobalDeclarations.IsFirstRun = true;
+                
             }
             else
             {

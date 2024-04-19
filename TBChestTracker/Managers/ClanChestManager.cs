@@ -221,7 +221,7 @@ namespace TBChestTracker
                                     {
                                         if (level >= condition.level)
                                         {
-                                            tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, level)));
+                                            tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, chestobtained, level)));
                                             var dbgmsg = $"[[Level {level} ({type.ToString()}) {chestName} from {clanmate} validated.]]";
                                             com.HellStormGames.Logging.Console.Write(dbgmsg, "OCR Result", com.HellStormGames.Logging.LogType.INFO);
                                         }
@@ -231,7 +231,7 @@ namespace TBChestTracker
                             else
                             {
 
-                                tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, level)));
+                                tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, chestobtained, level)));
                                 var dbg_msg = $"--- ADDING level {level} {type.ToString()}  '{chestName}' from {clanmate} ----";
                                 com.HellStormGames.Logging.Console.Write(dbg_msg, "OCR Result", com.HellStormGames.Logging.LogType.INFO);
                             }
@@ -265,7 +265,7 @@ namespace TBChestTracker
 
                                     if (typeStr.Equals(condition.ChestType, StringComparison.InvariantCultureIgnoreCase))
                                     {
-                                        tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, 0)));
+                                        tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, chestobtained, 0)));
                                         var dbgmsg = $"[[({type.ToString()}) {chestName} from {clanmate} validated.]]";
                                         com.HellStormGames.Logging.Console.Write(dbgmsg, "OCR Result", com.HellStormGames.Logging.LogType.INFO);   
                                     }
@@ -273,7 +273,7 @@ namespace TBChestTracker
                             }
                             else
                             {
-                                tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, 0)));
+                                tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, chestobtained, 0)));
                                 var dbgmsg = $"--- ADDING {type.ToString()}  '{chestName}' from {clanmate} ----";
                                 com.HellStormGames.Logging.Console.Write (dbgmsg, "OCR Result", LogType.INFO);  
                             }
@@ -431,7 +431,17 @@ namespace TBChestTracker
                                 {
                                     var chest_type = m_chest.Type.ToString();
                                     var level = m_chest.Level;
-                                    if (chest_type.ToLower() == pointvalue.ChestType.ToLower())
+
+                                    if(pointvalue.ChestType.ToLower() == "custom")
+                                    {
+                                        var chest_name = m_chest.Name;
+                                        if(chest_name.ToLower().Equals(pointvalue.ChestName.ToLower()))
+                                        {
+                                            chestdata.Points += pointvalue.PointValue;
+                                            break;
+                                        }
+                                    }
+                                    else if (chest_type.ToLower() == pointvalue.ChestType.ToLower())
                                     {
                                         var chest_level = pointvalue.Level;
                                         if (level == chest_level)
@@ -684,9 +694,7 @@ namespace TBChestTracker
                     //--- found clanmate
                     if (chestdata.Count > 0)
                     {
-
                         var m_chestdata = chestdata[0];
-
                         if (m_chestdata.chests == null)
                         {
                             chestcount.Count += 0;

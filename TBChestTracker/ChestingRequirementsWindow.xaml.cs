@@ -126,7 +126,9 @@ namespace TBChestTracker
                     var points = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints;
                     foreach (var point in points)
                     {
-                        var line = $"{point.ChestType} {point.Level} - {point.PointValue}";
+                        var line = String.IsNullOrEmpty(point.ChestName) == true ? 
+                            $"{point.ChestType} {point.Level} - {point.PointValue}" : $"{point.ChestName} {point.Level} - {point.PointValue}";
+
                         sw.WriteLine(line);
                     }
                     sw.Close();

@@ -22,6 +22,17 @@ namespace TBChestTracker
     public partial class EditChestPointValueWindow : Window, INotifyPropertyChanged
     {
 
+        private ChestRef _ChestRef = new ChestRef();
+        public ChestRef pChestRef
+        {
+            get => _ChestRef;
+            set
+            {
+                _ChestRef = value;
+                OnPropertyChanged(nameof(pChestRef));
+            }
+        }
+
         private int ChestPointsItemIndex { get; set; }
 
         public ChestPoints ChestPoints { get; set; }
@@ -38,7 +49,10 @@ namespace TBChestTracker
         {
             InitializeComponent();
             ChestPoints = new ChestPoints();
-            this.DataContext = ChestPoints;
+            pChestRef = new ChestRef();
+            pChestRef.ReferenceOption = RefEnum.BYTYPE;
+
+            
         }
 
         private void ChestTypeBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -101,11 +115,13 @@ namespace TBChestTracker
         public void LoadChestPoints(ChestPoints c, int index)
         {
             ChestPointsItemIndex = index;
+            ChestPoints.ChestRef = c.ChestRef;
+            pChestRef.ReferenceOption = ChestPoints.ChestRef.ReferenceOption;
 
             ChestPoints.ChestType = c.ChestType;
+            ChestPoints.ChestName = c.ChestName;    
             ChestPoints.Level = c.Level;
             ChestPoints.PointValue = c.PointValue;
-            
             var ChestType = c.ChestType;
             var chestboxchildren = ChestTypeBox.Items;
             
@@ -129,7 +145,6 @@ namespace TBChestTracker
                     {
                         cbi.IsSelected = true;
                         ChestPoints.Level = Int32.Parse(ChestPointLevel.Text);
-
                         break;
                     }
                 }
@@ -137,12 +152,33 @@ namespace TBChestTracker
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            
+            this.DataContext = ChestPoints;
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
 
+        }
+
+        private void StackPanel_Click_1(object sender, RoutedEventArgs e)
+        {
+            switch (ChestPoints.ChestRef.ReferenceOption)
+            {
+                case RefEnum.BYTYPE:
+                    {
+                        ChestTypeBox.Visibility = Visibility.Visible;
+                        ChestTextBox.Visibility = Visibility.Collapsed;
+                    }
+                    break;
+                case RefEnum.BYNAME:
+                    {
+                        ChestTextBox.Visibility = Visibility.Visible;
+                        ChestTypeBox.Visibility = Visibility.Collapsed;
+                        ChestTypeBox.Text = "Custom";
+                    }
+                    break;
+
+            }
         }
     }
 }

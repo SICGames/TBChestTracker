@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CsvHelper.Configuration.Attributes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -21,7 +22,30 @@ namespace TBChestTracker
     /// </summary>
     public partial class NewChestPointWindow : Window, INotifyPropertyChanged
     {
+
+        private string _chestName = "";
         private int pointvalue = 0;
+
+        private ChestRef _ChestRef = new ChestRef();
+        public ChestRef ChestRef
+        {
+            get => _ChestRef;
+            set
+            {
+                _ChestRef = value;
+                OnPropertyChanged(nameof(ChestRef));
+            }
+        }
+        public string ChestName
+        {
+            get => this._chestName;
+            set
+            {
+                this._chestName = value;
+                OnPropertyChanged(nameof(ChestName));
+            }
+        }
+        
         public int PointValue
         {
             get => pointvalue;
@@ -51,6 +75,8 @@ namespace TBChestTracker
         public NewChestPointWindow()
         {
             InitializeComponent();
+            ChestRef = new ChestRef();
+            ChestRef.ReferenceOption = RefEnum.BYTYPE;
             this.DataContext = this;
         }
 
@@ -59,6 +85,9 @@ namespace TBChestTracker
         private void AddBtn_Click(object sender, RoutedEventArgs e)
         {
             ChestPoints chestPoints = new ChestPoints();
+            chestPoints.ChestRef = ChestRef;
+
+            chestPoints.ChestName = ChestName;
             chestPoints.ChestType = ChestTypeBox.Text;
             chestPoints.Level = Level;
             chestPoints.PointValue = PointValue;
@@ -98,6 +127,27 @@ namespace TBChestTracker
             if (!String.IsNullOrEmpty(item.Content.ToString()))
             {
                 Level = Int32.Parse((string)item.Content.ToString());
+            }
+        }
+
+        private void StackPanel_Click(object sender, RoutedEventArgs e)
+        {
+            switch(ChestRef.ReferenceOption)
+            {
+                case RefEnum.BYTYPE:
+                    {
+                        ChestTypeBox.Visibility = Visibility.Visible;
+                        ChestTextBox.Visibility = Visibility.Collapsed;
+                    }
+                    break;
+                case RefEnum.BYNAME:
+                    {
+                        ChestTextBox.Visibility = Visibility.Visible;
+                        ChestTypeBox.Visibility = Visibility.Collapsed;
+                        ChestTypeBox.Text = "Custom";
+                    }
+                    break;
+
             }
         }
     }

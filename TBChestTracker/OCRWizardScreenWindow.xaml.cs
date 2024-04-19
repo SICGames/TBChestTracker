@@ -24,6 +24,13 @@ using Emgu.CV.OCR;
 using System.ComponentModel;
 using TBChestTracker.UI;
 using System.Windows.Controls.Primitives;
+using Emgu.CV.Util;
+using Emgu.CV.Features2D;
+using System.Windows.Navigation;
+using Windows.UI.Xaml.Media;
+using Windows.Media.Audio;
+
+
 
 namespace TBChestTracker
 {
@@ -59,12 +66,10 @@ namespace TBChestTracker
         private int retry_attempts = 0;
 
         private double min_treshold_gifts_tab = 0.0;
-        private double max_treshold_gifts_tab = 0.9;
+        private double max_treshold_gifts_tab = 0.85;
 
         private String pStatusMessage = "Processing...";
-
         public OCRWizardWindow ocrWindow { get; set; }
-
         public String StatusMessage
         {
             get
@@ -107,9 +112,6 @@ namespace TBChestTracker
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
-
-      
-
         #endregion
 
         #region OCRWizardScreenWindow Constructor
@@ -132,12 +134,16 @@ namespace TBChestTracker
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             this.Opacity = 0;
+            //this.Hide();
+
+            Snapture = new Snapture();
+            Snapture.isDPIAware = true;
+
             InitReferences();
 
             OpenChestButtonPositions = new List<sys_drawing.Point>();
 
-            Snapture = new Snapture();
-            Snapture.isDPIAware = true;
+            
             Snapture.SetBitmapResolution((int)Snapture.MonitorInfo.Monitors[0].Dpi.X);
             Snapture.onFrameCaptured += Snapture_onFrameCaptured;
             Snapture.Start(FrameCapturingMethod.GDI);
@@ -175,8 +181,15 @@ namespace TBChestTracker
             writeableBitmap = null;
             Letters = null;
             Snapture?.Dispose();
-            if(this != null && this.IsLoaded)
-                this.DialogResult = isCompleted;
+            try
+            {
+                if (this != null && this.IsLoaded)
+                    this.DialogResult = isCompleted;
+            }
+            catch(Exception ex)
+            {
+
+            }
         }
         private void StackPanel_Click(object sender, RoutedEventArgs e)
         {
@@ -210,7 +223,9 @@ namespace TBChestTracker
             if(ocrSettings.ClaimChestButtons.Count > 0)
                 ocrSettings.ClaimChestButtons.Clear();
 
-            ocrSettings.ClaimChestButtons.AddRange(OpenChestButtonPositions);
+            var sortedButtonPositions = OpenChestButtonPositions.OrderBy(bp => bp.Y);
+
+            ocrSettings.ClaimChestButtons.AddRange(sortedButtonPositions);
 
             SettingsManager.Instance.Save();
 
@@ -252,7 +267,6 @@ namespace TBChestTracker
         #region Snapture onFrameCaptured function
         private void Snapture_onFrameCaptured(object sender, FrameCapturedEventArgs e)
         {
-
             if (e.ScreenCapturedBitmap != null)
             {
                 var bitmap = e.ScreenCapturedBitmap;
@@ -277,6 +291,71 @@ namespace TBChestTracker
 
 
         #region Wizardary Stuff
+
+        #region Feature Based Matching
+        private Task<VectorOfPoint> FeatureMatchingAsync(sys_drawing.Bitmap bitmap, Image<Bgr, Byte> referenceImage, double uniquenessThreshold = 0.88)
+            => Task.Run(()  => FeatureMatching(bitmap, referenceImage, uniquenessThreshold));
+        private VectorOfPoint FeatureMatching(sys_drawing.Bitmap bitmap, Image<Bgr,Byte> referenceImage, double uniquenessThreshold = 0.88)
+        {
+            try
+            {
+                VectorOfPoint finalPoints = null;
+                Mat homography = new Mat();
+                Image<Gray, Byte> src_gray = bitmap.ToImage<Gray, Byte>();
+                Image<Gray, Byte> ref_gray = referenceImage.ToBitmap().ToImage<Gray, Byte>();
+                VectorOfKeyPoint templateKeypoints = new VectorOfKeyPoint();
+                VectorOfKeyPoint sourceKeypoints = new VectorOfKeyPoint();
+                Mat templateDesc = new Mat();
+                Mat sourceDesc = new Mat();
+
+                Mat mask;
+                int k = 2;
+                VectorOfVectorOfDMatch matches = new VectorOfVectorOfDMatch();
+
+                Brisk featureDetection = new Brisk();
+                featureDetection.DetectAndCompute(ref_gray, null, templateKeypoints, templateDesc, false);
+                featureDetection.DetectAndCompute(src_gray, null, sourceKeypoints, sourceDesc, false);
+
+                BFMatcher matcher = new BFMatcher(DistanceType.Hamming);
+                matcher.Add(templateDesc);
+                matcher.KnnMatch(sourceDesc, matches, k);
+
+                mask = new Mat(matches.Size, 1, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
+                mask.SetTo(new MCvScalar(255));
+
+                Features2DToolbox.VoteForUniqueness(matches, uniquenessThreshold, mask);
+                int count = Features2DToolbox.VoteForSizeAndOrientation(templateKeypoints, sourceKeypoints, matches, mask, 1.5, 20);
+                if(count >= 4)
+                {
+                    homography = Features2DToolbox.GetHomographyMatrixFromMatchedFeatures(templateKeypoints, sourceKeypoints, matches, mask, 5);
+                }
+                if(homography != null)
+                {
+                    sys_drawing.Rectangle rectangle = new sys_drawing.Rectangle(sys_drawing.Point.Empty, referenceImage.Size);
+                    sys_drawing.PointF[] pts = new sys_drawing.PointF[]
+                    {
+                        new sys_drawing.PointF(rectangle.Left, rectangle.Bottom),
+                        new sys_drawing.PointF(rectangle.Right, rectangle.Bottom),
+                        new sys_drawing.PointF(rectangle.Right, rectangle.Top),
+                        new sys_drawing.PointF(rectangle.Left, rectangle.Top)
+                    };
+
+                    pts = CvInvoke.PerspectiveTransform(pts, homography);
+                    sys_drawing.Point[] points = Array.ConvertAll<sys_drawing.PointF, sys_drawing.Point>(pts, sys_drawing.Point.Round);
+                    finalPoints = new VectorOfPoint(points);
+                }
+
+                return finalPoints;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        #endregion
+
+        #region PerformTemplateMatching Functions
+
         private Task<System.Drawing.Rectangle> performTemplateMatchingAsync(sys_drawing.Bitmap bitmap, Image<Bgr, byte> refImage, double minThreshold, double threshold, double sizeX = 32, double sizeY = 32) =>
            Task.Run(() => performTemplateMatching(bitmap, refImage, minThreshold, threshold, sizeX, sizeY));
 
@@ -288,7 +367,8 @@ namespace TBChestTracker
             if (bitmap == null)
                 return new System.Drawing.Rectangle(0, 0, 0, 0);
 
-            Image<Bgr, byte> src = bitmap.ToImage<Bgr, byte>();
+            Image<Gray, byte> src = bitmap.ToImage<Gray, byte>();
+            Image<Gray, byte> refImage_Gray = refImage.ToBitmap().ToImage<Gray, byte>();
 
             System.Drawing.Rectangle match_rectangle = new System.Drawing.Rectangle();
 
@@ -296,13 +376,18 @@ namespace TBChestTracker
             {
                 double[] minValues, maxValues;
                 System.Drawing.Point[] minLocations, maxLocations;
-
-                using (Image<Gray, float> resultImage = src.MatchTemplate(refImage, TemplateMatchingType.CcoeffNormed))
+                
+                using (Image<Gray, float> resultImage = 
+                    src.MatchTemplate(refImage_Gray, TemplateMatchingType.CcoeffNormed))
                 {
+
                     if(minThreshold > 0.0)
                         CvInvoke.Threshold(resultImage, resultImage, minThreshold, 1, ThresholdType.ToZero);
-                    
+
                     resultImage.MinMax(out minValues, out maxValues, out minLocations, out maxLocations);
+#if DEBUG
+                    System.Diagnostics.Debug.WriteLine($"Template matching Max Values: {maxValues[0]}");
+#endif
 
                     if (maxValues[0] > threshold)
                     {
@@ -323,7 +408,9 @@ namespace TBChestTracker
             src = null;
             return match_rectangle;
         }
+        #endregion
 
+        #region PerformMultipleTemplateMatching functions
         private Task<List<sys_drawing.Rectangle>> PerformMultipleTemplateMatchingAsync(sys_drawing.Bitmap bitmap, Image<Bgr, byte> refImage, double threshold) =>
             Task.Run(() => PerformMultipleTemplateMatching(bitmap, refImage, threshold));
 
@@ -341,7 +428,7 @@ namespace TBChestTracker
             sys_drawing.Bitmap refImage_gray_bmp = refImage.ToBitmap();
             Image<Gray, byte> refImage_gray = refImage_gray_bmp.ToImage<Gray, byte>();
             Mat image_Out = new Mat();
-
+            
             while (true)
             {
                 double min_values, max_values;
@@ -350,15 +437,21 @@ namespace TBChestTracker
                 sys_drawing.Point max_locations = new sys_drawing.Point();
 
                 CvInvoke.MatchTemplate(image_source, refImage_gray, image_Out, TemplateMatchingType.CcoeffNormed);
-                CvInvoke.Threshold(image_Out, image_Out, 0.8, 1.0, ThresholdType.ToZero);
 
+                double t = threshold - 0.1;
+                
+                CvInvoke.Threshold(image_Out, image_Out, t, 1.0, ThresholdType.ToZero);
+                
                 CvInvoke.MinMaxLoc(image_Out, ref min_values, ref max_values, ref min_Locations, ref max_locations);
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine($"Multiple Match Template - MAX VALUES: {max_values}");
+#endif
+
                 if (max_values > threshold)
                 {
 
                     sys_drawing.Rectangle match_rect = new sys_drawing.Rectangle(max_locations, refImage.Size);
                     matches.Add(match_rect);
-
                     //--- block out that area
                     CvInvoke.Rectangle(image_source, match_rect, new MCvScalar(0, 255, 0), -1);
                 }
@@ -367,6 +460,7 @@ namespace TBChestTracker
 
             }
 
+            
             image_Out.Dispose();
             refImage_gray.Dispose();
             refImage_gray_bmp.Dispose();
@@ -374,6 +468,7 @@ namespace TBChestTracker
 
             return matches;
         }
+        #endregion
 
         private Task DetectOpenChestButtonAsync(sys_drawing.Bitmap bitmap, double threshold)
             => Task.Run(() => DetectOpenChestButtonAsync(bitmap, threshold));
@@ -383,6 +478,7 @@ namespace TBChestTracker
                 return null;
 
             List<sys_drawing.Rectangle> matches = new List<sys_drawing.Rectangle>();
+            List<VectorOfPoint> points = new List<VectorOfPoint>();
             Task t = new Task(() =>
             {
                 matches = PerformMultipleTemplateMatching(bitmap, OpenChestRefImage, threshold);
@@ -404,7 +500,19 @@ namespace TBChestTracker
                 return false;
 
             bool isActive = false;
-            System.Drawing.Rectangle rect_result = performTemplateMatching(bitmap, ChestWindowChestsActiveRefImage, minThreshold, threshold);
+            var rect_match = FeatureMatching(bitmap, ChestWindowChestsActiveRefImage, 0.9);
+            if(rect_match != null)
+            {
+                isActive = true;
+            }
+            else
+            {
+                isActive = false;
+            }
+
+            /*
+            System.Drawing.Rectangle rect_result = 
+                performTemplateMatching(bitmap, ChestWindowChestsActiveRefImage, minThreshold, threshold);
             if (rect_result.X > 0 && rect_result.Y > 0)
             {
                 isActive = true;
@@ -413,6 +521,8 @@ namespace TBChestTracker
             {
                 isActive = false;
             }
+            */
+
             return isActive;
         }
 
@@ -488,7 +598,6 @@ namespace TBChestTracker
                     }
                     catch (Exception ex)
                     {
-
                         this.Hide();
                         throw new Exception(ex.Message);
 
@@ -518,8 +627,12 @@ namespace TBChestTracker
                     OCRWizardCanceled(new EventArgs());
                     return;
                 }
-                //var result = await CheckIfPlayerOnChestsWindowTaskAsync(bitmap, 0.3, 0.9);
-                var result = await CheckIfPlayerOnChestsWindowTaskAsync(bitmap, min_treshold_gifts_tab, max_treshold_gifts_tab);
+                
+                var result = 
+                    await CheckIfPlayerOnChestsWindowTaskAsync(bitmap, 
+                    min_treshold_gifts_tab, 
+                    max_treshold_gifts_tab);
+
                 if (result)
                 {
                     isPlayerOnChestsTab = true;
@@ -563,16 +676,16 @@ namespace TBChestTracker
                     StatusMessage = $"Performing Jedi Magic...";
                     foreach (var refImage in ref_images)
                     {
-
-                        var rect = await performTemplateMatchingAsync(bitmap, refImage, 0.0, 0.6);
+                        var threshold = Snapture.MonitorInfo.Monitors[0].Height > 1080 ? 0.6 : 0.7;
+                        var rect = await performTemplateMatchingAsync(bitmap, refImage, 0.0, threshold);
                         if (rect.Height != 0 && rect.Width != 0)
                         {
                             CornerRectangles.Add(rect);
                         }
                     }
 
-                    var claim_buttons = await DetectOpenChestButton(bitmap, 0.9);
-
+                    var chestButtonsThreshold = Snapture.MonitorInfo.Monitors[0].Height > 1080 ? 0.9 : 0.9;
+                    var claim_buttons = await DetectOpenChestButton(bitmap, chestButtonsThreshold);
                     if (claim_buttons.Count() > 0 && claim_buttons != null)
                     {
                         foreach (var claim_button in claim_buttons)
@@ -608,20 +721,29 @@ namespace TBChestTracker
                         var width = cx4 - (offset * 0.5);
                         var height = cy4 - (offset * 0.5);
                         AreaOfInterest = new AOIRect(cx, cy, width, height);
-
-                        //--- Now we can give a Recommended Area Of Interest.
-                        double recommended_x = cx + 230;
-                        double recommended_width = width - 400;
-                        SuggestedAreaOfInterest = new AOIRect(recommended_x, cy + 1, recommended_width, height - 1);
+                      
+                        double x_offset = Snapture.MonitorInfo.Monitors[0].Height > 1080 ? 230 : 170;
+                        double w_offset = Snapture.MonitorInfo.Monitors[0].Height > 1080 ? 400 : 350;
+                        double recommended_x = cx + x_offset;
+                        double recommended_width = width - w_offset;
+                        
+                        SuggestedAreaOfInterest = new AOIRect(recommended_x, 
+                            cy + 1, 
+                            recommended_width, height - 1);
 
                         Debug.WriteLine($"Creating Area Of Interest Markers");
                     }
 
                     //-- We should give a quick test and have user confirm everything.
                     CroppedBitmap croppedBitmap = new CroppedBitmap(bitmap.ToBitmapSource(),
-                        new Int32Rect((int)SuggestedAreaOfInterest.x, (int)SuggestedAreaOfInterest.y, (int)SuggestedAreaOfInterest.width - (int)SuggestedAreaOfInterest.x, (int)SuggestedAreaOfInterest.height - (int)SuggestedAreaOfInterest.y));
+                        new Int32Rect((int)SuggestedAreaOfInterest.x,
+                        (int)SuggestedAreaOfInterest.y, 
+                        (int)SuggestedAreaOfInterest.width - (int)SuggestedAreaOfInterest.x, 
+                        (int)SuggestedAreaOfInterest.height - (int)SuggestedAreaOfInterest.y));
 
                     var bmp = croppedBitmap.ToBitmap();
+                    
+
                     Image<Gray, byte> tessy_image = bmp.ToImage<Gray, byte>();
 
                     var Tessy = TesseractHelper.GetTesseract();
@@ -648,7 +770,6 @@ namespace TBChestTracker
                     CornerRectangles.Clear();
                     
                     CloseCanvas.Visibility = Visibility.Hidden;
-                    //ResultsDialog.Visibility = Visibility.Visible;
                     canExit = false;
                     PrepareClose();
                     return;
@@ -677,20 +798,16 @@ namespace TBChestTracker
             PerformORCWizard(bitmap, token);
         }
 
-        private void RetryIsPlayerOnGiftsTab()
-        {
-
-        }
         #endregion
 
         #region Functions & Stuff
         private void InitReferences()
         {
             ref_image_files = new List<string>(new string[] {
-                "Images/Refs/chest_window_ref_top_left.png",
-                "Images/Refs/chest_window_ref_top_right.png",
-                "Images/Refs/chest_window_ref_bottom_left.png",
-                "Images/Refs/chest_window_ref_bottom_right.png"
+                $"Images/Refs/chest_window_ref_top_left-{Snapture.MonitorInfo.Monitors[0].Height}.png",
+                $"Images/Refs/chest_window_ref_top_right-{Snapture.MonitorInfo.Monitors[0].Height}.png",
+                $"Images/Refs/chest_window_ref_bottom_left-{Snapture.MonitorInfo.Monitors[0].Height}.png",
+                $"Images/Refs/chest_window_ref_bottom_right-{Snapture.MonitorInfo.Monitors[0].Height}.png"
             });
 
             var ref_file_not_found = false;
@@ -714,11 +831,7 @@ namespace TBChestTracker
                     this.Close();
                 }
             }
-
             ref_images = new List<Image<Bgr, byte>>();
-
-            ChestWindowChestsActiveRefImage = new Image<Bgr, Byte>("Images/Refs/chest_window_chests_active.png");
-            OpenChestRefImage = new Image<Bgr, Byte>("Images/Refs/chest_window_claim_button.png");
             foreach (var ref_file in ref_image_files)
             {
                 var image = new Image<Bgr, Byte>(ref_file);
@@ -727,6 +840,10 @@ namespace TBChestTracker
                     ref_images.Add(image);
                 }
             }
+
+            ChestWindowChestsActiveRefImage = new Image<Bgr, Byte>($"Images/Refs/chest_window_chests_active-{Snapture.MonitorInfo.Monitors[0].Height}.png");
+            OpenChestRefImage = new Image<Bgr, Byte>($"Images/Refs/chest_window_claim_button-{Snapture.MonitorInfo.Monitors[0].Height}.png");
+
         }
 
         private void CreateCanvasControls(Canvas canvas)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -297,27 +298,40 @@ namespace TBChestTracker
         {
             try
             {
-                if(ClanStatisticData !=  null) 
-                    ClanStatisticData.Clear();
 
                 //var dateEntry = ChestManager.ClanChestDailyData.Where(d => d.Key.Equals(date)).ToList()[0];
                 var numDays = (enddate - startdate).TotalDays;
                 var dateRange = ChestManager.ClanChestDailyData.ToList().GetRange(0, (int)numDays + 1);
+                int commoncryptstotal, rarecryptstotal, epiccryptstotal, citadelsstotal,
+                        arenastotal, uniontriumphstotal, vaultancienttotal, ancientchests, jormungandrtotal, heroicstotal, bankstotal, storycheststotal, total, otherTotal, totalPoints;
+
+                commoncryptstotal = rarecryptstotal = epiccryptstotal = citadelsstotal = arenastotal =
+                heroicstotal = bankstotal = uniontriumphstotal = vaultancienttotal = ancientchests = jormungandrtotal = storycheststotal = total = otherTotal = totalPoints = 0;
+
+                if (ClanStatisticData != null)
+                    ClanStatisticData.Clear();
+
+
+                //-- initialize everything first.
+                foreach (var clanmate in ClanManager.Instance.ClanmateManager.Database.Clanmates)
+                {
+                    ClanStatisticData.Add(new TBChestTracker.ClanStatisticData(clanmate.Name, commoncryptstotal, rarecryptstotal, epiccryptstotal, citadelsstotal,
+                      arenastotal, uniontriumphstotal, vaultancienttotal, heroicstotal, ancientchests, jormungandrtotal, storycheststotal, bankstotal, total, totalPoints));
+                }
 
                 foreach (var date in dateRange)
                 {
                     foreach (var entry in date.Value)
                     {
-                        int commoncryptstotal, rarecryptstotal, epiccryptstotal, citadelsstotal,
-                          arenastotal, uniontriumphstotal, vaultancienttotal, ancientchests, jormungandrtotal, heroicstotal, bankstotal, storycheststotal, total, otherTotal, totalPoints;
 
                         commoncryptstotal = rarecryptstotal = epiccryptstotal = citadelsstotal = arenastotal =
-                    heroicstotal = bankstotal = uniontriumphstotal = vaultancienttotal = ancientchests = jormungandrtotal = storycheststotal = total = otherTotal = totalPoints = 0;
+               heroicstotal = bankstotal = uniontriumphstotal = vaultancienttotal = ancientchests = jormungandrtotal = storycheststotal = total = otherTotal = totalPoints = 0;
 
                         var clanmate = entry.Clanmate;
                         //var chests = dateEntry.Value.Where(name => name.Clanmate.Equals(clanmate)).Select(chest => chest.chests).ToList()[0];
-                        var chests = date.Value.Where(name => name.Clanmate.Equals(clanmate, StringComparison.CurrentCultureIgnoreCase)).Select(chest => chest.chests).ToList()[0];
-                       
+                        var chests = date.Value.Where(name =>
+                                                name.Clanmate.Equals(clanmate, StringComparison.CurrentCultureIgnoreCase)).Select(chest => chest.chests).ToList()[0];
+
                         if (chests != null)
                         {
                             commoncryptstotal = chests.Where(common => common.Type == ChestType.COMMON).Count();
@@ -330,46 +344,36 @@ namespace TBChestTracker
                             vaultancienttotal = chests.Where(common => common.Type == ChestType.VAULT).Count();
                             bankstotal = chests.Where(common => common.Type == ChestType.BANK).Count();
                             ancientchests = chests.Where(common => common.Type == ChestType.ANCIENT_EVENT).Count();
-                            jormungandrtotal = chests.Where(c => c.Type == ChestType.JORMUNGANDR).Count();  
+                            jormungandrtotal = chests.Where(c => c.Type == ChestType.JORMUNGANDR).Count();
                             storycheststotal = chests.Where(common => common.Type == ChestType.STORY).Count();
-                            otherTotal = chests.Where(common => common.Type == ChestType.OTHER).Count();    
+                            otherTotal = chests.Where(common => common.Type == ChestType.OTHER).Count();
                             total = commoncryptstotal + rarecryptstotal + epiccryptstotal + citadelsstotal + arenastotal + uniontriumphstotal + heroicstotal + vaultancienttotal + bankstotal + storycheststotal + otherTotal;
-                            var points = date.Value.Where(name => name.Clanmate.Equals(clanmate, StringComparison.CurrentCultureIgnoreCase)).Select(p => p.Points).FirstOrDefault();
-                            totalPoints = points;
+                            totalPoints = entry.Points;
                         }
-
-                        bool alreadyExists = ClanStatisticData.Where(mate => mate.Clanmate.Equals(clanmate)).Count() > 0 ? true : false;
-                        if (alreadyExists)
-                        {
-                            var updateStats = ClanStatisticData.Where(mate => mate.Clanmate.Equals(clanmate)).ToList()[0];
-                            updateStats.CommonCryptsTotal += commoncryptstotal;
-                            updateStats.RareCryptsTotal += rarecryptstotal;
-                            updateStats.EpicCryptsTotal += epiccryptstotal;
-                            updateStats.CitadelsTotal += citadelsstotal;
-                            updateStats.ArenasTotal += arenastotal;
-                            updateStats.HeroicsTotal += heroicstotal;
-                            updateStats.UnionTriumphsTotal += uniontriumphstotal;
-                            updateStats.VaultAncientsTotal += vaultancienttotal;    
-                            updateStats.BanksTotal += bankstotal;
-                            updateStats.AncientChestsTotal += ancientchests;
-                            updateStats.JormungandrShopChestsTotal += jormungandrtotal;
-                            updateStats.StoryChestsTotal += storycheststotal;
-                            updateStats.Total += total;
-                            updateStats.Points += totalPoints;
-                        }
-                        else
-                            ClanStatisticData.Add(new TBChestTracker.ClanStatisticData(clanmate, commoncryptstotal, rarecryptstotal, epiccryptstotal, citadelsstotal,
-                            arenastotal, uniontriumphstotal, vaultancienttotal, heroicstotal, ancientchests, jormungandrtotal, storycheststotal, bankstotal, total, totalPoints));
+                        
+                        var updateStats = ClanStatisticData.Where(mate => mate.Clanmate.Equals(clanmate, StringComparison.CurrentCultureIgnoreCase)).ToList()[0];
+                        updateStats.CommonCryptsTotal += commoncryptstotal;
+                        updateStats.RareCryptsTotal += rarecryptstotal;
+                        updateStats.EpicCryptsTotal += epiccryptstotal;
+                        updateStats.CitadelsTotal += citadelsstotal;
+                        updateStats.ArenasTotal += arenastotal;
+                        updateStats.HeroicsTotal += heroicstotal;
+                        updateStats.UnionTriumphsTotal += uniontriumphstotal;
+                        updateStats.VaultAncientsTotal += vaultancienttotal;
+                        updateStats.BanksTotal += bankstotal;
+                        updateStats.AncientChestsTotal += ancientchests;
+                        updateStats.JormungandrShopChestsTotal += jormungandrtotal;
+                        updateStats.StoryChestsTotal += storycheststotal;
+                        updateStats.Total += total;
+                        updateStats.Points += totalPoints;
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                
+
             }
-
         }
-
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
 

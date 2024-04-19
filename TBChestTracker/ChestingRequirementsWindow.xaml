@@ -195,7 +195,8 @@
                                           ItemContainerStyle="{StaticResource ChestPointsListViewItemStyle}">
                                     <ListView.View>
                                         <GridView>
-                                            <GridViewColumn Header="Clan Chest Type" Width="200" DisplayMemberBinding="{Binding ChestType}"/>
+                                            <GridViewColumn Header="Chest Type" Width="200" DisplayMemberBinding="{Binding ChestType}"/>
+                                            <GridViewColumn Header="Chest Name" Width="200" DisplayMemberBinding="{Binding ChestName}"/>
                                             <GridViewColumn Header="Level" Width="95" DisplayMemberBinding="{Binding Level}"/>
                                             <GridViewColumn Header="Point" Width="50" DisplayMemberBinding="{Binding PointValue}"/>
                                         </GridView>

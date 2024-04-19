@@ -16,6 +16,7 @@ namespace TBChestTracker
     [Serializable]
     public class ClanDatabase : INotifyPropertyChanged
     {
+        public string ClanAbbreviations { get; set; }
         public string Clanname { get; set; }
         public string ClanDatabaseFolder { get; set; }
         public string DefaultClanFolderPath

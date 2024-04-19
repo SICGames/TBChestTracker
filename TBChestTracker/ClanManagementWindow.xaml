@@ -15,7 +15,8 @@
             <ListView.View>
                 <GridView>
                     <GridView.Columns>
-                        <GridViewColumn Header="Clan" Width="200" DisplayMemberBinding="{Binding Name, Mode=TwoWay}"/>
+                        <GridViewColumn Header="Clan Abbreviations" DisplayMemberBinding="{Binding Abbreviations, Mode=TwoWay}"/>
+                        <GridViewColumn Header="Clan" Width="175" DisplayMemberBinding="{Binding Name, Mode=TwoWay}"/>
                         <GridViewColumn Header="Members" Width="100" DisplayMemberBinding="{Binding Members, Mode=TwoWay}"/>
                     </GridView.Columns>
                 </GridView>

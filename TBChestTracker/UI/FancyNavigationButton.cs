@@ -60,9 +60,10 @@ namespace TBChestTracker.UI
 
         public override void OnApplyTemplate()
         {
-            //_rectangle = GetTemplateChild("ACTIVE_LIGHT") as Rectangle;
-            _rectangle = GetTemplateChild("ACTIVE_LIGHT") as Rectangle;
             base.OnApplyTemplate();
+            _rectangle = GetTemplateChild("ACTIVE_LIGHT") as Rectangle;
+            if (IsActive)
+                SetActive(this, true);
         }
         
         public static readonly DependencyProperty isActiveProperty = DependencyProperty.Register("IsActive", typeof(bool), typeof(FancyNavigationButton),
@@ -81,7 +82,7 @@ namespace TBChestTracker.UI
             typeof(BitmapSource), 
             typeof(FancyNavigationButton), new PropertyMetadata(null));
 
-        public static readonly DependencyProperty NavigationSourceProperty = DependencyProperty.Register("NavigationSource", typeof(Page), typeof(FancyNavigationButton), new PropertyMetadata(null));
+        public static readonly DependencyProperty NavigationSourceProperty = DependencyProperty.Register("NavigationSource", typeof(Uri), typeof(FancyNavigationButton), new PropertyMetadata(null));
 
         public bool IsActive
         {
@@ -115,9 +116,9 @@ namespace TBChestTracker.UI
             set { SetValue(ImageSourceProperty, value); }   
         }
 
-        public Page NavigationSource
+        public Uri NavigationSource
         {
-            get => (Page)GetValue(NavigationSourceProperty);
+            get => (Uri)GetValue(NavigationSourceProperty);
             set => SetValue (NavigationSourceProperty, value);
         }
 
@@ -131,7 +132,8 @@ namespace TBChestTracker.UI
         public void SetActive(DependencyObject d, bool active)
         {
 
-            if(_rectangle ==  null) return;
+            if(_rectangle == null) return;
+
             _rectangle.Visibility = active ? Visibility.Visible : Visibility.Hidden;
             var navbutton = d as FancyNavigationButton;
             if(_previousBrush == null)

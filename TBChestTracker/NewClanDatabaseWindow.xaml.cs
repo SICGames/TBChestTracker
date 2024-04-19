@@ -30,7 +30,7 @@ namespace TBChestTracker
         private void CreateClanFolders(Action<bool> result)
         {
             var clanname = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname;
-            var mainpath = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath;
+            var mainpath = SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder;
             if (String.IsNullOrEmpty(clanname) || clanname.Length < 3) 
             {
                 MessageBox.Show("Clan name must be more than three characters.");

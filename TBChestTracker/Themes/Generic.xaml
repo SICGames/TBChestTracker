@@ -231,4 +231,142 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <Style TargetType="{x:Type local:FancyNumericValue}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:FancyNumericValue}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}" x:Name="MAIN_BORDER">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBox Grid.Row="0" Grid.Column="0" 
+                                 x:Name="CONTENT_MAIN"
+                                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                                 BorderBrush="Transparent"
+                                 BorderThickness="0"
+                                 FontFamily="{TemplateBinding FontFamily}"
+                                 FontSize="{TemplateBinding FontSize}"
+                                 Foreground="{TemplateBinding Foreground}" FontWeight="{TemplateBinding FontWeight}"
+                                 FontStretch="{TemplateBinding FontStretch}" FontStyle="{TemplateBinding FontStyle}"/>
+                            <Grid Grid.Row="0" Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="NUMERIC_UP" Content="⯅" 
+                                        VerticalContentAlignment="Stretch"
+                                        FontSize="6" Padding="0"
+                                        FontWeight="Bold" 
+                                        Grid.Column="0" 
+                                        Grid.Row="0"  Width="12"/>
+                                <Button x:Name="NUMERIC_DOWN" Content="⯆" 
+                                        VerticalContentAlignment="Stretch"
+                                        FontSize="6" Padding="0"  
+                                        FontWeight="Bold" 
+                                        Grid.Column="0" Grid.Row="1" 
+                                        Width="12"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" Value="SkyBlue" TargetName="MAIN_BORDER"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:FancyTagItem}">
+        <Style.Resources>
+            <SolidColorBrush x:Key="BackgroundColorBrush" Color="SkyBlue"/>
+            <SolidColorBrush x:Key="ForegroundColorBrush" Color="White"/>
+            <SolidColorBrush x:Key="MouseOverColorBrush" Color="#00dfff"/>
+        </Style.Resources>
+        <Setter Property="Background" Value="{StaticResource BackgroundColorBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource ForegroundColorBrush}"/>
+        <Setter Property="BorderBrush" Value="SkyBlue"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Margin" Value="3"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:FancyTagItem}">
+                    <Border x:Name="MAIN_BORDER" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock TextWrapping="Wrap" 
+                                       x:Name="TEXT_CONTENT" Text="{TemplateBinding Label}" Foreground="{TemplateBinding Foreground}" 
+                                       FontWeight="{TemplateBinding FontWeight}"
+                                       FontSize="{TemplateBinding FontSize}" FontFamily="{TemplateBinding FontFamily}" FontStyle="{TemplateBinding FontStyle}"
+                                       Grid.Column="0" Grid.Row="0" 
+                                       VerticalAlignment="Center" 
+                                       HorizontalAlignment="Center" Margin="10,0"/>
+                            <Viewbox x:Name="CLOSE_VIEWBOX" Grid.Row="0" Grid.Column="1">
+                                <Image Source="Images/close-button.png" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="12" Height="12" Margin="4"/>
+                            </Viewbox>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{StaticResource MouseOverColorBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:FancyTagBox}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:FancyTagBox}">
+                    <Border x:Name="MAIN_CONTENT" Background="{TemplateBinding Background}"
+                            BorderBrush="Transparent"
+                            BorderThickness="0">
+                        <Grid x:Name="MAIN_GRID_CONTENT">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Grid.Row="0" x:Name="TAGS_TEXTBOX" Margin="2,2" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"/>
+                            <ScrollViewer x:Name="ScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Grid.Column="0" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Left">
+                                <WrapPanel Width="{Binding ElementName=ScrollViewer, Path=ViewportWidth}"
+                                    Orientation="Horizontal" 
+                                    FlowDirection="LeftToRight" x:Name="TAGS_BOX" 
+                                    HorizontalAlignment="Left" 
+                                    VerticalAlignment="Top" Margin="5,3"/>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

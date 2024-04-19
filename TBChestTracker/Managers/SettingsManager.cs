@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Newtonsoft;
 using Newtonsoft.Json;
+using Windows.Services.Cortana;
 
 namespace TBChestTracker
 {
@@ -67,6 +69,20 @@ namespace TBChestTracker
             return true;
         }
 
+
+        public void BuildDefaultConfiguration()
+        {
+            Settings.OCRSettings.CaptureMethod = "GDI+";
+            Settings.OCRSettings.GlobalBrightness = 0.65;
+            Settings.OCRSettings.Tags = new ObservableCollection<string>(new List<string> { "Chest", "From", "Source", "Gift" });
+            Settings.GeneralSettings.ClanRootFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\TotalBattleChestTracker\\";
+            Settings.GeneralSettings.TessDataFolder = $@"{AppContext.AppFolder}TessData";
+            Settings.GeneralSettings.Languages = "eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus+pol+por+pus+ukr+deu";
+            Settings.HotKeySettings.StartAutomationKeys = "F9";
+            Settings.HotKeySettings.StopAutomationKeys = "F10";
+
+            Save();
+        }
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)

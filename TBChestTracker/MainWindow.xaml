@@ -262,10 +262,10 @@
                     <MenuItem Header="Quit" Command="Commands:CustomCommandBindings.QuitApplication"/>
                 </MenuItem>
                 <MenuItem Header="Edit">
-                    <MenuItem Header="Clanmate Manager"/>
-                    <MenuItem Header="Clan Chest Manager"/>
+                    <MenuItem Header="Clanmate Manager" Command="Commands:CustomCommandBindings.ManageClanmates" />
+                    <MenuItem Header="Clan Chest Manager" Command="Commands:CustomCommandBindings.ManageClanChestSettings" />
                     <Separator/>
-                    <MenuItem Header="Settings"/>
+                    <MenuItem Header="Settings" Command="Commands:CustomCommandBindings.ManageSettings" />
                 </MenuItem>
                 <MenuItem Header="Window">
                     <MenuItem Header="Console" x:Name="ConsoleMenuButton" Click="ConsoleMenuButton_Click"/>

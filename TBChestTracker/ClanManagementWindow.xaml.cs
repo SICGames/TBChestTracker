@@ -55,6 +55,7 @@ namespace TBChestTracker
                             if (clandb != null)
                             {
                                 clan.Name = clandb.Clanname;
+                                clan.Abbreviations = clandb.ClanAbbreviations;
                             }
                             clandb = null;
                             sr.Close();
@@ -69,7 +70,7 @@ namespace TBChestTracker
                                 var data = StringHelpers.ConvertToUTF8(sr.ReadToEnd());
 
                                 tmp_clanmates_db = JsonConvert.DeserializeObject<ClanmatesDatabase>(data);
-                                clan.Members = tmp_clanmates_db.Clanmates.Count;
+                                clan.Members = tmp_clanmates_db.Clanmates.Count - 1;
                                 sr.Close();
                             }
 

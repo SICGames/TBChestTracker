@@ -10,10 +10,58 @@ namespace TBChestTracker
     public class ChestPoints : INotifyPropertyChanged
     {
 
+        private ChestRef _ChestRef = new ChestRef();
+
+        //private bool _isRefByTypeChecked = true;
+        //private bool _isRefByNameChecked = false;
+        private string _chestName = "";
         private string _chesttype = "";
         private int _level = 5;
         private int _pointValue = 0;
 
+        public ChestRef ChestRef
+        {
+            get => _ChestRef;
+            set
+            {
+                _ChestRef = value;
+                OnPropertyChanged(nameof(ChestRef));
+            }
+        }
+
+        /*
+        public bool isRefByTypeChecked
+        {
+            get
+            {
+                return _isRefByTypeChecked;
+            }
+            set
+            {
+                _isRefByTypeChecked = value;
+                OnPropertyChanged(nameof(isRefByTypeChecked));
+            }
+        }
+        public bool isRefByNameChecked
+        {
+            get => _isRefByNameChecked;
+            set
+            {
+                _isRefByNameChecked = value;
+                OnPropertyChanged(nameof(isRefByNameChecked));
+            }
+        }
+        */
+
+        public string ChestName
+        {
+            get => this._chestName;
+            set
+            {
+                this._chestName = value;
+                OnPropertyChanged(nameof(ChestName));
+            }
+        }
         public string ChestType
         {
             get => _chesttype;
