@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Newtonsoft;
 using Newtonsoft.Json;
@@ -61,9 +62,10 @@ namespace TBChestTracker
                 }
 
             }
-            catch (Exception ex)
+            catch (IOException ex)
             {
-                throw new Exception(ex.Message);
+                if (MessageBox.Show($"You'll need adminstration privileges to save settings file. Run Application as Administration.") == MessageBoxResult.OK)
+                    return false;
             }
 
             return true;
