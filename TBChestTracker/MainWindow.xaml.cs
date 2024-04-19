@@ -535,6 +535,7 @@ namespace TBChestTracker
             });
         }
 
+        
         public void CreateNewClan(Action<bool> response)
         {
             NewClanDatabaseWindow newClanDatabaseWindow = new NewClanDatabaseWindow();
@@ -543,11 +544,14 @@ namespace TBChestTracker
                 GlobalDeclarations.hasNewClanDatabaseCreated = true;
                 appContext.UpdateCurrentProject($"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}");
                 appContext.UpdateApplicationTitle();
+                
                 response(true);
             }
             else
                 response(false);
         }
+        
+
         public void ShowLoadClanWindow(Action<bool> response)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();

@@ -58,6 +58,7 @@ namespace TBChestTracker
                 if (result)
                 {
                     this.DialogResult = true;
+                    ClanManager.Instance.ClanDatabaseManager.Save();
                     this.Close();
                 }
                 

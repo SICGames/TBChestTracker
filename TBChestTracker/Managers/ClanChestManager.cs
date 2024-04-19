@@ -524,7 +524,7 @@ namespace TBChestTracker
         public void BuildData()
         {
             LoadData(); 
-
+            
             //--- build blank clanchestdata 
             foreach (var clanmate in ClanManager.Instance.ClanmateManager.Database.Clanmates)
             {
@@ -533,28 +533,32 @@ namespace TBChestTracker
                     clanChestData.Add(new ClanChestData(clanmate.Name, null));
                 }
             }
-            //--- midnight bug may occur here.
-            var lastDate = ClanChestDailyData.Keys.Last();
-            var dateStr = DateTime.Now.ToString(@"MM-dd-yyyy");
-            if (lastDate.Equals(dateStr))
-            {
 
-                clanChestData = ClanChestDailyData[lastDate];
-                foreach (var member in ClanManager.Instance.ClanmateManager.Database.Clanmates)
+            //--- midnight bug may occur here.
+            if (ClanChestDailyData != null && ClanChestDailyData.Keys != null && ClanChestDailyData.Keys.Count > 0)
+            {
+                var lastDate = ClanChestDailyData.Keys.Last();
+                var dateStr = DateTime.Now.ToString(@"MM-dd-yyyy");
+                if (lastDate.Equals(dateStr))
                 {
-                    var clanmate_exists = clanChestData.Exists(mate => mate.Clanmate.ToLower().Contains(member.Name.ToLower()));
-                    if (!clanmate_exists)
+
+                    clanChestData = ClanChestDailyData[lastDate];
+                    foreach (var member in ClanManager.Instance.ClanmateManager.Database.Clanmates)
                     {
-                        clanChestData.Add(new ClanChestData(member.Name, null));
+                        var clanmate_exists = clanChestData.Exists(mate => mate.Clanmate.ToLower().Contains(member.Name.ToLower()));
+                        if (!clanmate_exists)
+                        {
+                            clanChestData.Add(new ClanChestData(member.Name, null));
+                        }
                     }
                 }
-            }
-            else
-            {
-                ClanChestDailyData.Add(DateTime.Now.ToString(@"MM-dd-yyyy"), clanChestData);
-            }
+                else
+                {
+                    ClanChestDailyData.Add(DateTime.Now.ToString(@"MM-dd-yyyy"), clanChestData);
+                }
 
-            GlobalDeclarations.hasClanmatesBeenAdded = true;
+                GlobalDeclarations.hasClanmatesBeenAdded = true;
+            }
 
             return;
         }
