@@ -1,7 +1,5 @@
 # TBChestTracker - Total Battle Chest Tracker
 
-## Important News
-Version 1.0 is being released soon. 4/20/24 Looking for Release Day.
 ## Description
 Easily count clan chests with a hotkey and let the automation take control. 
 ## Features
