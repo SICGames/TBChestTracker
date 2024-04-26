@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using com.CaptainHookSharp;
+using com.CaptainHook;
 
 namespace TBChestTracker.Pages.Settings
 {
@@ -69,7 +69,7 @@ namespace TBChestTracker.Pages.Settings
             NewKey = Key.None;
         }
 
-        private void CaptainHook_onKeyboardMessage(object sender, CaptainHook.KeyboardHookMessageEventArgs e)
+        private void CaptainHook_onKeyboardMessage(object sender, KeyboardHookMessageEventArgs e)
         {
             var msg = e.MessageType;
             var vkey = e.VirtKeyCode;
@@ -77,7 +77,7 @@ namespace TBChestTracker.Pages.Settings
             bool isKeyDown = false;
             bool isNewKey = false;
 
-            isKeyDown = msg == com.CaptainHookSharp.Interop.KeyboardMessage.KeyDown ? true : false;
+            isKeyDown = msg == KeyboardMessage.KeyDown ? true : false;
             
             if (isKeyDown)
             {

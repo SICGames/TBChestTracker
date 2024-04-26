@@ -3,8 +3,6 @@ using System.IO;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
-using Windows.Globalization;
-using Windows.Graphics.Imaging;
 using System.Threading.Tasks;
 using Emgu;
 using Emgu.CV;
@@ -33,8 +31,8 @@ using System.Reflection;
 using com.HellstormGames.ScreenCapture;
 using com.HellstormGames.Imaging;
 using com.HellstormGames.Imaging.Extensions;
-using com.CaptainHookSharp;
-using CaptainHookInterlop = com.CaptainHookSharp.Interop;
+using com.CaptainHook;
+
 
 namespace TBChestTracker
 {
@@ -260,11 +258,9 @@ namespace TBChestTracker
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             
-            
             CaptainHook = new CaptainHook();
             CaptainHook.onKeyboardMessage += CaptainHook_onKeyboardMessage;
             CaptainHook.onInstalled += CaptainHook_onInstalled;
-            CaptainHook.onError += CaptainHook_onError;
             CaptainHook.Install();
             
             Snapture = new Snapture();
@@ -376,10 +372,6 @@ namespace TBChestTracker
         }
         
         #region CaptionHook Events
-        private void CaptainHook_onError(object sender, CaptainHook.HookErrorEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
 
         private void CaptainHook_onInstalled(object sender, EventArgs e)
         {
@@ -391,7 +383,7 @@ namespace TBChestTracker
         private Key previousKey = Key.None;
         private Key newKey = Key.None;
         String keyStr = $"";
-        private void CaptainHook_onKeyboardMessage(object sender, CaptainHook.KeyboardHookMessageEventArgs e)
+        private void CaptainHook_onKeyboardMessage(object sender, KeyboardHookMessageEventArgs e)
         {
             if(!GlobalDeclarations.IsConfiguringHotKeys) { 
                 
@@ -400,7 +392,7 @@ namespace TBChestTracker
                 var bIsNewKey = false;
                 
                 //--- to allow customized hot keys, will reuire update.
-                bool keyDown = e.MessageType == CaptainHookInterlop.KeyboardMessage.KeyDown ? true : false;
+                bool keyDown = e.MessageType == KeyboardMessage.KeyDown ? true : false;
                 if(keyDown)
                 {
                     newKey = key;
@@ -455,10 +447,7 @@ namespace TBChestTracker
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             appContext.isAppClosing = true;
-            if (CaptainHook.Uninstall())
-            {
-             
-            }
+            CaptainHook.Uninstall();
             
             ClanManager.Instance.Destroy();
             TesseractHelper.Destroy();

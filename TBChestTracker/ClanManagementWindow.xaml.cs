@@ -17,7 +17,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using TBChestTracker.ClanData;
 using TBChestTracker.Managers;
-using Windows.UI.Xaml.Shapes;
 
 namespace TBChestTracker
 {

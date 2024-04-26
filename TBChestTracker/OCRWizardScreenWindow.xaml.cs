@@ -27,9 +27,6 @@ using System.Windows.Controls.Primitives;
 using Emgu.CV.Util;
 using Emgu.CV.Features2D;
 using System.Windows.Navigation;
-using Windows.UI.Xaml.Media;
-using Windows.Media.Audio;
-
 
 
 namespace TBChestTracker
@@ -735,7 +732,8 @@ namespace TBChestTracker
                     }
 
                     //-- We should give a quick test and have user confirm everything.
-                    CroppedBitmap croppedBitmap = new CroppedBitmap(bitmap.ToBitmapSource(),
+                    BitmapSource bitmapSource = bitmap.ToBitmapSource();
+                    CroppedBitmap croppedBitmap = new CroppedBitmap(bitmapSource,
                         new Int32Rect((int)SuggestedAreaOfInterest.x,
                         (int)SuggestedAreaOfInterest.y, 
                         (int)SuggestedAreaOfInterest.width - (int)SuggestedAreaOfInterest.x, 

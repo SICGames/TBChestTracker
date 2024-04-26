@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows;
-using Windows.Media.Ocr;
+
 
 namespace TBChestTracker
 {

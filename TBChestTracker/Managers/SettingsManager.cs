@@ -10,7 +10,7 @@ using System.Windows;
 using System.Windows.Input;
 using Newtonsoft;
 using Newtonsoft.Json;
-using Windows.Services.Cortana;
+
 
 namespace TBChestTracker
 {

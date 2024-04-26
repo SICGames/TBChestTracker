@@ -13,7 +13,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Windows.Graphics.DirectX.Direct3D11;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace TBChestTracker.UI

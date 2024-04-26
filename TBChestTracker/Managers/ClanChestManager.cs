@@ -13,8 +13,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 using TBChestTracker.Managers;
-using Windows.Media.Ocr;
-using Windows.Networking.Proximity;
+
 using static Emgu.CV.Features2D.ORB;
 
 namespace TBChestTracker
