@@ -24,8 +24,9 @@ namespace TBChestTracker
         EPIC_BOSS,
         ANCIENT_EVENT,
         STORY,
-        OTHER,
         WEALTH,
-        JORMUNGANDR
+        RUNIC,
+        JORMUNGANDR,
+        OTHER
     }
 }

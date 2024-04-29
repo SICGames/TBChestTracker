@@ -51,8 +51,6 @@ namespace TBChestTracker
             ChestPoints = new ChestPoints();
             pChestRef = new ChestRef();
             pChestRef.ReferenceOption = RefEnum.BYTYPE;
-
-            
         }
 
         private void ChestTypeBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -101,6 +99,7 @@ namespace TBChestTracker
             {
                 if(chestpointItem.ChestType == ChestPoints.ChestType && index == ChestPointsItemIndex)
                 {
+                    chestpointItem.ChestType = ChestTypeBox.Text;
                     chestpointItem.Level = ChestPoints.Level;
                     chestpointItem.PointValue = ChestPoints.PointValue;
                     break;

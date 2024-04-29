@@ -174,33 +174,48 @@ namespace TBChestTracker
                             type = ChestType.COMMON;
                             if (chestobtained.Contains("epic"))
                                 type = ChestType.EPIC;
+                            
                             else if (chestobtained.Contains("rare"))
                                 type = ChestType.RARE;
+                            
                             else if (chestobtained.Contains("heroic"))
                                 type = ChestType.HEROIC;
+                            
                             else if (chestobtained.Contains("citadel"))
                                 type = ChestType.CITADEL;
-
+                            
+                            else if(chestobtained.Contains("runic"))
+                                type = ChestType.RUNIC;
+                            
+                            else if(chestobtained.Contains("vault"))
+                                type = ChestType.VAULT;
+                            
                             int level = 0;
 
                             var levelStr = chestobtained.Substring(chestobtained.IndexOf(' ') + 1);
                             levelStr = levelStr.Substring(0, levelStr.IndexOf(" "));
                             var levels = levelStr.Split('-');
-
+                            
                             if (levels.Count() == 1)
                             {
+                                if(Int32.TryParse(levels[0], out level) == false)
+                                {
+                                    //-- failed to obtain level from string.
+                                }
+                                /*
                                 if (!levels[0].Contains("io"))
                                     level = Int32.Parse(levels[0]);
                                 else
                                     level = 10;
+                                */
                             }
                             else if (levels.Count() > 1)
                             {
                                 //--- chest will implend new int array.
-                                if (!levels[0].Contains("io"))
-                                    level = Int32.Parse(levels[0]);
-                                else
-                                    level = 10;
+                                if (Int32.TryParse(levels[0], out level) == false)
+                                {
+                                    //-- failed to obtain level from string.
+                                }
                             }
 
                             //--- shouldn't be 0. Normally happens 1st chest that is a level 5. 
@@ -241,18 +256,25 @@ namespace TBChestTracker
                             type = ChestType.OTHER;
                             if (chestobtained.Contains("arena"))
                                 type = ChestType.ARENA;
+                            
                             else if (chestobtained.Contains("bank"))
                                 type = ChestType.BANK;
+                            
                             else if (chestobtained.Contains("union"))
                                 type = ChestType.UNION_TRIUMPH;
+                            
                             else if (chestobtained.Contains("mimic"))
                                 type = ChestType.MIMIC;
+                            
                             else if (chestobtained.Contains("rise"))
                                 type = ChestType.ANCIENT_EVENT;
+                            
                             else if (chestobtained.Contains("story"))
                                 type = ChestType.STORY;
+                            
                             else if (chestobtained.Contains("wealth"))
                                 type = ChestType.WEALTH;
+                            
                             else if (chestobtained.Contains("jörmungandr") || chestobtained.Contains("jormungandr"))
                                 type = ChestType.JORMUNGANDR;
 
