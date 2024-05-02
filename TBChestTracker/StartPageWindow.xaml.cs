@@ -30,9 +30,7 @@ namespace TBChestTracker
         public StartPageWindow()
         {
             InitializeComponent();
-
             RecentFiles = new ObservableCollection<String>();
-            IsFirstRun();
         }
 
         private void CloseBtn_Click(object sender, RoutedEventArgs e)
@@ -40,22 +38,6 @@ namespace TBChestTracker
             MainWindow.ShowWindow();
             this.Close();
         }
-
-        #region Check If FIRST RUN file exist
-        private void IsFirstRun()
-        {
-            if (File.Exists(".FIRSTRUN"))
-            {
-                //--- this is first run.
-                GlobalDeclarations.IsFirstRun = true;
-                
-            }
-            else
-            {
-                GlobalDeclarations.IsFirstRun = false;
-            }
-        }
-        #endregion
 
         private void LoadRecentFilesList()
         {

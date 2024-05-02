@@ -102,17 +102,18 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CaptainHook">
-      <HintPath>..\..\CaptainHook\CaptainHook\bin\x64\Debug\CaptainHook.dll</HintPath>
+    <Reference Include="CaptainHook, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\CaptainHook\CaptainHook\bin\x64\Release\CaptainHook.dll</HintPath>
     </Reference>
     <Reference Include="KonquestUI, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\KonquestUI\KonquestUI\bin\x64\Debug\KonquestUI.dll</HintPath>
+      <HintPath>..\..\KonquestUI\KonquestUI\bin\x64\Release\KonquestUI.dll</HintPath>
     </Reference>
     <Reference Include="PresentationFramework.Aero2" />
-    <Reference Include="Snapture, Version=1.0.8873.38934, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="Snapture, Version=1.0.8882.27601, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Snapture\x64\Debug\Snapture.dll</HintPath>
+      <HintPath>..\..\Snapture\x64\Release\Snapture.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -488,7 +489,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include=".FIRSTRUN" />
+    <None Include=".FIRSTRUN">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

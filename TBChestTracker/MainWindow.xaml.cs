@@ -274,15 +274,18 @@ namespace TBChestTracker
 
             com.HellStormGames.Logging.Console.Write("Snapture Started.", com.HellStormGames.Logging.LogType.INFO);
 
+            SettingsManager = new SettingsManager();
+            if (GlobalDeclarations.IsFirstRun)
+                SettingsManager.Instance.BuildDefaultConfiguration();
+            else
+                SettingsManager.Load();
+
+            com.HellStormGames.Logging.Console.Write("Settings Loaded.", com.HellStormGames.Logging.LogType.INFO);
             startPageWindow = new StartPageWindow();
             startPageWindow.MainWindow = this;
             startPageWindow.Show();
 
-            SettingsManager = new SettingsManager();
-            if(GlobalDeclarations.IsFirstRun)
-                SettingsManager.Instance.BuildDefaultConfiguration();
-            else 
-                SettingsManager.Load();
+           
 
 
             //-- init appContext
