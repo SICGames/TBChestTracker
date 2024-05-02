@@ -185,7 +185,7 @@ namespace TBChestTracker
             }
             catch(Exception ex)
             {
-
+                com.HellStormGames.Logging.Loggy.Write($"{ex.Message}", com.HellStormGames.Logging.LogType.ERROR);
             }
         }
         private void StackPanel_Click(object sender, RoutedEventArgs e)
@@ -236,6 +236,7 @@ namespace TBChestTracker
             catch(Exception ex)
             {
                 MessageBox.Show($@"Attempted to delete .FIRSTRUN file but couldn't. Please manually delete the file from the installation folder: Program Files\SicGames\TotalBattle Chest Tracker.");
+                com.HellStormGames.Logging.Loggy.Write($"{ex.Message}", com.HellStormGames.Logging.LogType.ERROR);
             }
             isCompleted = true;
 

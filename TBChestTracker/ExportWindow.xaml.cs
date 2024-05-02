@@ -203,6 +203,7 @@ namespace TBChestTracker
                         catch(Exception ex)
                         {
                             //-- log error.
+                            com.HellStormGames.Logging.Loggy.Write($"{ex.Message}", com.HellStormGames.Logging.LogType.ERROR);
                         }
                     }
                     break;

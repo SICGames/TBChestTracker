@@ -127,6 +127,7 @@ namespace TBChestTracker
                     {
                     
                         com.HellStormGames.Logging.Console.Write($"OCR Exception Thrown: {e.Message}. Stopping.", "OCR FATAL", LogType.ERROR);
+                        com.HellStormGames.Logging.Loggy.Write($"{e.Message}", com.HellStormGames.Logging.LogType.ERROR);
                         bError = true;
                         break;
                         //throw new Exception(e.Message);
@@ -158,6 +159,7 @@ namespace TBChestTracker
                         {
                             bError = true;
                             com.HellStormGames.Logging.Console.Write($"OCR Exception Thrown: {e.Message}. Stopping.", "OCR FATAL", LogType.ERROR);
+                            com.HellStormGames.Logging.Loggy.Write($"{e.Message}", com.HellStormGames.Logging.LogType.ERROR);
                             break;
                         }
                     }

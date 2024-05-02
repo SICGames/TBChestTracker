@@ -112,14 +112,11 @@ namespace TBChestTracker
                 {
                     //Debug.WriteLine($"--- DELETING CLAN DIRECTORY: {clan.FolderPath}");
                     Directory.Delete(clan.FolderPath, true);
-
-                    //--- remove from recent databases.
-
-                    //--- remove from clan manager
                     clans.Remove(clan);
                 }
                 catch( Exception ex )
                 {
+                    com.HellStormGames.Logging.Loggy.Write($"{ex.Message}", com.HellStormGames.Logging.LogType.ERROR);
                     //Debug.WriteLine($"--- EXCEPTION CAUGHT: {ex.Message}");
                 }
             }

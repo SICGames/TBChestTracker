@@ -49,6 +49,7 @@ namespace TBChestTracker.Helpers
             catch(Exception e)
             {
                 //Debug.WriteLine(e.Message);
+                com.HellStormGames.Logging.Loggy.Write($"{e.Message}", com.HellStormGames.Logging.LogType.ERROR);
                 return false;
             }
             com.HellStormGames.Logging.Console.Write("Tesseract Initialized Successfully", com.HellStormGames.Logging.LogType.INFO);
