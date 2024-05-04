@@ -252,114 +252,211 @@ namespace TBChestTracker
                 }
             }
         }
-#endregion
-     
-        #region Window Loaded
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        #endregion
+
+        #region Initializing functions
+        private Task InitCaptainHook()
         {
-            
-            CaptainHook = new CaptainHook();
-            CaptainHook.onKeyboardMessage += CaptainHook_onKeyboardMessage;
-            CaptainHook.onInstalled += CaptainHook_onInstalled;
-            CaptainHook.Install();
-            
-            Snapture = new Snapture();
-            Snapture.onFrameCaptured += Snapture_onFrameCaptured;
+            return Task.Run(() =>
+            {
+                CaptainHook = new CaptainHook();
+                CaptainHook.onKeyboardMessage += CaptainHook_onKeyboardMessage;
+                CaptainHook.onInstalled += CaptainHook_onInstalled;
+                CaptainHook.Install();
+            });
+        }
+        private Task InitSnapture()
+        {
+            return Task.Run(() =>
+            {
+                Snapture = new Snapture();
+                Snapture.onFrameCaptured += Snapture_onFrameCaptured;
 #if !SNAPTURE_DEBUG
-            Snapture.SetBitmapResolution((int)Snapture.MonitorInfo.Monitors[0].Dpi.X);
+                Snapture.SetBitmapResolution((int)Snapture.MonitorInfo.Monitors[0].Dpi.X);
 #elif SNAPTURE_DEBUG
             Snapture.SetBitmapResolution(96);
 #endif
-            Snapture.Start(FrameCapturingMethod.GDI);
+                Snapture.Start(FrameCapturingMethod.GDI);
 
-            com.HellStormGames.Logging.Console.Write("Snapture Started.", com.HellStormGames.Logging.LogType.INFO);
+                com.HellStormGames.Logging.Console.Write("Snapture Started.", com.HellStormGames.Logging.LogType.INFO);
 
-            SettingsManager = new SettingsManager();
-            if (GlobalDeclarations.IsFirstRun)
-                SettingsManager.Instance.BuildDefaultConfiguration();
-            else
-                SettingsManager.Load();
-
-            com.HellStormGames.Logging.Console.Write("Settings Loaded.", com.HellStormGames.Logging.LogType.INFO);
-            startPageWindow = new StartPageWindow();
-            startPageWindow.MainWindow = this;
-            startPageWindow.Show();
-
-           
-
-
-            //-- init appContext
-
-            appContext.IsAutomationPlayButtonEnabled = false;
-            appContext.IsCurrentClandatabase = false;
-            appContext.IsAutomationStopButtonEnabled = false;
-            appContext.UpdateApplicationTitle();
-            
-            this.ClanManager = new ClanManager();
-            
-            if (System.IO.Directory.Exists(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath) == false)
+            });
+        }
+        private Task InitSettings()
+        {
+            return Task.Run(() =>
             {
-                System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath);
-            }
+                SettingsManager = new SettingsManager();
+                if (GlobalDeclarations.IsFirstRun)
+                    SettingsManager.Instance.BuildDefaultConfiguration();
+                else
+                    SettingsManager.Load();
 
-            OCRWizardWindow = new OCRWizardWindow();
+                com.HellStormGames.Logging.Console.Write("Settings Loaded.", com.HellStormGames.Logging.LogType.INFO);
 
-            if (File.Exists("recent.lst"))
+                //-- init appContext
+                appContext.IsAutomationPlayButtonEnabled = false;
+                appContext.IsCurrentClandatabase = false;
+                appContext.IsAutomationStopButtonEnabled = false;
+                appContext.UpdateApplicationTitle();
+            });
+        }
+
+        private Task FinishingUpTask()
+        {
+            return Task.Run(() =>
             {
-                using(var sr = File.OpenText("recent.lst"))
+                this.ClanManager = new ClanManager();
+                if (String.IsNullOrEmpty(SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder))
                 {
-                    var data = sr.ReadToEnd();
-                    if (data.Contains("\r\n"))
-                    {
-                        data = data.Replace("\r\n", ",");
-                    }
-                    else
-                        data = data.Replace("\n", ",");
-
-                    var list = data.Split(',');
-                    
-                    foreach(var file in list)
-                    {
-                        if(string.IsNullOrEmpty(file))
-                            continue;
-
-                        MenuItem mu = new MenuItem();
-                        var position = StringHelpers.findNthOccurance(file, Convert.ToChar(@"\"), 3);
-                        var truncated = StringHelpers.truncate_file_name(file, position);
-                        mu.Header = truncated;
-                        mu.Tag = file;
-                        mu.Click += Mu_Click;
-                        RecentlyOpenedParent.Items.Add(mu);
-                        recently_opened_files.Add(file);
-                    }
+                    SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath;
                 }
 
-                //-- add seperator to recently opened clan databases.
-                Separator separator = new Separator();
-                RecentlyOpenedParent.Items.Add(separator);
-                MenuItem mi = new MenuItem();
-                mi.Tag = "CLEAR_HISTORY";
-                mi.Header = "Clear Recent Clan Databases";
-                mi.Click += Mu_Click;
-                RecentlyOpenedParent.Items.Add(mi);
-            }
-            else
+                if (System.IO.Directory.Exists(SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder) == false)
+                {
+                    System.IO.Directory.CreateDirectory(SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder);
+                }
+
+                if (File.Exists("recent.lst"))
+                {
+
+                    using (var sr = File.OpenText("recent.lst"))
+                    {
+                        var data = sr.ReadToEnd();
+                        if (data.Contains("\r\n"))
+                        {
+                            data = data.Replace("\r\n", ",");
+                        }
+                        else
+                            data = data.Replace("\n", ",");
+
+                        var list = data.Split(',');
+
+                        foreach (var file in list)
+                        {
+                            if (string.IsNullOrEmpty(file))
+                                continue;
+
+                            this.Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                MenuItem mu = new MenuItem();
+                                var position = StringHelpers.findNthOccurance(file, Convert.ToChar(@"\"), 3);
+                                var truncated = StringHelpers.truncate_file_name(file, position);
+                                mu.Header = truncated;
+                                mu.Tag = file;
+                                mu.Click += Mu_Click;
+                                RecentlyOpenedParent.Items.Add(mu);
+                                recently_opened_files.Add(file);
+                            }));
+                        }
+                    }
+
+                    //-- add seperator to recently opened clan databases.
+                    this.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        Separator separator = new Separator();
+                        RecentlyOpenedParent.Items.Add(separator);
+                        MenuItem mi = new MenuItem();
+                        mi.Tag = "CLEAR_HISTORY";
+                        mi.Header = "Clear Recent Clan Databases";
+                        mi.Click += Mu_Click;
+                        RecentlyOpenedParent.Items.Add(mi);
+                    }));
+                }
+                else
+                {
+
+                }
+              
+            });
+        }
+        private Task InitTesseract()
+        {
+            return Task.Run(() =>
             {
 
-            }
+                if (System.IO.Directory.Exists(SettingsManager.Instance.Settings.GeneralSettings.TessDataFolder))
+                {
+                    GlobalDeclarations.TessDataExists = true;
+                    var languages = SettingsManager.Instance.Settings.GeneralSettings.Languages;
+                    TesseractHelper.Init(SettingsManager.Instance.Settings.GeneralSettings.TessDataFolder, languages);
+                }
+                else
+                {
+                    //-- tessdata folder needs to exist. And if not, should be prevented from even attempting to do any OCR.
+                    MessageBox.Show($"No Tessdata directory exists. Download tessdata and ensure all traineddata is inside tessdata.");
+                    GlobalDeclarations.TessDataExists = false;
+                }
+            });
+        }
+        private Task LaunchTask(SplashScreen splashScreen)
+        {
+            return Task.Run(() =>
+            {
+                this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    splashScreen.Complete();
+                }));
+            });
+        }
 
-            if (System.IO.Directory.Exists(SettingsManager.Instance.Settings.GeneralSettings.TessDataFolder))
+        public async void Init(Window window)
+        {
+            if (window is SplashScreen splashScreen)
             {
-                GlobalDeclarations.TessDataExists = true;
-                var languages = SettingsManager.Instance.Settings.GeneralSettings.Languages;
-                await TesseractHelper.InitAsync(SettingsManager.Instance.Settings.GeneralSettings.TessDataFolder, languages);
+                await this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    splashScreen.UpdateStatus("Initializing Captain Hook...", 25);
+                }));
+
+                await InitCaptainHook();
+
+                await this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    splashScreen.UpdateStatus("Initializing Snapture...", 40);
+                }));
+
+                await InitSnapture();
+                await this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    splashScreen.UpdateStatus("Loading Settings...", 50);
+                }));
+
+                await InitSettings();
+
+                await this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    splashScreen.UpdateStatus("Tidying everything up...", 90);
+                
+                }));
+
+                await FinishingUpTask();
+
+                await this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    splashScreen.UpdateStatus("Initializing Tesseract...", 95);
+                }));
+
+                await InitTesseract();
+
+                await this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    splashScreen.UpdateStatus("Launching...", 100);
+                }));
+
+                await Task.Delay(2000);
+
+                await LaunchTask(splashScreen);
+                
             }
-            else
-            {
-                //-- tessdata folder needs to exist. And if not, should be prevented from even attempting to do any OCR.
-                MessageBox.Show($"No Tessdata directory exists. Download tessdata and ensure all traineddata is inside tessdata.");
-                GlobalDeclarations.TessDataExists = false;
-            }
+        }
+        #endregion
+
+        #region Window Loaded
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            //startPageWindow = new StartPageWindow();
+            //startPageWindow.Show();
         }
         #endregion
 
@@ -369,7 +466,8 @@ namespace TBChestTracker
             if(GlobalDeclarations.IsFirstRun)
             {
                 //-- prompt the user to set up OCR for the first time.
-                if(OCRWizardWindow != null)
+                OCRWizardWindow = new OCRWizardWindow();
+                if (OCRWizardWindow != null)
                     OCRWizardWindow.Show();
             }
         }

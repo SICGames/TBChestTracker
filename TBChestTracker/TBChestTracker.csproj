@@ -229,6 +229,9 @@
     <Compile Include="Settings\OCRSettings.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Shared\AppContext.cs" />
+    <Compile Include="SplashScreen.xaml.cs">
+      <DependentUpon>SplashScreen.xaml</DependentUpon>
+    </Compile>
     <Compile Include="StartPageWindow.xaml.cs">
       <DependentUpon>StartPageWindow.xaml</DependentUpon>
     </Compile>
@@ -450,6 +453,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="SplashScreen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="StartPageWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -490,7 +497,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include=".FIRSTRUN">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="app.manifest" />
     <None Include="Properties\Settings.settings">
@@ -533,6 +540,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Images\Chest_Lg.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\close-button.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
