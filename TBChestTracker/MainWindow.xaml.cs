@@ -55,14 +55,14 @@ namespace TBChestTracker
         public Snapture Snapture { get; private set; }
 
         public AppContext appContext { get; private set; }
-
-        List<string> recently_opened_files { get; set; }
+        
         ConsoleWindow consoleWindow { get; set; }
         CancellationTokenSource CancellationTokenSource { get; set; }
         SettingsWindow SettingsWindow { get; set; }
         OCRWizardWindow OCRWizardWindow { get; set; }
         StartPageWindow startPageWindow {  get; set; }  
         ClanChestProcessResult clanChestProcessResult { get; set; }
+        RecentDatabase recentlyOpenedDatabases { get; set; }
         #endregion
 
         #region PropertyChanged Event
@@ -82,7 +82,8 @@ namespace TBChestTracker
             appContext = new AppContext();
             this.DataContext = appContext;
             this.Closing += MainWindow_Closing;
-            recently_opened_files = new List<string>();
+            recentlyOpenedDatabases = new RecentDatabase();
+
             consoleWindow = new ConsoleWindow();
         }
         #endregion
@@ -171,7 +172,9 @@ namespace TBChestTracker
                 if (GlobalDeclarations.canCaptureAgain)
                 {
                     Thread.Sleep(1250); //-- could prevent the "From:" bug.
+
                     CaptureRegion();
+
                     while (ClanManager.Instance.ClanChestManager.ChestProcessingState != ChestProcessingState.COMPLETED)
                     {
                     }
@@ -255,42 +258,56 @@ namespace TBChestTracker
         #endregion
 
         #region Initializing functions
-        private Task InitCaptainHook()
+        private void InitCaptainHook()
         {
-            return Task.Run(() =>
-            {
-                CaptainHook = new CaptainHook();
-                CaptainHook.onKeyboardMessage += CaptainHook_onKeyboardMessage;
-                CaptainHook.onInstalled += CaptainHook_onInstalled;
-                CaptainHook.Install();
-            });
+
+            CaptainHook = new CaptainHook();
+            CaptainHook.onKeyboardMessage += CaptainHook_onKeyboardMessage;
+            CaptainHook.onInstalled += CaptainHook_onInstalled;
+            CaptainHook.Install();
         }
+
         private Task InitSnapture()
         {
             return Task.Run(() =>
             {
                 Snapture = new Snapture();
                 Snapture.onFrameCaptured += Snapture_onFrameCaptured;
-#if !SNAPTURE_DEBUG
                 Snapture.SetBitmapResolution((int)Snapture.MonitorInfo.Monitors[0].Dpi.X);
-#elif SNAPTURE_DEBUG
-            Snapture.SetBitmapResolution(96);
-#endif
                 Snapture.Start(FrameCapturingMethod.GDI);
-
                 com.HellStormGames.Logging.Console.Write("Snapture Started.", com.HellStormGames.Logging.LogType.INFO);
-
             });
         }
-        private Task InitSettings()
+
+        private Task<bool> IsFirstLaunch()
         {
-            return Task.Run(() =>
+            var firstLaunchTask = Task.Run(() => System.IO.File.Exists($".FIRSTRUN"));
+            return firstLaunchTask;
+        }
+
+        private void InitSettingsTask()
+        {
+            Task t = new Task(new Action(async () =>
+            {
+                await InitSettings();
+            }));
+            t.Start();
+            t.Wait();
+        }
+        private Task<SettingsManager> InitSettings()
+        {
+            return Task.Run(async () =>
             {
                 SettingsManager = new SettingsManager();
-                if (GlobalDeclarations.IsFirstRun)
+
+                var isFirstRun = await IsFirstLaunch();
+
+                if (isFirstRun)
+                {
                     SettingsManager.Instance.BuildDefaultConfiguration();
-                else
-                    SettingsManager.Load();
+                }
+
+                SettingsManager.Load();
 
                 com.HellStormGames.Logging.Console.Write("Settings Loaded.", com.HellStormGames.Logging.LogType.INFO);
 
@@ -299,6 +316,8 @@ namespace TBChestTracker
                 appContext.IsCurrentClandatabase = false;
                 appContext.IsAutomationStopButtonEnabled = false;
                 appContext.UpdateApplicationTitle();
+                return SettingsManager;
+
             });
         }
 
@@ -317,9 +336,32 @@ namespace TBChestTracker
                     System.IO.Directory.CreateDirectory(SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder);
                 }
 
-                if (File.Exists("recent.lst"))
+                if (File.Exists(GlobalDeclarations.RecentOpenedClanDatabases))
                 {
+                    
+                    if(recentlyOpenedDatabases.Load())
+                    {
+                        foreach(var recent in recentlyOpenedDatabases.RecentClanDatabases)
+                        {
+                            if(string.IsNullOrEmpty(recent.FullClanRootFolder) ) 
+                            {
+                                continue;
+                            }
+                            this.Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                MenuItem mu = new MenuItem();
+                                //var position = StringHelpers.findNthOccurance(recent.FullClanRootFolder, Convert.ToChar(@"\"), 3);
+                                //var truncated = StringHelpers.truncate_file_name(recent.FullClanRootFolder, position);
+                                mu.Header = recent.ShortClanRootFolder;
+                                mu.Tag = recent.FullClanRootFolder;
+                                mu.Click += Mu_Click;
+                                RecentlyOpenedParent.Items.Add(mu);
+                                //recently_opened_files.Add(file);
+                            }));
+                        }
+                    }
 
+                    /*
                     using (var sr = File.OpenText("recent.lst"))
                     {
                         var data = sr.ReadToEnd();
@@ -350,6 +392,7 @@ namespace TBChestTracker
                             }));
                         }
                     }
+                    */
 
                     //-- add seperator to recently opened clan databases.
                     this.Dispatcher.BeginInvoke(new Action(() =>
@@ -374,7 +417,6 @@ namespace TBChestTracker
         {
             return Task.Run(() =>
             {
-
                 if (System.IO.Directory.Exists(SettingsManager.Instance.Settings.GeneralSettings.TessDataFolder))
                 {
                     GlobalDeclarations.TessDataExists = true;
@@ -404,25 +446,42 @@ namespace TBChestTracker
         {
             if (window is SplashScreen splashScreen)
             {
+
+                await this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    splashScreen.UpdateStatus("Initalizing...", 0);
+                }));
+                
+                SettingsManager = await InitSettings();
+
+                if(SettingsManager == null)
+                {
+                    throw new Exception("SettingzManager is null");
+                }
+
+                if(String.IsNullOrEmpty(SettingsManager.Instance.Settings.GeneralSettings.TessDataFolder))
+                {
+                    throw new Exception("Unable to correctly populate settings.");
+                }
+
+//                await Task.Delay(2000);
+
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     splashScreen.UpdateStatus("Initializing Captain Hook...", 25);
                 }));
 
-                await InitCaptainHook();
+                await Task.Delay(500);
+                
+                InitCaptainHook();
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     splashScreen.UpdateStatus("Initializing Snapture...", 40);
                 }));
-
+                await Task.Delay(500);
                 await InitSnapture();
-                await this.Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    splashScreen.UpdateStatus("Loading Settings...", 50);
-                }));
-
-                await InitSettings();
+              
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
@@ -430,12 +489,15 @@ namespace TBChestTracker
                 
                 }));
 
+                await Task.Delay(500);
                 await FinishingUpTask();
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     splashScreen.UpdateStatus("Initializing Tesseract...", 95);
                 }));
+
+                await Task.Delay(500);
 
                 await InitTesseract();
 
@@ -463,7 +525,7 @@ namespace TBChestTracker
         public void ShowWindow()
         {
             this.Show();
-            if(GlobalDeclarations.IsFirstRun)
+            if(IsFirstLaunch().Result)
             {
                 //-- prompt the user to set up OCR for the first time.
                 OCRWizardWindow = new OCRWizardWindow();
@@ -589,10 +651,9 @@ namespace TBChestTracker
             {
                 try
                 {
-                    System.IO.File.Delete("recent.lst");
+                    System.IO.File.Delete($@"{GlobalDeclarations.RecentOpenedClanDatabases}");
                     RecentlyOpenedParent.Items.Clear();
-                    recently_opened_files.Clear();
-
+                    recentlyOpenedDatabases.RecentClanDatabases.Clear();
                 }
                 catch(Exception ex)
                 {
@@ -662,23 +723,27 @@ namespace TBChestTracker
                         appContext.UpdateCurrentProject($"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}");
                         appContext.UpdateApplicationTitle();
 
-                        //AppTitle = $"TotalBattle Chest Tracker v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} - {ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}";
-                        if (!recently_opened_files.Contains(file, StringComparer.CurrentCultureIgnoreCase))
+                        var recentlyOpenedFiles = recentlyOpenedDatabases.RecentClanDatabases.Select(f => f.FullClanRootFolder).ToList();
+
+                        if(!recentlyOpenedFiles.Contains(file))
                         {
-                            recently_opened_files.Add(file);
-                            MenuItem mu = new MenuItem();
+                            RecentClanDatabase recentdb = new RecentClanDatabase();
+                            recentdb.ClanAbbreviations = ClanManager.ClanDatabaseManager.ClanDatabase.ClanAbbreviations;
+                            recentdb.ClanName = ClanManager.ClanDatabaseManager.ClanDatabase.Clanname;
                             var position = StringHelpers.findNthOccurance(file, Convert.ToChar(@"\"), 3);
+                            recentdb.ShortClanRootFolder = StringHelpers.truncate_file_name(file, position);
+                            recentdb.FullClanRootFolder = file;
+                            recentdb.LastOpened = DateTime.Now.ToFileTimeUtc().ToString();
+                            recentlyOpenedDatabases.RecentClanDatabases.Add(recentdb);
+
+                            MenuItem mu = new MenuItem();
                             mu.Header = StringHelpers.truncate_file_name(file, position);
                             mu.Tag = file;
                             mu.Click += Mu_Click;
                             RecentlyOpenedParent.Items.Add(mu);
-                            using (var tw = File.CreateText("recent.lst"))
-                            {
-                                foreach (var f in recently_opened_files)
-                                {
-                                    tw.WriteLine(f);
-                                }
-                            }
+
+                            recentlyOpenedDatabases.Save();
+
                         }
 
                         com.HellStormGames.Logging.Console.Write($"Loaded Clan ({ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}) Database Successfully.",

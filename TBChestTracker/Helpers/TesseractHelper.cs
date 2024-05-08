@@ -98,7 +98,8 @@ namespace TBChestTracker.Helpers
                 _tesseract.Dispose();
                 _tesseract = null;
             }
-           
         }
+
+
     }
 }

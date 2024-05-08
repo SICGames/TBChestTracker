@@ -23,36 +23,52 @@ namespace TBChestTracker
         
         public SettingsManager() 
         {
-            Settings = new Settings();
             if (Instance == null)
                 Instance = this;
+
+            var settingsPathFolder = GlobalDeclarations.CommonAppFolder;
+            if(!System.IO.Directory.Exists(settingsPathFolder))
+            {
+                try
+                {
+                    System.IO.Directory.CreateDirectory(settingsPathFolder);
+                }
+                catch(System.IO.IOException ex) 
+                { 
+                    throw new Exception(ex.Message);
+                }
+
+            }
         }
 
         public bool Load(string file = "Settings.json")
         {
-            if (File.Exists(file) == false)
+            var filePath = $"{GlobalDeclarations.CommonAppFolder}{file}";
+            if (File.Exists(filePath) == false)
                 return false;
 
-            using (StreamReader sr = File.OpenText(file))
+            using (StreamReader sr = File.OpenText(filePath))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Formatting = Formatting.Indented;
+                
+                if(Settings != null)
+                    Settings.Dispose();
+
+                Settings = new Settings();
+
                 Settings = (Settings)serializer.Deserialize(sr, typeof(Settings));
-                if (Settings != null)
-                {
-                    CommandManager.InvalidateRequerySuggested();
-                    return true;
-                }
-                else
-                    return false;
+                CommandManager.InvalidateRequerySuggested();
+                return true;
             }
         }
         public bool Save(string file = "Settings.json")
         {
             //var saveFilePath = $"Settings.json";
+            var savePath = $"{GlobalDeclarations.CommonAppFolder}{file}";
             try
             {
-                using (System.IO.StreamWriter sw = System.IO.File.CreateText(file))
+                using (System.IO.StreamWriter sw = System.IO.File.CreateText(savePath))
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     serializer.Formatting = Formatting.Indented;
@@ -74,6 +90,10 @@ namespace TBChestTracker
 
         public void BuildDefaultConfiguration()
         {
+            if(Settings == null) 
+                Settings = new Settings();
+
+
             Settings.OCRSettings.CaptureMethod = "GDI+";
             Settings.OCRSettings.GlobalBrightness = 0.65;
             Settings.OCRSettings.Tags = new ObservableCollection<string>(new List<string> { "Chest", "From", "Source", "Gift" });

@@ -86,6 +86,7 @@ namespace TBChestTracker
             }
             return false;
         }
+
         //-- ProcessChestData optimize chest data
         private List<ChestData> ProcessText2(List<String> result)
         {

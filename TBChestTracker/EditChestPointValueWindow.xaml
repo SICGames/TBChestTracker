@@ -10,7 +10,7 @@
         Closing="Window_Closing"
         WindowStyle="ToolWindow" SizeToContent="WidthAndHeight"  Topmost="True" WindowStartupLocation="CenterScreen">
     <Window.Resources>
-        <local:ChestRefConverter x:Key="ChestRefConverter"/>
+        <local:EnumToRadioOptionConverter x:Key="ChestRefConverter"/>
     </Window.Resources>
     <Grid>
         <StackPanel Orientation="Vertical">

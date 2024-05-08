@@ -19,6 +19,15 @@ namespace TBChestTracker
         {
             get => $@"{System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\";
         }
+        public static string CommonAppFolder
+        {
+            get => $@"{System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\SICGames\TotalBattleChestTracker\";
+        }
+        public static string RecentOpenedClanDatabases
+        {
+            get => $@"{CommonAppFolder}recent.db";
+        }
+
         public static string TesseractData
         {
             get => $@"{AppFolder}TessData";
@@ -26,7 +35,7 @@ namespace TBChestTracker
         public static bool TessDataExists { get; set; }
         public static bool AutomationRunning = false;
 
-        public static bool IsFirstRun => System.IO.File.Exists($".FIRSTRUN");
+        
         public static bool IsConfiguringHotKeys = false;
 
         public static bool DebugOCRWizardEnabled = false;

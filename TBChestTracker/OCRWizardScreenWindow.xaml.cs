@@ -27,6 +27,7 @@ using System.Windows.Controls.Primitives;
 using Emgu.CV.Util;
 using Emgu.CV.Features2D;
 using System.Windows.Navigation;
+using TBChestTracker.Helpers.Extensions;
 
 
 namespace TBChestTracker
@@ -524,6 +525,45 @@ namespace TBChestTracker
             return isActive;
         }
 
+        private Task<Tesseract.Character[]> ObtainScreenTextAsync(sys_drawing.Bitmap bitmap, AOIRect rect, params string[] filters) => Task.Run(() => ObtainScreenText(bitmap, rect, filters));
+        private Tesseract.Character[] ObtainScreenText(sys_drawing.Bitmap bitmap, AOIRect rect, params string[] filters)
+        {
+            Tesseract.Character[] result = null;
+            
+            //-- We should give a quick test and have user confirm everything.
+            sys_drawing.Bitmap clone = (sys_drawing.Bitmap)bitmap.Clone();
+            BitmapSource bitmapSource = clone.ToBitmapSource();
+            CroppedBitmap croppedBitmap = new CroppedBitmap(bitmapSource,
+                new Int32Rect((int)rect.x,
+                (int)rect.y,
+                (int)rect.width - (int)rect.x,
+                (int)rect.height - (int)rect.y));
+
+            var bmp = croppedBitmap.ToBitmap();
+
+            Image<Gray, byte> tessy_image = bmp.ToImage<Gray, byte>();
+
+            var tessy = TesseractHelper.GetTesseract();
+            tessy.SetImage(tessy_image);
+            if (tessy.Recognize() == 0)
+            {
+                result = tessy.GetCharacters();
+                if(filters.Count() > 0)
+                {
+                    result.Filter(filters);
+                }
+            }
+
+            //--- clean up on isle 5
+            tessy = null;
+            tessy_image.Dispose();
+            bmp.Dispose();
+            croppedBitmap = null;
+            bitmapSource = null;
+            clone.Dispose();
+            return result;
+        }
+
         private Task BeginRenderingTaskAsync() => Task.Run(() => BeginRenderingTask());
         private void BeginRenderingTask()
         {
@@ -608,6 +648,8 @@ namespace TBChestTracker
         {
             Snapture.CaptureDesktop();
         }
+
+
         private async void PerformORCWizard(sys_drawing.Bitmap bitmap, CancellationToken cancellationToken)
         {
             bool mustRetry = false;
@@ -671,7 +713,8 @@ namespace TBChestTracker
                     if (CornerRectangles.Count() > 0)
                         CornerRectangles.Clear();
 
-                    StatusMessage = $"Performing Jedi Magic...";
+                    StatusMessage = $"Building Suggested Area Of Interest...";
+
                     foreach (var refImage in ref_images)
                     {
                         var threshold = Snapture.MonitorInfo.Monitors[0].Height > 1080 ? 0.6 : 0.7;
@@ -682,23 +725,7 @@ namespace TBChestTracker
                         }
                     }
 
-                    var chestButtonsThreshold = Snapture.MonitorInfo.Monitors[0].Height > 1080 ? 0.9 : 0.9;
-                    var claim_buttons = await DetectOpenChestButton(bitmap, chestButtonsThreshold);
-                    if (claim_buttons.Count() > 0 && claim_buttons != null)
-                    {
-                        foreach (var claim_button in claim_buttons)
-                        {
-                            claim_button.Offset(8, 8);
-                            if (!claim_button.IsEmpty)
-                            {
-                                var claim_button_rect = claim_button;
-                                var claim_center_x = (claim_button_rect.Width / 2) + claim_button_rect.X;
-                                var claim_center_y = (claim_button_rect.Height / 2) + claim_button_rect.Y;
-                                OpenChestButtonPositions.Add(new sys_drawing.Point(claim_center_x, claim_center_y));
-                            }
-                        }
-                        Debug.WriteLine($"Detected Claim Chest Buttons");
-                    }
+                   
 
                     if (CornerRectangles.Count() > 0)
                     {
@@ -732,45 +759,55 @@ namespace TBChestTracker
                         Debug.WriteLine($"Creating Area Of Interest Markers");
                     }
 
-                    //-- We should give a quick test and have user confirm everything.
-                    BitmapSource bitmapSource = bitmap.ToBitmapSource();
-                    CroppedBitmap croppedBitmap = new CroppedBitmap(bitmapSource,
-                        new Int32Rect((int)SuggestedAreaOfInterest.x,
-                        (int)SuggestedAreaOfInterest.y, 
-                        (int)SuggestedAreaOfInterest.width - (int)SuggestedAreaOfInterest.x, 
-                        (int)SuggestedAreaOfInterest.height - (int)SuggestedAreaOfInterest.y));
+                    StatusMessage = "Detecting Open Chest Buttons...";
 
-                    var bmp = croppedBitmap.ToBitmap();
-                    
+                    await Task.Delay(750);
 
-                    Image<Gray, byte> tessy_image = bmp.ToImage<Gray, byte>();
-
-                    var Tessy = TesseractHelper.GetTesseract();
-                    Tessy.SetImage(tessy_image);
-                    if (Tessy.Recognize() == 0)
+                    var chestButtonsThreshold = Snapture.MonitorInfo.Monitors[0].Height > 1080 ? 0.9 : 0.9;
+                    var claim_buttons = await DetectOpenChestButton(bitmap, chestButtonsThreshold);
+                    if (claim_buttons.Count() > 0 && claim_buttons != null)
                     {
-                        Letters = Tessy.GetCharacters();
+                        foreach (var claim_button in claim_buttons)
+                        {
+                            claim_button.Offset(8, 8);
+                            if (!claim_button.IsEmpty)
+                            {
+                                var claim_button_rect = claim_button;
+                                var claim_center_x = (claim_button_rect.Width / 2) + claim_button_rect.X;
+                                var claim_center_y = (claim_button_rect.Height / 2) + claim_button_rect.Y;
+                                OpenChestButtonPositions.Add(new sys_drawing.Point(claim_center_x, claim_center_y));
+                            }
+                        }
+                        Debug.WriteLine($"Detected Claim Chest Buttons");
                     }
 
-                    //--- clean up on isle 5
-                    Tessy = null;
-                    tessy_image.Dispose();
-                    bmp.Dispose();
-                    croppedBitmap = null;
+                    StatusMessage = "Finalizing everything...";
+                    await Task.Delay(750);
 
-                    ProgressCanvas.Visibility = Visibility.Hidden;
+                    //-- We should give a quick test and have user confirm everything.
+                    Letters = await ObtainScreenTextAsync(bitmap,SuggestedAreaOfInterest);
 
-                    await BeginRenderingTaskAsync();
+                    if (Letters != null)
+                    {
+                        ProgressCanvas.Visibility = Visibility.Hidden;
 
-                    Debug.WriteLine($"OCR Wizard Completed");
+                        await BeginRenderingTaskAsync();
 
-                    PreviewImageSource = null;
-                    CapturedBitmap.Dispose();
-                    CornerRectangles.Clear();
-                    
-                    CloseCanvas.Visibility = Visibility.Hidden;
-                    canExit = false;
-                    PrepareClose();
+                        Debug.WriteLine($"OCR Wizard Completed");
+
+                        PreviewImageSource = null;
+                        CapturedBitmap.Dispose();
+                        CornerRectangles.Clear();
+
+                        CloseCanvas.Visibility = Visibility.Hidden;
+                        canExit = false;
+                        PrepareClose();
+                    }
+                    else
+                    {
+                        //-- critical problem
+                        throw new Exception("Tesseract was unable to obtain screen text.");
+                    }
                     return;
                 }
 

@@ -11,6 +11,54 @@
         Topmost="True" ShowInTaskbar="False" WindowStartupLocation="CenterScreen" 
         Background="Black" RenderOptions.BitmapScalingMode="HighQuality"
         WindowStyle="None" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing">
+    <Window.Resources>
+        <DataTemplate x:Key="RecentOpenedDatabaseTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Column="0" Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Image Grid.Row="0" Grid.Column="0" Source="Images/icons_main_menu_clan_1.png" Stretch="UniformToFill" Width="32" Margin="5"/>
+
+                    <Grid Grid.Column="1" Grid.Row="0" Margin="10,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Foreground="White" FontWeight="Bold" Text="{Binding Path=ClanAbbreviations}" FontSize="16" Margin="5,3" VerticalAlignment="Bottom"/>
+                            <TextBlock Grid.Column="1" Foreground="White" FontWeight="Bold" Text="{Binding Path=ClanName}" FontSize="14" Margin="3,3" VerticalAlignment="Bottom"/>
+                        </Grid>
+                        
+                        <TextBlock Grid.Row="1" Foreground="White" FontStyle="Italic" Text="{Binding Path=ShortClanRootFolder}" Margin="5,2" VerticalAlignment="Center"/>
+                        
+                        
+                    </Grid>
+                </Grid>
+                
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="32"/>
     </WindowChrome.WindowChrome>
@@ -69,8 +117,14 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <TextBlock Text="Recent Opened Clan Databases" Foreground="White" FontWeight="Bold" FontSize="20" Grid.Column="0" Margin="15,10"/>
-                    <ListView x:Name="recentFilesView" Grid.Row="1" Background="#111" BorderBrush="Transparent" BorderThickness="0" Margin="10,5" Foreground="White" FontWeight="Bold">
-
+                    <ListView ItemTemplate="{DynamicResource RecentOpenedDatabaseTemplate}" 
+                              x:Name="recentFilesView" Grid.Row="1" 
+                              Background="#111" BorderBrush="Transparent" BorderThickness="0" Margin="0" Foreground="White" FontWeight="Bold">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="Lvi_PreviewMouseDown"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     </ListView>
                 </Grid>
                 <!--#region  Recent Files-->

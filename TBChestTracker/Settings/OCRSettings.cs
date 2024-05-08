@@ -10,12 +10,19 @@ using Newtonsoft;
 
 namespace TBChestTracker
 {
+
+    [System.Serializable]
+    public enum CaptureEnum
+    {
+        ENTIRE_SCREEN,
+        SPECIFIC_REGION
+    }
+
     [System.Serializable]
     public class OCRSettings : INotifyPropertyChanged
     {
-        
-        private double _GlobalBrightness;
 
+        private double _GlobalBrightness;
         public double GlobalBrightness
         {
             get
@@ -41,7 +48,18 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(Tags));
             }
         }
-        
+
+        private CaptureEnum _capture = CaptureEnum.SPECIFIC_REGION;
+
+        public CaptureEnum Capture
+        {
+            get => _capture;
+            set
+            {
+                _capture = value;
+                OnPropertyChanged(nameof(Capture));
+            }
+        }
 
         public string CaptureMethod { get; set; }
         public AOIRect AreaOfInterest { get; set; }

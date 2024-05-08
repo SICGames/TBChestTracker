@@ -8,7 +8,7 @@ using System.Windows.Data;
 
 namespace TBChestTracker
 {
-    public class ChestRefConverter : IValueConverter
+    public class EnumToRadioOptionConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

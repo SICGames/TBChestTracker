@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
         mc:Ignorable="d"
-        Title="SplashScreen" Width="800" WindowStartupLocation="CenterScreen" 
-        SizeToContent="Height" Background="Black" WindowStyle="None" ResizeMode="NoResize" Loaded="Window_Loaded" Unloaded="Window_Unloaded">
+        Title="SplashScreen" WindowStartupLocation="CenterScreen" 
+        SizeToContent="WidthAndHeight" Background="Black" WindowStyle="None" ResizeMode="NoResize" Loaded="Window_Loaded" Unloaded="Window_Unloaded">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>

@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="New Chest Point" MinWidth="400" WindowStyle="ToolWindow" SizeToContent="WidthAndHeight" Topmost="True" DataContext="local:ClanChestSettings" WindowStartupLocation="CenterScreen">
     <Window.Resources>
-        <local:ChestRefConverter x:Key="ChestRefConverter"/>
+        <local:EnumToRadioOptionConverter x:Key="ChestRefConverter"/>
     </Window.Resources>
     <Grid>
         <StackPanel Orientation="Vertical">

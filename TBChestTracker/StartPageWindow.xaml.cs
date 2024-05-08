@@ -25,12 +25,15 @@ namespace TBChestTracker
     /// </summary>
     public partial class StartPageWindow : Window
     {
-        public ObservableCollection<String> RecentFiles;
+        public ObservableCollection<RecentClanDatabase> RecentClanDatabases { get; set; }
+
+        //public ObservableCollection<String> RecentFiles;
         public MainWindow MainWindow { get; set; }
         public StartPageWindow()
         {
             InitializeComponent();
-            RecentFiles = new ObservableCollection<String>();
+          //  RecentFiles = new ObservableCollection<String>();
+            RecentClanDatabases = new ObservableCollection<RecentClanDatabase>();   
         }
 
         private void CloseBtn_Click(object sender, RoutedEventArgs e)
@@ -41,47 +44,45 @@ namespace TBChestTracker
 
         private void LoadRecentFilesList()
         {
-            if (File.Exists("recent.lst"))
+            if(File.Exists(GlobalDeclarations.RecentOpenedClanDatabases))
             {
-                using (var sr = File.OpenText("recent.lst"))
+                var recentDatabase = new RecentDatabase();
+                recentDatabase.Load();
+
+                
+                foreach(var recent in recentDatabase.RecentClanDatabases)
                 {
-                    var data = sr.ReadToEnd();
-                    if (data.Contains("\r\n"))
-                    {
-                        data = data.Replace("\r\n", ",");
-                    }
-                    else
-                        data = data.Replace("\n", ",");
+                    RecentClanDatabases.Add(recent);
+                    /*
+                    var file = recent.FullClanRootFolder;
+                    if (string.IsNullOrEmpty(file))
+                        continue;
 
-                    var list = data.Split(',');
+                    var position = StringHelpers.findNthOccurance(file, Convert.ToChar(@"\"), 3);
+                    var truncated = StringHelpers.truncate_file_name(file, position);
 
-                    foreach (var file in list)
-                    {
-                        if (string.IsNullOrEmpty(file))
-                            continue;
-
-                        var position = StringHelpers.findNthOccurance(file, Convert.ToChar(@"\"), 3);
-                        var truncated = StringHelpers.truncate_file_name(file, position);
-                        ListViewItem lvi = new ListViewItem();
-                        lvi.Tag = file;
-                        lvi.Content = truncated;
-                        lvi.PreviewMouseDown += Lvi_PreviewMouseDown;
-                        recentFilesView.Items.Add(lvi); 
-                    }
+                    ListViewItem lvi = new ListViewItem();
+                    lvi.Tag = file;
+                    lvi.Content = truncated;
+                    lvi.PreviewMouseDown += Lvi_PreviewMouseDown;
+                    recentFilesView.Items.Add(lvi);
+                    */
                 }
+
+                recentFilesView.ItemsSource = RecentClanDatabases;
             }
+
         }
 
         private void Lvi_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            var menuitem = sender as ListViewItem;
-            var tag = menuitem.Tag.ToString();
-            MainWindow.LoadReentFile(tag, result =>
+            var item = ((ListViewItem)sender).Content as RecentClanDatabase;
+
+            MainWindow.LoadReentFile(item.FullClanRootFolder, result =>
             {
                 MainWindow.ShowWindow();
                 this.Close();
             });
-        
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -91,10 +92,18 @@ namespace TBChestTracker
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            if (RecentClanDatabases.Count > 0)
+                RecentClanDatabases.Clear();
+
+            RecentClanDatabases = null;
+
+            /*
             if(RecentFiles.Count > 0)
                 RecentFiles.Clear(); 
             
             RecentFiles = null;
+            */
+
             MainWindow = null;
         }
 

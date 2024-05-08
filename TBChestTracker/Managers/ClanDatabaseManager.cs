@@ -47,6 +47,33 @@ namespace TBChestTracker
                 sw.Close();
                 sw.Dispose();
             }
+
+            //--- in addition, we add it to recent files. 
+            var recentdb = new RecentDatabase();
+            recentdb.Load();
+            if (recentdb.RecentClanDatabases.Count > 0)
+            {
+                var recent_files = recentdb.RecentClanDatabases.Where(f => f.FullClanRootFolder.Equals(saveFilePath)).ToList();
+                if(recent_files.Count>0)
+                {
+                    recent_files[0].LastOpened = DateTime.Now.ToFileTimeUtc().ToString();
+                }
+                else
+                {
+                    RecentClanDatabase recentClanDatabase = new RecentClanDatabase();
+                    recentClanDatabase.ClanAbbreviations = ClanDatabase.ClanAbbreviations;
+                    recentClanDatabase.ClanName = ClanDatabase.Clanname;
+
+                    var position = StringHelpers.findNthOccurance(saveFilePath, Convert.ToChar(@"\"), 3);
+                    var truncated = StringHelpers.truncate_file_name(saveFilePath, position);
+
+                    recentClanDatabase.ShortClanRootFolder = truncated;
+                    recentClanDatabase.FullClanRootFolder = saveFilePath;
+                    recentClanDatabase.LastOpened = DateTime.Now.ToFileTimeUtc().ToString();
+                    recentdb.RecentClanDatabases.Add(recentClanDatabase);
+                    recentdb.Save();
+                }
+            }
         }
         public void Load(string file, ClanChestManager m_ClanChestManager, Action<bool> result)
         {

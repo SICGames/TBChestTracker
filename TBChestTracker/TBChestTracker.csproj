@@ -158,7 +158,7 @@
     </Compile>
     <Compile Include="Console\Console.cs" />
     <Compile Include="Console\ConsoleData.cs" />
-    <Compile Include="Converters\ChestRefConverter.cs" />
+    <Compile Include="Converters\EnumToRadioOptionConverter.cs" />
     <Compile Include="Converters\MidPointValueConverter.cs" />
     <Compile Include="CustomControls\DpiAwareImage.cs" />
     <Compile Include="EditChestPointValueWindow.xaml.cs">
@@ -167,6 +167,7 @@
     <Compile Include="Helpers\ImageDpiHelper.cs" />
     <Compile Include="Helpers\IOHelper.cs" />
     <Compile Include="Helpers\JsonHelper.cs" />
+    <Compile Include="Helpers\ListExtension.cs" />
     <Compile Include="Helpers\Table.cs" />
     <Compile Include="Helpers\Translator.cs" />
     <Compile Include="Managers\ClanChestProcessResult.cs" />
@@ -217,6 +218,8 @@
     <Compile Include="PreviewScreenshotWindow.xaml.cs">
       <DependentUpon>PreviewScreenshotWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RecentData\RecentClanDatabase.cs" />
+    <Compile Include="RecentData\RecentDatabase.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
@@ -496,9 +499,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include=".FIRSTRUN">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include=".FIRSTRUN" />
     <None Include="app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
