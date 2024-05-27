@@ -282,7 +282,7 @@ namespace TBChestTracker
 
         private Task<bool> IsFirstLaunch()
         {
-            var firstLaunchTask = Task.Run(() => System.IO.File.Exists($".FIRSTRUN"));
+            var firstLaunchTask = Task.Run(() => System.IO.File.Exists($@"{GlobalDeclarations.CommonAppFolder}.FIRSTRUN"));
             return firstLaunchTask;
         }
 

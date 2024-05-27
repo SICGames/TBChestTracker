@@ -33,7 +33,6 @@ namespace TBChestTracker
         public StartPageWindow()
         {
             InitializeComponent();
-          //  RecentFiles = new ObservableCollection<String>();
             RecentClanDatabases = new ObservableCollection<RecentClanDatabase>();   
         }
 
@@ -49,25 +48,10 @@ namespace TBChestTracker
             {
                 var recentDatabase = new RecentDatabase();
                 recentDatabase.Load();
-
                 
                 foreach(var recent in recentDatabase.RecentClanDatabases)
                 {
                     RecentClanDatabases.Add(recent);
-                    /*
-                    var file = recent.FullClanRootFolder;
-                    if (string.IsNullOrEmpty(file))
-                        continue;
-
-                    var position = StringHelpers.findNthOccurance(file, Convert.ToChar(@"\"), 3);
-                    var truncated = StringHelpers.truncate_file_name(file, position);
-
-                    ListViewItem lvi = new ListViewItem();
-                    lvi.Tag = file;
-                    lvi.Content = truncated;
-                    lvi.PreviewMouseDown += Lvi_PreviewMouseDown;
-                    recentFilesView.Items.Add(lvi);
-                    */
                 }
 
                 recentFilesView.ItemsSource = RecentClanDatabases;
@@ -97,14 +81,6 @@ namespace TBChestTracker
                 RecentClanDatabases.Clear();
 
             RecentClanDatabases = null;
-
-            /*
-            if(RecentFiles.Count > 0)
-                RecentFiles.Clear(); 
-            
-            RecentFiles = null;
-            */
-
             MainWindow = null;
         }
 
