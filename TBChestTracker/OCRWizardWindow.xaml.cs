@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TBChestTracker.Pages.OCRWizard;
 
 namespace TBChestTracker
 {
@@ -22,7 +23,8 @@ namespace TBChestTracker
     {
         private bool isCompleted = false;
 
-        OCRWizardScreenWindow ocrWizardScreenWindow = null; 
+        OCRWizardManualEditorWindow OCRWizardManualEditorWindow;
+
         public OCRWizardWindow()
         {
             InitializeComponent();
@@ -30,8 +32,7 @@ namespace TBChestTracker
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            ocrWizardScreenWindow = new OCRWizardScreenWindow();
-            ocrWizardScreenWindow.ocrWindow = this;
+            
             OCRWizardGuideViewer.LoadCompleted += OCRWizardGuideViewer_LoadCompleted;
         }
 
@@ -46,7 +47,12 @@ namespace TBChestTracker
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            ocrWizardScreenWindow?.Close();
+            //-- before we close, let's save everthing
+            var page = OCRWizardGuideViewer.Content;
+            if(page.GetType() == typeof(OCRWizard_Successful))
+            {
+                SettingsManager.Instance.Save();
+            }
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
@@ -75,25 +81,52 @@ namespace TBChestTracker
         }
         private void BeginButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Hide();
-
-            if (ocrWizardScreenWindow.ShowDialog() == true)
+            var page = OCRWizardGuideViewer.Content;
+            OCRWizardManualEditorWindow = new OCRWizardManualEditorWindow();
+            
+            if (page.GetType() == typeof(OCRWizard_SelectRegion))
             {
-                isCompleted = true;
-                this.Close();
+                OCRWizardManualEditorWindow.OCRManualMode = OCRManualMode.REGION_SELECTION;
             }
-            else
+            else if(page.GetType() == typeof(OCRWizard_CreateMarker))
+            {
+                OCRWizardManualEditorWindow.OCRManualMode = OCRManualMode.MARKER_PLACEMENT;
+            }
+            this.Hide();
+            
+            if (OCRWizardManualEditorWindow.ShowDialog() == true)
             {
                 this.Show();
+                //-- we need to move to next step
+                var ocrMode = OCRWizardManualEditorWindow.OCRManualMode;
+                if (ocrMode == OCRManualMode.REGION_SELECTION)
+                {
+                    NavigateTo("Pages/OCRWizard/OCRWizard_CreateMarker.xaml");
+                }
+                else if(ocrMode == OCRManualMode.MARKER_PLACEMENT)
+                {
+                    NavigateTo("Pages/OCRWizard/OCRWizard_Successful.xaml");
+                    BeginButton.Visibility = Visibility.Hidden;
+                    NextButton.Visibility = Visibility.Hidden;
+                    DoneButton.Visibility = Visibility.Visible;
+                }
             }
         }
 
         private void NextButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigateTo("Pages/OCRWizard/OCRWizard_GiftsTab.xaml");
-            
-            BeginButton.Visibility = Visibility.Visible;
-            NextButton.Visibility = Visibility.Collapsed;
+            var uri = OCRWizardGuideViewer.Content;
+
+            if (uri.GetType() == typeof(OCRWizard_WelcomePage))
+            {
+                NavigateTo("Pages/OCRWizard/OCRWizard_GiftsTab.xaml");
+            }
+            else if(uri.GetType() == typeof(OCRWizard_GiftsTab))
+            {
+                NavigateTo("Pages/OCRWizard/OCRWizard_SelectRegion.xaml");
+                NextButton.Visibility = Visibility.Collapsed;
+                BeginButton.Visibility = Visibility.Visible;
+            }
         }
 
         private void DoneButton_Click(object sender, RoutedEventArgs e)

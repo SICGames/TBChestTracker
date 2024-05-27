@@ -30,7 +30,8 @@ namespace TBChestTracker
     public partial class PreviewScreenshotWindow : Window
     {
         Snapture Snapture { get; set; }
-        public String ScreenshotImage { get; set; }
+       
+        // public String ScreenshotImage { get; set; }
 
         private Rectangle SelectionRectangle { get; set; }
         private Rectangle FillRectangle { get; set; }
@@ -39,7 +40,6 @@ namespace TBChestTracker
 
         private int SelectionThickness = 3;
         BitmapSource PreviewImageSource { get; set; }
-
         PreviewCroppedImageViewer previewer { get; set; }
 
         public string clanmateName { get; set; }
@@ -77,8 +77,7 @@ namespace TBChestTracker
         {
             if(e.ScreenCapturedBitmap != null)
             {
-                
-                var bitmap = e.ScreenCapturedBitmap;
+                 var bitmap = e.ScreenCapturedBitmap;
                 var file = $@"{IOHelper.ApplicationFolder}\PreviewScreenShot.jpg";
 
                 PreviewImageSource = bitmap.ToBitmapSource();  //BitmapHelper.ConvertFromBitmap(bitmap, (Int32)144, (Int32)144);

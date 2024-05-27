@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
         xmlns:Commands="clr-namespace:Hellscape.Commands"
-        xmlns:UIControls="clr-namespace:com.Konquest.UI;assembly=KonquestUI"
-        xmlns:UI="clr-namespace:TBChestTracker.UI"
+        xmlns:UIControls="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
+        xmlns:UI="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
         mc:Ignorable="d"
         Title="{Binding Path=AppTitle, Mode=TwoWay}" 
         Width="800" Loaded="Window_Loaded" 
@@ -272,8 +272,8 @@
                     <Separator/>
                     <MenuItem Header="OCR Wizard" x:Name="OCRWizard" Click="OCRWizard_Click"/>
                 </MenuItem>
-                <MenuItem Header="Help">
-                    <MenuItem Header="Tutorial"/>
+                <MenuItem Header="Help" x:Name="HelpMenu" Click="HelpMenu_Click">
+                    <MenuItem Header="About" Tag="AboutApp"/>
                 </MenuItem>
             </Menu>
         </DockPanel>

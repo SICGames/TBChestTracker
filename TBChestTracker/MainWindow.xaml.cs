@@ -32,6 +32,7 @@ using com.HellstormGames.ScreenCapture;
 using com.HellstormGames.Imaging;
 using com.HellstormGames.Imaging.Extensions;
 using com.CaptainHook;
+using com.KonquestUI.Controls;
 
 
 namespace TBChestTracker
@@ -115,8 +116,8 @@ namespace TBChestTracker
             
             int ca_x = (int)capture_region.x;
             int ca_y = (int)capture_region.y;
-            int ca_width = (int)capture_region.width - ca_x;
-            int ca_height = (int)capture_region.height - ca_y;
+            int ca_width = (int)capture_region.width;
+            int ca_height = (int)capture_region.height;
 
             Snapture.CaptureRegion(ca_x, ca_y, ca_width, ca_height);
 
@@ -993,6 +994,19 @@ namespace TBChestTracker
 
             OCRWizardWindow = new OCRWizardWindow();
             OCRWizardWindow.Show();
+
+        }
+
+        private void HelpMenu_Click(object sender, RoutedEventArgs e)
+        {
+            var mi = (MenuItem)e.OriginalSource;
+            var _tag = mi.Tag;
+
+            if (_tag.Equals("AboutApp"))
+            {
+                AboutWindow aboutWindow = new AboutWindow();
+                aboutWindow.Show();
+            }
 
         }
     }

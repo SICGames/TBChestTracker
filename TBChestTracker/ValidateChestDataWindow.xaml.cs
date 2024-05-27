@@ -55,7 +55,6 @@ namespace TBChestTracker
 
         private bool ValidateChestDataChestTypes(ref Dictionary<string, List<ClanChestData>> chestdata)
         {
-            
             foreach (var dates in chestdata.Keys)
             {
                 var data = chestdata[dates];
@@ -67,8 +66,10 @@ namespace TBChestTracker
                         foreach(var chest in chests)
                         {
                             var chesttype = chest.Type;
-                            var chestSource = chest.Name;
-                            if(chestSource.ToLower().Contains("jormungandr"))
+                            var chestSource = chest.Source;
+                            var chestname = chest.Name;
+
+                            if (chestSource.ToLower().Contains("jormungandr"))
                             {
                                 if (chesttype == ChestType.OTHER)
                                 {
@@ -83,6 +84,8 @@ namespace TBChestTracker
 
             return true;
         }
+
+
         //--- should be a task
         private void BeginValidatingChestData(CancellationToken token)
         {
@@ -95,12 +98,12 @@ namespace TBChestTracker
             //--- if not, replace point value
             //--- alert or change status to completed and close
             var chestsettings = ClanManager.Instance.ClanChestSettings;
-            
+
             var chestdata = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
 
             if (!chestsettings.ChestPointsSettings.UseChestPoints)
             {
-                EndValidatingChestData("There's nothing to do.",true, false);
+                EndValidatingChestData("There's nothing to do.", true, false);
                 return;
             }
             if (token.IsCancellationRequested)
@@ -113,72 +116,66 @@ namespace TBChestTracker
             //--- Validate ChestType Data.
             StatusMessage = "Validating Chest data types...";
             var chestTypeRepaired = ValidateChestDataChestTypes(ref chestdata);
-
             var numClanmates = ClanManager.Instance.ClanmateManager.Database.NumClanmates;
+            StatusMessage = "Validating other chest data...";
 
-            if (chestTypeRepaired)
+            foreach (var dates in chestdata.Keys)
             {
-                StatusMessage = "Validating other chest data...";
-                foreach (var dates in chestdata.Keys)
+                var data = chestdata[dates];
+
+                /*
+                 -- to implement in future. 
+                 -- Goal is to remove duplicates from clan chest data. 
+                var cleaned_data = data.Distinct(new ClanChestComparer()).ToList();
+                if (data.Count() != cleaned_data.Count())
                 {
-                    var data = chestdata[dates];
-                    
-                    /*
-                     -- to implement in future. 
-                     -- Goal is to remove duplicates from clan chest data. 
-                    var cleaned_data = data.Distinct(new ClanChestComparer()).ToList();
-                    if (data.Count() != cleaned_data.Count())
+                    chestErrors++;
+                    data = cleaned_data;
+                }
+                */
+                foreach (var _data in data)
+                {
+                    var clanmate_points = _data.Points;
+                    var chests = _data.chests;
+
+                    var total_chest_points = 0;
+
+                    if (chests != null)
                     {
-                        chestErrors++;
-                        data = cleaned_data;
-                    }
-                    */
-
-                    foreach (var _data in data)
-                    {
-                        var clanmate_points = _data.Points;
-                        var chests = _data.chests;
-
-                        var total_chest_points = 0;
-
-                        if (chests != null)
+                        foreach (var chest in chests)
                         {
-                            foreach (var chest in chests)
+                            foreach (var chestpointvalue in chestpointsvalues)
                             {
-                                foreach (var chestpointvalue in chestpointsvalues)
+                                var chestname = chest.Name;
+                                if (chestpointvalue.ChestType.ToLower() == "custom")
                                 {
-                                    var chestname = chest.Name;
-                                    if (chestpointvalue.ChestType.ToLower() == "custom")
+                                    if (chestname.ToLower().Equals(chestpointvalue.ChestName.ToLower()))
                                     {
-                                        if (chestname.ToLower().Equals(chestpointvalue.ChestName.ToLower()))
-                                        {
-                                            total_chest_points += chestpointvalue.PointValue;
-                                            break;
-                                        }
+                                        total_chest_points += chestpointvalue.PointValue;
+                                        break;
                                     }
-                                    if (chest.Type.ToString().ToLower() == chestpointvalue.ChestType.ToLower())
+                                }
+                                if (chest.Type.ToString().ToLower() == chestpointvalue.ChestType.ToLower())
+                                {
+                                    if (chest.Level == chestpointvalue.Level)
                                     {
-                                        if (chest.Level == chestpointvalue.Level)
-                                        {
-                                            total_chest_points += chestpointvalue.PointValue;
-                                            break;
-                                        }
+                                        total_chest_points += chestpointvalue.PointValue;
+                                        break;
                                     }
                                 }
                             }
-                            if (clanmate_points != total_chest_points)
-                            {
-                                _data.Points = total_chest_points;
-                                chestErrors++;
-                            }
                         }
-
+                        if (clanmate_points != total_chest_points)
+                        {
+                            _data.Points = total_chest_points;
+                            chestErrors++;
+                        }
                     }
                 }
             }
-            
+
             //--- now we fix duplicates inside clanchests.db file
-            if(chestErrors > 0)
+            if (chestErrors > 0)
             {
                 EndValidatingChestData($"Chest Data has been successfully fixed.", true, true);
                 return;
@@ -188,6 +185,8 @@ namespace TBChestTracker
                 EndValidatingChestData($"Chest Data looks fine.", true, false);
             }
         }
+
+
         private void EndValidatingChestData(string message, bool isCompleted, bool isRepaired)
         {
             //--- we wrap things up by placing checkmark icon and hide progress bar

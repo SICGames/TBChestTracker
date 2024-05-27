@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:TBChestTracker.Pages.OCRWizard"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      Height="250" Width="800"
       Title="OCRWizard_Successful">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -24,7 +24,7 @@
             </Grid.RowDefinitions>
             <TextBlock Text="OCR Wizard Successful" Grid.Row="0" Foreground="White" FontWeight="Bold" FontSize="24"/>
             <TextBlock 
-      Text="It was a success. So what you should've seen was text surrounded by rectangles and red circles around the Open buttons. If it did not appear correct, you will need to run the OCR wizard again."
+      Text="If everything was done correctly, you shouldn't have a issue. And if there is an issue, there's a reason for that. And it's due to a user error.."
       TextWrapping="Wrap"
       Grid.Row="1" Foreground="White"
       Margin="10,5"/>

@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace TBChestTracker.Pages.OCRWizard
 {
     /// <summary>
-    /// Interaction logic for OCRWizard_Failed.xaml
+    /// Interaction logic for OCRWizard_SelectRegion.xaml
     /// </summary>
-    public partial class OCRWizard_Failed : Page
+    public partial class OCRWizard_SelectRegion : Page
     {
-        public OCRWizard_Failed()
+        public OCRWizard_SelectRegion()
         {
             InitializeComponent();
         }

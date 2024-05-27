@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
-        xmlns:UIControls="clr-namespace:com.Konquest.UI;assembly=KonquestUI"
+        xmlns:UIControls="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
         mc:Ignorable="d"
         Title="Clan Chests Management" Height="600" Width="800" Topmost="True" WindowStartupLocation="CenterScreen">
     <Window.Resources>
@@ -54,20 +54,20 @@
                                     </ListView.View>
                                 </ListView>
                                 <StackPanel Orientation="Vertical" Grid.Column="1">
-                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/PlusIcon.png" 
+                                    <UIControls:FancyImageButton ImageSource="pack://application:,,,/Images/PlusIcon.png" 
                                                             Height="24" Width="24" 
                                                             BorderBrush="DarkGray" BorderThickness="1" 
-                                                            HoverBrush="LightGray" 
+                                                            HighlightBrush="LightGray"
                                                             IsEnabled="True" Click="AddConditionBtn_Click" Margin="0,2"/>
-                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/MinusIcon.png" 
+                                    <UIControls:FancyImageButton ImageSource="pack://application:,,,/Images/MinusIcon.png" 
                                                             Height="24" Width="24" 
                                                             BorderBrush="DarkGray" BorderThickness="1" 
-                                                            HoverBrush="LightGray" 
+                                                            HighlightBrush="LightGray" 
                                                             IsEnabled="True" Click="RemoveConditionBtn_Click" Margin="0,2"/>
-                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/trashIcon.png" 
+                                    <UIControls:FancyImageButton ImageSource="pack://application:,,,/Images/trashIcon.png" 
                                                             Height="24" Width="24" 
                                                             BorderBrush="DarkGray" BorderThickness="1" 
-                                                            HoverBrush="LightGray" 
+                                                            HighlightBrush="LightGray" 
                                                             IsEnabled="True" Click="ClearAllConditionsBtn_Click" Margin="0,2"/>
                                 </StackPanel>
                             </Grid>
@@ -101,22 +101,22 @@
                                     <RowDefinition Height="auto"/>
                                 </Grid.RowDefinitions>
                                 <StackPanel Orientation="Horizontal" Grid.Row="0">
-                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/PlusIcon.png" 
+                                    <UIControls:FancyImageButton ImageSource="pack://application:,,,/Images/PlusIcon.png" 
                                                             Height="24" Width="24"
                                                             Margin="3,0"
                                                             BorderBrush="DarkGray"
-                                                            BorderThickness="1" HoverBrush="LightGray" x:Name="AddRequirementButton" Click="AddRequirementButton_Click"/>
-                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/MinusIcon.png" 
+                                                            BorderThickness="1" HighlightBrush="LightGray" x:Name="AddRequirementButton" Click="AddRequirementButton_Click"/>
+                                    <UIControls:FancyImageButton ImageSource="pack://application:,,,/Images/MinusIcon.png" 
                                                             Height="24" Width="24"
                                                             Margin="3,0"
                                                             BorderBrush="DarkGray"
-                                                            BorderThickness="1" HoverBrush="LightGray"
+                                                            BorderThickness="1" HighlightBrush="LightGray"
                                                             x:Name="RemoveRequirementButton" Click="RemoveRequirementButton_Click"/>
-                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/trashIcon.png" 
+                                    <UIControls:FancyImageButton ImageSource="pack://application:,,,/Images/trashIcon.png" 
                                                             Height="24" Width="24"
                                                             Margin="3,0"
                                                             BorderBrush="DarkGray"
-                                                            BorderThickness="1" HoverBrush="LightGray"
+                                                            BorderThickness="1" HighlightBrush="LightGray"
                                                             x:Name="ClearRequirementsButton" Click="ClearRequirementsButton_Click"/>
                                 </StackPanel>
                                 <ListView Grid.Row="1" ItemsSource="{Binding ClanRequirements.ClanSpecifiedRequirements}" ItemContainerStyle="{StaticResource RequirementListViewItemStyle}">
@@ -160,34 +160,34 @@
                                     <RowDefinition Height="auto"/>
                                 </Grid.RowDefinitions>
                                 <StackPanel Orientation="Horizontal" Grid.Row="0">
-                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/PlusIcon.png" 
+                                    <UIControls:FancyImageButton ImageSource="pack://application:,,,/Images/PlusIcon.png" 
                                      Height="24" Width="24"
                                      Margin="3,0"
                                      BorderBrush="DarkGray"
-                                     BorderThickness="1" HoverBrush="LightGray" x:Name="AddChestPointButton" Click="AddChestPointButton_Click"/>
-                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/MinusIcon.png" 
+                                     BorderThickness="1" HighlightBrush="LightGray" x:Name="AddChestPointButton" Click="AddChestPointButton_Click"/>
+                                    <UIControls:FancyImageButton ImageSource="pack://application:,,,/Images/MinusIcon.png" 
                                      Height="24" Width="24"
                                      Margin="3,0"
                                      BorderBrush="DarkGray"
-                                     BorderThickness="1" HoverBrush="LightGray"
+                                     BorderThickness="1" HighlightBrush="LightGray"
                                      x:Name="RemoveChestPointButton" Click="RemoveChestPointButton_Click"/>
-                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/trashIcon.png" 
+                                    <UIControls:FancyImageButton ImageSource="pack://application:,,,/Images/trashIcon.png" 
                                      Height="24" Width="24"
                                      Margin="3,0"
                                      BorderBrush="DarkGray"
-                                     BorderThickness="1" HoverBrush="LightGray"
+                                     BorderThickness="1" HighlightBrush="LightGray"
                                      x:Name="ClearChestPointsButton" Click="ClearChestPointsButton_Click"/>
-                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/EditIcon.png" 
+                                    <UIControls:FancyImageButton ImageSource="pack://application:,,,/Images/EditIcon.png" 
                                         Height="24" Width="24"
                                         Margin="3,0"
                                         BorderBrush="DarkGray"
-                                        BorderThickness="1" HoverBrush="LightGray"
+                                        BorderThickness="1" HighlightBrush="LightGray"
                                         x:Name="EditChestPoints" Click="EditChestPoints_Click"/>
-                                    <UIControls:ImageButton Icon="pack://application:,,,/Images/saveIcon.png" 
+                                    <UIControls:FancyImageButton ImageSource="pack://application:,,,/Images/saveIcon.png" 
                                                             Height="24" Width="24"
                                                             Margin="3,0"
                                                             BorderBrush="DarkGray"
-                                                            BorderThickness="1" HoverBrush="LightGray"
+                                                            BorderThickness="1" HighlightBrush="LightGray"
                                                             x:Name="ExportChestPointsToFile" Click="ExportChestPointsToFile_Click"/>
 
                                 </StackPanel>

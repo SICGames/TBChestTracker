@@ -108,7 +108,7 @@
     </Reference>
     <Reference Include="KonquestUI, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\KonquestUI\KonquestUI\bin\x64\Release\KonquestUI.dll</HintPath>
+      <HintPath>..\..\KonquestUI\KonquestUI\bin\x64\Debug\KonquestUI.dll</HintPath>
     </Reference>
     <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="Snapture, Version=1.0.8882.27601, Culture=neutral, processorArchitecture=AMD64">
@@ -138,6 +138,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AboutWindow.xaml.cs">
+      <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Arrays\IDataCollection.cs" />
     <Compile Include="Automation\Automator.cs" />
     <Compile Include="Chest\ChestPointsData.cs" />
@@ -181,6 +184,9 @@
     <Compile Include="NewRequirementWindow.xaml.cs">
       <DependentUpon>NewRequirementWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="OCRWizardManualEditorWindow.xaml.cs">
+      <DependentUpon>OCRWizardManualEditorWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="OCRWizardScreenWindow.xaml.cs">
       <DependentUpon>OCRWizardScreenWindow.xaml</DependentUpon>
     </Compile>
@@ -191,11 +197,14 @@
     <Compile Include="Pages\ClanPage.xaml.cs">
       <DependentUpon>ClanPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\OCRWizard\OCRWizard_CreateMarker.xaml.cs">
+      <DependentUpon>OCRWizard_CreateMarker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\OCRWizard\OCRWizard_SelectRegion.xaml.cs">
+      <DependentUpon>OCRWizard_SelectRegion.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\Settings\GeneralSettingsPage.xaml.cs">
       <DependentUpon>GeneralSettingsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\OCRWizard\OCRWizard_Failed.xaml.cs">
-      <DependentUpon>OCRWizard_Failed.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\OCRWizard\OCRWizard_GiftsTab.xaml.cs">
       <DependentUpon>OCRWizard_GiftsTab.xaml</DependentUpon>
@@ -300,13 +309,8 @@
     </Compile>
     <Compile Include="Chest\SortType.cs" />
     <Compile Include="Helpers\StringHelpers.cs" />
-    <Compile Include="UI\FancyButton.cs" />
-    <Compile Include="UI\FancyImageButton.cs" />
-    <Compile Include="UI\FancyNavigationButton.cs" />
     <Compile Include="UI\FancyNumericValue.cs" />
     <Compile Include="UI\FancyPicker.cs" />
-    <Compile Include="UI\FancyTagBox.cs" />
-    <Compile Include="UI\FancyTagItem.cs" />
     <Compile Include="UI\Milestone.xaml.cs">
       <DependentUpon>Milestone.xaml</DependentUpon>
     </Compile>
@@ -316,6 +320,10 @@
     <Compile Include="ValidateChestDataWindow.xaml.cs">
       <DependentUpon>ValidateChestDataWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="AddClanmatesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -400,6 +408,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="OCRWizardManualEditorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="OCRWizardScreenWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -412,11 +424,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\Settings\GeneralSettingsPage.xaml">
+    <Page Include="Pages\OCRWizard\OCRWizard_CreateMarker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\OCRWizard\OCRWizard_Failed.xaml">
+    <Page Include="Pages\OCRWizard\OCRWizard_SelectRegion.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Settings\GeneralSettingsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -568,6 +584,12 @@
     <Content Include="Images\OCRWizard\Green-CheckMark.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\OCRWizard\PlaceMarkerOnOpenButton.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\OCRWizard\SelectRegionSuggestion.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\OCR_Icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -580,10 +602,16 @@
     <Content Include="Images\Refs\chest_window_chests_active-1080.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\Refs\chest_window_chests_active.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\Refs\chest_window_claim_button-1080.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Refs\chest_window_claim_button-2160.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refs\chest_window_claim_button.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Refs\chest_window_ref_bottom_left-2160.png">
@@ -592,10 +620,16 @@
     <Content Include="Images\Refs\chest_window_ref_bottom_left-1080.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\Refs\chest_window_ref_bottom_left.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\Refs\chest_window_ref_bottom_right-1080.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Refs\chest_window_ref_bottom_right-2160.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refs\chest_window_ref_bottom_right.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Refs\chest_window_ref_top_left-2160.png">
@@ -604,10 +638,16 @@
     <Content Include="Images\Refs\chest_window_ref_top_left-1080.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\Refs\chest_window_ref_top_left.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\Refs\chest_window_ref_top_right-2160.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Refs\chest_window_ref_top_right-1080.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refs\chest_window_ref_top_right.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Refs\Open_Chest_Button_RefImage-2160.jpg">

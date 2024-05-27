@@ -4,9 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
-        xmlns:ui="clr-namespace:TBChestTracker.UI"
+        xmlns:ui="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
         mc:Ignorable="d"
-        Title="OCR Wizard" Height="350" Width="500" WindowStyle="None" WindowStartupLocation="CenterScreen" Topmost="True" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing">
+        Title="OCR Wizard" SizeToContent="WidthAndHeight" d:Height="350" d:Width="500" WindowStyle="None" WindowStartupLocation="CenterScreen" Topmost="True" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing">
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="32" ResizeBorderThickness="0"/>
     </WindowChrome.WindowChrome>

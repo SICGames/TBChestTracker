@@ -17,6 +17,7 @@ using TBChestTracker.Managers;
 using TBChestTracker.UI;
 using System.Runtime.CompilerServices;
 using System.Windows.Shell;
+using com.KonquestUI.Controls;
 
 namespace TBChestTracker
 {
@@ -114,7 +115,7 @@ namespace TBChestTracker
         }
         private void StackPanel_Click(object sender, RoutedEventArgs e)
         {
-            var button = e.OriginalSource as TBChestTracker.UI.FancyButton;
+            var button = e.OriginalSource as FancyButton;
             string action = button.Tag.ToString();
             switch (action)
             {

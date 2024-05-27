@@ -28,7 +28,7 @@ using Emgu.CV.Util;
 using Emgu.CV.Features2D;
 using System.Windows.Navigation;
 using TBChestTracker.Helpers.Extensions;
-
+using com.KonquestUI.Controls;
 
 namespace TBChestTracker
 {
@@ -132,6 +132,7 @@ namespace TBChestTracker
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             this.Opacity = 0;
+           
             //this.Hide();
 
             Snapture = new Snapture();
@@ -260,8 +261,6 @@ namespace TBChestTracker
             }
 
         }
-
-
         #endregion
         #region Snapture onFrameCaptured function
         private void Snapture_onFrameCaptured(object sender, FrameCapturedEventArgs e)
@@ -294,41 +293,63 @@ namespace TBChestTracker
         #region Feature Based Matching
         private Task<VectorOfPoint> FeatureMatchingAsync(sys_drawing.Bitmap bitmap, Image<Bgr, Byte> referenceImage, double uniquenessThreshold = 0.88)
             => Task.Run(()  => FeatureMatching(bitmap, referenceImage, uniquenessThreshold));
-        private VectorOfPoint FeatureMatching(sys_drawing.Bitmap bitmap, Image<Bgr,Byte> referenceImage, double uniquenessThreshold = 0.88)
+
+        private VectorOfPoint FeatureMatching(sys_drawing.Bitmap bitmap, Image<Bgr, Byte> referenceImage, double uniquenessThreshold = 0.88)
         {
+            VectorOfPoint finalPoints = null;
+            Mat homography = new Mat();
+            Image<Gray, Byte> src_gray = bitmap.ToImage<Gray, Byte>().Canny(160, 255);
+
+            Image<Gray, Byte> ref_gray = referenceImage.ToBitmap().ToImage<Gray, Byte>();
+
+            VectorOfKeyPoint templateKeypoints = new VectorOfKeyPoint();
+            VectorOfKeyPoint sourceKeypoints = new VectorOfKeyPoint();
+            Mat templateDesc = new Mat();
+            Mat sourceDesc = new Mat();
+
+            Mat mask;
+            int k = 2;
+            VectorOfVectorOfDMatch matches = new VectorOfVectorOfDMatch();
+            
+            Brisk featureDetection = new Brisk();
             try
             {
-                VectorOfPoint finalPoints = null;
-                Mat homography = new Mat();
-                Image<Gray, Byte> src_gray = bitmap.ToImage<Gray, Byte>();
-                Image<Gray, Byte> ref_gray = referenceImage.ToBitmap().ToImage<Gray, Byte>();
-                VectorOfKeyPoint templateKeypoints = new VectorOfKeyPoint();
-                VectorOfKeyPoint sourceKeypoints = new VectorOfKeyPoint();
-                Mat templateDesc = new Mat();
-                Mat sourceDesc = new Mat();
-
-                Mat mask;
-                int k = 2;
-                VectorOfVectorOfDMatch matches = new VectorOfVectorOfDMatch();
-
-                Brisk featureDetection = new Brisk();
                 featureDetection.DetectAndCompute(ref_gray, null, templateKeypoints, templateDesc, false);
                 featureDetection.DetectAndCompute(src_gray, null, sourceKeypoints, sourceDesc, false);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Feature Detection And Compution Failed: {ex.Message} ");
+            }
 
+            try
+            {
                 BFMatcher matcher = new BFMatcher(DistanceType.Hamming);
                 matcher.Add(templateDesc);
                 matcher.KnnMatch(sourceDesc, matches, k);
+
+                if (matches[0].Size == 0)
+                {
+                    return null;
+                }
 
                 mask = new Mat(matches.Size, 1, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
                 mask.SetTo(new MCvScalar(255));
 
                 Features2DToolbox.VoteForUniqueness(matches, uniquenessThreshold, mask);
-                int count = Features2DToolbox.VoteForSizeAndOrientation(templateKeypoints, sourceKeypoints, matches, mask, 1.5, 20);
-                if(count >= 4)
+                int count = Features2DToolbox.VoteForSizeAndOrientation(templateKeypoints, sourceKeypoints, matches, mask, 1.5, 15);
+
+                if (count >= 4)
                 {
                     homography = Features2DToolbox.GetHomographyMatrixFromMatchedFeatures(templateKeypoints, sourceKeypoints, matches, mask, 5);
                 }
-                if(homography != null)
+                
+                if(homography == null)
+                {
+
+                    return null;
+                }
+                if (homography.IsEmpty == false)
                 {
                     sys_drawing.Rectangle rectangle = new sys_drawing.Rectangle(sys_drawing.Point.Empty, referenceImage.Size);
                     sys_drawing.PointF[] pts = new sys_drawing.PointF[]
@@ -343,14 +364,15 @@ namespace TBChestTracker
                     sys_drawing.Point[] points = Array.ConvertAll<sys_drawing.PointF, sys_drawing.Point>(pts, sys_drawing.Point.Round);
                     finalPoints = new VectorOfPoint(points);
                 }
-
-                return finalPoints;
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception($"Feature Matching Voting For Uniqueness failed: {ex.Message}");
             }
+         
+            return finalPoints;
         }
+        
         #endregion
 
         #region PerformTemplateMatching Functions
@@ -366,7 +388,7 @@ namespace TBChestTracker
             if (bitmap == null)
                 return new System.Drawing.Rectangle(0, 0, 0, 0);
 
-            Image<Gray, byte> src = bitmap.ToImage<Gray, byte>();
+            Image<Gray, byte> src = bitmap.ToImage<Gray, byte>().Canny(160,255);
             Image<Gray, byte> refImage_Gray = refImage.ToBitmap().ToImage<Gray, byte>();
 
             System.Drawing.Rectangle match_rectangle = new System.Drawing.Rectangle();
@@ -508,20 +530,6 @@ namespace TBChestTracker
             {
                 isActive = false;
             }
-
-            /*
-            System.Drawing.Rectangle rect_result = 
-                performTemplateMatching(bitmap, ChestWindowChestsActiveRefImage, minThreshold, threshold);
-            if (rect_result.X > 0 && rect_result.Y > 0)
-            {
-                isActive = true;
-            }
-            else
-            {
-                isActive = false;
-            }
-            */
-
             return isActive;
         }
 
@@ -715,17 +723,20 @@ namespace TBChestTracker
 
                     StatusMessage = $"Building Suggested Area Of Interest...";
 
+                    var count = 0;
+
                     foreach (var refImage in ref_images)
                     {
-                        var threshold = Snapture.MonitorInfo.Monitors[0].Height > 1080 ? 0.6 : 0.7;
+                        var threshold = Snapture.MonitorInfo.Monitors[0].Height > 1080 ? 0.62 : 0.7;
+
+                        //--- feature matching doesn't work. Result comes back null. 
+                        //--- using scale variant template matching 
                         var rect = await performTemplateMatchingAsync(bitmap, refImage, 0.0, threshold);
                         if (rect.Height != 0 && rect.Width != 0)
                         {
                             CornerRectangles.Add(rect);
                         }
                     }
-
-                   
 
                     if (CornerRectangles.Count() > 0)
                     {
@@ -839,11 +850,21 @@ namespace TBChestTracker
         #region Functions & Stuff
         private void InitReferences()
         {
+            /*
             ref_image_files = new List<string>(new string[] {
                 $"Images/Refs/chest_window_ref_top_left-{Snapture.MonitorInfo.Monitors[0].Height}.png",
                 $"Images/Refs/chest_window_ref_top_right-{Snapture.MonitorInfo.Monitors[0].Height}.png",
                 $"Images/Refs/chest_window_ref_bottom_left-{Snapture.MonitorInfo.Monitors[0].Height}.png",
                 $"Images/Refs/chest_window_ref_bottom_right-{Snapture.MonitorInfo.Monitors[0].Height}.png"
+            });
+            */
+
+            ref_image_files = new List<string>(new string[] 
+            {
+                $@"{GlobalDeclarations.AppFolder}Images\Refs\chest_window_ref_top_left.png",
+                $@"{GlobalDeclarations.AppFolder}Images\Refs\chest_window_ref_top_right.png",
+                $@"{GlobalDeclarations.AppFolder}Images\Refs\chest_window_ref_bottom_left.png",
+                $@"{GlobalDeclarations.AppFolder}Images\Refs\chest_window_ref_bottom_right.png"
             });
 
             var ref_file_not_found = false;
@@ -877,9 +898,10 @@ namespace TBChestTracker
                 }
             }
 
-            ChestWindowChestsActiveRefImage = new Image<Bgr, Byte>($"Images/Refs/chest_window_chests_active-{Snapture.MonitorInfo.Monitors[0].Height}.png");
-            OpenChestRefImage = new Image<Bgr, Byte>($"Images/Refs/chest_window_claim_button-{Snapture.MonitorInfo.Monitors[0].Height}.png");
-
+            // ChestWindowChestsActiveRefImage = new Image<Bgr, Byte>($@"{GlobalDeclarations.AppFolder}Images\Refs\chest_window_chests_active-{Snapture.MonitorInfo.Monitors[0].Height}.png");
+            // OpenChestRefImage = new Image<Bgr, Byte>($@"{GlobalDeclarations.AppFolder}Images\Refs\chest_window_claim_button-{Snapture.MonitorInfo.Monitors[0].Height}.png");
+            ChestWindowChestsActiveRefImage = new Image<Bgr, Byte>($@"{GlobalDeclarations.AppFolder}Images\Refs\chest_window_chests_active.png");
+            OpenChestRefImage = new Image<Bgr, Byte>($@"{GlobalDeclarations.AppFolder}Images\Refs\chest_window_claim_button.png");
         }
 
         private void CreateCanvasControls(Canvas canvas)

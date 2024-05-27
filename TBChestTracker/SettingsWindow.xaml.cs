@@ -11,7 +11,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using TBChestTracker.UI;
+using com.KonquestUI.Controls;
+
 
 namespace TBChestTracker
 {
