@@ -167,6 +167,7 @@
     <Compile Include="EditChestPointValueWindow.xaml.cs">
       <DependentUpon>EditChestPointValueWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ErrorHandlers\ChestProcessingError.cs" />
     <Compile Include="Helpers\ImageDpiHelper.cs" />
     <Compile Include="Helpers\IOHelper.cs" />
     <Compile Include="Helpers\JsonHelper.cs" />
@@ -515,7 +516,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include=".FIRSTRUN" />
     <None Include="app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

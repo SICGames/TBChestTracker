@@ -131,7 +131,6 @@ namespace TBChestTracker
                         com.HellStormGames.Logging.Loggy.Write($"{e.Message}", com.HellStormGames.Logging.LogType.ERROR);
                         bError = true;
                         break;
-                        //throw new Exception(e.Message);
                     }
                     
                     com.HellStormGames.Logging.Console.Write($"OCR RESULT [{chestName}, {clanmate}, {chestobtained}", "OCR Result", LogType.INFO);
@@ -205,12 +204,6 @@ namespace TBChestTracker
                                 {
                                     //-- failed to obtain level from string.
                                 }
-                                /*
-                                if (!levels[0].Contains("io"))
-                                    level = Int32.Parse(levels[0]);
-                                else
-                                    level = 10;
-                                */
                             }
                             else if (levels.Count() > 1)
                             {
@@ -305,6 +298,7 @@ namespace TBChestTracker
                     }
                 }
             }
+
             if (bError)
                 return null;
 
@@ -331,7 +325,7 @@ namespace TBChestTracker
             return clanChestData;
         }
 
-        public ClanChestProcessResult ProcessChestData(List<string> result, System.Action<bool> onError)
+        public ClanChestProcessResult ProcessChestData(List<string> result, System.Action<ChestProcessingError> onError)
         {
 
             /*
@@ -357,8 +351,8 @@ namespace TBChestTracker
 
             if (tmpchests == null)
             {
-                onError(true);
-                return new ClanChestProcessResult("Temp chests is null.", 0, ClanChestProcessEnum.ERROR);
+                onError(new ChestProcessingError("Temporary chest data is null"));
+                return new ClanChestProcessResult("Temporary chest data is null.", 0, ClanChestProcessEnum.ERROR);
             }
 
             List<ClanChestData> tmpchestdata = CreateClanChestData(tmpchests);

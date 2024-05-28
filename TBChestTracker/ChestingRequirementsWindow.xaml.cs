@@ -1,9 +1,12 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -115,13 +118,17 @@ namespace TBChestTracker
 
         private void ExportChestPointsToFile_Click(object sender, RoutedEventArgs e)
         {
+
+            //-- one file is text file and other file is db file to allow users to import if sharing same point values
+
             SaveFileDialog sf = new SaveFileDialog();
             sf.RestoreDirectory = true;
             sf.Filter = "Text File|*.txt";
             sf.OverwritePrompt = true;
             if(sf.ShowDialog() == true)
             {
-                using (StreamWriter sw = File.CreateText(sf.FileName))
+                var filename = sf.FileName;
+                using (StreamWriter sw = File.CreateText(filename))
                 {
                     var points = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints;
                     foreach (var point in points)
@@ -131,6 +138,16 @@ namespace TBChestTracker
 
                         sw.WriteLine(line);
                     }
+                    sw.Close();
+                }
+
+                var dbFilename = filename.Substring(0,filename.LastIndexOf("."));
+                dbFilename += $".cpd";
+                using(var sw =  File.CreateText(dbFilename))
+                {
+                    Newtonsoft.Json.JsonSerializer serializer = new Newtonsoft.Json.JsonSerializer();
+                    serializer.Formatting = Newtonsoft.Json.Formatting.Indented;
+                    serializer.Serialize(sw, ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints);
                     sw.Close();
                 }
             }
@@ -161,5 +178,26 @@ namespace TBChestTracker
 
         }
 
+        private void ImportChestPointsFile_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "Chest Points Data file|*.cpd|All Files|*.*";
+            ofd.RestoreDirectory = true;
+            if(ofd.ShowDialog() == true)
+            {
+                using(var sr = File.OpenText(ofd.FileName))
+                {
+                    Newtonsoft.Json.JsonSerializer serializer = new Newtonsoft.Json.JsonSerializer();
+                    serializer.Formatting = Newtonsoft.Json.Formatting.Indented;
+                    var chestpoints = new ObservableCollection<ChestPoints>();
+                    
+                    chestpoints = (ObservableCollection<ChestPoints>)serializer.Deserialize(sr, typeof(ObservableCollection<ChestPoints>));
+                    ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints = chestpoints;
+                    sr.Close();
+                    ICollectionView collectionView = CollectionViewSource.GetDefaultView(ChestPointsListView.ItemsSource);
+                    collectionView.Refresh();
+                }
+            }
+        }
     }
 }

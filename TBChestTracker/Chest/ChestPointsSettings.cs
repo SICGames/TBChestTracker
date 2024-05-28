@@ -32,7 +32,16 @@ namespace TBChestTracker
             }
         }
 
-        public ObservableCollection<ChestPoints> ChestPoints { get; set; }
+        private ObservableCollection<ChestPoints> _ChestPoints;
+        public ObservableCollection<ChestPoints> ChestPoints 
+        {
+            get => _ChestPoints;
+            set
+            {
+                _ChestPoints = value;
+                OnPropertyChanged(nameof(ChestPoints));
+            }
+        }
 
         public ChestPointsSettings() 
         { 

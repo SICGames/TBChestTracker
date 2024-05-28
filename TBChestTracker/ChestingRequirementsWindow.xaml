@@ -175,19 +175,27 @@
                                      Height="24" Width="24"
                                      Margin="3,0"
                                      BorderBrush="DarkGray"
-                                     BorderThickness="1" HighlightBrush="LightGray"
+                                     BorderThickness="1" HighlightBrush="LightGray" ToolTip="Clear All Chest Points Data"
                                      x:Name="ClearChestPointsButton" Click="ClearChestPointsButton_Click"/>
                                     <UIControls:FancyImageButton ImageSource="pack://application:,,,/Images/EditIcon.png" 
                                         Height="24" Width="24"
                                         Margin="3,0"
                                         BorderBrush="DarkGray"
-                                        BorderThickness="1" HighlightBrush="LightGray"
+                                        BorderThickness="1" HighlightBrush="LightGray" ToolTip="Edit Chest Point Value"
                                         x:Name="EditChestPoints" Click="EditChestPoints_Click"/>
+
+                                    <UIControls:FancyImageButton ImageSource="pack://application:,,,/Images/folderIcon.png" 
+                                         Height="24" Width="24"
+                                        Margin="3,0"
+                                        BorderBrush="DarkGray"
+                                        BorderThickness="1" HighlightBrush="LightGray" ToolTip="Import Shared Chest Points Data"
+                                       x:Name="ImportChestPointsFile" Click="ImportChestPointsFile_Click"/>
+
                                     <UIControls:FancyImageButton ImageSource="pack://application:,,,/Images/saveIcon.png" 
                                                             Height="24" Width="24"
                                                             Margin="3,0"
                                                             BorderBrush="DarkGray"
-                                                            BorderThickness="1" HighlightBrush="LightGray"
+                                                            BorderThickness="1" HighlightBrush="LightGray" ToolTip="Export Chest Points To File"
                                                             x:Name="ExportChestPointsToFile" Click="ExportChestPointsToFile_Click"/>
 
                                 </StackPanel>

@@ -85,7 +85,6 @@ namespace TBChestTracker
 
         public void UpdateStatus(string message, double progress, int delayMs = 3000)
         {
-
             StatusMessage = message;
             StatusProgress = progress;
         }
