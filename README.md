@@ -11,7 +11,11 @@ Easily count clan chests with a hotkey and let the automation take control.
 - Clan Chest Filtering. Filter only the ones you want to be added to the chest quota.
 - More to be added in the future. 
 ## How to install
-- Download installer from releases section.
+- Download installer (TBChestTracker-Setup.exe) from releases section.
+
+## Want to contribute? 
+Send message to be allowed to push updates to the project. I rather have people contribute than clone and compile solely for themselves.
+
 ## Launched Program and now what?
 - Click first button "Clan Manager" to create your clan database.
 - CLick on + icon to create new clan.
