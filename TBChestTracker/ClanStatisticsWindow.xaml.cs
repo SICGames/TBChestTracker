@@ -17,6 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using TBChestTracker.Managers;
 using com.KonquestUI.Controls;
+using System.Windows.Media.Animation;
 namespace TBChestTracker
 {
     /// <summary>
@@ -236,30 +237,44 @@ namespace TBChestTracker
             ClanStatsListView.ItemsSource = ClanStatisticData;
 
             CollectionViewSource.GetDefaultView(ClanStatsListView.ItemsSource).Filter = Filter_Clanmate_Results;
-            DateTime currentDate = DateTime.Now;
-            var firstDateEntry = ChestManager.ClanChestDailyData.First().Key;
-            var firstDate = DateTime.Parse(firstDateEntry);
-            var weekEndDate = firstDate.AddDays(7);
-            firstDate = firstDate.AddDays(-1);
 
-            var lastDateEntry = ChestManager.ClanChestDailyData.Last().Key;
-            var lastDate = DateTime.Parse(lastDateEntry).AddDays(1);
+            try
+            {
+                DateTime currentDate = DateTime.Now;
 
-            var todayDate = DateTime.Now;
+                var firstDateEntry = ChestManager.ClanChestDailyData.First().Key;
 
-            DateSelection.BlackoutDates.Add(new CalendarDateRange(new DateTime(1900, 1, 1), firstDate));
-            DateSelection.BlackoutDates.Add(new CalendarDateRange(lastDate, new DateTime(9999, 1, 1)));
-            DateSelection.DisplayDate = DateTime.Now;
-            StartDate = firstDate.AddDays(1);
+                var firstDate = DateTime.Parse(firstDateEntry); //-- causing exception to be throne
 
-            EndDateSelection.BlackoutDates.Add(new CalendarDateRange(new DateTime(1900, 1, 1), firstDate));
-            EndDateSelection.BlackoutDates.Add(new CalendarDateRange(lastDate, new DateTime(9999, 1, 1)));
-            EndDateSelection.DisplayDate = lastDate;
-            EndDate = lastDate.AddDays(-1);
-            isready = true;
-            LoadDateEntry(StartDate, EndDate);
+                var weekEndDate = firstDate.AddDays(7);
+                firstDate = firstDate.AddDays(-1);
 
-            Sort();
+                var lastDateEntry = ChestManager.ClanChestDailyData.Last().Key;
+
+                var lastDate = DateTime.Parse(lastDateEntry).AddDays(1); //--- or causing exception to be thrown.
+
+                var todayDate = DateTime.Now;
+
+                DateSelection.BlackoutDates.Add(new CalendarDateRange(new DateTime(1900, 1, 1), firstDate));
+                DateSelection.BlackoutDates.Add(new CalendarDateRange(lastDate, new DateTime(9999, 1, 1)));
+                DateSelection.DisplayDate = DateTime.Now;
+                StartDate = firstDate.AddDays(1);
+
+                EndDateSelection.BlackoutDates.Add(new CalendarDateRange(new DateTime(1900, 1, 1), firstDate));
+                EndDateSelection.BlackoutDates.Add(new CalendarDateRange(lastDate, new DateTime(9999, 1, 1)));
+                EndDateSelection.DisplayDate = lastDate;
+                EndDate = lastDate.AddDays(-1);
+                isready = true;
+
+                LoadDateEntry(StartDate, EndDate);
+
+                Sort();
+            }
+            catch(Exception ex)
+            {
+                //--- fault in parsing date from clanchest.db
+                MessageBox.Show($"There seems to be a fault inside the clanchest.db file regarding to dates. Unable to parse desired date from the file results in this message.");
+            }
         }
         void Sort()
         {
@@ -310,7 +325,6 @@ namespace TBChestTracker
 
                 if (ClanStatisticData != null)
                     ClanStatisticData.Clear();
-
 
                 //-- initialize everything first.
                 foreach (var clanmate in ClanManager.Instance.ClanmateManager.Database.Clanmates)

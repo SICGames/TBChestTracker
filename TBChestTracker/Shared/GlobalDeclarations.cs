@@ -15,6 +15,7 @@ namespace TBChestTracker
         public static bool isAnyGiftsAvailable { get; set; }
         public static bool isBusyProcessingClanchests { get; set; }
         public static bool canCaptureAgain { get; set; }
+
         public static string AppFolder
         {
             get => $@"{System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\";

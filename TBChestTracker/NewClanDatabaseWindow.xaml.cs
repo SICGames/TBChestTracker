@@ -31,17 +31,21 @@ namespace TBChestTracker
         {
             var clanname = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname;
             var mainpath = SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder;
+
             if (String.IsNullOrEmpty(clanname) || clanname.Length < 3) 
             {
                 MessageBox.Show("Clan name must be more than three characters.");
                 result(false);
                 return;
             }
-            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath = $"{mainpath}{clanname}";
-            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder = $"{mainpath}{clanname}\\db";
-            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestReportFolderPath = $"{mainpath}{clanname}\\reports";
-            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseExportFolderPath = $"{mainpath}{clanname}\\exports";
-            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath = $"{mainpath}{clanname}\\backups";
+
+            var clanrootfolder = $"{mainpath}{clanname}";
+
+            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath = clanrootfolder;
+            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder = $"{clanrootfolder}\\db";
+            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestReportFolderPath = $"{clanrootfolder}\\reports";
+            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseExportFolderPath = $"{clanrootfolder}\\exports";
+            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath = $"{clanrootfolder}\\backups";
             
             System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath);
             System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder);

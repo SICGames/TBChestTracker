@@ -233,10 +233,20 @@ namespace TBChestTracker
 
                 if (result != null)
                 {
+                    var brightness = SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness;
+
+                    // Bash Jr III
+
                     Image<Gray, byte> result_image = result.ToImage<Gray, byte>();
-                    Image<Gray, byte> modified_image = result_image.Mul(0.75f) + 0.75f;
-                    modified_image.Save($@"selected_area.jpg");
-                    var ocrResult = TesseractHelper.Read(modified_image);
+                    Image<Gray, byte> modified_image = result_image.Mul(brightness) + brightness;
+                    var imageScaled = modified_image.Resize(5, Emgu.CV.CvEnum.Inter.Cubic);
+
+#if DEBUG
+                    imageScaled.Save($"OCR_ImageScaled.png");
+                    modified_image.Save($"OCR_ImageOut.png");
+#endif
+
+                    var ocrResult = TesseractHelper.Read(imageScaled);
                     if (ocrResult != null)
                     {
                         clanmateName = ocrResult.Words[0];

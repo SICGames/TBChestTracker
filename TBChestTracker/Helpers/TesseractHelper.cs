@@ -43,8 +43,11 @@ namespace TBChestTracker.Helpers
         {
             try
             {
-                if(_tesseract == null)
+                if (_tesseract == null)
+                {
                     _tesseract = new Tesseract(tessdata_path, languages, OcrEngineMode.Default);
+                    var psm = _tesseract.PageSegMode; //-- default is SingleBlock.
+                }
             }
             catch(Exception e)
             {
@@ -60,8 +63,11 @@ namespace TBChestTracker.Helpers
             try
             {
                 if (image == null)
+                {
                     return null;
+                }
 
+                
                 //-- AccessViolationException -- Correupted Memory sometimes.
                 _tesseract.SetImage(image);
                 _tesseract.Recognize();

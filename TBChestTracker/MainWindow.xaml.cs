@@ -100,7 +100,14 @@ namespace TBChestTracker
             image = bitmap.ToImage<Gray, Byte>();
             imageOut = image.Mul(brightness) + brightness;
 
-            var ocrResult = TesseractHelper.Read(imageOut);
+            //-- OCR Incorrect Text Bug - e.g. Slash Jr III is read Slash )r III
+            //-- Fix: Upscaling input image large enough to read properly.
+            var imageScaled = imageOut.Resize(5, Emgu.CV.CvEnum.Inter.Cubic);
+#if DEBUG
+            imageScaled.Save($"OCR_ImageScaled.png");
+            imageOut.Save($"OCR_ImageOut.png");
+#endif
+            var ocrResult = TesseractHelper.Read(imageScaled);
 
             imageOut.Dispose();
             imageOut = null;
