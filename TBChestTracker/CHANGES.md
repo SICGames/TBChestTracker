@@ -1,5 +1,5 @@
 ﻿# Changes and Bug Fixes
-Below is a list of what have been fixed or seemed to be fixed and changes that have been done.
+Below is a list of what have been fixed and changes that have been done.
 
 ## Version 1.2.2
 ### June 5, 2024
