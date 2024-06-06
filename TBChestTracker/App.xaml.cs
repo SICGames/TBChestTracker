@@ -40,6 +40,10 @@ namespace TBChestTracker
                 {
                     GlobalDeclarations.DebugOCRWizardEnabled = true;
                 }
+                else if(argumentsDictionary.ContainsKey("--save_ocr_images"))
+                {
+                    GlobalDeclarations.SaveOCRImages = true;
+                }
             }
 
             splashScreen.Show();

@@ -241,10 +241,11 @@ namespace TBChestTracker
                     Image<Gray, byte> modified_image = result_image.Mul(brightness) + brightness;
                     var imageScaled = modified_image.Resize(5, Emgu.CV.CvEnum.Inter.Cubic);
 
-#if DEBUG
-                    imageScaled.Save($"OCR_ImageScaled.png");
-                    modified_image.Save($"OCR_ImageOut.png");
-#endif
+                    if (GlobalDeclarations.SaveOCRImages)
+                    {
+                        imageScaled.Save($"OCR_ImageScaled.png");
+                        modified_image.Save($"OCR_ImageOut.png");
+                    }
 
                     var ocrResult = TesseractHelper.Read(imageScaled);
                     if (ocrResult != null)

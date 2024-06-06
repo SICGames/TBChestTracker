@@ -105,13 +105,15 @@ namespace TBChestTracker
             var imageScaled = imageOut.Resize(5, Emgu.CV.CvEnum.Inter.Cubic);
             var threshold = new Gray(85);
             var maxThreshold = new Gray(255);
-
             var imageThreshold = imageScaled.ThresholdBinaryInv(threshold, maxThreshold);
-#if DEBUG
-            imageScaled.Save($"OCR_ImageScaled.png");
-            imageOut.Save($"OCR_ImageOut.png");
-            imageThreshold.Save($"OCR_Threshold.png");
-#endif
+
+            if (GlobalDeclarations.SaveOCRImages)
+            {
+                imageScaled.Save($"OCR_ImageScaled.png");
+                imageOut.Save($"OCR_ImageOut.png");
+                imageThreshold.Save($"OCR_Threshold.png");
+            }
+
             var ocrResult = TesseractHelper.Read(imageThreshold);
             
             imageThreshold.Dispose();

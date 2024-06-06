@@ -35,10 +35,9 @@ namespace TBChestTracker
         }
         public static bool TessDataExists { get; set; }
         public static bool AutomationRunning = false;
-
-        
         public static bool IsConfiguringHotKeys = false;
-
         public static bool DebugOCRWizardEnabled = false;
+        public static bool SaveOCRImages = false;
+
     }
 }
