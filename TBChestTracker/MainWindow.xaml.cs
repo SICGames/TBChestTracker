@@ -103,15 +103,25 @@ namespace TBChestTracker
             //-- OCR Incorrect Text Bug - e.g. Slash Jr III is read Slash )r III
             //-- Fix: Upscaling input image large enough to read properly.
             var imageScaled = imageOut.Resize(5, Emgu.CV.CvEnum.Inter.Cubic);
+            var threshold = new Gray(85);
+            var maxThreshold = new Gray(255);
+
+            var imageThreshold = imageScaled.ThresholdBinaryInv(threshold, maxThreshold);
 #if DEBUG
             imageScaled.Save($"OCR_ImageScaled.png");
             imageOut.Save($"OCR_ImageOut.png");
+            imageThreshold.Save($"OCR_Threshold.png");
 #endif
-            var ocrResult = TesseractHelper.Read(imageScaled);
-
+            var ocrResult = TesseractHelper.Read(imageThreshold);
+            
+            imageThreshold.Dispose();
+            imageScaled.Dispose();
             imageOut.Dispose();
-            imageOut = null;
             image.Dispose();
+
+            imageThreshold = null;
+            imageScaled = null;
+            imageOut = null;
             image = null;
 
             return Task.FromResult(ocrResult);
@@ -369,40 +379,6 @@ namespace TBChestTracker
                             }));
                         }
                     }
-
-                    /*
-                    using (var sr = File.OpenText("recent.lst"))
-                    {
-                        var data = sr.ReadToEnd();
-                        if (data.Contains("\r\n"))
-                        {
-                            data = data.Replace("\r\n", ",");
-                        }
-                        else
-                            data = data.Replace("\n", ",");
-
-                        var list = data.Split(',');
-
-                        foreach (var file in list)
-                        {
-                            if (string.IsNullOrEmpty(file))
-                                continue;
-
-                            this.Dispatcher.BeginInvoke(new Action(() =>
-                            {
-                                MenuItem mu = new MenuItem();
-                                var position = StringHelpers.findNthOccurance(file, Convert.ToChar(@"\"), 3);
-                                var truncated = StringHelpers.truncate_file_name(file, position);
-                                mu.Header = truncated;
-                                mu.Tag = file;
-                                mu.Click += Mu_Click;
-                                RecentlyOpenedParent.Items.Add(mu);
-                                recently_opened_files.Add(file);
-                            }));
-                        }
-                    }
-                    */
-
                     //-- add seperator to recently opened clan databases.
                     this.Dispatcher.BeginInvoke(new Action(() =>
                     {
@@ -526,8 +502,7 @@ namespace TBChestTracker
         #region Window Loaded
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //startPageWindow = new StartPageWindow();
-            //startPageWindow.Show();
+            
         }
         #endregion
 
@@ -604,8 +579,18 @@ namespace TBChestTracker
                         keyStr = String.Empty;
                         previousKey = Key.None;
                         newKey = Key.None;
-                       
                     }
+#if DEBUG
+                    else if(keyStr.Equals(Key.F8.ToString()))
+                    {
+                        CaptureRegion();
+                        GlobalDeclarations.hasHotkeyBeenPressed = true;
+                        keyStr = String.Empty;
+                        previousKey= Key.None;
+                        newKey= Key.None;
+                    }
+#endif
+                    
                     keyStr = String.Empty;
                     bIsNewKey = false;
 
