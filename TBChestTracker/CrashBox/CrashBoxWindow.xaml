@@ -6,7 +6,10 @@
         xmlns:local="clr-namespace:TBChestTracker.Dialogs"
         xmlns:UI="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
         mc:Ignorable="d"
-        Title="A Crash Occured!" SizeToContent="Height" Width="500" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Unloaded="Window_Unloaded" ResizeMode="NoResize" WindowStyle="ToolWindow">
+        Title="A Crash Occured!" SizeToContent="Height" Width="500" WindowStartupLocation="CenterScreen" 
+        Loaded="Window_Loaded" 
+        Unloaded="Window_Unloaded" 
+        ResizeMode="NoResize" WindowStyle="ToolWindow" Topmost="True">
     <Grid Background="#aaa" x:Name="MAIN_CONTENT" Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>

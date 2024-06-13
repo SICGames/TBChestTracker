@@ -513,13 +513,13 @@ namespace TBChestTracker
         #region Window Loaded
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            
         }
         #endregion
 
         public void ShowWindow()
         {
             this.Show();
+            
             if(IsFirstLaunch().Result)
             {
                 //-- prompt the user to set up OCR for the first time.
@@ -1012,6 +1012,11 @@ namespace TBChestTracker
                 aboutWindow.Show();
             }
 
+        }
+
+        private void Patreon_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start($"https://www.patreon.com/TotalBattleGuide");
         }
     }
 }

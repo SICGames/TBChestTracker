@@ -26,7 +26,7 @@ namespace TBChestTracker.Dialogs
     public partial class CrashBoxWindow : Window
     {
         public Exception exception { get; set; }
-
+        bool viewingReport = false;
         public CrashBoxWindow()
         {
             InitializeComponent();
@@ -53,7 +53,12 @@ namespace TBChestTracker.Dialogs
 
         private void ViewCrashReportBtn_Click(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start($@"{GlobalDeclarations.CommonAppFolder}\crash.log");
+            if (viewingReport == false)
+            {
+                System.Diagnostics.Process.Start($@"{GlobalDeclarations.CommonAppFolder}\crash.log");
+                viewingReport = true;
+            }
+            this.Close();
         }
     }
 }
