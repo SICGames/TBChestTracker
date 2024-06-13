@@ -102,6 +102,9 @@ namespace TBChestTracker
             Settings.GeneralSettings.Languages = "eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus+pol+por+pus+ukr+deu";
             Settings.HotKeySettings.StartAutomationKeys = "F9";
             Settings.HotKeySettings.StopAutomationKeys = "F10";
+            Settings.OCRSettings.PreviewImage = String.Empty;
+            Settings.OCRSettings.Threshold = 85;
+            Instance.Settings.OCRSettings.MaxThreshold = 255;
 
             Save();
         }

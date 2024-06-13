@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using TBChestTracker.Managers;
 using com.KonquestUI.Controls;
 using System.Windows.Media.Animation;
+using System.Globalization;
 namespace TBChestTracker
 {
     /// <summary>
@@ -233,27 +234,24 @@ namespace TBChestTracker
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            
+
             ClanStatsListView.ItemsSource = ClanStatisticData;
 
             CollectionViewSource.GetDefaultView(ClanStatsListView.ItemsSource).Filter = Filter_Clanmate_Results;
-
+            
             try
             {
                 DateTime currentDate = DateTime.Now;
+                var currentCulture = new System.Globalization.CultureInfo(System.Globalization.CultureInfo.CurrentCulture.Name);
+                var firstDateEntry = DateTime.Parse(ChestManager.ClanChestDailyData.First().Key, currentCulture);
 
-                var firstDateEntry = ChestManager.ClanChestDailyData.First().Key;
+                var weekEndDate = firstDateEntry.AddDays(7);
+                var firstDate = firstDateEntry.AddDays(-1);
 
-                var firstDate = DateTime.Parse(firstDateEntry); //-- causing exception to be throne
+                var lastDateEntry = DateTime.Parse(ChestManager.ClanChestDailyData.Last().Key, currentCulture);
+                var lastDate = lastDateEntry.AddDays(1);
 
-                var weekEndDate = firstDate.AddDays(7);
-                firstDate = firstDate.AddDays(-1);
-
-                var lastDateEntry = ChestManager.ClanChestDailyData.Last().Key;
-
-                var lastDate = DateTime.Parse(lastDateEntry).AddDays(1); //--- or causing exception to be thrown.
-
-                var todayDate = DateTime.Now;
+                var todayDate = DateTime.Now.Date;
 
                 DateSelection.BlackoutDates.Add(new CalendarDateRange(new DateTime(1900, 1, 1), firstDate));
                 DateSelection.BlackoutDates.Add(new CalendarDateRange(lastDate, new DateTime(9999, 1, 1)));
@@ -273,8 +271,12 @@ namespace TBChestTracker
             catch(Exception ex)
             {
                 //--- fault in parsing date from clanchest.db
-                MessageBox.Show($"There seems to be a fault inside the clanchest.db file regarding to dates. Unable to parse desired date from the file results in this message.");
+                //--- if person is from Germany, but Windows time and region is configured as America, it will lead to this issue.
+                var message = $"This is a result of different regions. Generally, if you started counting chests using America region format, and now using another region, you will see this error.\n\n\n To fix this error, set your time and date's region format to the correct region.";
+                MessageBox.Show(message, "Date Parsing Error");
             }
+
+
         }
         void Sort()
         {

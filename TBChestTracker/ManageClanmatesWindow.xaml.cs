@@ -23,14 +23,14 @@ namespace TBChestTracker
     /// <summary>
     /// Interaction logic for AddClanmatesWindow.xaml
     /// </summary>
-    public partial class AddClanmatesWindow : Window
+    public partial class ManageClanmatesWindow : Window
     {
 
         CollectionViewSource viewSource { get; set; }
         public bool clanmatesAdded { get; set; }
         public string previous_Clanmate_Name { get; set; }
 
-        public AddClanmatesWindow()
+        public ManageClanmatesWindow()
         {
             InitializeComponent();
             viewSource = new CollectionViewSource();
@@ -91,7 +91,7 @@ namespace TBChestTracker
         {
             this.DataContext = ClanManager.Instance.ClanmateManager.Database; 
 
-            ListClanMates01.ItemsSource = ClanManager.Instance.ClanmateManager.Database.Clanmates; // MainWindow.ClanChestManager.ClanmateManager.Clanmates;
+            ListClanMates01.ItemsSource = ClanManager.Instance.ClanmateManager.Database.Clanmates; 
             ClanManager.Instance.ClanmateManager.UpdateCount();
             //MainWindow.ClanChestManager.ClanmateManager.UpdateCount();
             CollectionViewSource.GetDefaultView(ListClanMates01.ItemsSource).Filter = filter_clanmate;

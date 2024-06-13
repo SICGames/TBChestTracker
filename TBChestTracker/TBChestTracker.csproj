@@ -163,6 +163,13 @@
     <Compile Include="Console\ConsoleData.cs" />
     <Compile Include="Converters\EnumToRadioOptionConverter.cs" />
     <Compile Include="Converters\MidPointValueConverter.cs" />
+    <Compile Include="CrashBox\CrashBox.cs" />
+    <Compile Include="CrashBox\CrashBoxDialog.cs" />
+    <Compile Include="CrashBox\CrashBoxWindow.xaml.cs">
+      <DependentUpon>CrashBoxWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CrashBox\Events\CrashBoxEvents.cs" />
+    <Compile Include="CrashBox\Events\CrashBoxExceptionArgs.cs" />
     <Compile Include="CustomControls\DpiAwareImage.cs" />
     <Compile Include="EditChestPointValueWindow.xaml.cs">
       <DependentUpon>EditChestPointValueWindow.xaml</DependentUpon>
@@ -311,7 +318,6 @@
     </Compile>
     <Compile Include="Chest\SortType.cs" />
     <Compile Include="Helpers\StringHelpers.cs" />
-    <Compile Include="UI\FancyNumericValue.cs" />
     <Compile Include="UI\FancyPicker.cs" />
     <Compile Include="UI\Milestone.xaml.cs">
       <DependentUpon>Milestone.xaml</DependentUpon>
@@ -326,7 +332,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AddClanmatesWindow.xaml">
+    <Page Include="CrashBox\CrashBoxWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ManageClanmatesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -374,8 +384,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="AddClanmatesWindow.xaml.cs">
-      <DependentUpon>AddClanmatesWindow.xaml</DependentUpon>
+    <Compile Include="ManageClanmatesWindow.xaml.cs">
+      <DependentUpon>ManageClanmatesWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -528,17 +538,20 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CefSharp.Wpf">
+      <Version>124.3.80</Version>
+    </PackageReference>
     <PackageReference Include="CsvHelper">
-      <Version>31.0.2</Version>
+      <Version>32.0.3</Version>
     </PackageReference>
     <PackageReference Include="Emgu.CV">
-      <Version>4.8.1.5350</Version>
+      <Version>4.9.0.5494</Version>
     </PackageReference>
     <PackageReference Include="Emgu.CV.Bitmap">
-      <Version>4.8.1.5350</Version>
+      <Version>4.9.0.5494</Version>
     </PackageReference>
     <PackageReference Include="Emgu.CV.runtime.windows">
-      <Version>4.8.1.5350</Version>
+      <Version>4.9.0.5494</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.3</Version>
@@ -686,6 +699,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="NodeJS\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using Newtonsoft;
 
 namespace TBChestTracker
@@ -64,7 +65,44 @@ namespace TBChestTracker
         public string CaptureMethod { get; set; }
         public AOIRect AreaOfInterest { get; set; }
         public AOIRect SuggestedAreaOfInterest { get; set; }
-        public List<Point> ClaimChestButtons {  get; set; }    
+        public List<Point> ClaimChestButtons {  get; set; }
+
+        private String _previewImage = null;
+        public String PreviewImage
+        {
+            get
+            {
+                return _previewImage;
+            }
+            set
+            {
+                _previewImage = value;
+                OnPropertyChanged(nameof(PreviewImage));
+            }
+        }
+
+        private Int32 _threshold = 135;
+        public Int32 Threshold
+        {
+            get => _threshold;
+            set
+            {
+                _threshold = value;
+                OnPropertyChanged(nameof(Threshold));
+            }
+        }
+
+        private Int32 _maxThreshold = 255;
+        public Int32 MaxThreshold
+        {
+            get => _maxThreshold;
+            set
+            {
+                _maxThreshold = value;
+                OnPropertyChanged(nameof(MaxThreshold));
+            }
+        }
+
         public OCRSettings() 
         { 
             AreaOfInterest = new AOIRect();

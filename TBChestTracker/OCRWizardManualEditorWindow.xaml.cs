@@ -51,7 +51,7 @@ namespace TBChestTracker
         private Snapture snapture;
         public OCRManualMode OCRManualMode { get; set; }
         private BitmapSource preview {  get; set; }
-        Tesseract.Character[] tessy_characters { get; set; }
+        Tesseract.Word[] tessy_characters { get; set; }
 
         private WriteableBitmap writeableBitmap { get; set; }
         private Image WriteableImage { get; set; }
@@ -101,12 +101,45 @@ namespace TBChestTracker
             var bitmap = e.ScreenCapturedBitmap;
             PreviewImage.Source = bitmap.ToBitmapSource();
             this.Opacity = 1;
+
+            
             CreateCanvasControls();
 
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+
+            //-- grab fresh copy of region created.
+            if (!String.IsNullOrEmpty(SettingsManager.Instance.Settings.OCRSettings.PreviewImage))
+                SettingsManager.Instance.Settings.OCRSettings.PreviewImage = String.Empty;
+
+            var aoi = SettingsManager.Instance.Settings.OCRSettings.SuggestedAreaOfInterest;
+
+            var cropped_bitmap = new CroppedBitmap(PreviewImage.Source as BitmapSource, new Int32Rect((int)aoi.x, (int)aoi.y, (int)aoi.width, (int)aoi.height));
+            
+            var bmp = cropped_bitmap.ToBitmap();
+
+            bmp.Save($@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png");
+            SettingsManager.Instance.Settings.OCRSettings.PreviewImage = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png";
+            Image<Gray, byte> image = bmp.ToImage<Gray, byte>();
+            var imageBrightened = image.Mul(SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness) + SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness;
+            var imageScaled = image.Resize(5, Emgu.CV.CvEnum.Inter.Cubic);
+
+            var threshold = new Gray(SettingsManager.Instance.Settings.OCRSettings.Threshold);
+            var maxThreshold = new Gray(SettingsManager.Instance.Settings.OCRSettings.MaxThreshold);
+
+            var imageThreshold = image.ThresholdBinaryInv(threshold, maxThreshold);
+            
+            SettingsManager.Instance.Save();
+
+            imageThreshold.Dispose();
+            imageScaled.Dispose();
+            imageBrightened.Dispose();
+            image.Dispose();
+            bmp.Dispose();
+            cropped_bitmap = null;
+
             this.DialogResult = true;
             this.Cursor = Cursors.Arrow;
         }
@@ -186,7 +219,7 @@ namespace TBChestTracker
                     CroppedBitmap cropped_bitmap = null;
                     BitmapSource bms = null;
 
-                    Tesseract.Character[] tessy_result = null;
+                    Tesseract.Word[] tessy_result = null;
 
                     try
                     {
@@ -214,7 +247,7 @@ namespace TBChestTracker
                             tessy.SetImage(modified_image);
                             if (tessy.Recognize() == 0)
                             {
-                                tessy_result = tessy.GetCharacters();
+                                tessy_result = tessy.GetWords();
                                 tessy_characters = tessy_result;
                             }
 

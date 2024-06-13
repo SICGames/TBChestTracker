@@ -7,7 +7,8 @@
       xmlns:ui="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
       xmlns:main="clr-namespace:TBChestTracker"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      x:Name="OCR_Settings_Page"
+      d:DesignHeight="810" d:DesignWidth="800"
       Title="OCRSettingsPage" Loaded="Page_Loaded" Unloaded="Page_Unloaded">
     <Page.Resources>
         <main:EnumToRadioOptionConverter x:Key="CaptureMethodConverter"/>
@@ -23,12 +24,17 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <TextBlock Text="Global OCR Brightness" Margin="5" Grid.Column="0" Grid.Row="0"/>
         <TextBlock Text="OCR Filtering" Margin="5"  Grid.Column="0" Grid.Row="1"/>
         <TextBlock Text="Capture Method" Margin="5" Grid.Column="0" Grid.Row="3"/>
         <TextBlock Text="Screen Capturer" Margin="5"  Grid.Column="0" Grid.Row="4"/>
-        
+        <TextBlock Text="Preview" Margin="5" Grid.Column="0" Grid.Row="5"/>
+        <TextBlock Text="Threshold" Margin="5" Grid.Column="0" Grid.Row="6"/>
+        <TextBlock Text="Max Threshold" Margin="5" Grid.Column="0" Grid.Row="7"/>
         <ui:FancyNumericValue BorderBrush="LightGray" 
                           HoverBrush="SkyBlue"
                           BorderThickness="2" 
@@ -54,5 +60,21 @@ ConverterParameter={x:Static main:CaptureEnum.SPECIFIC_REGION}}" Tag="byChestTyp
         <ComboBox x:Name="CaptureMethodBox" Grid.Row="4" Grid.Column="1" Width="200" HorizontalAlignment="Left" SelectedIndex="0">
             <ComboBoxItem Content="GDI+"/>
         </ComboBox>
+
+        <Image x:Name="ImagePreview" Margin="5,25,0,0" Height="500" Width="500" HorizontalAlignment="Left" Stretch="UniformToFill" Grid.ColumnSpan="2" Grid.Row="5"/>
+        
+        <ui:FancyNumericValue x:Name="ThresholdNumericValue" BorderBrush="LightGray" 
+                  HoverBrush="SkyBlue"
+                  BorderThickness="2" 
+                  Minimal="0.0" Maximum="255" Steps="1.0" Value="{Binding OCRSettings.Threshold}"
+                  ValueChanged="ThresholdNumericValue_ValueChanged"
+                  CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="6" Grid.Column="1"/>
+
+        <ui:FancyNumericValue x:Name="MaxThresholdNumericValue" BorderBrush="LightGray" 
+          HoverBrush="SkyBlue"
+          BorderThickness="2" 
+          Minimal="0.0" Maximum="255" Steps="1.0" Value="{Binding OCRSettings.MaxThreshold}"
+          ValueChanged="MaxThresholdNumericValue_ValueChanged"
+          CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="7" Grid.Column="1"/>
     </Grid>
 </Page>

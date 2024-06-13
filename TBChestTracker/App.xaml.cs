@@ -46,6 +46,9 @@ namespace TBChestTracker
                 }
             }
 
+            //-- configure crashbox
+            CrashBox crashBox = new CrashBox();
+
             splashScreen.Show();
         }
 

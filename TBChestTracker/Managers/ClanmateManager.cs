@@ -20,7 +20,7 @@ namespace TBChestTracker
 
         public void UpdateCount()
         {
-            Database.NumClanmates = Database.Clanmates.Count - 1;
+            Database.NumClanmates = Database.Clanmates.Count;
         }
         public ClanmateManager() 
         {

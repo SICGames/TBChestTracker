@@ -10,7 +10,7 @@ namespace TBChestTracker.Helpers.Extensions
 {
     public static class ListExtension
     {
-        public static void Filter(this Tesseract.Character[] src, string[] values)
+        public static void Filter(this Tesseract.Word[] src, string[] values)
         {
             var filtered = src.Where(w => ContainsAny(w.Text, values));
             src = filtered.ToArray();

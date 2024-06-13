@@ -7,7 +7,7 @@
         xmlns:ui="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
         xmlns:Pages="clr-namespace:TBChestTracker.Pages" x:Class="TBChestTracker.SettingsWindow"
         mc:Ignorable="d"
-        Title="Settings" Height="450" Width="800" Topmost="True" Loaded="Window_Loaded" Closing="Window_Closing">
+        Title="Settings" Height="720" Width="800" Topmost="True" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
@@ -41,7 +41,10 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Frame Grid.Row="0" Grid.Column="0" x:Name="SettingsNavigationView" NavigationUIVisibility="Hidden" Source="/Pages/Settings/GeneralSettingsPage.xaml" />
+            <ScrollViewer Grid.Row="0" Grid.Column="0">
+                <Frame x:Name="SettingsNavigationView" NavigationUIVisibility="Hidden"
+                   Source="/Pages/Settings/GeneralSettingsPage.xaml" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" />
+            </ScrollViewer>
             <StackPanel Orientation="Horizontal" Height="42" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <ui:FancyButton Width="100" Height="24" 
                                 Background="#0077ff" 

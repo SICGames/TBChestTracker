@@ -25,7 +25,7 @@
             </Grid.RowDefinitions>
             <TextBlock Text="Create Selection Region" Grid.Row="0" Foreground="White" FontWeight="Bold" FontSize="24"/>
             <TextBlock 
-      Text="Next step is to select a region where you want the OCR to read from. As recommended from the image on the left side. Failure to do so, will result in OCR not to read correctly. Which is a user problem. "
+      Text="Next step is to select a region where you want the OCR to read from. As recommended from the image on the left side. Failure to do so, will result in OCR not to read correctly."
       TextWrapping="Wrap"
       Grid.Row="1" Foreground="White"
       Margin="10,5"/>

@@ -24,7 +24,7 @@
             </Grid.RowDefinitions>
             <TextBlock Text="Where is that Open button at?" Grid.Row="0" Foreground="White" FontWeight="Bold" FontSize="24"/>
             <TextBlock 
-   Text="Since you've gotten to this step. It is time to finish up and place down a marker so the program knows where to click as it processes chests. And a little reminder, any issues is due to the user."
+   Text="Since you've gotten to this step. It is time to finish up and place down a marker so the program knows where to click as it processes chests."
    TextWrapping="Wrap"
    Grid.Row="1" Foreground="White"
    Margin="10,5"/>

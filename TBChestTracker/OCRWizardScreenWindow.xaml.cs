@@ -37,6 +37,7 @@ namespace TBChestTracker
     /// </summary>
     public partial class OCRWizardScreenWindow : Window, INotifyPropertyChanged
     {
+        Tesseract.Word word;
 
         #region Global Declarations
         private Snapture Snapture = null;
@@ -58,7 +59,7 @@ namespace TBChestTracker
         bool isPlayerOnChestsTab = false;
         bool canRender = false;
         private CancellationTokenSource cancellationTokenSource = null;
-        private Tesseract.Character[] Letters {  get; set; }
+        private Tesseract.Word[] Words {  get; set; }
 
         private int max_retry_attempts = 5;
         private int retry_attempts = 0;
@@ -178,7 +179,7 @@ namespace TBChestTracker
             AreaOfInterest?.Dispose();
             WritableImage = null;
             writeableBitmap = null;
-            Letters = null;
+            Words = null;
             Snapture?.Dispose();
             try
             {
@@ -533,10 +534,11 @@ namespace TBChestTracker
             return isActive;
         }
 
-        private Task<Tesseract.Character[]> ObtainScreenTextAsync(sys_drawing.Bitmap bitmap, AOIRect rect, params string[] filters) => Task.Run(() => ObtainScreenText(bitmap, rect, filters));
-        private Tesseract.Character[] ObtainScreenText(sys_drawing.Bitmap bitmap, AOIRect rect, params string[] filters)
+        private Task<Tesseract.Word[]> ObtainScreenTextAsync(sys_drawing.Bitmap bitmap, AOIRect rect, params string[] filters) => Task.Run(() => ObtainScreenText(bitmap, rect, filters));
+        private Tesseract.Word[] ObtainScreenText(sys_drawing.Bitmap bitmap, AOIRect rect, params string[] filters)
         {
-            Tesseract.Character[] result = null;
+            
+            Tesseract.Word[] result = null;
             
             //-- We should give a quick test and have user confirm everything.
             sys_drawing.Bitmap clone = (sys_drawing.Bitmap)bitmap.Clone();
@@ -555,7 +557,8 @@ namespace TBChestTracker
             tessy.SetImage(tessy_image);
             if (tessy.Recognize() == 0)
             {
-                result = tessy.GetCharacters();
+                
+                result = tessy.GetWords();
                 if(filters.Count() > 0)
                 {
                     result.Filter(filters);
@@ -625,7 +628,7 @@ namespace TBChestTracker
                                 writeableBitmap.FillEllipseCentered((int)OpenChestButtonPosition.X, (int)OpenChestButtonPosition.Y, 25, 25, Colors.Red);
                             }
                             //--- render the letters obtained from Tesseract
-                            foreach (var letter in Letters)
+                            foreach (var letter in Words)
                             {
                                 var region = letter.Region;
                                 region.Offset(8, 8);
@@ -796,9 +799,9 @@ namespace TBChestTracker
                     await Task.Delay(750);
 
                     //-- We should give a quick test and have user confirm everything.
-                    Letters = await ObtainScreenTextAsync(bitmap,SuggestedAreaOfInterest);
+                    Words = await ObtainScreenTextAsync(bitmap,SuggestedAreaOfInterest);
 
-                    if (Letters != null)
+                    if (Words != null)
                     {
                         ProgressCanvas.Visibility = Visibility.Hidden;
 

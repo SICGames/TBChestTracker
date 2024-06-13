@@ -24,7 +24,7 @@
             </Grid.RowDefinitions>
             <TextBlock Text="OCR Wizard Successful" Grid.Row="0" Foreground="White" FontWeight="Bold" FontSize="24"/>
             <TextBlock 
-      Text="If everything was done correctly, you shouldn't have a issue. And if there is an issue, there's a reason for that. And it's due to a user error.."
+      Text="If everything was done correctly, you shouldn't have a issue."
       TextWrapping="Wrap"
       Grid.Row="1" Foreground="White"
       Margin="10,5"/>

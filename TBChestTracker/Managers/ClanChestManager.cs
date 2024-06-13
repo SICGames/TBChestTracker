@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -22,7 +23,7 @@ namespace TBChestTracker
     public class ClanChestManager
     {
         public List<ClanChestData> clanChestData { get; set; }
-        public Dictionary<String, List<ClanChestData>> ClanChestDailyData;
+        public Dictionary<string, List<ClanChestData>> ClanChestDailyData;
         private ChestProcessingState pChestProcessingState = ChestProcessingState.IDLE;
 
         public ChestProcessingState ChestProcessingState
@@ -96,7 +97,7 @@ namespace TBChestTracker
 
             //-- quick filter. 
             //-- in Triumph Chests, divider creates dirty characters. 
-            var filter_words = new string[] { "Chest", "From", "Source", "Gift" };
+            var filter_words = SettingsManager.Instance.Settings.OCRSettings.Tags.ToArray(); // new string[] { "Chest", "From", "Source", "Gift" };
 
             //-- OCR Result exception from filtering resulted in:
             //-- From : [player_name]
@@ -360,7 +361,7 @@ namespace TBChestTracker
 
             //-- do we need to insert new entry?
             //-- causes midnight bug.
-            var currentdate = DateTime.Now.ToString(@"MM-dd-yyyy");
+            var currentdate = DateTime.Now.ToShortDateString();
             var dates = ClanChestDailyData.Where(x => x.Key.Equals(currentdate));
 
             if (dates.Count() == 0)
@@ -370,7 +371,8 @@ namespace TBChestTracker
                 {
                     clanChestData.Add(new ClanChestData(mate.Name, null, 0));
                 }
-                ClanChestDailyData.Add(DateTime.Now.ToString(@"MM-dd-yyyy"), clanChestData);
+
+                ClanChestDailyData.Add(DateTime.Now.ToString("d", new CultureInfo(CultureInfo.CurrentCulture.Name)), clanChestData);
             }
 
             //-- make sure clanmate exists.
@@ -476,7 +478,7 @@ namespace TBChestTracker
                 }
             }
 
-            var datestr = DateTime.Now.ToString(@"MM-dd-yyyy");
+            var datestr = DateTime.Now.ToString("d", new CultureInfo(CultureInfo.CurrentCulture.Name));   
             ClanChestDailyData[datestr] = clanChestData;
             ChestProcessingState = ChestProcessingState.COMPLETED;
             GlobalDeclarations.isBusyProcessingClanchests = false;
@@ -509,7 +511,7 @@ namespace TBChestTracker
 
             if (!System.IO.File.Exists(clanchestfile))
             {
-                ClanChestDailyData.Add(DateTime.Now.ToString(@"MM-dd-yyyy"), clanChestData);
+                ClanChestDailyData.Add(DateTime.Now.ToString("d", new CultureInfo(CultureInfo.CurrentCulture.Name)), clanChestData);
                 await SaveDataTask();
             }
             else
@@ -556,10 +558,9 @@ namespace TBChestTracker
             if (ClanChestDailyData != null && ClanChestDailyData.Keys != null && ClanChestDailyData.Keys.Count > 0)
             {
                 var lastDate = ClanChestDailyData.Keys.Last();
-                var dateStr = DateTime.Now.ToString(@"MM-dd-yyyy");
+                var dateStr = DateTime.Now.ToString("d");
                 if (lastDate.Equals(dateStr))
                 {
-
                     clanChestData = ClanChestDailyData[lastDate];
                     foreach (var member in ClanManager.Instance.ClanmateManager.Database.Clanmates)
                     {
@@ -572,7 +573,7 @@ namespace TBChestTracker
                 }
                 else
                 {
-                    ClanChestDailyData.Add(DateTime.Now.ToString(@"MM-dd-yyyy"), clanChestData);
+                    ClanChestDailyData.Add(DateTime.Now.ToString("d", new CultureInfo(CultureInfo.CurrentCulture.Name)), clanChestData);
                 }
 
                 GlobalDeclarations.hasClanmatesBeenAdded = true;

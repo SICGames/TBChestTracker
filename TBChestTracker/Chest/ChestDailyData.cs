@@ -9,13 +9,13 @@ namespace TBChestTracker
     [System.Serializable]
     public class ChestDailyData
     {
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
         public List<ClanChestData> ChestData { get; set; }
         public ChestDailyData()
         {
 
         }
-        public ChestDailyData(string date, List<ClanChestData> chestData)
+        public ChestDailyData(DateTime date, List<ClanChestData> chestData)
         {
             Date = date;
             ChestData = chestData;

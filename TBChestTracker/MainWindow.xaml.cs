@@ -33,6 +33,8 @@ using com.HellstormGames.Imaging;
 using com.HellstormGames.Imaging.Extensions;
 using com.CaptainHook;
 using com.KonquestUI.Controls;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
 
 
 namespace TBChestTracker
@@ -94,18 +96,25 @@ namespace TBChestTracker
         {
             Image<Gray, Byte> image = null;
             Image<Gray, Byte> imageOut = null;
-            var brightness = 0.0d;
-
-            brightness = SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness;
+            var ocrSettings = SettingsManager.Instance.Settings.OCRSettings;
+            var brightness = ocrSettings.GlobalBrightness;
             image = bitmap.ToImage<Gray, Byte>();
             imageOut = image.Mul(brightness) + brightness;
 
             //-- OCR Incorrect Text Bug - e.g. Slash Jr III is read Slash )r III
             //-- Fix: Upscaling input image large enough to read properly.
             var imageScaled = imageOut.Resize(5, Emgu.CV.CvEnum.Inter.Cubic);
-            var threshold = new Gray(85);
-            var maxThreshold = new Gray(255);
+
+            var threshold = new Gray(ocrSettings.Threshold); //-- 85
+            var maxThreshold = new Gray(ocrSettings.MaxThreshold); //--- 255
             var imageThreshold = imageScaled.ThresholdBinaryInv(threshold, maxThreshold);
+
+            //-- if it is null or empty somehow, we update it.
+            if (String.IsNullOrEmpty(ocrSettings.PreviewImage))
+            {
+                imageThreshold.Save($@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png");
+                ocrSettings.PreviewImage = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png";
+            }
 
             if (GlobalDeclarations.SaveOCRImages)
             {
@@ -825,7 +834,7 @@ namespace TBChestTracker
 
         private void ManageClanmatesCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            AddClanmatesWindow addClanmatesWindow = new AddClanmatesWindow();
+            ManageClanmatesWindow addClanmatesWindow = new ManageClanmatesWindow();
             if (addClanmatesWindow.ShowDialog() == true)
             {
                 GlobalDeclarations.hasClanmatesBeenAdded = true;
