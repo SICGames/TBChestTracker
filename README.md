@@ -11,7 +11,7 @@ Easily count clan chests with a hotkey and let the automation take control.
 - Clan Chest Filtering. Filter only the ones you want to be added to the chest quota.
 - More to be added in the future. 
 ## How to install
-- Download installer (TBChestTracker-Setup.exe) from releases section.
+- Head over to [Releases section](https://github.com/SICGames/TBChestTracker/releases) and download the latest version TBChestTracker-Setup.exe.
 
 ## Want to contribute? 
 Send message to be allowed to push updates to the project. I rather have people contribute than clone and compile solely for themselves.
