@@ -1,15 +1,54 @@
 # TBChestTracker - Total Battle Chest Tracker
+![GitHub commit activity](https://img.shields.io/github/commit-activity/t/SICGames/TBChestTracker)
+![GitHub contributors](https://img.shields.io/github/contributors/SICGames/TBChestTracker)
+[![Github All Releases](https://img.shields.io/github/downloads/SICGames/TBChestTracker/total.svg)]()
 
 ## Description
-Easily count clan chests with a hotkey and let the automation take control. 
-## Features
-- Manage Multiple Clans.
-- Choose multiple languages for the OCR to understand.
-- Track Clan Statistics and Performance
-- If clanmate isn't added to Clanmate Database, OCR will detect the clanmate and add it for you while automating chest count.
-- Add clanmate by using selection rectangle.
-- Clan Chest Filtering. Filter only the ones you want to be added to the chest quota.
-- More to be added in the future. 
+TotalBattle Chest Tracker was designed to easily track your clan's chest count. 
+
+## Features  
+<details><summary>
+  Clan management
+</summary>
+  
+ * Manage Multiple Clans.
+  
+</details>
+<details>
+<summary>
+  OCR
+</summary>
+  
+ * Choose multiple languages for the OCR to understand.
+ * Select Region for OCR to extract text from with OCR Wizard.
+ * OCR detects unknown clan mates and adds them to database.
+
+</details>
+<details>
+<summary>
+Clan Insights
+</summary>
+  
+ * Track clan performance and statistics.
+ * Future implendation is to allow clans to create goals to achieve. 
+ * Future implendation is to allow simulate what they'd need to do to get higher clan wealth.
+ * Filter clan insights data by name using Quick Filter feature.
+ * Filter clan insights data by chest type.
+
+</details>
+<details>
+<summary>
+Clanmate Management
+</summary>
+  
+ * Add clanmates via text file.
+ * Add clanmates via selection rectangle.
+ * Clanmate search box filters a clan mate. 
+ * Create clanmate aliases by selecting parent clanmate name then their known aliases. In case OCR misreads their name. 
+ * Remove multiple clanmate names.
+ 
+</details>
+
 ## How to install
 - Head over to [Releases section](https://github.com/SICGames/TBChestTracker/releases) and download the latest version TBChestTracker-Setup.exe.
 
