@@ -35,12 +35,8 @@ namespace TBChestTracker
                     var json_data = sr.ReadToEnd();
 
                     var json = JsonConvert.SerializeObject(json_data);
-
-                    //Debug.WriteLine(json);
-
                     sr.Dispose();
                 }
-             
             }
             response.Close();
             response.Dispose();

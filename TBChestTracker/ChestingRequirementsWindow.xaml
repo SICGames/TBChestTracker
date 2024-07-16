@@ -11,9 +11,6 @@
         <Style x:Key="ConditionsListViewItemStyle" TargetType="ListViewItem">
             <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
         </Style>
-        <Style x:Key="RequirementListViewItemStyle" x:Name="RequirementListViewItem" TargetType="ListViewItem">
-            <EventSetter Event="MouseDoubleClick" Handler="RequirementListViewItem_MouseDoubleClick"/>
-        </Style>
         <Style x:Key="ChestPointsListViewItemStyle" x:Name="ChestPointsListViewItem" TargetType="ListViewItem">
             <EventSetter x:Name="ChestPointsListViewItem" Event="MouseDoubleClick" Handler="ChestPointsListViewItem_MouseDoubleClick"/>
         </Style>
@@ -28,27 +25,33 @@
                 <TabItem Header="Conditions">
                     <ScrollViewer>
                         <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="54*"/>
+                                <ColumnDefinition Width="329*"/>
+                            </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto"/>
                                 <RowDefinition Height="auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Text="Chest conditions will only include clan chests if specified by their clan chest type and level of chest." FontWeight="Bold" Margin="10"/>
-                            <GroupBox Header="Condition Options" Grid.Row="1" Margin="0,5">
+                            <TextBlock Grid.Row="0" Text="Chest conditions will only include clan chests if specified by their clan chest type and equal to or higher level of the clan chest." 
+                                       FontWeight="Bold" Margin="10,10,10,154" TextWrapping="Wrap" Grid.ColumnSpan="2" />
+                            <GroupBox Header="Condition Options" Margin="0,41,0,72" Grid.ColumnSpan="2">
                                 <StackPanel Orientation="Vertical" Margin="10,5">
                                     <RadioButton Content="Do not use" Margin="0,2" IsChecked="{Binding ChestRequirements.useNoChestConditions, Mode=TwoWay}"/>
                                     <RadioButton Content="Use Specific Conditions" IsChecked="{Binding ChestRequirements.useChestConditions, Mode=TwoWay}"/>
                                 </StackPanel>
                             </GroupBox>
-                            <Grid Grid.Row="2">
+                            <Grid Grid.ColumnSpan="2" Margin="0,113,0,0" Grid.RowSpan="3">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="24"/>
                                 </Grid.ColumnDefinitions>
-                                <ListView Grid.Column="0" ItemsSource="{Binding ChestRequirements.ChestConditions}" ItemContainerStyle="{StaticResource ConditionsListViewItemStyle}">
+                                <ListView x:Name="ChestConditionsListView" Grid.Column="0" ItemsSource="{Binding ChestRequirements.ChestConditions}" ItemContainerStyle="{StaticResource ConditionsListViewItemStyle}">
                                     <ListView.View>
                                         <GridView>
-                                            <GridViewColumn Header="Clan Chest Type" Width="150" DisplayMemberBinding="{Binding ChestType, Mode=TwoWay}"/>
+                                            <GridViewColumn Header="Chest Type" Width="150" DisplayMemberBinding="{Binding ChestType, Mode=TwoWay}"/>
+                                            <GridViewColumn Header="Chest Name" Width="150" DisplayMemberBinding="{Binding ChestName, Mode=TwoWay}"/>
                                             <GridViewColumn Header="Minimal Level" Width="100" DisplayMemberBinding="{Binding level, Mode=TwoWay}"/>
                                         </GridView>
                                     </ListView.View>
@@ -74,66 +77,7 @@
                         </Grid>
                     </ScrollViewer>
                 </TabItem>
-                <TabItem Header="Requirements">
-                    <Grid Margin="5,10">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <TextBlock 
-                            Grid.Row="0" 
-                            Text="Requirements for clanmates to meet per day. In addition, will help sort out who's passing and who's failing in chest quota."
-                            Margin="5" FontWeight="Bold"/>
-                        <GroupBox Header="Requirement Options" Grid.Row="1">
-                            <StackPanel Orientation="Vertical">
-                                <RadioButton Content="None" 
-                                             IsChecked="{Binding ClanRequirements.UseNoClanRequirements, Mode=TwoWay}"/>
-                                <RadioButton x:Name="UseSpecifiedRequirementsRadio" Content="Use Specified Requirements" 
-                                             IsChecked="{Binding ClanRequirements.UseSpecifiedClanRequirements, Mode=TwoWay}"/>
-                            </StackPanel>
-                        </GroupBox>
-                        <GroupBox Header="Specified Requirements" Grid.Row="2" IsEnabled="{Binding ElementName=UseSpecifiedRequirementsRadio, Path=IsEnabled}" Margin="3,5">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="24"/>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="auto"/>
-                                </Grid.RowDefinitions>
-                                <StackPanel Orientation="Horizontal" Grid.Row="0">
-                                    <UIControls:FancyImageButton ImageSource="pack://application:,,,/Images/PlusIcon.png" 
-                                                            Height="24" Width="24"
-                                                            Margin="3,0"
-                                                            BorderBrush="DarkGray"
-                                                            BorderThickness="1" HighlightBrush="LightGray" x:Name="AddRequirementButton" Click="AddRequirementButton_Click"/>
-                                    <UIControls:FancyImageButton ImageSource="pack://application:,,,/Images/MinusIcon.png" 
-                                                            Height="24" Width="24"
-                                                            Margin="3,0"
-                                                            BorderBrush="DarkGray"
-                                                            BorderThickness="1" HighlightBrush="LightGray"
-                                                            x:Name="RemoveRequirementButton" Click="RemoveRequirementButton_Click"/>
-                                    <UIControls:FancyImageButton ImageSource="pack://application:,,,/Images/trashIcon.png" 
-                                                            Height="24" Width="24"
-                                                            Margin="3,0"
-                                                            BorderBrush="DarkGray"
-                                                            BorderThickness="1" HighlightBrush="LightGray"
-                                                            x:Name="ClearRequirementsButton" Click="ClearRequirementsButton_Click"/>
-                                </StackPanel>
-                                <ListView Grid.Row="1" ItemsSource="{Binding ClanRequirements.ClanSpecifiedRequirements}" ItemContainerStyle="{StaticResource RequirementListViewItemStyle}">
-                                    <ListView.View>
-                                        <GridView>
-                                            <GridViewColumn Header="Clan Chest Type" Width="200" DisplayMemberBinding="{Binding ChestType}"/>
-                                            <GridViewColumn Header="Minimal Level" Width="95" DisplayMemberBinding="{Binding ChestLevel}"/>
-                                            <GridViewColumn Header="Per Day" Width="50" DisplayMemberBinding="{Binding AmountPerDay}"/>
-                                            <GridViewColumn Header="AND/OR" Width="78" DisplayMemberBinding="{Binding ChestOperator}"/>
-                                        </GridView>
-                                    </ListView.View>
-                                </ListView>
-                                <TextBlock Grid.Row="2" Text="AND / OR are operators used during export's total count. If Rankings are used, will aid in sorting who has exceeded required clan chest per week." TextWrapping="Wrap" FontWeight="Bold" FontStyle="Italic"/>
-                            </Grid>
-                        </GroupBox>
-                    </Grid>
-                </TabItem>
+
                 <TabItem Header="Chest Points">
                     <Grid Margin="5">
                         <Grid.RowDefinitions>

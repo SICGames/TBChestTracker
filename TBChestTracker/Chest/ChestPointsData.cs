@@ -11,9 +11,6 @@ namespace TBChestTracker
     {
 
         private ChestRef _ChestRef = new ChestRef();
-
-        //private bool _isRefByTypeChecked = true;
-        //private bool _isRefByNameChecked = false;
         private string _chestName = "";
         private string _chesttype = "";
         private int _level = 5;
@@ -28,31 +25,6 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(ChestRef));
             }
         }
-
-        /*
-        public bool isRefByTypeChecked
-        {
-            get
-            {
-                return _isRefByTypeChecked;
-            }
-            set
-            {
-                _isRefByTypeChecked = value;
-                OnPropertyChanged(nameof(isRefByTypeChecked));
-            }
-        }
-        public bool isRefByNameChecked
-        {
-            get => _isRefByNameChecked;
-            set
-            {
-                _isRefByNameChecked = value;
-                OnPropertyChanged(nameof(isRefByNameChecked));
-            }
-        }
-        */
-
         public string ChestName
         {
             get => this._chestName;

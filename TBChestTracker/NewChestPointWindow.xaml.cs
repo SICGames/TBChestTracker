@@ -1,4 +1,5 @@
 ﻿using CsvHelper.Configuration.Attributes;
+using Emgu.CV.CvEnum;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,7 +26,6 @@ namespace TBChestTracker
 
         private string _chestName = "";
         private int pointvalue = 0;
-
         private ChestRef _ChestRef = new ChestRef();
         public ChestRef ChestRef
         {
@@ -87,7 +87,7 @@ namespace TBChestTracker
             ChestPoints chestPoints = new ChestPoints();
             chestPoints.ChestRef = ChestRef;
 
-            chestPoints.ChestName = ChestName;
+            chestPoints.ChestName = ChestNameBox.Text;
             chestPoints.ChestType = ChestTypeBox.Text;
             chestPoints.Level = Level;
             chestPoints.PointValue = PointValue;
@@ -98,6 +98,12 @@ namespace TBChestTracker
 
         private void ChestTypeBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (ChestTypeBox.SelectedItem == null)
+            {
+                ChestTypeBox.SelectedIndex = 0;
+                return;
+            }
+
             var item = (ComboBoxItem)ChestTypeBox.SelectedItem;
 
             if(item.Content.ToString().Equals("Heroic", StringComparison.CurrentCultureIgnoreCase))
@@ -137,18 +143,48 @@ namespace TBChestTracker
                 case RefEnum.BYTYPE:
                     {
                         ChestTypeBox.Visibility = Visibility.Visible;
-                        ChestTextBox.Visibility = Visibility.Collapsed;
+                        //ChestTextBox.Visibility = Visibility.Collapsed;
+                        ChestNameBox.Visibility = Visibility.Collapsed;
                     }
                     break;
                 case RefEnum.BYNAME:
                     {
-                        ChestTextBox.Visibility = Visibility.Visible;
+                        //ChestTextBox.Visibility = Visibility.Visible;
+                        ChestNameBox.Visibility = Visibility.Visible;
                         ChestTypeBox.Visibility = Visibility.Collapsed;
-                        ChestTypeBox.Text = "Custom";
                     }
                     break;
-
             }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+
+            //-- load chestypes from chesttypes.csv file
+            var chesttypes = ApplicationManager.Instance.ChestTypes;
+            var chestnames = ApplicationManager.Instance.ChestNames;
+            foreach( var chesttype in chesttypes )
+            {
+                var ci = new ComboBoxItem();
+                ci.Content = chesttype.Name;
+                ChestTypeBox.Items.Add(ci);
+            }
+            foreach(var chestname in chestnames )
+            {
+                var ci = new ComboBoxItem();
+                ci.Content = chestname.Name;
+                ChestNameBox.Items.Add(ci);  
+            }
+        }
+
+        private void Window_Unloaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ChestNameBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
     }
 }

@@ -44,23 +44,10 @@
                 <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <ComboBox x:Name="ChestTypeBox" Visibility="Visible" Grid.Row="1" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Center" 
                       VerticalAlignment="Center" SelectionChanged="ChestTypeBox_SelectionChanged">
-                        <ComboBoxItem Content="Common"/>
-                        <ComboBoxItem Content="Rare"/>
-                        <ComboBoxItem Content="Epic"/>
-                        <ComboBoxItem Content="Citadel"/>
-                        <ComboBoxItem Content="Heroic"/>
-                        <ComboBoxItem Content="Bank"/>
-                        <ComboBoxItem Content="Union Triumph"/>
-                        <ComboBoxItem Content="Fenrir"/>
-                        <ComboBoxItem Content="Jormungandr"/>
-                        <ComboBoxItem Content="Arena"/>
-                        <ComboBoxItem Content="Story"/>
-                        <ComboBoxItem Content="Custom"/>
                     </ComboBox>
-                    <TextBox x:Name="ChestTextBox" Visibility="Collapsed" 
-                            Width="200" Height="24" 
-                            TextAlignment="Center" Text="{Binding ChestName}" 
-                            VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <ComboBox x:Name="ChestNameBox" Visibility="Collapsed" Grid.Row="1" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Center" 
+                        VerticalAlignment="Center" SelectionChanged="ChestNameBox_SelectionChanged">
+                    </ComboBox>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center">

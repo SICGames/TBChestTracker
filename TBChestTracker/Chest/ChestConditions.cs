@@ -9,9 +9,32 @@ namespace TBChestTracker
 {
     public class ChestConditions : INotifyPropertyChanged
     {
-        private string _chestType = "Common";
-        private int _level = 5;
+        private string _chestType;
+        private string _chestName;
 
+        private int _level = 5;
+        private ChestRef _chestRef;
+        public ChestRef ChestRef
+        {
+            get => _chestRef;
+            set
+            {
+                _chestRef = value;
+                OnPropertyChanged(nameof(ChestRef));
+            }
+        }
+        public string ChestName
+        {
+            get
+            {
+                return _chestName;
+            }
+            set
+            {
+                _chestName = value;
+                OnPropertyChanged(nameof(ChestName));
+            }
+        }
         public string ChestType
         {
             get 

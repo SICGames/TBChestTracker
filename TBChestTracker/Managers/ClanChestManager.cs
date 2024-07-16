@@ -19,7 +19,6 @@ using static Emgu.CV.Features2D.ORB;
 
 namespace TBChestTracker
 {
-
     public class ClanChestManager
     {
         public List<ClanChestData> clanChestData { get; set; }
@@ -34,11 +33,11 @@ namespace TBChestTracker
 
         public ClanChestManager()
         {
-
             clanChestData = new List<ClanChestData>();  
             ClanChestDailyData = new Dictionary<string, List<ClanChestData>>();
             ChestProcessingState = ChestProcessingState.IDLE;
         }
+
         public void ClearData()
         {
             ClanChestDailyData.Clear();

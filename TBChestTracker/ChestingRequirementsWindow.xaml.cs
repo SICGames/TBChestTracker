@@ -42,7 +42,8 @@ namespace TBChestTracker
         }
         private void RemoveConditionBtn_Click(object sender, RoutedEventArgs e)
         {
-            var item = ((ListViewItem)sender).Content as ChestConditions;
+            var item = ChestConditionsListView.SelectedItem as ChestConditions;
+            
             ClanManager.Instance.ClanChestSettings.ChestRequirements.ChestConditions.Remove(item);
         }
 
@@ -69,33 +70,7 @@ namespace TBChestTracker
 
             }
         }
-
-        private void AddRequirementButton_Click(object sender, RoutedEventArgs e)
-        {
-            NewRequirementWindow newRequirementWindow = new NewRequirementWindow();
-            if(newRequirementWindow.ShowDialog() == true)
-            {
-               
-            }
-        }
-
-        private void RemoveRequirementButton_Click(object sender, RoutedEventArgs e)
-        {
-            var item = ((ListViewItem)sender).Content as ClanSpecifiedRequirements;
-            ClanManager.Instance.ClanChestSettings.ClanRequirements.ClanSpecifiedRequirements.Remove(item);
-        }
-
-        private void ClearRequirementsButton_Click(object sender, RoutedEventArgs e)
-        {
-            ClanManager.Instance.ClanChestSettings.ClanRequirements.ClanSpecifiedRequirements.Clear();
-        }
-
-        private void RequirementListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            var item = ((ListViewItem)sender).Content as ClanSpecifiedRequirements;
-
-        }
-
+      
         private void AddChestPointButton_Click(object sender, RoutedEventArgs e)
         {
             NewChestPointWindow newChestPointWindow = new NewChestPointWindow();

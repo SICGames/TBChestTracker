@@ -130,7 +130,6 @@ namespace TBChestTracker
                 if( comboboxItem.Content.Equals(ChestType) )
                 {
                     comboboxItem.IsSelected = true;
-                    
                     break;
                 }
             }
@@ -151,6 +150,20 @@ namespace TBChestTracker
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            
+            foreach (var chesttype in ApplicationManager.Instance.ChestTypes)
+            {
+                ComboBoxItem ci = new ComboBoxItem();
+                ci.Content = chesttype.Name;
+                ChestTypeBox.Items.Add(ci);
+            }
+            foreach (var chestname in ApplicationManager.Instance.ChestNames)
+            {
+                ComboBoxItem ci = new ComboBoxItem();
+                ci.Content = chestname.Name;
+                ChestNameBox.Items.Add(ci);
+            }
+
             this.DataContext = ChestPoints;
         }
 
@@ -166,18 +179,22 @@ namespace TBChestTracker
                 case RefEnum.BYTYPE:
                     {
                         ChestTypeBox.Visibility = Visibility.Visible;
-                        ChestTextBox.Visibility = Visibility.Collapsed;
+                        ChestNameBox.Visibility = Visibility.Collapsed;
                     }
                     break;
                 case RefEnum.BYNAME:
                     {
-                        ChestTextBox.Visibility = Visibility.Visible;
+                        ChestNameBox.Visibility = Visibility.Visible;
                         ChestTypeBox.Visibility = Visibility.Collapsed;
                         ChestTypeBox.Text = "Custom";
                     }
                     break;
 
             }
+        }
+        private void ChestNameBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
     }
 }

@@ -171,6 +171,8 @@
     <Compile Include="CrashBox\Events\CrashBoxEvents.cs" />
     <Compile Include="CrashBox\Events\CrashBoxExceptionArgs.cs" />
     <Compile Include="CustomControls\DpiAwareImage.cs" />
+    <Compile Include="Data\ChestNames.cs" />
+    <Compile Include="Data\ChestTypes.cs" />
     <Compile Include="EditChestPointValueWindow.xaml.cs">
       <DependentUpon>EditChestPointValueWindow.xaml</DependentUpon>
     </Compile>
@@ -182,6 +184,7 @@
     <Compile Include="Helpers\ListExtension.cs" />
     <Compile Include="Helpers\Table.cs" />
     <Compile Include="Helpers\Translator.cs" />
+    <Compile Include="Managers\ApplicationManager.cs" />
     <Compile Include="Managers\ClanChestProcessResult.cs" />
     <Compile Include="Managers\SettingsManager.cs" />
     <Compile Include="MergeClanmateWindow.xaml.cs">
@@ -529,6 +532,7 @@
     </EmbeddedResource>
     <None Include="app.manifest" />
     <None Include="CHANGES.md" />
+    <None Include="Data\ChestTypes.csv" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

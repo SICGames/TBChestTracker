@@ -66,6 +66,8 @@ namespace TBChestTracker
         StartPageWindow startPageWindow {  get; set; }  
         ClanChestProcessResult clanChestProcessResult { get; set; }
         RecentDatabase recentlyOpenedDatabases { get; set; }
+        ApplicationManager applicationManager { get; set; }
+
         #endregion
 
         #region PropertyChanged Event
@@ -409,6 +411,7 @@ namespace TBChestTracker
               
             });
         }
+
         private Task InitTesseract()
         {
             return Task.Run(() =>
@@ -427,6 +430,16 @@ namespace TBChestTracker
                 }
             });
         }
+
+        private Task BuildChestData()
+        {
+            return Task.Run(() =>
+            {
+                applicationManager = new ApplicationManager();
+                applicationManager.Build();
+            });
+        }
+
         private Task LaunchTask(SplashScreen splashScreen)
         {
             return Task.Run(() =>
@@ -496,6 +509,13 @@ namespace TBChestTracker
                 await Task.Delay(500);
 
                 await InitTesseract();
+
+                await this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    splashScreen.UpdateStatus("Building Chest Variables...", 97);
+                }));
+                await Task.Delay(250);
+                await BuildChestData();
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
@@ -621,8 +641,7 @@ namespace TBChestTracker
             TesseractHelper.Destroy();
             com.HellStormGames.Logging.Console.Destroy();
             SettingsManager.Dispose();
-            
-                
+            applicationManager = null;
         }
         #endregion
 
@@ -996,6 +1015,7 @@ namespace TBChestTracker
             if (OCRWizardWindow != null)
                 OCRWizardWindow = null;
 
+            
             OCRWizardWindow = new OCRWizardWindow();
             OCRWizardWindow.Show();
 
