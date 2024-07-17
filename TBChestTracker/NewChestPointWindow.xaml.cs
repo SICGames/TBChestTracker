@@ -79,7 +79,17 @@ namespace TBChestTracker
             ChestRef.ReferenceOption = RefEnum.BYTYPE;
             this.DataContext = this;
         }
-
+        private void BuildLevels(ComboBox cb, int minLevel = 0, int maxLevel = 45, int StepAmount = 1)
+        {
+            cb.Items.Clear();
+            for (int i = minLevel; i <= maxLevel; i += StepAmount)
+            {
+                ComboBoxItem cbi = new ComboBoxItem();
+                cbi.Content = i.ToString();
+                cb.Items.Add(cbi);
+            }
+            cb.SelectedIndex = 0;
+        }
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void AddBtn_Click(object sender, RoutedEventArgs e)
@@ -87,9 +97,18 @@ namespace TBChestTracker
             ChestPoints chestPoints = new ChestPoints();
             chestPoints.ChestRef = ChestRef;
 
-            chestPoints.ChestName = ChestNameBox.Text;
-            chestPoints.ChestType = ChestTypeBox.Text;
-            chestPoints.Level = Level;
+            
+            if (chestPoints.ChestRef.ReferenceOption == RefEnum.BYNAME)
+            {
+                chestPoints.ChestType = "Custom";
+                chestPoints.ChestName = ChestNameBox.Text;
+            }
+            else
+            {
+                chestPoints.ChestType = ChestTypeBox.Text;
+                chestPoints.ChestName = "";
+            }
+            chestPoints.Level = Int32.Parse(ChestPointLevel.Text);
             chestPoints.PointValue = PointValue;
             ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints.Add(chestPoints);
             this.DialogResult = true;
@@ -98,42 +117,27 @@ namespace TBChestTracker
 
         private void ChestTypeBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (ChestTypeBox.SelectedItem == null)
+            if(ChestTypeBox.SelectedItem != null)
             {
-                ChestTypeBox.SelectedIndex = 0;
-                return;
-            }
-
-            var item = (ComboBoxItem)ChestTypeBox.SelectedItem;
-
-            if(item.Content.ToString().Equals("Heroic", StringComparison.CurrentCultureIgnoreCase))
-            {
-                if(LevelTextBox != null)
-                    LevelTextBox.Visibility = Visibility.Visible;
-
-                if(ChestPointLevel != null)
-                    ChestPointLevel.Visibility = Visibility.Collapsed;
+                var content = ((ComboBoxItem)ChestTypeBox.SelectedItem).Content;
+                if(content.ToString().Equals("Heroic"))
+                {
+                    BuildLevels(ChestPointLevel, 16, 45, 1);
+                }
+                else
+                {
+                    BuildLevels(ChestPointLevel, 0, 45, 5);
+                }
             }
             else
             {
-                if(LevelTextBox != null)
-                    LevelTextBox.Visibility = Visibility.Collapsed;
-
-                if (ChestPointLevel != null)
-                    ChestPointLevel.Visibility = Visibility.Visible;
+                BuildLevels(ChestPointLevel, 0, 45, 5);
             }
         }
 
         private void ChestPointLevel_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var item = (ComboBoxItem)ChestPointLevel.SelectedItem;
-            if (item == null)
-                return;
-
-            if (!String.IsNullOrEmpty(item.Content.ToString()))
-            {
-                Level = Int32.Parse((string)item.Content.ToString());
-            }
+          
         }
 
         private void StackPanel_Click(object sender, RoutedEventArgs e)
@@ -143,22 +147,24 @@ namespace TBChestTracker
                 case RefEnum.BYTYPE:
                     {
                         ChestTypeBox.Visibility = Visibility.Visible;
-                        //ChestTextBox.Visibility = Visibility.Collapsed;
+                        ChestTypeBox.SelectedIndex = 0;
                         ChestNameBox.Visibility = Visibility.Collapsed;
                     }
                     break;
                 case RefEnum.BYNAME:
                     {
-                        //ChestTextBox.Visibility = Visibility.Visible;
                         ChestNameBox.Visibility = Visibility.Visible;
+                        ChestNameBox.SelectedIndex = 0;
                         ChestTypeBox.Visibility = Visibility.Collapsed;
                     }
                     break;
             }
+            ChestPointLevel.SelectedIndex = 0;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            BuildLevels(ChestPointLevel, 0, 45, 5);
 
             //-- load chestypes from chesttypes.csv file
             var chesttypes = ApplicationManager.Instance.ChestTypes;
@@ -169,7 +175,8 @@ namespace TBChestTracker
                 ci.Content = chesttype.Name;
                 ChestTypeBox.Items.Add(ci);
             }
-            foreach(var chestname in chestnames )
+
+            foreach (var chestname in chestnames )
             {
                 var ci = new ComboBoxItem();
                 ci.Content = chestname.Name;

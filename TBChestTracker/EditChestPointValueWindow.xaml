@@ -42,30 +42,18 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <ComboBox x:Name="ChestTypeBox" Visibility="Visible" Grid.Row="1" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Center" 
+                    <ComboBox x:Name="ChestTypeBox" Visibility="Visible" Grid.Row="1" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Center" Text="{Binding ChestType}"
                       VerticalAlignment="Center" SelectionChanged="ChestTypeBox_SelectionChanged">
                     </ComboBox>
-                    <ComboBox x:Name="ChestNameBox" Visibility="Collapsed" Grid.Row="1" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Center" 
+                    <ComboBox x:Name="ChestNameBox" Visibility="Collapsed" Grid.Row="1" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Center" Text="{Binding ChestName}"
                         VerticalAlignment="Center" SelectionChanged="ChestNameBox_SelectionChanged">
                     </ComboBox>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <ComboBox Grid.Row="1" Grid.Column="1" Height="24" Width="50" HorizontalContentAlignment="Center" 
-                          SelectedIndex="0" SelectionChanged="ChestPointLevel_SelectionChanged" x:Name="ChestPointLevel" Text="{Binding Level}">
-                        <ComboBoxItem Content="0"/>
-                        <ComboBoxItem Content="5"/>
-                        <ComboBoxItem Content="10"/>
-                        <ComboBoxItem Content="15"/>
-                        <ComboBoxItem Content="20"/>
-                        <ComboBoxItem Content="25"/>
-                        <ComboBoxItem Content="30"/>
-                        <ComboBoxItem Content="35"/>
+                           SelectionChanged="ChestPointLevel_SelectionChanged" x:Name="ChestPointLevel" Text="{Binding Level}">
                     </ComboBox>
-                    <TextBox x:Name="LevelTextBox" Visibility="Collapsed" 
-                         Width="50" Height="24" 
-                         TextAlignment="Center" Text="{Binding Level}" 
-                         VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 </StackPanel>
 
                 <TextBlock Grid.Row="0" Grid.Column="3" Text="Point Value" HorizontalAlignment="Center" VerticalAlignment="Center"/>

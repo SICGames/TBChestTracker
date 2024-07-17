@@ -64,7 +64,7 @@ namespace TBChestTracker
         {
             var item = ((ListViewItem)sender).Content as ChestConditions;
             EditConditionWindow editConditionWindow = new EditConditionWindow();
-            editConditionWindow.LoadChestCondition(item.ChestType, item.level);
+            editConditionWindow.LoadChestCondition(item,ChestConditionsListView.SelectedIndex);
             if(editConditionWindow.ShowDialog() == true)
             {
 

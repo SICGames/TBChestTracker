@@ -45,14 +45,6 @@
                     VerticalAlignment="Center" SelectionChanged="ChestNameBox_SelectionChanged"></ComboBox>
                 </StackPanel>
                 <ComboBox Grid.Row="1" Grid.Column="2" Height="24" Width="50" HorizontalContentAlignment="Center" SelectedIndex="0" x:Name="ChestLevelCondition">
-                    <ComboBoxItem Content="0"/>
-                    <ComboBoxItem Content="5"/>
-                    <ComboBoxItem Content="10"/>
-                    <ComboBoxItem Content="15"/>
-                    <ComboBoxItem Content="20"/>
-                    <ComboBoxItem Content="25"/>
-                    <ComboBoxItem Content="30"/>
-                    <ComboBoxItem Content="35"/>
                 </ComboBox>
                 <StackPanel Grid.Row="2" Grid.ColumnSpan="4" Background="LightGray" Orientation="Horizontal">
                     <TextBlock Grid.Column="0" Foreground="Red" Text="* LEVEL 0 is anything that does not have a level." HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,0,0,0"/>

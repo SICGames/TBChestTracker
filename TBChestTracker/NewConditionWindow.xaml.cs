@@ -48,12 +48,33 @@ namespace TBChestTracker
             InitializeComponent();
         }
 
+        private void BuildLevels(ComboBox cb, int minLevel = 0, int maxLevel = 45, int StepAmount = 1)
+        {
+            cb.Items.Clear();
+            for(int i = minLevel; i <= maxLevel;  i+=StepAmount)
+            {
+                ComboBoxItem cbi = new ComboBoxItem();
+                cbi.Content = i.ToString();
+                cb.Items.Add(cbi); 
+            }
+            cb.SelectedIndex = 0;
+
+        }
         private void AddBtn_Click(object sender, RoutedEventArgs e)
         {
             ChestConditions chestcondition = new ChestConditions();
 
-            chestcondition.ChestType = ChestTypeBox.Text;
-            chestcondition.ChestName = ChestNameBox.Text;   
+            if (ChestRef.ReferenceOption == RefEnum.BYNAME)
+            {
+                chestcondition.ChestType = "Custom";
+                chestcondition.ChestName = ChestNameBox.Text;
+            }
+            else
+            {
+                chestcondition.ChestType = ChestTypeBox.Text;
+                chestcondition.ChestName = "";
+            }
+            
             chestcondition.ChestRef = ChestRef;
 
             chestcondition.level = Int32.Parse(ChestLevelCondition.Text);
@@ -70,12 +91,20 @@ namespace TBChestTracker
                 ci.Content = chesttype.Name;
                 ChestTypeBox.Items.Add(ci);
             }
+            /*
+            ComboBoxItem cbi = new ComboBoxItem();
+            cbi.Content = "Custom";
+            ChestTypeBox.Items.Add(cbi);
+            */
+
             foreach (var chestname in ApplicationManager.Instance.ChestNames)
             {
                 ComboBoxItem ci = new ComboBoxItem();
                 ci.Content = chestname.Name;
                 ChestNameBox.Items.Add(ci);
             }
+            
+            BuildLevels(ChestLevelCondition, 0,45,5);
 
             this.DataContext = this;
         }
@@ -92,23 +121,39 @@ namespace TBChestTracker
                 case RefEnum.BYTYPE:
                     {
                         ChestTypeBox.Visibility = Visibility.Visible;
-                        //ChestTextBox.Visibility = Visibility.Collapsed;
+                        ChestTypeBox.SelectedIndex = 0;
                         ChestNameBox.Visibility = Visibility.Collapsed;
                     }
                     break;
                 case RefEnum.BYNAME:
                     {
-                        //ChestTextBox.Visibility = Visibility.Visible;
                         ChestNameBox.Visibility = Visibility.Visible;
+                        ChestNameBox.SelectedIndex = 0;
                         ChestTypeBox.Visibility = Visibility.Collapsed;
                     }
                     break;
             }
+            ChestLevelCondition.SelectedIndex = 0;
         }
 
         private void ChestTypeBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            if(ChestTypeBox.SelectedItem != null)
+            {
+                var content = ((ComboBoxItem)ChestTypeBox.SelectedItem).Content;
+                if(content.ToString().Equals("Heroic"))
+                {
+                    BuildLevels(ChestLevelCondition, 16);
+                }
+                else
+                {
+                    BuildLevels(ChestLevelCondition, 0,45,5);
+                }
+            }
+            else
+            {
+                BuildLevels(ChestLevelCondition, 0, 45, 5);
+            }
         }
 
         private void ChestNameBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
