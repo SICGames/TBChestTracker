@@ -1,4 +1,4 @@
-﻿# Localalization
+﻿# Localization
 locale folder holds all the localization files necessary. Would like to implemend localizaiton strings for ui under a seperate file. 
 - ChestNames.csv
 - ChestSources.csv
