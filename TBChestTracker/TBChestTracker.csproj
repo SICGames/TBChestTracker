@@ -532,7 +532,9 @@
     </EmbeddedResource>
     <None Include="app.manifest" />
     <None Include="CHANGES.md" />
-    <None Include="Data\ChestTypes.csv" />
+    <None Include="locale\en-US\ChestNames.csv" />
+    <None Include="locale\en-US\ChestSources.csv" />
+    <None Include="locale\TODO.md" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
