@@ -17,11 +17,11 @@ locale\pl-PL\Strings.csv
 # Strings.csv
 Will be a dictionary list.
 
-{English Name},{Translated Value}
+{UI Name},{Translated Value}
 
-Hello,Guten Tag 'locale\de-DE\Strings.csv'
+GreetingUI,Guten Tag 'locale\de-DE\Strings.csv'
 
-Hello,Hello 'locale\en-US\Strings.csv'
+GreetingUI,Hello 'locale\en-US\Strings.csv'
 
 
 # Localization Folder installation 
