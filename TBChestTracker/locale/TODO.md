@@ -6,8 +6,12 @@ locale folder holds all the localization files necessary. Would like to implemen
 
 # Directory Format 
 
-locale\<language short code>\<file> 
+- locale (directory)
+  - language short code (en-US)
+	- file (Strings.csv)
+
 locale\en-US\Strings.csv
+
 locale\pl-PL\Strings.csv
 
 # Strings.csv
