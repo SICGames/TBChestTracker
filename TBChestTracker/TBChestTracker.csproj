@@ -102,19 +102,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CaptainHook, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\CaptainHook\CaptainHook\bin\x64\Release\CaptainHook.dll</HintPath>
-    </Reference>
-    <Reference Include="KonquestUI, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\KonquestUI\KonquestUI\bin\x64\Release\KonquestUI.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationFramework.Aero2" />
-    <Reference Include="Snapture, Version=1.0.8882.27601, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Snapture\x64\Release\Snapture.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
@@ -544,6 +532,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CaptainHook">
+      <Version>1.0.0</Version>
+    </PackageReference>
     <PackageReference Include="CefSharp.Wpf">
       <Version>124.3.80</Version>
     </PackageReference>
@@ -559,8 +550,14 @@
     <PackageReference Include="Emgu.CV.runtime.windows">
       <Version>4.9.0.5494</Version>
     </PackageReference>
+    <PackageReference Include="KonquestUI">
+      <Version>1.0.0</Version>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="Snapture">
+      <Version>1.0.0</Version>
     </PackageReference>
     <PackageReference Include="WindowsAPICodePack-Core">
       <Version>1.1.2</Version>

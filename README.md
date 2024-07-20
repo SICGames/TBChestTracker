@@ -53,7 +53,7 @@ Clanmate Management
 - Head over to [Releases section](https://github.com/SICGames/TBChestTracker/releases) and download the latest version TBChestTracker-Setup.exe.
 
 ## Want to contribute? 
-Send message to be allowed to push updates to the project. I rather have people contribute than clone and compile solely for themselves.
+Head over to [Contributions section](https://github.com/SICGames/TBChestTracker/blob/master/CONTRIBUTING.md) to contribute to this project.
 
 ## Launched Program and now what?
 - In the Start Up Page, click on New Clan and create your clan. 
