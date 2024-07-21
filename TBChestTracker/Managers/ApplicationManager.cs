@@ -46,6 +46,13 @@ namespace TBChestTracker
             //-- loaded from C:\ProgramData\SICGames\TotalBattleChestTracker\locale\ and user's language.
 
             string localeFolderPath = $@"{GlobalDeclarations.CommonAppFolder}locale\{Language}\";
+
+            if(!System.IO.Directory.Exists(localeFolderPath))
+            {
+                //-- fall back on en-US.
+                localeFolderPath = $@"{GlobalDeclarations.CommonAppFolder}locale\en-US\";
+            }
+
             string ChestTypesFile = $"{localeFolderPath}ChestSources.csv";
             string ChestNamesFile = $"{localeFolderPath}ChestNames.csv";
 

@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using TBChestTracker.Localization;
 
 namespace TBChestTracker
 {
@@ -15,6 +18,12 @@ namespace TBChestTracker
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+
+            //Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("fr-FR");
+
+            LocalizationManager.Set("fr-FR");
+
+
             MainWindow mainwnd = new MainWindow();
             StartPageWindow startPageWindow = new StartPageWindow();
             

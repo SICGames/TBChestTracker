@@ -7,12 +7,13 @@
         xmlns:Commands="clr-namespace:Hellscape.Commands"
         xmlns:UIControls="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
         xmlns:UI="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
+        xmlns:locale="clr-namespace:TBChestTracker.Localization"
+        xmlns:ResourceStrings="clr-namespace:TBChestTracker.Resources"
         mc:Ignorable="d"
         Title="{Binding Path=AppTitle, Mode=TwoWay}" 
         Width="800" Loaded="Window_Loaded" 
         SizeToContent="Height" Topmost="True" 
         WindowStyle="ToolWindow"  ResizeMode="NoResize" >
-    
     <Window.CommandBindings>
         <CommandBinding Command="Commands:CustomCommandBindings.ClanManager" 
                         x:Name="ClanManagerCommand" 
@@ -245,7 +246,10 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" LastChildFill="True">
             <Menu DockPanel.Dock="Top" Height="auto" VerticalAlignment="Top">
-                <MenuItem Header="File">
+                <!-- File menu -->
+                
+                    <!--="{Binding Path=[FileMenu], Source={x:Static locale:LocalizationManager.LocalizedDictionary}}"-->
+                <MenuItem Header="{x:Static ResourceStrings:Strings.File}">
                     <MenuItem Header="Clan Manager" x:Name="ClanManagerMenuItem" Command="Commands:CustomCommandBindings.ClanManager"/>
                     <Separator/>
                     <MenuItem Header="Load Clan Database" x:Name="LoadClanDB" Command="Commands:CustomCommandBindings.LoadClanDatabase"/>

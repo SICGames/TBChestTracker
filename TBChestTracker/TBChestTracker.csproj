@@ -176,8 +176,10 @@
     <Compile Include="Helpers\ListExtension.cs" />
     <Compile Include="Helpers\Table.cs" />
     <Compile Include="Helpers\Translator.cs" />
+    <Compile Include="Data\LocaleDictionary.cs" />
     <Compile Include="Managers\ApplicationManager.cs" />
     <Compile Include="Managers\ClanChestProcessResult.cs" />
+    <Compile Include="Managers\LocalizationManager.cs" />
     <Compile Include="Managers\SettingsManager.cs" />
     <Compile Include="MergeClanmateWindow.xaml.cs">
       <DependentUpon>MergeClanmateWindow.xaml</DependentUpon>
@@ -233,6 +235,16 @@
     </Compile>
     <Compile Include="RecentData\RecentClanDatabase.cs" />
     <Compile Include="RecentData\RecentDatabase.cs" />
+    <Compile Include="Resources\Strings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Strings.fr-FR.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.fr-FR.resx</DependentUpon>
+    </Compile>
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
@@ -522,11 +534,18 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Strings.fr-FR.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.fr-FR.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Strings.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <None Include="app.manifest" />
     <None Include="CHANGES.md" />
     <None Include="locale\en-US\ChestNames.csv" />
     <None Include="locale\en-US\ChestSources.csv" />
-    <None Include="locale\en-US\Strings.csv" />
     <None Include="locale\TODO.md" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

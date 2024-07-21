@@ -515,6 +515,7 @@ namespace TBChestTracker
                     splashScreen.UpdateStatus("Building Chest Variables...", 97);
                 }));
                 await Task.Delay(250);
+
                 await BuildChestData();
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
