@@ -350,19 +350,21 @@ namespace TBChestTracker
 
                         if (chests != null)
                         {
-                            commoncryptstotal = chests.Where(common => common.Type == ChestType.COMMON).Count();
-                            rarecryptstotal = chests.Where(common => common.Type == ChestType.RARE).Count();
-                            epiccryptstotal = chests.Where(common => common.Type == ChestType.EPIC).Count();
-                            citadelsstotal = chests.Where(common => common.Type == ChestType.CITADEL).Count();
-                            arenastotal = chests.Where(common => common.Type == ChestType.ARENA).Count();
-                            heroicstotal = chests.Where(common => common.Type == ChestType.HEROIC).Count();
-                            uniontriumphstotal = chests.Where(common => common.Type == ChestType.UNION_TRIUMPH).Count();
-                            vaultancienttotal = chests.Where(common => common.Type == ChestType.VAULT).Count();
-                            bankstotal = chests.Where(common => common.Type == ChestType.BANK).Count();
-                            ancientchests = chests.Where(common => common.Type == ChestType.ANCIENT_EVENT).Count();
-                            jormungandrtotal = chests.Where(c => c.Type == ChestType.JORMUNGANDR).Count();
-                            storycheststotal = chests.Where(common => common.Type == ChestType.STORY).Count();
-                            otherTotal = chests.Where(common => common.Type == ChestType.OTHER).Count();
+
+                            commoncryptstotal = chests.Where(common => common.Type.ToLower().Contains("common")).Count();
+                            rarecryptstotal = chests.Where(common => common.Type.ToLower().Contains("rare")).Count();
+                            epiccryptstotal = chests.Where(common => common.Type.ToLower().Contains("epic")).Count();
+                            citadelsstotal = chests.Where(common => common.Type.ToLower().Contains("citadel")).Count();
+                            arenastotal = chests.Where(common => common.Type.ToLower().Contains("arena")).Count();
+                            heroicstotal = chests.Where(common => common.Type.ToLower().Contains("heroic")).Count();
+                            uniontriumphstotal = chests.Where(common => common.Type.ToLower().Contains("union of triumph")).Count();
+                            vaultancienttotal = chests.Where(common => common.Type.ToLower().Contains("vault")).Count();
+                            bankstotal = chests.Where(common => common.Type.ToLower().Contains("bank")).Count();
+                            ancientchests = chests.Where(common => common.Type.ToLower().Contains("Ancient")).Count();
+                            jormungandrtotal = chests.Where(c => c.Type.ToLower().Contains("jormungandr")).Count();
+                            storycheststotal = chests.Where(common => common.Type.ToLower().Contains("story")).Count();
+                            otherTotal = chests.Where(common => common.Type.ToLower().Contains("other")).Count();
+
                             total = commoncryptstotal + rarecryptstotal + epiccryptstotal + citadelsstotal + arenastotal + uniontriumphstotal + heroicstotal + vaultancienttotal + bankstotal + storycheststotal + otherTotal;
                             totalPoints = entry.Points;
                         }

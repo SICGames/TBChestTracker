@@ -117,10 +117,109 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="About" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="Chest" xml:space="preserve">
+    <value>Chest</value>
+  </data>
+  <data name="Clan" xml:space="preserve">
+    <value>Clan</value>
+  </data>
+  <data name="ClanChestManager" xml:space="preserve">
+    <value>Clan Chest Manager</value>
+  </data>
+  <data name="ClanInsightsTooltip" xml:space="preserve">
+    <value>Open Clan Insights</value>
+  </data>
+  <data name="ClanManager" xml:space="preserve">
+    <value>Clan Manager</value>
+  </data>
+  <data name="ClanmateManager" xml:space="preserve">
+    <value>Clanmate Manager</value>
+  </data>
+  <data name="Common" xml:space="preserve">
+    <value>Common</value>
+  </data>
+  <data name="Console" xml:space="preserve">
+    <value>Console</value>
+  </data>
+  <data name="ConsoleWindowTooltip" xml:space="preserve">
+    <value>Open Console Window</value>
+  </data>
   <data name="Edit" xml:space="preserve">
     <value>Edit</value>
   </data>
+  <data name="ExitApplication" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="ExportChestData" xml:space="preserve">
+    <value>Export Chest Data</value>
+  </data>
   <data name="File" xml:space="preserve">
     <value>File</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="Heroic" xml:space="preserve">
+    <value>Heroic</value>
+  </data>
+  <data name="LaunchOCRWizardTooltip" xml:space="preserve">
+    <value>Launch OCR Wizard</value>
+  </data>
+  <data name="Level" xml:space="preserve">
+    <value>Level</value>
+  </data>
+  <data name="LoadClanDatabase" xml:space="preserve">
+    <value>Load Clan Database</value>
+  </data>
+  <data name="ManageClanChestSettingsTooltip" xml:space="preserve">
+    <value>Manage Clan Chest Settings</value>
+  </data>
+  <data name="ManageClanmatesTooltip" xml:space="preserve">
+    <value>Manage Clanmate(s)</value>
+  </data>
+  <data name="ManageClansTooltip" xml:space="preserve">
+    <value>Manage Clan(s)</value>
+  </data>
+  <data name="OCRWizard" xml:space="preserve">
+    <value>OCR Wizard</value>
+  </data>
+  <data name="OnlyCrypt" xml:space="preserve">
+    <value>Crypt</value>
+  </data>
+  <data name="Patreon" xml:space="preserve">
+    <value>Patreon</value>
+  </data>
+  <data name="SaveClanDatabase" xml:space="preserve">
+    <value>Save Clan Database</value>
+  </data>
+  <data name="SaveClanDatabaseAs" xml:space="preserve">
+    <value>Save As...</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Source" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="StartAutomationTooltip" xml:space="preserve">
+    <value>Start Automation</value>
+  </data>
+  <data name="StopAutomationTooltip" xml:space="preserve">
+    <value>Stop Automation</value>
+  </data>
+  <data name="Tools" xml:space="preserve">
+    <value>Tools</value>
+  </data>
+  <data name="VerifyChestDataIntegrity" xml:space="preserve">
+    <value>Verify Chest Data Integrity</value>
+  </data>
+  <data name="Window" xml:space="preserve">
+    <value>Window</value>
   </data>
 </root>

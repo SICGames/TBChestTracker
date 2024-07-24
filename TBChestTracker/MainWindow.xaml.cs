@@ -182,13 +182,11 @@ namespace TBChestTracker
         {
 
             var claim_button = SettingsManager.Instance.Settings.OCRSettings.ClaimChestButtons[0];
-
             com.HellStormGames.Logging.Console.Write("Automation Started", com.HellStormGames.Logging.LogType.INFO);
             GlobalDeclarations.canCaptureAgain = true;
-
-            appContext.ChestCountTotal = 0;
-
             bool bCanceled = false;
+
+            //-- we want to speed up this.
 
             while (true)
             {
@@ -218,10 +216,6 @@ namespace TBChestTracker
                     {
                         Automator.LeftClick(claim_button.X, claim_button.Y);
                         automatorClicks++;
-
-                        this.Dispatcher.BeginInvoke(new Action(() => {
-                            appContext.ChestCountTotal++;
-                        }));
                         Thread.Sleep(100);
                     }
 
@@ -305,7 +299,9 @@ namespace TBChestTracker
             {
                 Snapture = new Snapture();
                 Snapture.onFrameCaptured += Snapture_onFrameCaptured;
-                Snapture.SetBitmapResolution((int)Snapture.MonitorInfo.Monitors[0].Dpi.X);
+                var dpi = 300; //-- testing new dpi.
+
+                Snapture.SetBitmapResolution(dpi);
                 Snapture.Start(FrameCapturingMethod.GDI);
                 com.HellStormGames.Logging.Console.Write("Snapture Started.", com.HellStormGames.Logging.LogType.INFO);
             });

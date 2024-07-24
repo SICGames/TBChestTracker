@@ -69,6 +69,7 @@ namespace TBChestTracker
                             var chestSource = chest.Source;
                             var chestname = chest.Name;
 
+                            /*
                             if (chestSource.ToLower().Contains("jormungandr"))
                             {
                                 if (chesttype == ChestType.OTHER)
@@ -77,6 +78,7 @@ namespace TBChestTracker
                                     chestErrors++;
                                 }
                             }
+                            */
                         }
                     }
                 }

@@ -42,7 +42,7 @@ namespace TBChestTracker
         BitmapSource PreviewImageSource { get; set; }
         PreviewCroppedImageViewer previewer { get; set; }
 
-        public string clanmateName { get; set; }
+        public string[] clanmateName { get; set; }
 
         public PreviewScreenshotWindow()
         {
@@ -66,7 +66,9 @@ namespace TBChestTracker
             //this.Hide();
             Snapture = new Snapture();
             Snapture.isDPIAware = true;
-            Snapture.SetBitmapResolution((int)Snapture.MonitorInfo.Monitors[0].Dpi.X);
+            var dpi = (int)Snapture.MonitorInfo.Monitors[0].Dpi.X;
+            Snapture.SetBitmapResolution(300);
+
             Snapture.onFrameCaptured += Snapture_onFrameCaptured;
             Snapture.Start(FrameCapturingMethod.GDI);
             
@@ -250,8 +252,13 @@ namespace TBChestTracker
                     var ocrResult = TesseractHelper.Read(imageScaled);
                     if (ocrResult != null)
                     {
-                        clanmateName = ocrResult.Words[0];
-                        var dialog = MessageBox.Show($"Clanmate detected as '{clanmateName}' is this correct?", "Add New Clanmate", MessageBoxButton.YesNo);
+                        clanmateName = ocrResult.Words.ToArray();
+                        var clanmateStr = String.Empty;
+                        foreach (var clanmate in clanmateName)
+                        {
+                            clanmateStr += $"\t \u2022 {clanmate}\n";
+                        }
+                        var dialog = MessageBox.Show($"Clanmate(s) detected as:\n {clanmateStr}\n is this correct?", "Add New Clanmate(s)", MessageBoxButton.YesNo);
                         if(dialog == MessageBoxResult.Yes)
                         {
                             //-- clean up and add clanmate. 
@@ -278,7 +285,11 @@ namespace TBChestTracker
 
             if(clanmateConfirmed)
             {
-                ClanManager.Instance.ClanmateManager.Add(clanmateName);
+                foreach (var clanmate in clanmateName)
+                {
+                    ClanManager.Instance.ClanmateManager.Add(clanmate);
+                }
+
                 this.Close();
             }
         }

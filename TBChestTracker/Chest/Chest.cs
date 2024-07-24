@@ -11,10 +11,10 @@ namespace TBChestTracker
     public class Chest
     {
         public string Name { get; set; }
-        public ChestType Type { get; set; }
+        public string Type { get; set; }
         public string Source { get; set; }
         public int Level { get; set; }
-        public Chest(string name, ChestType type, string source, int level)
+        public Chest(string name, string type, string source, int level)
         {
             Name = name;
             Type = type;

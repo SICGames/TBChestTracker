@@ -61,6 +61,96 @@ namespace TBChestTracker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to About.
+        /// </summary>
+        public static string About {
+            get {
+                return ResourceManager.GetString("About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chest.
+        /// </summary>
+        public static string Chest {
+            get {
+                return ResourceManager.GetString("Chest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clan.
+        /// </summary>
+        public static string Clan {
+            get {
+                return ResourceManager.GetString("Clan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clan Chest Manager.
+        /// </summary>
+        public static string ClanChestManager {
+            get {
+                return ResourceManager.GetString("ClanChestManager", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Clan Insights.
+        /// </summary>
+        public static string ClanInsightsTooltip {
+            get {
+                return ResourceManager.GetString("ClanInsightsTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clan Manager.
+        /// </summary>
+        public static string ClanManager {
+            get {
+                return ResourceManager.GetString("ClanManager", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clanmate Manager.
+        /// </summary>
+        public static string ClanmateManager {
+            get {
+                return ResourceManager.GetString("ClanmateManager", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Common.
+        /// </summary>
+        public static string Common {
+            get {
+                return ResourceManager.GetString("Common", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Console.
+        /// </summary>
+        public static string Console {
+            get {
+                return ResourceManager.GetString("Console", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Console Window.
+        /// </summary>
+        public static string ConsoleWindowTooltip {
+            get {
+                return ResourceManager.GetString("ConsoleWindowTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Edit.
         /// </summary>
         public static string Edit {
@@ -70,11 +160,218 @@ namespace TBChestTracker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Exit.
+        /// </summary>
+        public static string ExitApplication {
+            get {
+                return ResourceManager.GetString("ExitApplication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export Chest Data.
+        /// </summary>
+        public static string ExportChestData {
+            get {
+                return ResourceManager.GetString("ExportChestData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File.
         /// </summary>
         public static string File {
             get {
                 return ResourceManager.GetString("File", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to From.
+        /// </summary>
+        public static string From {
+            get {
+                return ResourceManager.GetString("From", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Help.
+        /// </summary>
+        public static string Help {
+            get {
+                return ResourceManager.GetString("Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Heroic.
+        /// </summary>
+        public static string Heroic {
+            get {
+                return ResourceManager.GetString("Heroic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Launch OCR Wizard.
+        /// </summary>
+        public static string LaunchOCRWizardTooltip {
+            get {
+                return ResourceManager.GetString("LaunchOCRWizardTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Level.
+        /// </summary>
+        public static string Level {
+            get {
+                return ResourceManager.GetString("Level", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load Clan Database.
+        /// </summary>
+        public static string LoadClanDatabase {
+            get {
+                return ResourceManager.GetString("LoadClanDatabase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manage Clan Chest Settings.
+        /// </summary>
+        public static string ManageClanChestSettingsTooltip {
+            get {
+                return ResourceManager.GetString("ManageClanChestSettingsTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manage Clanmate(s).
+        /// </summary>
+        public static string ManageClanmatesTooltip {
+            get {
+                return ResourceManager.GetString("ManageClanmatesTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manage Clan(s).
+        /// </summary>
+        public static string ManageClansTooltip {
+            get {
+                return ResourceManager.GetString("ManageClansTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to OCR Wizard.
+        /// </summary>
+        public static string OCRWizard {
+            get {
+                return ResourceManager.GetString("OCRWizard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Crypt.
+        /// </summary>
+        public static string OnlyCrypt {
+            get {
+                return ResourceManager.GetString("OnlyCrypt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patreon.
+        /// </summary>
+        public static string Patreon {
+            get {
+                return ResourceManager.GetString("Patreon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save Clan Database.
+        /// </summary>
+        public static string SaveClanDatabase {
+            get {
+                return ResourceManager.GetString("SaveClanDatabase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save As....
+        /// </summary>
+        public static string SaveClanDatabaseAs {
+            get {
+                return ResourceManager.GetString("SaveClanDatabaseAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string Settings {
+            get {
+                return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source.
+        /// </summary>
+        public static string Source {
+            get {
+                return ResourceManager.GetString("Source", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start Automation.
+        /// </summary>
+        public static string StartAutomationTooltip {
+            get {
+                return ResourceManager.GetString("StartAutomationTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop Automation.
+        /// </summary>
+        public static string StopAutomationTooltip {
+            get {
+                return ResourceManager.GetString("StopAutomationTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tools.
+        /// </summary>
+        public static string Tools {
+            get {
+                return ResourceManager.GetString("Tools", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Verify Chest Data Integrity.
+        /// </summary>
+        public static string VerifyChestDataIntegrity {
+            get {
+                return ResourceManager.GetString("VerifyChestDataIntegrity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Window.
+        /// </summary>
+        public static string Window {
+            get {
+                return ResourceManager.GetString("Window", resourceCulture);
             }
         }
     }

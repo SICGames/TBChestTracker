@@ -242,7 +242,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
             <RowDefinition Height="36"/>
-            <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" LastChildFill="True">
             <Menu DockPanel.Dock="Top" Height="auto" VerticalAlignment="Top">
@@ -250,36 +249,36 @@
                 
                     <!--="{Binding Path=[FileMenu], Source={x:Static locale:LocalizationManager.LocalizedDictionary}}"-->
                 <MenuItem Header="{x:Static ResourceStrings:Strings.File}">
-                    <MenuItem Header="Clan Manager" x:Name="ClanManagerMenuItem" Command="Commands:CustomCommandBindings.ClanManager"/>
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.ClanManager}" x:Name="ClanManagerMenuItem" Command="Commands:CustomCommandBindings.ClanManager"/>
                     <Separator/>
-                    <MenuItem Header="Load Clan Database" x:Name="LoadClanDB" Command="Commands:CustomCommandBindings.LoadClanDatabase"/>
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.LoadClanDatabase}" x:Name="LoadClanDB" Command="Commands:CustomCommandBindings.LoadClanDatabase"/>
                     <Separator/>
-                    <MenuItem Header="Save Clan Database" x:Name="SaveClanDB" Command="Commands:CustomCommandBindings.SaveClanDatabase"/>
-                    <MenuItem Header="Save As..." x:Name="SaveClanDBAs" Command="Commands:CustomCommandBindings.SaveAsClanDatabase"/>
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.SaveClanDatabase}" x:Name="SaveClanDB" Command="Commands:CustomCommandBindings.SaveClanDatabase"/>
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.SaveClanDatabaseAs}" x:Name="SaveClanDBAs" Command="Commands:CustomCommandBindings.SaveAsClanDatabase"/>
                     <Separator/>
-                    <MenuItem Header="Verify Chest Data Integritiy" Command="Commands:CustomCommandBindings.ValidateChestData"/>
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.VerifyChestDataIntegrity}" Command="Commands:CustomCommandBindings.ValidateChestData"/>
                     <Separator/>
-                    <MenuItem Header="Export Chest Data" Command="Commands:CustomCommandBindings.ExportClanDatabase"/>
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.ExportChestData}" Command="Commands:CustomCommandBindings.ExportClanDatabase"/>
                     <Separator/>
                     <MenuItem x:Name="RecentlyOpenedParent" Header="Recently Opened Databases">
                     </MenuItem>
-                    <MenuItem Header="Quit" Command="Commands:CustomCommandBindings.QuitApplication"/>
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.ExitApplication}" Command="Commands:CustomCommandBindings.QuitApplication"/>
                 </MenuItem>
-                <MenuItem Header="Edit">
-                    <MenuItem Header="Clanmate Manager" Command="Commands:CustomCommandBindings.ManageClanmates" />
-                    <MenuItem Header="Clan Chest Manager" Command="Commands:CustomCommandBindings.ManageClanChestSettings" />
+                <MenuItem Header="{x:Static ResourceStrings:Strings.Edit}">
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.ClanmateManager}" Command="Commands:CustomCommandBindings.ManageClanmates" />
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.ClanChestManager}" Command="Commands:CustomCommandBindings.ManageClanChestSettings" />
                     <Separator/>
-                    <MenuItem Header="Settings" Command="Commands:CustomCommandBindings.ManageSettings" />
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.Settings}" Command="Commands:CustomCommandBindings.ManageSettings" />
                 </MenuItem>
-                <MenuItem Header="Window">
-                    <MenuItem Header="Console" x:Name="ConsoleMenuButton" Click="ConsoleMenuButton_Click"/>
+                <MenuItem Header="{x:Static ResourceStrings:Strings.Window}">
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.Console}" x:Name="ConsoleMenuButton" Click="ConsoleMenuButton_Click"/>
                     <Separator/>
-                    <MenuItem Header="OCR Wizard" x:Name="OCRWizard" Click="OCRWizard_Click"/>
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.OCRWizard}" x:Name="OCRWizard" Click="OCRWizard_Click"/>
                 </MenuItem>
-                <MenuItem Header="Help" x:Name="HelpMenu" Click="HelpMenu_Click">
-                    <MenuItem Header="About" Tag="AboutApp"/>
+                <MenuItem Header="{x:Static ResourceStrings:Strings.Help}" x:Name="HelpMenu" Click="HelpMenu_Click">
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.About}" Tag="AboutApp"/>
                 </MenuItem>
-                <MenuItem Header="Patreon" x:Name="Patreon" Click="Patreon_Click"/>
+                <MenuItem Header="{x:Static ResourceStrings:Strings.Patreon}" x:Name="Patreon" Click="Patreon_Click"/>
             </Menu>
         </DockPanel>
         <ToolBarTray Grid.Row="1" Height="36" IsLocked="True">
@@ -294,7 +293,7 @@
                                      HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
                                      HighlightStrokeBrush="#0044FF" Corners="0"
                                      ImageSource="pack://application:,,,/Images/ClanManagerIcon.png"
-                                     ToolTip="Manage Clan(s)"
+                                     ToolTip="{x:Static ResourceStrings:Strings.ManageClansTooltip}"
                                      Command="Commands:CustomCommandBindings.ClanManager" 
                                      IsEnabled="True"/>
                 <Separator/>
@@ -303,7 +302,7 @@
                          HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
                          HighlightStrokeBrush="#0044FF" Corners="0"
                          ImageSource="pack://application:,,,/Images/icons_main_menu_clan_1.png"
-                         ToolTip="Manage Clanmates(s)"
+                         ToolTip="{x:Static ResourceStrings:Strings.ManageClanmatesTooltip}"
                          Command="Commands:CustomCommandBindings.ManageClanmates" 
                          IsEnabled="{Binding IsCurrentClandatabase}">
                 </UI:FancyImageButton>
@@ -313,7 +312,7 @@
                         HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
                         HighlightStrokeBrush="#0044FF" Corners="0"
                         ImageSource="pack://application:,,,/Images/icons_chest_1.png"
-                        ToolTip="Manage Clan Chest Settings"
+                        ToolTip="{x:Static ResourceStrings:Strings.ManageClanChestSettingsTooltip}"
                         Command="Commands:CustomCommandBindings.ManageClanChestSettings" 
                         IsEnabled="{Binding IsCurrentClandatabase}"/>
 
@@ -324,7 +323,7 @@
                         HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
                         HighlightStrokeBrush="#0044FF" Corners="0"
                         ImageSource="pack://application:,,,/Images/StartAutomationIcon.png"
-                        ToolTip="Start Automation [F9]"
+                        ToolTip="{x:Static ResourceStrings:Strings.StartAutomationTooltip}"
                         Command="Commands:CustomCommandBindings.StartAutomation" 
                         IsEnabled="{Binding IsAutomationPlayButtonEnabled}"/>
 
@@ -333,7 +332,7 @@
                         HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
                         HighlightStrokeBrush="#0044FF" Corners="0"
                         ImageSource="pack://application:,,,/Images/StopAutomation.png"
-                        ToolTip="Stop Automation [F10]"
+                        ToolTip="{x:Static ResourceStrings:Strings.StopAutomationTooltip}"
                         Command="Commands:CustomCommandBindings.StopAutomation" 
                         IsEnabled="{Binding IsAutomationStopButtonEnabled}"/>
                 <Separator/>
@@ -344,7 +343,7 @@
                       ImageSource="pack://application:,,,/Images/OCR_Icon.png"
                       x:Name="OCRWizardButton"
                       Click="OCRWizardButton_Click"
-                      ToolTip="OCR Wizard"
+                      ToolTip="{x:Static ResourceStrings:Strings.LaunchOCRWizardTooltip}"
                       IsEnabled="True"/>
 
                 <UI:FancyImageButton Height="24" Width="24" 
@@ -352,7 +351,7 @@
                       HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
                       HighlightStrokeBrush="#0044FF" Corners="0"
                       ImageSource="pack://application:,,,/Images/ConsoleIcon.png"
-                      ToolTip="Console Window"
+                      ToolTip="{x:Static ResourceStrings:Strings.ConsoleWindowTooltip}"
                       IsEnabled="True"
                       x:Name="ConsoleButton"
                       Click="ConsoleButton_Click"/>
@@ -362,7 +361,7 @@
                             HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
                             HighlightStrokeBrush="#0044FF" Corners="0"
                             ImageSource="pack://application:,,,/Images/ClanStatsIcon.png"
-                            ToolTip="Clan Insights"
+                            ToolTip="{x:Static ResourceStrings:Strings.ClanInsightsTooltip}"
                             Command="Commands:CustomCommandBindings.ClanStats" 
                             IsEnabled="{Binding IsCurrentClandatabase}"/>
                 
@@ -371,17 +370,11 @@
                       HighlightOpacity="0.25" 
                       HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
                       HighlightStrokeBrush="#0044FF" Corners="0"
-                      ToolTip="Settings"
+                      ToolTip="{x:Static ResourceStrings:Strings.Settings}"
                       Command="Commands:CustomCommandBindings.ManageSettings" 
                       ImageSource="pack://application:,,,/Images/SettingsIcon01.png"
                       IsEnabled="True"/>
             </ToolBar>
         </ToolBarTray>
-        <StatusBar Grid.Row="2">
-            <DockPanel>
-                <TextBlock Text="{Binding ChestCountTotal}" Margin="5,0"/>
-                <TextBlock Text="Chests Counted" Margin="5,0"/>
-            </DockPanel>
-        </StatusBar>
     </Grid>
 </Window>

@@ -286,7 +286,6 @@
       <DependentUpon>ChestingRequirementsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Chest\ChestRequirements.cs" />
-    <Compile Include="Chest\ChestType.cs" />
     <Compile Include="ClanData\ClanChestData.cs" />
     <Compile Include="Managers\ClanChestManager.cs" />
     <Compile Include="ClanData\ClanChestReport.cs" />

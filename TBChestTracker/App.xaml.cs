@@ -18,11 +18,8 @@ namespace TBChestTracker
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-
-            //Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("fr-FR");
-
-            LocalizationManager.Set("fr-FR");
-
+            //-- Manually set Culture Language for debugging purposes.
+            //LocalizationManager.Set("fr-FR");
 
             MainWindow mainwnd = new MainWindow();
             StartPageWindow startPageWindow = new StartPageWindow();
@@ -34,7 +31,6 @@ namespace TBChestTracker
             splashScreen.onSplashScreenComplete += SplashScreen_onSplashScreenComplete;
             splashScreen.mainWindow = mainwnd;
             splashScreen.startPageWindow = startPageWindow;
-
             
             Dictionary<string,string> argumentsDictionary = new Dictionary<string,string>();
 
