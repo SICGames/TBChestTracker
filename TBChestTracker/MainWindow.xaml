@@ -275,6 +275,9 @@
                     <Separator/>
                     <MenuItem Header="{x:Static ResourceStrings:Strings.OCRWizard}" x:Name="OCRWizard" Click="OCRWizard_Click"/>
                 </MenuItem>
+                <MenuItem Header="{x:Static ResourceStrings:Strings.Tools}">
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.ChestBuilder}" x:Name="ChestBuilderMenuItem" Click="ChestBuilderMenuItem_Click"/>
+                </MenuItem>
                 <MenuItem Header="{x:Static ResourceStrings:Strings.Help}" x:Name="HelpMenu" Click="HelpMenu_Click">
                     <MenuItem Header="{x:Static ResourceStrings:Strings.About}" Tag="AboutApp"/>
                 </MenuItem>

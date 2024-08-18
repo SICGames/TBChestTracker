@@ -373,5 +373,17 @@ namespace TBChestTracker
             PreviewScreenshotWindow previewWindow = new PreviewScreenshotWindow();
             previewWindow.Show();
         }
+       
+        private void ListClanMates01_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.A && e.SystemKey == Key.LeftCtrl)
+            {
+                ListClanMates01.SelectionMode = SelectionMode.Multiple;
+                foreach (ListViewItem item in ListClanMates01.Items)
+                {
+                    item.IsSelected = !item.IsSelected;
+                }
+            }
+        }
     }
 }

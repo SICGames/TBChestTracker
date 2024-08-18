@@ -88,8 +88,8 @@
             <DockPanel Grid.Column="0" Grid.Row="0" LastChildFill="True">
                 <ListBox ItemTemplate="{DynamicResource ListBoxItemTemplate1}" x:Name="ListClanMates01" Grid.Row="0" Width="345"
                          HorizontalAlignment="Left"
-                         SelectionMode="Multiple"
-                         ItemsSource="{Binding Clanmates, Mode=TwoWay}">
+                         SelectionMode="Extended"
+                         ItemsSource="{Binding Clanmates, Mode=TwoWay}" PreviewKeyDown="ListClanMates01_PreviewKeyDown">
                 </ListBox>
             </DockPanel>
         </Grid>

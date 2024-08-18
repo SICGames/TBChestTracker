@@ -19,6 +19,7 @@ using static Emgu.CV.Features2D.ORB;
 
 namespace TBChestTracker
 {
+    [System.Serializable]
     public class ClanChestManager
     {
         public List<ClanChestData> clanChestData { get; set; }
@@ -89,6 +90,9 @@ namespace TBChestTracker
 
         private List<ChestData> ProcessText3(List<string> result)
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
             //---Processing Chests Took: 00:00:00.0115509
             List<ChestData> tmpchests = new List<ChestData>();
 
@@ -264,6 +268,8 @@ namespace TBChestTracker
             if (bError)
                 return null;
 
+            sw.Stop();
+            Debug.WriteLine($"ProcessText3 took {sw.Elapsed.ToString()} to process.");
             return tmpchests;
         }
 

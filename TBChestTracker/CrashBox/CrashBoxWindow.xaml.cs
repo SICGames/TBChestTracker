@@ -43,10 +43,17 @@ namespace TBChestTracker.Dialogs
             var reasonOfCrash = exception;
             var crashDate = DateTime.Now.ToString(@"d");
             var crashTime = DateTime.Now.ToString(@"t");
+            if(!Directory.Exists($@"{GlobalDeclarations.CommonAppFolder}\Logs"))
+            {
+                Directory.CreateDirectory($@"{GlobalDeclarations.CommonAppFolder}\Logs");
+            }
 
-            using (var sw = File.AppendText($@"{GlobalDeclarations.CommonAppFolder}\crash.log"))
+            var crashLogFile = $@"{GlobalDeclarations.CommonAppFolder}\Logs\crash.log";
+
+            using (var sw = File.AppendText(crashLogFile))
             {
                 var crashMessage = $"Crash Log {crashDate} - {crashTime}:\n {reasonOfCrash.Message} \n {reasonOfCrash.StackTrace.ToString()}\n";
+                sw.WriteLine(crashMessage);
                 sw.Close();
             }
         }
@@ -55,7 +62,7 @@ namespace TBChestTracker.Dialogs
         {
             if (viewingReport == false)
             {
-                System.Diagnostics.Process.Start($@"{GlobalDeclarations.CommonAppFolder}\crash.log");
+                System.Diagnostics.Process.Start($@"{GlobalDeclarations.CommonAppFolder}\Logs\crash.log");
                 viewingReport = true;
             }
             this.Close();

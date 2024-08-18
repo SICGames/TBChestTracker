@@ -79,6 +79,15 @@ namespace TBChestTracker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Chest Builder.
+        /// </summary>
+        public static string ChestBuilder {
+            get {
+                return ResourceManager.GetString("ChestBuilder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clan.
         /// </summary>
         public static string Clan {

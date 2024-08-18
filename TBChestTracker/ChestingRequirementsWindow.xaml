@@ -47,7 +47,8 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="24"/>
                                 </Grid.ColumnDefinitions>
-                                <ListView x:Name="ChestConditionsListView" Grid.Column="0" ItemsSource="{Binding ChestRequirements.ChestConditions}" ItemContainerStyle="{StaticResource ConditionsListViewItemStyle}">
+                                <ListView x:Name="ChestConditionsListView" Grid.Column="0" ItemsSource="{Binding ChestRequirements.ChestConditions}" 
+                                          ItemContainerStyle="{StaticResource ConditionsListViewItemStyle}">
                                     <ListView.View>
                                         <GridView>
                                             <GridViewColumn Header="Chest Type" Width="150" DisplayMemberBinding="{Binding ChestType, Mode=TwoWay}"/>

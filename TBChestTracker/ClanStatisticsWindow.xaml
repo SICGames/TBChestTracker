@@ -118,9 +118,9 @@
         </StackPanel>
         <DockPanel Grid.Row="2" Grid.Column="0" LastChildFill="True">
             <ListView ItemsSource="{Binding ClanStatisticData}" x:Name="ClanStatsListView">
+                <!--
                 <ListView.View>
                     <GridView>
-                        <GridView.Columns>
                             <GridViewColumn Header="Clanmate" Width="200" DisplayMemberBinding="{Binding Path=Clanmate}"/>
                             <GridViewColumn Width="{Binding Path=bShowCommonCryptsTotal, Converter={StaticResource BooleanToWidthConverter}, ConverterParameter=100}" 
                                             DisplayMemberBinding="{Binding Path=CommonCryptsTotal}">
@@ -186,6 +186,7 @@
                         </GridView.Columns>
                     </GridView>
                 </ListView.View>
+                -->
             </ListView>
         </DockPanel>
     </Grid>

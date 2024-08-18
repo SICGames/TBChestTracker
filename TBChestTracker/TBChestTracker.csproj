@@ -135,13 +135,21 @@
     </Compile>
     <Compile Include="Arrays\IDataCollection.cs" />
     <Compile Include="Automation\Automator.cs" />
+    <Compile Include="ChestBuilderWindow.xaml.cs">
+      <DependentUpon>ChestBuilderWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Chest\ChestPointsData.cs" />
     <Compile Include="Chest\ChestPointsSettings.cs" />
     <Compile Include="Chest\ChestRef.cs" />
+    <Compile Include="Chest\GameChest.cs" />
     <Compile Include="Chest\RefEnum.cs" />
     <Compile Include="ClanData\ClanChestComparer.cs" />
     <Compile Include="ClanData\ClanRequirements.cs" />
     <Compile Include="ClanData\ClanSpecifiedRequirements.cs" />
+    <Compile Include="ClanInsightsWindow.xaml.cs">
+      <DependentUpon>ClanInsightsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClanInsights\ClanInsightsData.cs" />
     <Compile Include="Clanmate\Clanmate.cs" />
     <Compile Include="Clanmate\ClanmateDatabase.cs" />
     <Compile Include="ClanWizardWindow.xaml.cs">
@@ -335,6 +343,14 @@
       <DependentUpon>ValidateChestDataWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ChestBuilderWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ClanInsightsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

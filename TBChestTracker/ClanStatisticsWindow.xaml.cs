@@ -223,12 +223,55 @@ namespace TBChestTracker
         }
         #endregion
 
+
+        private void BuildListView()
+        {
+            var listview = ClanStatsListView as ListView;
+            var gridView = new GridView();
+            GridViewColumn gridViewColumn = new GridViewColumn();
+            gridViewColumn.Width = 100;
+            gridViewColumn.DisplayMemberBinding = new Binding("Clanmate");
+            gridViewColumn.Header = "Clanmate";
+            gridView.Columns.Add(gridViewColumn);
+
+            var previousChestType = String.Empty;
+            foreach(var chest in ApplicationManager.Instance.Chests)
+            {
+                if (chest.ChestType != previousChestType)
+                {
+                    previousChestType = chest.ChestType;
+                    GridViewColumn column = new GridViewColumn();
+                    column.Width = 100;
+                    // column.DisplayMemberBinding = new Binding("Clanmate");
+                    column.Header = chest.ChestType;
+                    gridView.Columns.Add(column);
+                }
+                
+            }
+            
+            GridViewColumn totalcolumn = new GridViewColumn();
+            totalcolumn.Width = 100;
+            // column.DisplayMemberBinding = new Binding("Clanmate");
+            totalcolumn.Header = "Total";
+            gridView.Columns.Add(totalcolumn);
+
+            GridViewColumn totalpointscolumn = new GridViewColumn();
+            totalpointscolumn.Width = 200;
+            // column.DisplayMemberBinding = new Binding("Clanmate");
+            totalpointscolumn.Header = "Total Points";
+            gridView.Columns.Add(totalpointscolumn);
+
+
+            listview.View = gridView;
+        }
         public ClanStatisticsWindow()
         {
             InitializeComponent();
+            BuildListView();
             this.DataContext = this;
             ClanStatisticData = new ObservableCollection<ClanStatisticData>();
             isready = false;
+            
 
         }
 

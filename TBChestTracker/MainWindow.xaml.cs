@@ -35,6 +35,8 @@ using com.CaptainHook;
 using com.KonquestUI.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
+using System.Net;
+using System.Net.Http;
 
 
 namespace TBChestTracker
@@ -207,7 +209,6 @@ namespace TBChestTracker
                     while (ClanManager.Instance.ClanChestManager.ChestProcessingState != ChestProcessingState.COMPLETED)
                     {
                     }
-                    captureCounter++;
                 }
 
                 if (clanChestProcessResult.Result == ClanChestProcessEnum.SUCCESS)
@@ -436,6 +437,16 @@ namespace TBChestTracker
             });
         }
 
+        private Task StartInsightsServer()
+        {
+            return Task.Run(() =>
+            {
+                if(applicationManager != null)
+                {
+                    applicationManager.StartNodeServer();
+                }
+            });
+        }
         private Task LaunchTask(SplashScreen splashScreen)
         {
             return Task.Run(() =>
@@ -513,6 +524,14 @@ namespace TBChestTracker
                 await Task.Delay(250);
 
                 await BuildChestData();
+
+                await this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    splashScreen.UpdateStatus("Starting Clan Insights Server...", 99);
+                }));
+
+                await Task.Delay(250);
+                await StartInsightsServer();
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
@@ -632,6 +651,7 @@ namespace TBChestTracker
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             appContext.isAppClosing = true;
+            applicationManager.KillNodeServer();
             CaptainHook.Uninstall();
             
             ClanManager.Instance.Destroy();
@@ -925,11 +945,35 @@ namespace TBChestTracker
                 e.CanExecute = false;
         }
 
+
+        private async void PrepareClanInsightsData()
+        {
+            var server = "http://127.0.0.1:8888/";
+            var apiCall = "api/Build";
+            var responseData = String.Empty;
+
+            //-- build ClanInsightsData
+            var chestdata = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
+            var gameChests = ApplicationManager.Instance.Chests;
+
+            ClanInsightsData insightsData = new ClanInsightsData(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname, ClanManager.Instance.ClanmateManager.Database.NumClanmates, gameChests, chestdata);
+            var JsonStr = JsonConvert.SerializeObject(insightsData, Formatting.Indented);
+
+            var stringContent = new StringContent(JsonStr, Encoding.UTF8, "application/json");
+            var httpClient = new HttpClient();
+            var httpResponse = await httpClient.PostAsync($"{server}{apiCall}", stringContent);
+            if(httpResponse.Content != null)
+            {
+                var responseContent = await httpResponse.Content.ReadAsStringAsync();
+                Debug.WriteLine(responseContent);
+            }
+        }
         private void ClanStatsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ClanStatisticsWindow clanStatisticsWindow = new ClanStatisticsWindow();
-            clanStatisticsWindow.ChestManager = ClanManager.Instance.ClanChestManager;
-            clanStatisticsWindow.Show();    
+            PrepareClanInsightsData();
+            
+            ClanInsightsWindow clanInsightsWindow = new ClanInsightsWindow();
+            clanInsightsWindow.Show();
         }
         #endregion
 
@@ -1034,6 +1078,12 @@ namespace TBChestTracker
         private void Patreon_Click(object sender, RoutedEventArgs e)
         {
             Process.Start($"https://www.patreon.com/TotalBattleGuide");
+        }
+
+        private void ChestBuilderMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            ChestBuilderWindow chestBuilderWindow = new ChestBuilderWindow();
+            chestBuilderWindow.Show();
         }
     }
 }

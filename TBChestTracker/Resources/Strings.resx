@@ -123,6 +123,9 @@
   <data name="Chest" xml:space="preserve">
     <value>Chest</value>
   </data>
+  <data name="ChestBuilder" xml:space="preserve">
+    <value>Chest Builder</value>
+  </data>
   <data name="Clan" xml:space="preserve">
     <value>Clan</value>
   </data>
