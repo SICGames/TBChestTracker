@@ -29,12 +29,12 @@ namespace TBChestTracker
         public ChestProcessingState ChestProcessingState
         {
             get => pChestProcessingState;
-            set => pChestProcessingState = value;   
+            set => pChestProcessingState = value;
         }
 
         public ClanChestManager()
         {
-            clanChestData = new List<ClanChestData>();  
+            clanChestData = new List<ClanChestData>();
             ClanChestDailyData = new Dictionary<string, List<ClanChestData>>();
             ChestProcessingState = ChestProcessingState.IDLE;
         }
@@ -48,16 +48,16 @@ namespace TBChestTracker
 
         public void RemoveChestData(string clanmatename)
         {
-            foreach(var date in ClanChestDailyData.ToList())
+            foreach (var date in ClanChestDailyData.ToList())
             {
                 var chestdata = date.Value;
-                foreach(var data in  chestdata.ToList())
+                foreach (var data in chestdata.ToList())
                 {
-                    if(data.Clanmate.Equals(clanmatename, StringComparison.CurrentCultureIgnoreCase)) 
+                    if (data.Clanmate.Equals(clanmatename, StringComparison.CurrentCultureIgnoreCase))
                     {
                         var name = data.Clanmate;
                         chestdata.Remove(data);
-                        com.HellStormGames.Logging.Console.Write($"{name} was successfully removed from clanchestdata.","Clanmate Removal", com.HellStormGames.Logging.LogType.INFO);
+                        com.HellStormGames.Logging.Console.Write($"{name} was successfully removed from clanchestdata.", "Clanmate Removal", com.HellStormGames.Logging.LogType.INFO);
                     }
                 }
             }
@@ -66,10 +66,20 @@ namespace TBChestTracker
             return;
         }
 
-        private void FilterChestData(ref List<String> data, String[] words)
+        bool filteringErrorOccurred = false;
+        string lastFilterString = String.Empty;
+
+        private void FilterChestData(ref List<String> data, String[] words, System.Action<string> onError)
         {
             var filtered = data.Where(d => ContainsAny(d, words));
             data = filtered.ToList();
+            if (filteringErrorOccurred)
+            {
+                //-- if some how we came to this point, junk data exists.
+                var dbg_msg = $"---- '{lastFilterString}' from OCR results doesn't match specified values. Make sure spelling is correct in OCR filtering in Settings.";
+                onError(dbg_msg); 
+             
+            }
         }
         private bool ContainsAny(string str, IEnumerable<string> values)
         {
@@ -81,17 +91,22 @@ namespace TBChestTracker
                     if (bExists)
                         return true;
                 }
-                //-- if some how we came to this point, junk data exists.
-                var dbg_msg = $"---- '{str}' from OCR results doesn't match specified values.";
-                com.HellStormGames.Logging.Console.Write(dbg_msg, "Invalid OCR", com.HellStormGames.Logging.LogType.INFO);
+                lastFilterString = str;
+                filteringErrorOccurred = true;
+
+                
             }
             return false;
         }
 
-        private List<ChestData> ProcessText3(List<string> result)
+        private ProcessingTextResult ProcessText3(List<string> result)
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+            ProcessingTextResult ProcessingTextResult = new ProcessingTextResult();
+            bool bFilteringError = false;
+            string sFilteringErrorMessage = String.Empty;
+            
+            lastFilterString = String.Empty;
+            filteringErrorOccurred = false;
 
             //---Processing Chests Took: 00:00:00.0115509
             List<ChestData> tmpchests = new List<ChestData>();
@@ -104,7 +119,23 @@ namespace TBChestTracker
             //-- From : [player_name]
             //-- Patched 1/22/24
 
-            FilterChestData(ref result, filter_words);
+            FilterChestData(ref result, filter_words, errorResult =>
+            {
+                if(!String.IsNullOrEmpty(errorResult))
+                {
+                    com.HellStormGames.Logging.Console.Write(errorResult, "Invalid OCR", com.HellStormGames.Logging.LogType.INFO);
+                    bFilteringError = true;
+                    sFilteringErrorMessage = errorResult;
+                 
+                }
+            });
+
+            if(bFilteringError)
+            {
+                ProcessingTextResult.Status = ProcessingStatus.UNKNOWN_ERROR;
+                ProcessingTextResult.Message = sFilteringErrorMessage;
+                return ProcessingTextResult;
+            }
 
             bool bError = false;
 
@@ -128,9 +159,13 @@ namespace TBChestTracker
                     }
                     catch (Exception e)
                     {
-
+                        ProcessingTextResult.Status = ProcessingStatus.INDEX_OUT_OF_RANGE;
+                        ProcessingTextResult.Message = $"An error occured while processing OCR text from screen. This could indicate a word not added to filtering list. Go to Settings -> OCR and add the appropriate chest name to the filter list.";
+                        /*
                         com.HellStormGames.Logging.Console.Write($"OCR Exception Thrown: {e.Message}. Stopping.", "OCR FATAL", LogType.ERROR);
                         com.HellStormGames.Logging.Loggy.Write($"{e.Message}", com.HellStormGames.Logging.LogType.ERROR);
+                        */
+
                         bError = true;
                         break;
                     }
@@ -160,8 +195,12 @@ namespace TBChestTracker
                         catch (Exception e)
                         {
                             bError = true;
-                            com.HellStormGames.Logging.Console.Write($"OCR Exception Thrown: {e.Message}. Stopping.", "OCR FATAL", LogType.ERROR);
+                            ProcessingTextResult.Status = ProcessingStatus.CLANMATE_ERROR;
+                            ProcessingTextResult.Message = $"Seems to be an issue while extracting clanmate's name. Exception caught => {e.Message}. ";
+                            /*
+                            com.HellStormGames.Logging.Console.Write($"{ProcessingTextResult.Message}", "OCR FATAL", LogType.ERROR);
                             com.HellStormGames.Logging.Loggy.Write($"{e.Message}", com.HellStormGames.Logging.LogType.ERROR);
+                            */
                             break;
                         }
                     }
@@ -266,211 +305,17 @@ namespace TBChestTracker
             }
 
             if (bError)
-                return null;
-
-            sw.Stop();
-            Debug.WriteLine($"ProcessText3 took {sw.Elapsed.ToString()} to process.");
-            return tmpchests;
-        }
-
-        #region Obselete ProcessText2
-        [Obsolete("ProcessText3 replaces ProcessText2. No more checking what type of chest type is.")]
-        private List<ChestData> ProcessText2(List<String> result)
-        {
-            //---Processing Chests Took: 00:00:00.0115509
-            List<ChestData> tmpchests = new List<ChestData>();
-
-            //-- quick filter. 
-            //-- in Triumph Chests, divider creates dirty characters. 
-            var filter_words = SettingsManager.Instance.Settings.OCRSettings.Tags.ToArray(); // new string[] { "Chest", "From", "Source", "Gift" };
-
-            //-- OCR Result exception from filtering resulted in:
-            //-- From : [player_name]
-            //-- Patched 1/22/24
-
-            FilterChestData(ref result, filter_words);
-
-            bool bError = false;
-
-            for (var x = 0; x < result.Count; x += 3)
             {
-                var word = result[x];
-
-                if (word == null)
-                    break;
-
-                if (!word.Contains(TBChestTracker.Resources.Strings.Clan))
-                {
-                    var chestName = "";
-                    var clanmate = "";
-                    var chestobtained = "";
-                    try
-                    {
-                        chestName = result[x + 0];
-                        clanmate = result[x + 1];
-                        chestobtained = result[x + 2];
-                    }
-                    catch(Exception e)
-                    {
-                    
-                        com.HellStormGames.Logging.Console.Write($"OCR Exception Thrown: {e.Message}. Stopping.", "OCR FATAL", LogType.ERROR);
-                        com.HellStormGames.Logging.Loggy.Write($"{e.Message}", com.HellStormGames.Logging.LogType.ERROR);
-                        bError = true;
-                        break;
-                    }
-                    
-                    com.HellStormGames.Logging.Console.Write($"OCR RESULT [{chestName}, {clanmate}, {chestobtained}", "OCR Result", LogType.INFO);
-
-                    if (clanmate.Contains(TBChestTracker.Resources.Strings.From))
-                    {
-
-                        //--- clean up
-                        //--- Sometimes there's a From : Playername
-                        //--- Causing The Iroh Bug.
-                        try
-                        {
-                            //--- skip the space check and the odd symbol to get straight to the meat.
-                            clanmate = clanmate.Substring(clanmate.IndexOf(' ') + 1);   
-                            if (clanmate.Contains(TBChestTracker.Resources.Strings.From))
-                            {
-                                //-- error - shouldn't even have reached this point.
-                                //-- game actually causes this error from not rendering name fast enough 
-                                //-- hasbeen patched but throw exception just in case.
-                                var badname = 0;
-                                throw new Exception("Clanmate name is blank. Increase thread sleep timer to prevent this.");
-                            }
-                            
-                        }
-                        catch(Exception e)
-                        {
-                            bError = true;
-                            com.HellStormGames.Logging.Console.Write($"OCR Exception Thrown: {e.Message}. Stopping.", "OCR FATAL", LogType.ERROR);
-                            com.HellStormGames.Logging.Loggy.Write($"{e.Message}", com.HellStormGames.Logging.LogType.ERROR);
-                            break;
-                        }
-                    }
-
-                    //-- building tmpchestdata
-                    if (chestobtained.Contains(TBChestTracker.Resources.Strings.Source))
-                    {
-                        //-- foreign language prevent speeding this up.
-                        //-- Spanish - Cripta de nivel 10 translate to english Level 10 Crypt.
-                        //-- First approach was extract type of crypt and phase out chesttype completely. 
-                        //-- Source: Cripta de 
-                        //-- Level of crypt: 10
-
-                        var ChestSource = chestobtained.Substring(chestobtained.IndexOf(":") + 2);
-                        var levelStartPos = ChestSource.IndexOf(TBChestTracker.Resources.Strings.Level);
-                        string type = String.Empty;
-                        
-                        //-- parse type then level.
-                        foreach (var chesttype in ApplicationManager.Instance.ChestTypes)
-                        {
-                            if (ChestSource.ToLower().Contains(chesttype.Name.ToLower()))
-                            {
-                                //-- US - Level 10 Rare Crypt 
-                                //-- Rare Crypt is 9th character position and 10 characters in length.
-                                type = chesttype.Name;
-                                break;
-                            }
-                        }
-
-                        //-- if still empty then we default to common.
-                        if (String.IsNullOrEmpty(type))
-                        {
-                            type = TBChestTracker.Resources.Strings.Common;
-                        }
-
-                        if (levelStartPos > 0)
-                        {
-                            chestobtained = chestobtained.Substring(levelStartPos).ToLower();
-                            int level = 0;
-
-                            var levelStr = chestobtained.Substring(chestobtained.IndexOf(' ') + 1);
-                            levelStr = levelStr.Substring(0, levelStr.IndexOf(" "));
-                            var levels = levelStr.Split('-');
-                            
-                            if (levels.Count() == 1)
-                            {
-                                if(Int32.TryParse(levels[0], out level) == false)
-                                {
-                                    //-- failed to obtain level from string.
-                                }
-                            }
-                            else if (levels.Count() > 1)
-                            {
-                                //--- chest will implend new int array.
-                                if (Int32.TryParse(levels[0], out level) == false)
-                                {
-                                    //-- failed to obtain level from string.
-                                }
-                            }
-
-                            //--- shouldn't be 0. Normally happens 1st chest that is a level 5. 
-                            if (level == 0)
-                                level = 5;
-
-                            //-- filter chest if chest conditions enabled
-                            //--- if chest requirements are using conditions, we use those conditions. If not, we continue.
-                            
-                            if (ClanManager.Instance.ClanChestSettings.ChestRequirements.useChestConditions)
-                            {
-                                foreach (var condition in ClanManager.Instance.ClanChestSettings.ChestRequirements.ChestConditions)
-                                {
-                                    var typeStr = type.ToString().ToLower();
-
-                                    if (typeStr.Equals(condition.ChestType, StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        if (level >= condition.level)
-                                        {
-                                            tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, ChestSource, level)));
-                                            var dbgmsg = $"[[Level {level} ({type.ToString()}) {chestName} from {clanmate} validated.]]";
-                                            com.HellStormGames.Logging.Console.Write(dbgmsg, "OCR Result", com.HellStormGames.Logging.LogType.INFO);
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-
-                                tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, ChestSource, level)));
-                                var dbg_msg = $"--- ADDING level {level} {type.ToString()}  '{chestName}' from {clanmate} ----";
-                                com.HellStormGames.Logging.Console.Write(dbg_msg, "OCR Result", com.HellStormGames.Logging.LogType.INFO);
-                            }
-                        }
-                        else
-                        {
-                            if (ClanManager.Instance.ClanChestSettings.ChestRequirements.useChestConditions)
-                            {
-                                foreach (var condition in ClanManager.Instance.ClanChestSettings.ChestRequirements.ChestConditions)
-                                {
-                                    var typeStr = type.ToString().ToLower();
-
-                                    if (typeStr.Equals(condition.ChestType, StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, ChestSource, 0)));
-                                        var dbgmsg = $"[[({type.ToString()}) {chestName} from {clanmate} validated.]]";
-                                        com.HellStormGames.Logging.Console.Write(dbgmsg, "OCR Result", com.HellStormGames.Logging.LogType.INFO);   
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                tmpchests.Add(new ChestData(clanmate, new Chest(chestName, type, ChestSource, 0)));
-                                var dbgmsg = $"--- ADDING {type.ToString()}  '{chestName}' from {clanmate} ----";
-                                com.HellStormGames.Logging.Console.Write (dbgmsg, "OCR Result", LogType.INFO);  
-                            }
-                        }
-                    }
-                }
+                ProcessingTextResult.ChestData = tmpchests;
+                return ProcessingTextResult;
             }
 
-            if (bError)
-                return null;
+            ProcessingTextResult.Status = ProcessingStatus.OK;
+            ProcessingTextResult.Message = "Success";
+            ProcessingTextResult.ChestData = tmpchests;
 
-            return tmpchests;
+            return ProcessingTextResult;
         }
-        #endregion
 
         private List<ClanChestData> CreateClanChestData(List<ChestData> chestdata)
         {
@@ -514,14 +359,17 @@ namespace TBChestTracker
 
             ChestProcessingState = ChestProcessingState.PROCESSING;
             GlobalDeclarations.isAnyGiftsAvailable = true;
-            List<ChestData> tmpchests = ProcessText3(resulttext);
+            ProcessingTextResult textResult = ProcessText3(resulttext);
 
-            if (tmpchests == null)
+            //List<ChestData> tmpchests = ProcessText3(resulttext);
+            if (textResult.Status != ProcessingStatus.OK)
             {
-                onError(new ChestProcessingError("Temporary chest data is null"));
-                return new ClanChestProcessResult("Temporary chest data is null.", 0, ClanChestProcessEnum.ERROR);
+                onError(new ChestProcessingError($"{textResult.Message}"));
+                return new ClanChestProcessResult($"{textResult.Message}", 0, ClanChestProcessEnum.ERROR);
             }
 
+            List<ChestData> tmpchests = textResult.ChestData;
+            
             List<ClanChestData> tmpchestdata = CreateClanChestData(tmpchests);
             var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates.ToList();
 

@@ -50,6 +50,28 @@ namespace TBChestTracker
                 _languages = value;
             }
         }
+
+        private string _AbsentClanmateDuration;
+        public string AbsentClanmateDuration
+        {
+            get { return _AbsentClanmateDuration; }
+            set
+            {
+                _AbsentClanmateDuration = value;
+                OnPropertyChanged(nameof(AbsentClanmateDuration));
+            }
+        }
+        private string _AbsentClanmateAction;
+        public string AbsentClanmateAction
+        {
+            get => _AbsentClanmateAction;
+            set
+            {
+                _AbsentClanmateAction = value;
+                OnPropertyChanged(nameof(AbsentClanmateAction));
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged(string propertyName)

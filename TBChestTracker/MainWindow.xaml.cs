@@ -267,10 +267,10 @@ namespace TBChestTracker
                     if (onError != null && !String.IsNullOrEmpty(onError.Message))
                     {
                         
-                        var result = MessageBox.Show($"A critical error has occured during processing text from image. Stopping automation and saving chest data. Reason: {onError.Message}", "OCR Error", MessageBoxButton.OK);
+                        var result = MessageBox.Show($"Stopping automation and saving chest data. Reason: {onError.Message}", "OCR Error", MessageBoxButton.OK);
                         if (result == MessageBoxResult.OK)
                         {
-                            com.HellStormGames.Logging.Console.Write($"Error Occured Processing Chests. Auotmation Stopped.", "Automation Result", com.HellStormGames.Logging.LogType.ERROR);
+                            com.HellStormGames.Logging.Console.Write($"Error Occured Processing Chests. Automation Stopped.", "Automation Result", com.HellStormGames.Logging.LogType.ERROR);
                             StopAutomation();
                         }
                     }
