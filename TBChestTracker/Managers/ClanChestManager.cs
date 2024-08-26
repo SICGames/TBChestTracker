@@ -25,6 +25,8 @@ namespace TBChestTracker
         public List<ClanChestData> clanChestData { get; set; }
         public Dictionary<string, List<ClanChestData>> ClanChestDailyData;
         private ChestProcessingState pChestProcessingState = ChestProcessingState.IDLE;
+        bool filteringErrorOccurred = false;
+        string lastFilterString = String.Empty;
 
         public ChestProcessingState ChestProcessingState
         {
@@ -65,10 +67,6 @@ namespace TBChestTracker
             SaveData();
             return;
         }
-
-        bool filteringErrorOccurred = false;
-        string lastFilterString = String.Empty;
-
         private void FilterChestData(ref List<String> data, String[] words, System.Action<string> onError)
         {
             var filtered = data.Where(d => ContainsAny(d, words));
@@ -91,10 +89,14 @@ namespace TBChestTracker
                     if (bExists)
                         return true;
                 }
-                lastFilterString = str;
-                filteringErrorOccurred = true;
 
-                
+                //-- since we don't care about Contains: on expired gifts. We skip it.
+                //-- But we care about anything that is not listed within the OCR Filtering.
+                if (!str.ToLower().Contains("contains"))
+                {
+                    lastFilterString = str;
+                    filteringErrorOccurred = true;
+                }
             }
             return false;
         }
@@ -126,7 +128,6 @@ namespace TBChestTracker
                     com.HellStormGames.Logging.Console.Write(errorResult, "Invalid OCR", com.HellStormGames.Logging.LogType.INFO);
                     bFilteringError = true;
                     sFilteringErrorMessage = errorResult;
-                 
                 }
             });
 
@@ -161,11 +162,6 @@ namespace TBChestTracker
                     {
                         ProcessingTextResult.Status = ProcessingStatus.INDEX_OUT_OF_RANGE;
                         ProcessingTextResult.Message = $"An error occured while processing OCR text from screen. This could indicate a word not added to filtering list. Go to Settings -> OCR and add the appropriate chest name to the filter list.";
-                        /*
-                        com.HellStormGames.Logging.Console.Write($"OCR Exception Thrown: {e.Message}. Stopping.", "OCR FATAL", LogType.ERROR);
-                        com.HellStormGames.Logging.Loggy.Write($"{e.Message}", com.HellStormGames.Logging.LogType.ERROR);
-                        */
-
                         bError = true;
                         break;
                     }
@@ -197,10 +193,6 @@ namespace TBChestTracker
                             bError = true;
                             ProcessingTextResult.Status = ProcessingStatus.CLANMATE_ERROR;
                             ProcessingTextResult.Message = $"Seems to be an issue while extracting clanmate's name. Exception caught => {e.Message}. ";
-                            /*
-                            com.HellStormGames.Logging.Console.Write($"{ProcessingTextResult.Message}", "OCR FATAL", LogType.ERROR);
-                            com.HellStormGames.Logging.Loggy.Write($"{e.Message}", com.HellStormGames.Logging.LogType.ERROR);
-                            */
                             break;
                         }
                     }

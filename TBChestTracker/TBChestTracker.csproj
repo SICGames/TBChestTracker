@@ -301,9 +301,6 @@
     <Compile Include="ClanData\ClanChestSettings.cs" />
     <Compile Include="ClanData\ClanDatabase.cs" />
     <Compile Include="Managers\ClanDatabaseManager.cs" />
-    <Compile Include="ClanStatisticsWindow.xaml.cs">
-      <DependentUpon>ClanStatisticsWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ClanData\ClanStatStatisticData.cs" />
     <Compile Include="Converters\EnumToIntConverter.cs" />
     <Compile Include="EditConditionWindow.xaml.cs">
@@ -376,10 +373,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ClanmateVerificationWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ClanStatisticsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

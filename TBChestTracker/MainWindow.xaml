@@ -11,9 +11,16 @@
         xmlns:ResourceStrings="clr-namespace:TBChestTracker.Resources"
         mc:Ignorable="d"
         Title="{Binding Path=AppTitle, Mode=TwoWay}" 
-        Width="800" Loaded="Window_Loaded" 
+        d:Width="800"
+        d:Height="96"
+        MinWidth="300"
+        MaxWidth="800"
+        MinHeight="96"
+        MaxHeight="96"
+        Width="350"
+        Loaded="Window_Loaded" 
         SizeToContent="Height" Topmost="True" 
-        WindowStyle="ToolWindow"  ResizeMode="NoResize" >
+        WindowStyle="ToolWindow"  ResizeMode="CanResizeWithGrip">
     <Window.CommandBindings>
         <CommandBinding Command="Commands:CustomCommandBindings.ClanManager" 
                         x:Name="ClanManagerCommand" 

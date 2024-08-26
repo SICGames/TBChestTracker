@@ -954,9 +954,25 @@ namespace TBChestTracker
 
             //-- build ClanInsightsData
             var chestdata = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
-            var gameChests = ApplicationManager.Instance.Chests;
+            var gameChests = new List<string>();
+            var previousChest = String.Empty;
+            foreach(var chest in ApplicationManager.Instance.Chests)
+            {
+                if (chest.ChestType != previousChest)
+                {
+                    gameChests.Add(chest.ChestType);
+                    previousChest = chest.ChestType;
+                }
+            }
 
-            ClanInsightsData insightsData = new ClanInsightsData(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname, ClanManager.Instance.ClanmateManager.Database.NumClanmates, gameChests, chestdata);
+            var clan = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname;
+            var size = ClanManager.Instance.ClanmateManager.Database.NumClanmates;
+            var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates;
+            var clanmateNames = clanmates.Select(n => n.Name).ToList();
+            var usePoints = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.UseChestPoints;
+
+            ClanInsightsData insightsData = new ClanInsightsData(clan,size,clanmateNames,gameChests, chestdata, usePoints);
+
             var JsonStr = JsonConvert.SerializeObject(insightsData, Formatting.Indented);
 
             var stringContent = new StringContent(JsonStr, Encoding.UTF8, "application/json");

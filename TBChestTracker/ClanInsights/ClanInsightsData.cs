@@ -11,15 +11,18 @@ namespace TBChestTracker
     {
         public string Clan {  get; set; }   
         public int Size { get; set; }
-        public List<GameChest> GameChests { get; set; }
+        public List<string> Members { get; set; }
+        public List<String> GameChests { get; set; }
         public Dictionary<string, List<ClanChestData>> ChestData { get; set; }
-
-        public ClanInsightsData(string clan, int size, List<GameChest> gameChests, Dictionary<string, List<ClanChestData>> chestData)
+        public bool UsePoints { get; set; }
+        public ClanInsightsData(string clan, int size, List<string> members, List<String> gameChests, Dictionary<string, List<ClanChestData>> chestData, bool usepoints)
         {
             Clan = clan;
             Size = size;
+            Members = members;
             GameChests = gameChests;
             ChestData = chestData;
+            UsePoints = usepoints;
         }   
     }
 }
