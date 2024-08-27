@@ -7,68 +7,116 @@
         xmlns:ui="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
         mc:Ignorable="d"
         Title="Export Clan Chest Window" Width="300" WindowStyle="ToolWindow" SizeToContent="Height" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
-  
     <Grid>
         <Grid.RowDefinitions >
             <RowDefinition Height="50"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="320"/>
             <RowDefinition Height="32"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0">
             <local:FilePicker x:Name="FilePicker01" Title="Export Clan Chest Data" Height="35" VerticalAlignment="Top" 
-                              Extensions="Text File|*.txt|CSV|*.csv" HoverColor="LightBlue" 
+                              Extensions="CSV|*.csv" HoverColor="LightBlue" 
                               DefaultColor="Gray" FileAccepted="FilePicker_FileAccepted" Margin="5"/>
         </DockPanel>
         <DockPanel Grid.Row="1">
-            <StackPanel Orientation="Vertical" Margin="5">
-                <GroupBox Header="Sort Options">
-                    <ComboBox x:Name="SortOptions" SelectedIndex="2" Margin="5">
-                        <ComboBoxItem Content="None"/>
-                        <ComboBoxItem Content="Ascending"/>
-                        <ComboBoxItem Content="Desending"/>
-                    </ComboBox>
-                </GroupBox>
-                <GroupBox Header="Export Options">
-                    <ComboBox x:Name="ExportOptions" SelectedIndex="0" Margin="5">
-                        <ComboBoxItem Content="Do Nothing"/>
-                        <ComboBoxItem Content="Archive"/>
-                        <ComboBoxItem Content="Delete"/>
-                    </ComboBox>
-                </GroupBox>
-                <GroupBox Header="Points Correction">
+            <TabControl>
+                <TabItem Header="General">
                     <StackPanel Orientation="Vertical" Margin="5">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Chest Points +/-" Margin="5"/>
-                            <TextBox Text="0" VerticalContentAlignment="Center" x:Name="ChestPointsValue" Margin="5" Width="75" Height="18"/>
-                        </StackPanel>
-                        <TextBlock 
-                            Text="Mistakes happen. In case, accidently claiming all instead of starting automation, correct by entering a number to give everyone added chest points." 
-                            TextWrapping="Wrap" 
-                            Margin="5" 
-                            FontWeight="Bold" 
-                            FontSize="10"/>
+                        <GroupBox Header="Sort Options">
+                            <ComboBox x:Name="SortOptions" SelectedIndex="2" Margin="5">
+                                <ComboBoxItem Content="None"/>
+                                <ComboBoxItem Content="Ascending"/>
+                                <ComboBoxItem Content="Desending"/>
+                            </ComboBox>
+                        </GroupBox>
+                        <GroupBox Header="Date Range">
+                            <ComboBox x:Name="DateRangeOptions" SelectedIndex="0" Margin="5">
+                                <ComboBoxItem Content="Today"/>
+                                <ComboBoxItem Content="Week"/>
+                                <ComboBoxItem Content="Month"/>
+                                <ComboBoxItem Content="Custom"/>
+                            </ComboBox>
+                        </GroupBox>
+                        <GroupBox Header="Points Correction">
+                            <StackPanel Orientation="Vertical" Margin="5">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Chest Points +/-" Margin="5"/>
+                                    <TextBox Text="0" VerticalContentAlignment="Center" x:Name="ChestPointsValue" Margin="5" Width="75" Height="18"/>
+                                </StackPanel>
+                                <TextBlock 
+                                        Text="Mistakes happen. In case, accidently claiming all instead of starting automation, correct by entering a number to give everyone added chest points." 
+                                        TextWrapping="Wrap" 
+                                        Margin="5" 
+                                        FontWeight="Bold" 
+                                        FontSize="10"/>
+                            </StackPanel>
+                        </GroupBox>
                     </StackPanel>
-                </GroupBox>
-                <GroupBox Header="Chest Counting Method">
-                    <StackPanel Orientation="Vertical" Margin="5">
-                        <RadioButton x:Name="ShowTotal" Content="Show Total" Margin="0,3" IsChecked="True" IsEnabled="{Binding UseTotalCountMethod}"/>
-                        <RadioButton x:Name="ShowIndividual" Margin="0,3" IsEnabled="{Binding UseSpecificCountMethod}">
-                            <RadioButton.Content>
-                                <TextBlock Text="Show Individual Amount specified in Clan Requirements" TextWrapping="Wrap" />
-                            </RadioButton.Content>
-                        </RadioButton>
-                    </StackPanel>
-                </GroupBox>
-            </StackPanel>
+                </TabItem>
+                <TabItem Header="Extra Headers">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="What extra headers would you like to include in the export?" TextWrapping="Wrap" Margin="5,10"/>
+                        <Grid Grid.Row="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="24"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <ComboBox x:Name="HeadersComboBox" Width="260" HorizontalAlignment="Left" Margin="5,0" SelectedIndex="0">
+                                    <ComboBoxItem Content="Clanmate"/>
+                                </ComboBox>
+                            </Grid>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="54*"/>
+                                    <ColumnDefinition Width="13*"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0" Grid.ColumnSpan="2">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="auto"/>
+                                    </Grid.RowDefinitions>
+                                    <ListView x:Name="HeadersListView" Margin="5,5" Grid.Row="0" ItemsSource="{Binding ExtraHeaders}"/>
+                                    <StackPanel Orientation="Horizontal" Height="24" Grid.Row="1">
+                                        <ui:FancyImageButton ImageSource="pack://application:,,,/Images/PlusIcon.png" Margin="5,0" Width="16" Height="16" x:Name="AddHeaderItemBtn" Click="AddHeaderItemBtn_Click"/>
+                                        <ui:FancyImageButton ImageSource="pack://application:,,,/Images/MinusIcon.png" Margin="5,0" Width="16" Height="16" x:Name="RemoveHeaderItemBtn" Click="RemoveHeaderItemBtn_Click"/>
+                                        <ui:FancyImageButton ImageSource="pack://application:,,,/Images/TrashIcon.png" Margin="5,0" Width="16" Height="16" x:Name="ClearHeaderItemsBtn" Click="ClearHeaderItemsBtn_Click"/>
+                                    </StackPanel>
+                                </Grid>
+                                <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,5,0,5">
+                                    <ui:FancyImageButton ImageSource="pack://application:,,,/Images/UpArrow-Icon.png" Margin="5,3" Width="16" Height="16" x:Name="MoveUpItemBtn" Click="MoveUpItemBtn_Click"/>
+                                    <ui:FancyImageButton ImageSource="pack://application:,,,/Images/DownArrow-Icon.png" Margin="5,3" Width="16" Height="16" x:Name="MoveDownItemBtn" Click="MoveDownItemBtn_Click"/>
+                                </StackPanel>
+                            </Grid>
+
+                        </Grid>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+
         </DockPanel>
         <DockPanel Grid.Row="2" Background="#eeeeee">
-            <ui:FancyButton x:Name="exportBtn" Width="75" Height="24" 
-                            VerticalAlignment="Center" 
-                            HorizontalAlignment="Right" 
-                            RenderMode="TEXT" 
-                            Text="Export" 
-                            Click="exportBtn_Click"
-                            Corners="10" BorderBrush="Transparent" BorderThickness="0" Background="#0077ff" HilightBrush="#00aaff" Foreground="White" Margin="10,0"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <CheckBox Content="Save Export Settings" Grid.Column="0" VerticalAlignment="Center" Margin="5" IsChecked="True" x:Name="SaveExportSettingsCheckBox"/>
+                <ui:FancyButton x:Name="exportBtn" Width="75" Height="24" Grid.Column="1"
+                VerticalAlignment="Center" 
+                HorizontalAlignment="Right" 
+                RenderMode="TEXT" 
+                Text="Export" 
+                Click="exportBtn_Click"
+                Corners="10" BorderBrush="Transparent" BorderThickness="0" Background="#0077ff" HilightBrush="#00aaff" Foreground="White" Margin="10,0"/>
+            </Grid>
+            
         </DockPanel>
     </Grid>
 </Window>

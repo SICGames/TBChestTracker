@@ -159,10 +159,14 @@ namespace TBChestTracker
                                 }
                                 if (chest.Type.ToString().ToLower() == chestpointvalue.ChestType.ToLower())
                                 {
-                                    if (chest.Level == chestpointvalue.Level)
+                                    if (!chestpointvalue.Level.Equals("(Any)"))
                                     {
-                                        total_chest_points += chestpointvalue.PointValue;
-                                        break;
+                                        var chestlevel = Int32.Parse(chestpointvalue.Level);
+                                        if (chest.Level == chestlevel)
+                                        {
+                                            total_chest_points += chestpointvalue.PointValue;
+                                            break;
+                                        }
                                     }
                                 }
                             }

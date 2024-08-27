@@ -9,22 +9,11 @@ namespace TBChestTracker
 {
     public class ChestPoints : INotifyPropertyChanged
     {
-
-        private ChestRef _ChestRef = new ChestRef();
         private string _chestName = "";
         private string _chesttype = "";
-        private int _level = 5;
+        private string _level = String.Empty;
         private int _pointValue = 0;
-
-        public ChestRef ChestRef
-        {
-            get => _ChestRef;
-            set
-            {
-                _ChestRef = value;
-                OnPropertyChanged(nameof(ChestRef));
-            }
-        }
+        
         public string ChestName
         {
             get => this._chestName;
@@ -43,7 +32,7 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(ChestType));
             }
         }
-        public int Level
+        public string Level
         {
             get => _level;
             set

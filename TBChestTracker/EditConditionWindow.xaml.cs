@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,10 +23,11 @@ namespace TBChestTracker
     public partial class EditConditionWindow : Window, INotifyPropertyChanged
     {
         ChestConditions ChestConditions { get; set; }
-        private ChestRef _ChestRef = new ChestRef();
         private int itemIndex = 0;
 
         public event PropertyChangedEventHandler PropertyChanged;
+        
+        private List<GameChest> GameChests { get; set; }
 
         protected void OnPropertyChanged(string propertyName)
         {
@@ -35,52 +37,172 @@ namespace TBChestTracker
             }
         }
 
-        public ChestRef ChestRef
-        {
-            get => _ChestRef;
-            set
-            {
-                _ChestRef = value;
-                OnPropertyChanged(nameof(ChestRef));
-            }
-        }
-
         public EditConditionWindow()
         {
             InitializeComponent();
             ChestConditions = new ChestConditions();
-            ChestRef.ReferenceOption = RefEnum.BYNAME;
+            GameChests = ApplicationManager.Instance.Chests;
+
         }
 
-        private void BuildLevels(ComboBox cb, int minLevel = 0, int maxLevel = 45, int StepAmount = 1)
+        private void BuildChestTypes(ComboBox cb)
         {
-            cb.Items.Clear();
-            for (int i = minLevel; i <= maxLevel; i += StepAmount)
+            this.Dispatcher.BeginInvoke(new Action(() =>
             {
-                ComboBoxItem cbi = new ComboBoxItem();
-                cbi.Content = i.ToString();
-                cb.Items.Add(cbi);
-            }
-            cb.SelectedIndex = 0;
+                cb.Items.Clear();
+                var previousChestType = String.Empty;
+
+                foreach (var gameChest in GameChests)
+                {
+                    if (gameChest.ChestType != previousChestType)
+                    {
+                        ComboBoxItem cbi = new ComboBoxItem();
+                        cbi.Content = gameChest.ChestType;
+                        cb.Items.Add(cbi);
+                        previousChestType = gameChest.ChestType;
+                    }
+                }
+
+            }));
+        }
+        private void BuildChestNames(ComboBox cb, string chestType)
+        {
+            Debug.WriteLine("Building Chest Names!");
+
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                cb.Items.Clear();
+                var cbi_p = new ComboBoxItem();
+                cbi_p.Content = "(Any)";
+                cb.Items.Add(cbi_p);
+
+                foreach (var gameChest in GameChests)
+                {
+                    if (chestType == gameChest.ChestType)
+                    {
+                        ComboBoxItem cbi = new ComboBoxItem();
+                        cbi.Content = gameChest.ChestName;
+                        cb.Items.Add(cbi);
+                    }
+                }
+            }));
         }
 
+        private void BuildLevels(ComboBox cb)
+        {
+            Debug.WriteLine("Building Chest Levels!");
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                cb.Items.Clear();
+                var cbi_p = new ComboBoxItem();
+                cbi_p.Content = "(Any)";
+                cb.Items.Add(cbi_p);
+
+                int min, max, amount = 0;
+                min = max = amount;
+
+                var ChestTypeSelectedString = ChestTypeBox.Text;
+
+                bool bHasNoLevel = false;
+
+                foreach (var gamechest in GameChests)
+                {
+                    if (gamechest.ChestType == ChestTypeSelectedString)
+                    {
+                        if (gamechest.HasLevel)
+                        {
+                            min = gamechest.MinLevel;
+                            max = gamechest.MaxLevel;
+                            amount = gamechest.IncrementPerLevel;
+                            break;
+                        }
+                        else
+                        {
+                            bHasNoLevel = true;
+                        }
+                    }
+                }
+                if (!bHasNoLevel)
+                {
+                    for (int i = min; i <= max; i += amount)
+                    {
+                        ComboBoxItem cbi = new ComboBoxItem();
+                        cbi.Content = i.ToString();
+                        cb.Items.Add(cbi);
+                    }
+                }
+                else
+                {
+                    cb.SelectedIndex = 0;
+                }
+
+
+            }));
+
+        }
+        private void UpdateChestTypeSelection()
+        {
+            Debug.WriteLine("Updating Chest Types!");
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                foreach (var item in ChestTypeBox.Items)
+                {
+                    var comboboxItem = (ComboBoxItem)item;
+                    if (comboboxItem.Content.Equals(ChestConditions.ChestType))
+                    {
+                        comboboxItem.IsSelected = true;
+                        break;
+                    }
+                }
+            }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        }
+        private void UpdateChestNameSelection()
+        {
+            Debug.WriteLine("Updating Chest Names!");
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                foreach (var item in ChestNameBox.Items)
+                {
+                    var cbi = (ComboBoxItem)item;
+                    if (cbi.Content.Equals(ChestConditions.ChestName))
+                    {
+                        cbi.IsSelected = true;
+                        break;
+                    }
+                }
+            }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        }
+
+        private void UpdateChestLevelSelection()
+        {
+            Debug.WriteLine("Updating Chest Levels!");
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                foreach (var item in ChestLevelCondition.Items)
+                {
+                    var cbi = (ComboBoxItem)item;
+                    if (cbi.Content.Equals(ChestConditions.level))
+                    {
+                        cbi.IsSelected = true;
+                        break;
+                    }
+
+                }
+            }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        }
+
+        private void BuildControls()
+        {
+            BuildChestTypes(ChestTypeBox);
+            UpdateChestTypeSelection();
+            ChestTypeBox.SelectionChanged += ChestTypeBox_SelectionChanged;
+            UpdateChestNameSelection();
+            UpdateChestLevelSelection();
+        }
         private void ApplyBtn_Click(object sender, RoutedEventArgs e)
         {
             var condition = ClanManager.Instance.ClanChestSettings.ChestRequirements.ChestConditions[itemIndex];
-
-            if (ChestRef.ReferenceOption == RefEnum.BYNAME)
-            {
-                condition.ChestType = "Custom";
-                condition.ChestName = ChestNameBox.Text;
-            }
-            else
-            {
-                condition.ChestType = ChestTypeBox.Text;
-                condition.ChestName = "";
-            }
-
-            condition.ChestRef = ChestRef;
-            condition.level = Int32.Parse(ChestLevelCondition.Text);
+            condition.level = ChestLevelCondition.Text;
             this.Close();
         }
         public void LoadChestCondition(ChestConditions chestcondition, int index)
@@ -89,110 +211,27 @@ namespace TBChestTracker
 
             ChestConditions.ChestType = chestcondition.ChestType;
             ChestConditions.level = chestcondition.level;
-            ChestConditions.ChestRef = chestcondition.ChestRef;
-            ChestRef = chestcondition.ChestRef;
-
             ChestConditions.ChestName = chestcondition.ChestName;
-            
-            foreach (var item in ChestTypeBox.Items)
-            {
-                var comboboxItem = (ComboBoxItem)item;
-                if (comboboxItem.Content.Equals(chestcondition.ChestType))
-                {
-                    comboboxItem.IsSelected = true;
-                    break;
-                }
-            }
-
-            switch (ChestConditions.ChestRef.ReferenceOption)
-            {
-                case RefEnum.BYTYPE:
-                    {
-                        ChestTypeBox.Visibility = Visibility.Visible;
-                        ChestNameBox.Visibility = Visibility.Collapsed;
-                    }
-                    break;
-                case RefEnum.BYNAME:
-                    {
-                        ChestNameBox.Visibility = Visibility.Visible;
-                        ChestTypeBox.Visibility = Visibility.Collapsed;
-                        ChestTypeBox.Text = "Custom";
-                    }
-                    break;
-            }
-
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            BuildLevels(ChestLevelCondition, 5);
-
-            foreach (var chesttype in ApplicationManager.Instance.ChestTypes)
-            {
-                ComboBoxItem ci = new ComboBoxItem();
-                ci.Content = chesttype.Name;
-                ChestTypeBox.Items.Add(ci);
-            }
-            /*
-            ComboBoxItem cbi = new ComboBoxItem();
-            cbi.Content = "Custom";
-            ChestTypeBox.Items.Add(cbi);
-            */
-            foreach (var chestname in ApplicationManager.Instance.ChestNames)
-            {
-                ComboBoxItem ci = new ComboBoxItem();
-                ci.Content = chestname.Name;
-                ChestNameBox.Items.Add(ci);
-            }
-
+            BuildControls();
             this.DataContext = ChestConditions;
         }
 
         private void ChestTypeBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(ChestTypeBox.SelectedItem != null)
+            Debug.WriteLine("ChestTypeBox Fired Event!");
+            this.Dispatcher.BeginInvoke(new Action(() =>
             {
-                var content = ((ComboBoxItem)ChestTypeBox.SelectedItem).Content;    
-                if(content.ToString().Equals("Heroic"))
+                var item = (ComboBoxItem)ChestTypeBox.SelectedItem;
+                if (ChestTypeBox.SelectedItem != null)
                 {
-                    BuildLevels(ChestLevelCondition, 16, 45,1);
+                    var content = ((ComboBoxItem)ChestTypeBox.SelectedItem).Content;
+                    BuildChestNames(ChestNameBox, content.ToString());
+                    BuildLevels(ChestLevelCondition);
                 }
-                else
-                {
-                    BuildLevels(ChestLevelCondition, 0, 45,5);
-                }
-            }
-            else
-            {
-                BuildLevels(ChestLevelCondition, 0, 45, 5);
-            }
-        }
-
-        private void ChestNameBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
-        private void StackPanel_Click(object sender, RoutedEventArgs e)
-        {
-            switch (ChestConditions.ChestRef.ReferenceOption)
-            {
-                case RefEnum.BYTYPE:
-                    {
-                        ChestTypeBox.Visibility = Visibility.Visible;
-                        ChestTypeBox.SelectedIndex = 0;
-                        ChestNameBox.Visibility = Visibility.Collapsed;
-                    }
-                    break;
-                case RefEnum.BYNAME:
-                    {
-                        ChestNameBox.Visibility = Visibility.Visible;
-                        ChestNameBox.SelectedIndex = 0;
-                        ChestTypeBox.Visibility = Visibility.Collapsed;
-                        ChestTypeBox.Text = "Custom";
-                    }
-                    break;
-            }
-            ChestLevelCondition.SelectedIndex = 0;
+            }));
         }
     }
 }

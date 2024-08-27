@@ -140,7 +140,6 @@
     </Compile>
     <Compile Include="Chest\ChestPointsData.cs" />
     <Compile Include="Chest\ChestPointsSettings.cs" />
-    <Compile Include="Chest\ChestRef.cs" />
     <Compile Include="Chest\GameChest.cs" />
     <Compile Include="Chest\RefEnum.cs" />
     <Compile Include="ClanData\ClanChestComparer.cs" />
@@ -608,6 +607,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Images\Checkmark.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\Chest_Lg.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -615,6 +617,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\ConsoleIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\DownArrow-Icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\NewFileIcon.png">
@@ -729,6 +734,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\infoIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\UpArrow-Icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\warningIcon.png">

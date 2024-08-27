@@ -133,11 +133,8 @@ namespace TBChestTracker
             var item = ChestPointsListView.SelectedItem as ChestPoints;
             EditChestPointValueWindow editChestPointValueWindow = new EditChestPointValueWindow();
             editChestPointValueWindow.LoadChestPoints(item, ChestPointsListView.SelectedIndex);
-            if(editChestPointValueWindow.ShowDialog() == true)
-            {
-
-            }
-
+            editChestPointValueWindow.ShowDialog();
+            
         }
 
         private void ChestPointsListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -146,10 +143,8 @@ namespace TBChestTracker
             if (item == null) return;
             EditChestPointValueWindow editChestPointValueWindow = new EditChestPointValueWindow();
             editChestPointValueWindow.LoadChestPoints(item, ChestPointsListView.SelectedIndex);
-            if (editChestPointValueWindow.ShowDialog()== true)
-            {
-
-            }
+            editChestPointValueWindow.ShowDialog();
+           
 
         }
 

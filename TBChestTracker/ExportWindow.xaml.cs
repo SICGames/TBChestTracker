@@ -17,6 +17,7 @@ using CsvHelper;
 using System.IO;
 using System.Globalization;
 using System.ComponentModel;
+using System.Collections.ObjectModel;
 
 namespace TBChestTracker
 {
@@ -27,6 +28,10 @@ namespace TBChestTracker
     {
 
         int extensionFilterIndex = 0;
+
+
+
+        public ObservableCollection<string> ExtraHeaders { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(String propertyName)
@@ -60,6 +65,8 @@ namespace TBChestTracker
         {
             InitializeComponent();
             exportBtn.IsEnabled = false;
+            ExtraHeaders = new ObservableCollection<string>();
+
             this.DataContext = this;
         }
 
@@ -139,7 +146,6 @@ namespace TBChestTracker
             var file = FilePicker01.File;
             var sortOption = (SortType)SortOptions.SelectedIndex;
             var chest_points_value = ChestPointsValue.Text;
-            var selectedExportIndex = ExportOptions.SelectedIndex;
             int chest_points = 0;
             var selectedFileExtension = FilePicker01.ExtensionFilterIndex;
 
@@ -150,11 +156,7 @@ namespace TBChestTracker
             }
 
             var count_method = 0;
-            if (ShowTotal.IsChecked == true)
-                count_method = 0;
-            else if(ShowIndividual.IsChecked == true) 
-                count_method = 1;
-
+            
             var clansettings = ClanManager.Instance.ClanChestSettings;
             List<ChestCountData> chestcountdata = null;
             if (clansettings.ClanRequirements.UseSpecifiedClanRequirements)
@@ -170,44 +172,7 @@ namespace TBChestTracker
                 chestcountdata = await ClanManager.Instance.ClanChestManager.BuildAllChestCountDataAsync(sortOption);
             }
 
-            if (selectedFileExtension == 0)
-            {
-                await CreateTextFileAsync(file, chestcountdata, chest_points, count_method);
-            }
-            if(selectedFileExtension == 2)
-            {
-                await CreateCSVFileAysnc(file, chestcountdata);
-            }
-            switch (selectedExportIndex)
-            {
-                case 0: //-- Do nothing.
-                    {
-                    }
-                    break;
-                case 1: //-- Archive
-                    {
-                        //-- Clan Statistic Window will allow ability view archieved chest reports.
-
-                    }
-                    break;
-                case 2: //-- Delete
-                    {
-                        //-- delete and rebuild.
-                        var clanchestfile = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile;
-                        try
-                        {
-                            System.IO.File.Delete(clanchestfile);
-                            ClanManager.Instance.ClanChestManager.ClearData();
-                            ClanManager.Instance.ClanChestManager.BuildData();
-                        }
-                        catch(Exception ex)
-                        {
-                            //-- log error.
-                            com.HellStormGames.Logging.Loggy.Write($"{ex.Message}", com.HellStormGames.Logging.LogType.ERROR);
-                        }
-                    }
-                    break;
-            }
+            await CreateCSVFileAysnc(file, chestcountdata);
 
             this.Close();
         }
@@ -232,11 +197,52 @@ namespace TBChestTracker
                 UseTotalCountMethod = true;
                 UseSpecificCountMethod = false;
             }
+
+            var GameChests = ApplicationManager.Instance.Chests;
+            var previousChestType = String.Empty;
+            HeadersComboBox.Items.Clear();
+            foreach(var gamechest in GameChests)
+            {
+                if(gamechest.ChestType != previousChestType)
+                {
+                    HeadersComboBox.Items.Add(gamechest.ChestType);
+                    previousChestType = gamechest.ChestType;
+                }
+            }
+
+            HeadersComboBox.SelectedIndex = 0;  
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
 
+        }
+
+        private void AddHeaderItemBtn_Click(object sender, RoutedEventArgs e)
+        {
+            ExtraHeaders.Add(HeadersComboBox.SelectedValue.ToString());
+        }
+
+        private void RemoveHeaderItemBtn_Click(object sender, RoutedEventArgs e)
+        {
+            ExtraHeaders.Remove(HeadersComboBox.SelectedValue.ToString());  
+        }
+
+        private void ClearHeaderItemsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            ExtraHeaders.Clear();
+        }
+
+        private void MoveUpItemBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedIndex = HeadersListView.SelectedIndex;
+            ExtraHeaders.Move(selectedIndex, selectedIndex - 1);
+        }
+
+        private void MoveDownItemBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedIndex = HeadersListView.SelectedIndex;
+            ExtraHeaders.Move(selectedIndex, selectedIndex + 1);
         }
     }
 }

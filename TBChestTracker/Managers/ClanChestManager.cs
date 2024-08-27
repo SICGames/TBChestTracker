@@ -470,10 +470,15 @@ namespace TBChestTracker
                                     else if (chest_type.ToLower() == pointvalue.ChestType.ToLower())
                                     {
                                         var chest_level = pointvalue.Level;
-                                        if (level == chest_level)
+                                        if (!chest_level.Equals("(Any)"))
                                         {
-                                            chestdata.Points += pointvalue.PointValue;
-                                            break;
+                                            var chestlevel = Int32.Parse(chest_level);
+
+                                            if (level == chestlevel)
+                                            {
+                                                chestdata.Points += pointvalue.PointValue;
+                                                break;
+                                            }
                                         }
                                     }
                                 }

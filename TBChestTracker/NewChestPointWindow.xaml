@@ -5,16 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
         mc:Ignorable="d"
-        Title="New Chest Point" MinWidth="400" WindowStyle="ToolWindow" SizeToContent="WidthAndHeight" Loaded="Window_Loaded" Unloaded="Window_Unloaded" Topmost="True" DataContext="local:ClanChestSettings" WindowStartupLocation="CenterScreen">
-    <Window.Resources>
-        <local:EnumToRadioOptionConverter x:Key="ChestRefConverter"/>
-    </Window.Resources>
+        Title="New Chest Point" MinWidth="400" WindowStyle="ToolWindow" SizeToContent="WidthAndHeight" Loaded="Window_Loaded" Closing="Window_Closing" Topmost="True" DataContext="local:ClanChestSettings" WindowStartupLocation="CenterScreen">
     <Grid>
-        <StackPanel Orientation="Vertical">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="107*"/>
+            <ColumnDefinition Width="293*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Vertical" Grid.ColumnSpan="2">
             <Grid Margin="0,5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="200"/>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
                 </Grid.ColumnDefinitions>
@@ -23,86 +24,27 @@
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Ref" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBlock Grid.Row="0" Grid.Column="1" Text="Chest" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Type" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="Name" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="0" Grid.Column="2" Text="Level" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical" Margin="5" ButtonBase.Click="StackPanel_Click">
-                    <RadioButton GroupName="Ref" Content="By Type" 
-                                 IsChecked="{Binding ChestRef.ReferenceOption, Converter={StaticResource ChestRefConverter},
-                                            ConverterParameter={x:Static local:RefEnum.BYTYPE}}" Tag="byChestType"/>
-                    <RadioButton GroupName="Ref" Content="By Name" 
-                                 IsChecked="{Binding ChestRef.ReferenceOption, 
-                                            Converter={StaticResource ChestRefConverter},
-                                            ConverterParameter={x:Static local:RefEnum.BYNAME}}" Tag="byChestName"/>
-                </StackPanel>
+                <ComboBox Width="95" x:Name="ChestTypeBox" Visibility="Visible" Grid.Row="1" Grid.Column="0" SelectedIndex="0" HorizontalAlignment="Center" 
+                    VerticalAlignment="Center" SelectionChanged="ChestTypeBox_SelectionChanged">
+                </ComboBox>
+                <ComboBox x:Name="ChestNameBox" Width="150" Visibility="Visible" Grid.Row="1" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Center" 
+                          VerticalAlignment="Center" SelectionChanged="ChestNameBox_SelectionChanged">
+                    <ComboBoxItem Content="(Any)"/>
+                </ComboBox>
 
-                <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <ComboBox x:Name="ChestTypeBox" Visibility="Visible" Grid.Row="1" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Center" 
-                          VerticalAlignment="Center" SelectionChanged="ChestTypeBox_SelectionChanged">
-
-                        <!--
-                        <ComboBoxItem Content="Common"/>
-                        <ComboBoxItem Content="Rare"/>
-                        <ComboBoxItem Content="Epic"/>
-                        <ComboBoxItem Content="Citadel"/>
-                        <ComboBoxItem Content="Heroic"/>
-                        <ComboBoxItem Content="Bank"/>
-                        <ComboBoxItem Content="Union Triumph"/>
-                        <ComboBoxItem Content="Fenrir"/>
-                        <ComboBoxItem Content="Jormungandr"/>
-                        <ComboBoxItem Content="Arena"/>
-                        <ComboBoxItem Content="Story"/>
-                        <ComboBoxItem Content="Custom"/>
-                        -->
-
-                    </ComboBox>
-                    <ComboBox x:Name="ChestNameBox" Visibility="Collapsed" Grid.Row="1" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Center" 
-                        VerticalAlignment="Center" SelectionChanged="ChestNameBox_SelectionChanged">
-                        <!--
-    <ComboBoxItem Content="Common"/>
-    <ComboBoxItem Content="Rare"/>
-    <ComboBoxItem Content="Epic"/>
-    <ComboBoxItem Content="Citadel"/>
-    <ComboBoxItem Content="Heroic"/>
-    <ComboBoxItem Content="Bank"/>
-    <ComboBoxItem Content="Union Triumph"/>
-    <ComboBoxItem Content="Fenrir"/>
-    <ComboBoxItem Content="Jormungandr"/>
-    <ComboBoxItem Content="Arena"/>
-    <ComboBoxItem Content="Story"/>
-    <ComboBoxItem Content="Custom"/>
-    -->
-
-                    </ComboBox>
-                    <TextBox x:Name="ChestTextBox" Visibility="Collapsed" 
-                                Width="200" Height="24" 
-                                TextAlignment="Center" Text="{Binding ChestName}" 
-                                VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <ComboBox Grid.Row="1" Grid.Column="1" Height="24" Width="50" HorizontalContentAlignment="Center" 
-                              SelectedIndex="0" SelectionChanged="ChestPointLevel_SelectionChanged" x:Name="ChestPointLevel" Text="{Binding Level}">
-                        <ComboBoxItem Content="0"/>
-                        <ComboBoxItem Content="5"/>
-                        <ComboBoxItem Content="10"/>
-                        <ComboBoxItem Content="15"/>
-                        <ComboBoxItem Content="20"/>
-                        <ComboBoxItem Content="25"/>
-                        <ComboBoxItem Content="30"/>
-                        <ComboBoxItem Content="35"/>
-                    </ComboBox>
-                    <TextBox x:Name="LevelTextBox" Visibility="Collapsed" 
-                             Width="50" Height="24" 
-                             TextAlignment="Center" Text="{Binding Level}" 
-                             VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                </StackPanel>
+                <ComboBox Grid.Row="1" Grid.Column="2" Height="24" Width="75" HorizontalContentAlignment="Center" 
+                        SelectedIndex="0" SelectionChanged="ChestPointLevel_SelectionChanged" x:Name="ChestPointLevel" Text="{Binding Level}">
+                    <ComboBoxItem Content="(Any)"/>
+                </ComboBox>
 
                 <TextBlock Grid.Row="0" Grid.Column="3" Text="Point Value" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <TextBox x:Name="ChestPointValueTextBox" 
                          Grid.Row="1" Grid.Column="3" Text="{Binding PointValue}" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Width="75"/>
             </Grid>
+            
             <Grid Grid.Row="2" Grid.ColumnSpan="4" Background="LightGray">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -111,7 +53,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Column="0" Foreground="Red" Text="* LEVEL 0 is anything that does not have a level." HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,0,0,0" Width="300"/>
+                <TextBlock Grid.Column="0" Foreground="Red" Text="* (Any) means not to care too much about criteria." HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,0,0,0" Width="300"/>
                 <Button Grid.Row="0" Grid.Column="1" Content="Add" Width="64" Margin="10,5" x:Name="AddBtn" Click="AddBtn_Click"/>
             </Grid>
         </StackPanel>

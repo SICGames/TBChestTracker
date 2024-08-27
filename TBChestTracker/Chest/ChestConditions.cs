@@ -12,17 +12,8 @@ namespace TBChestTracker
         private string _chestType;
         private string _chestName;
 
-        private int _level = 5;
-        private ChestRef _chestRef;
-        public ChestRef ChestRef
-        {
-            get => _chestRef;
-            set
-            {
-                _chestRef = value;
-                OnPropertyChanged(nameof(ChestRef));
-            }
-        }
+        private string _level = String.Empty;
+      
         public string ChestName
         {
             get
@@ -48,7 +39,7 @@ namespace TBChestTracker
             }
         }
 
-        public int level {
+        public string level {
             get
             {
                 return _level;
