@@ -5,7 +5,8 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:TBChestTracker.Pages.OCRWizard"
       mc:Ignorable="d" 
-      Height="450" Width="800"
+      Height="450" Width="650"
+      MinWidth="650"
       Title="OCRWizard_CreateMarker">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -22,7 +23,7 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Where is that Open button at?" Grid.Row="0" Foreground="White" FontWeight="Bold" FontSize="24"/>
+            <TextBlock Text="Mark The Claim Button" Grid.Row="0" Foreground="White" FontWeight="Bold" FontSize="24"/>
             <TextBlock 
    Text="Since you've gotten to this step. It is time to finish up and place down a marker so the program knows where to click as it processes chests."
    TextWrapping="Wrap"

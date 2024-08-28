@@ -5,8 +5,9 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:TBChestTracker.Pages.OCRWizard"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Width="800" Height="450"
+      d:DesignHeight="450" d:DesignWidth="600"
+      MinWidth="600" MaxWidth="800"
+      Width="600" Height="450"
       Title="OCRWizard_GiftsTab">
 
     <Grid>

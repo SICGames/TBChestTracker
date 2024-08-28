@@ -1093,5 +1093,15 @@ namespace TBChestTracker
             ChestBuilderWindow chestBuilderWindow = new ChestBuilderWindow();
             chestBuilderWindow.Show();
         }
+
+        private void AbsentClanmateCleanerMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ClanWealthBuilderMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

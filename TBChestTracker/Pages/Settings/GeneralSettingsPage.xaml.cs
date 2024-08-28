@@ -99,6 +99,12 @@ namespace TBChestTracker.Pages
         {
             var result = BuildSelectedLanguagesToString();
             SettingsManager.Instance.Settings.GeneralSettings.Languages = result;
+            
+        }
+
+        private void UILanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
     }
 }

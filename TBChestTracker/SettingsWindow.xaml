@@ -30,11 +30,6 @@
             <ui:FancyNavigationButton 
                 ActiveBrush="#eee" ActiveBackgroundBrush="#444" HoverBrush="#555"
                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
-                Text="Automation" Height="36" Foreground="White" Background="#111" 
-                BorderBrush="#000" FontWeight="Bold" NavigationSource="/Pages/Settings/HotkeySettingsPage.xaml"/>
-            <ui:FancyNavigationButton 
-                ActiveBrush="#eee" ActiveBackgroundBrush="#444" HoverBrush="#555"
-                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
                 Text="Hot Keys" Height="36" Foreground="White" Background="#111" 
                 BorderBrush="#000" FontWeight="Bold" NavigationSource="/Pages/Settings/HotkeySettingsPage.xaml"/>
         </StackPanel>

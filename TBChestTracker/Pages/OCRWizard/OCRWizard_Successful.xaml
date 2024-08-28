@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:TBChestTracker.Pages.OCRWizard"
       mc:Ignorable="d" 
-      Height="250" Width="800"
+      Height="250" Width="500"
       Title="OCRWizard_Successful">
     <Grid>
         <Grid.ColumnDefinitions>
