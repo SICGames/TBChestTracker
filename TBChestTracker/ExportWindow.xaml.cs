@@ -18,6 +18,7 @@ using System.IO;
 using System.Globalization;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using Newtonsoft.Json;
 
 namespace TBChestTracker
 {
@@ -28,8 +29,7 @@ namespace TBChestTracker
     {
 
         int extensionFilterIndex = 0;
-
-
+        private ExportSettings exportSettings {  get; set; }    
 
         public ObservableCollection<string> ExtraHeaders { get; set; }
 
@@ -39,6 +39,8 @@ namespace TBChestTracker
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        private string ExportSettingsFile { get; set; }
 
         private bool useTotalCountMethod = true;
         public bool UseTotalCountMethod
@@ -210,7 +212,16 @@ namespace TBChestTracker
                 }
             }
 
-            HeadersComboBox.SelectedIndex = 0;  
+            HeadersComboBox.SelectedIndex = 0;
+            var clanRootFolder = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder;
+            ExportSettingsFile = $"{clanRootFolder}exportSettings.db";
+
+            exportSettings = new ExportSettings();
+
+            if(System.IO.File.Exists(clanRootFolder))
+            {
+                LoadExportSettings();
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -244,5 +255,50 @@ namespace TBChestTracker
             var selectedIndex = HeadersListView.SelectedIndex;
             ExtraHeaders.Move(selectedIndex, selectedIndex + 1);
         }
+
+        private void DateRangeOptions_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var c = ((ComboBoxItem)DateRangeOptions.SelectedItem).Content;
+
+            if (c.ToString() == "Custom")
+            {
+                if (CustomDateRangeGrid != null)
+                {
+                    CustomDateRangeGrid.Visibility = Visibility.Visible;
+                }
+            }
+            else
+            {
+                if (CustomDateRangeGrid != null)
+                {
+                    CustomDateRangeGrid.Visibility = Visibility.Collapsed;
+                }
+            }
+        }
+
+        public void LoadExportSettings()
+        {
+            using (StreamReader sr = File.OpenText(ExportSettingsFile))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Formatting = Formatting.Indented;
+                serializer.Deserialize(sr, typeof(ExportSettings));
+                sr.Close();
+            }
+
+            //--- start to build everything from settings.
+
+        }
+        public void SaveExportSettings()
+        {
+            using(StreamWriter sw = File.CreateText(ExportSettingsFile))
+            {
+                var serializer = new JsonSerializer();
+                serializer.Formatting = Formatting.Indented;
+                serializer.Serialize(sw, typeof(ExportSettings));
+                sw.Close();
+            }
+        }
+
     }
 }

@@ -168,14 +168,14 @@ namespace TBChestTracker
         #region Start Automation Thread
         void StartAutomationThread()
         {
-            
-            GlobalDeclarations.AutomationRunning = true;
-            CancellationTokenSource = new CancellationTokenSource();
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
+                GlobalDeclarations.AutomationRunning = true;
+                CancellationTokenSource = new CancellationTokenSource();
+            
                 Task automationTask = Task.Run(() => StartAutomationProcess(CancellationTokenSource.Token));
 
-            }));
+            }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         }
         #endregion
 
@@ -186,20 +186,12 @@ namespace TBChestTracker
             var claim_button = SettingsManager.Instance.Settings.OCRSettings.ClaimChestButtons[0];
             com.HellStormGames.Logging.Console.Write("Automation Started", com.HellStormGames.Logging.LogType.INFO);
             GlobalDeclarations.canCaptureAgain = true;
-            bool bCanceled = false;
 
             //-- we want to speed up this.
-
-            while (true)
+            while (!token.IsCancellationRequested)
             {
 
                 int automatorClicks = 0;
-                if (token.IsCancellationRequested)
-                {
-                    bCanceled = true;
-                    break;
-                }
-
                 if (GlobalDeclarations.canCaptureAgain)
                 {
                     Thread.Sleep(1250); //-- could prevent the "From:" bug.
@@ -225,26 +217,26 @@ namespace TBChestTracker
                 }
             }
 
-            if(bCanceled)
-            {
-                StopAutomation();
-            }
-
+            StopAutomation();
         }
         #endregion
 
         #region StopAutomation
         void StopAutomation()
         {
-            CancellationTokenSource.Cancel();
-            
-            GlobalDeclarations.AutomationRunning = false;
-            GlobalDeclarations.isBusyProcessingClanchests = false;
-            ClanManager.Instance.ClanChestManager.SaveDataTask();
-            ClanManager.Instance.ClanChestManager.CreateBackup();
-            appContext.IsAutomationPlayButtonEnabled = true;
-            appContext.IsAutomationStopButtonEnabled = false;
-            com.HellStormGames.Logging.Console.Write("Automation stopped.", com.HellStormGames.Logging.LogType.INFO);
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                CancellationTokenSource.Cancel();
+
+                GlobalDeclarations.AutomationRunning = false;
+                GlobalDeclarations.isBusyProcessingClanchests = false;
+                ClanManager.Instance.ClanChestManager.SaveDataTask();
+                ClanManager.Instance.ClanChestManager.CreateBackup();
+                appContext.IsAutomationPlayButtonEnabled = true;
+                appContext.IsAutomationStopButtonEnabled = false;
+                com.HellStormGames.Logging.Console.Write("Automation stopped.", com.HellStormGames.Logging.LogType.INFO);
+            }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+
         }
         #endregion
 
@@ -300,7 +292,7 @@ namespace TBChestTracker
             {
                 Snapture = new Snapture();
                 Snapture.onFrameCaptured += Snapture_onFrameCaptured;
-                var dpi = 300; //-- testing new dpi.
+                var dpi = 600; //-- testing new dpi.
 
                 Snapture.SetBitmapResolution(dpi);
                 Snapture.Start(FrameCapturingMethod.GDI);
