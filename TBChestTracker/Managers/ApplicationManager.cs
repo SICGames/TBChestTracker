@@ -27,7 +27,7 @@ namespace TBChestTracker
 
         public static ApplicationManager Instance { get; private set; }
         private CultureInfo Culture => System.Globalization.CultureInfo.CurrentCulture;
-        public string Language => Culture.Name;
+        public string Language { get; private set; }
         public string LocalePath { get; private set; }
 
         public Process ServerProcess { get; private set; }  
@@ -54,6 +54,18 @@ namespace TBChestTracker
         {
             //-- builds all necessary data for the application to use.
             //-- loaded from C:\ProgramData\SICGames\TotalBattleChestTracker\locale\ and user's language.
+
+            if (SettingsManager.Instance != null)
+            {
+                var generalSettings = SettingsManager.Instance.Settings.GeneralSettings;
+                if (generalSettings != null)
+                {
+                    if(generalSettings.UILanguage.Equals("English"))
+                    {
+                        Language = "en-US";
+                    }
+                }
+            }
 
             LocalePath = $@"{GlobalDeclarations.CommonAppFolder}locale\{Language}\";
 
