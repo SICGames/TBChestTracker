@@ -103,6 +103,17 @@ namespace TBChestTracker
             }
         }
 
+        private double _dpi = 600;
+        public double Dpi
+        {
+            get => (double)_dpi;
+            set
+            {
+                _dpi = value;
+                OnPropertyChanged(nameof(Dpi));
+            }
+        }
+
         public OCRSettings() 
         { 
             AreaOfInterest = new AOIRect();

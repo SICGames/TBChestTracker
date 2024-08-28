@@ -170,8 +170,6 @@
     <Compile Include="CrashBox\Events\CrashBoxEvents.cs" />
     <Compile Include="CrashBox\Events\CrashBoxExceptionArgs.cs" />
     <Compile Include="CustomControls\DpiAwareImage.cs" />
-    <Compile Include="Data\ChestNames.cs" />
-    <Compile Include="Data\ChestTypes.cs" />
     <Compile Include="EditChestPointValueWindow.xaml.cs">
       <DependentUpon>EditChestPointValueWindow.xaml</DependentUpon>
     </Compile>

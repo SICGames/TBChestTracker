@@ -161,13 +161,6 @@ namespace TBChestTracker
             this.MaxLevel = selectedChest.MaxLevel;
             this.IncrementPerLevel = selectedChest.IncrementPerLevel;
         }
-
-        private void SaveChestsBtn_Click(object sender, RoutedEventArgs e)
-        {
-            Save();
-            _unsavedChanges = 0;
-        }
-
         private void OkBtn_Click(object sender, RoutedEventArgs e)
         {
             var gamechest = new GameChest();
@@ -242,6 +235,13 @@ namespace TBChestTracker
         {
             _selectedIndex = CHESTS_LISTVIEW.SelectedIndex;
             OkBtn.Content = "Apply";
+        }
+
+        private void SaveBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Save();
+            _unsavedChanges = 0;
+            this.Close();
         }
     }
 }

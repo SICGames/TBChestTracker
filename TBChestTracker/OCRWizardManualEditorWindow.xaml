@@ -19,7 +19,7 @@
                 SnapsToDevicePixels="True" UseLayoutRounding="True" 
                 Width="{Binding ElementName=PreviewCanvas, Path=ActualWidth}"
                 Height="{Binding ElementName=PreviewCanvas, Path=ActualHeight}"
-                Stretch="None" RenderOptions.BitmapScalingMode="HighQuality"/>
+                Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality"/>
             
         </Canvas>
     </DockPanel>

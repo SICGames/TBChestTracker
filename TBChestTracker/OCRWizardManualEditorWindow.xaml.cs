@@ -23,6 +23,7 @@ using TBChestTracker.Helpers;
 using TBChestTracker.Managers;
 using Emgu.CV.OCR;
 using System.Security;
+using com.HellstormGames.Imaging;
 
 namespace TBChestTracker
 {
@@ -58,6 +59,10 @@ namespace TBChestTracker
 
         private bool mouseDown = false;
 
+        private Dpi dpi { get; set; }
+        private double scaleFactor = 0.0;
+
+
         public OCRWizardManualEditorWindow()
         {
             InitializeComponent();
@@ -65,11 +70,9 @@ namespace TBChestTracker
        
         private void CreateCanvasControls()
         {
-            var dpi = snapture.MonitorInfo.Monitors[0].Dpi;
-            var scaleFactor = dpi.ScaleFactor;
-
-            var canvasheight = PreviewCanvas.ActualHeight * scaleFactor;// * dpiY;
-            var canvaswidth = PreviewCanvas.ActualWidth * scaleFactor; // * dpiX;
+         
+            var canvasheight = PreviewCanvas.ActualHeight * scaleFactor;
+            var canvaswidth = PreviewCanvas.ActualWidth * scaleFactor; 
 
             writeableBitmap = new WriteableBitmap((int)canvaswidth, (int)canvasheight, dpi.X, dpi.Y, PixelFormats.Pbgra32, null);
             WriteableImage = new System.Windows.Controls.Image();
@@ -83,7 +86,10 @@ namespace TBChestTracker
 
             snapture = new Snapture();
             snapture.isDPIAware = true;
-            snapture.SetBitmapResolution((int)snapture.MonitorInfo.Monitors[0].Dpi.X);
+            dpi = snapture.MonitorInfo.Monitors[0].Dpi;  
+            scaleFactor = dpi.ScaleFactor;
+
+            snapture.SetBitmapResolution((int)dpi.X);
             snapture.onFrameCaptured += Snapture_onFrameCaptured;
             snapture.Start(FrameCapturingMethod.GDI);
             snapture.CaptureDesktop();
@@ -101,10 +107,7 @@ namespace TBChestTracker
             var bitmap = e.ScreenCapturedBitmap;
             PreviewImage.Source = bitmap.ToBitmapSource();
             this.Opacity = 1;
-
-            
             CreateCanvasControls();
-
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -155,7 +158,7 @@ namespace TBChestTracker
             {
                 startPoint = Mouse.GetPosition(PreviewCanvas);
                 endPoint = startPoint;
-                var dpi = Snapture.Instance.MonitorInfo.Monitors[0].Dpi;
+                
                 SelectionRectangle = new Rectangle();
                 SelectionRectangle.StrokeThickness = 3;
                 SelectionRectangle.Height = 1;

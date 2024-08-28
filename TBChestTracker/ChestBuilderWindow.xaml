@@ -12,20 +12,21 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <ToolBarTray Grid.Row="0" Grid.Column="0" Height="24">
+        <ToolBarTray Grid.Row="0" Grid.Column="0" Height="42">
             <ToolBar VerticalAlignment="Center" HorizontalAlignment="Center" 
-                     Height="24"
+                     Height="48"
                       Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type ToolBarTray}}, Path=ActualWidth}">
-                <ui:FancyImageButton ImageSource="pack://application:,,,/Images/editIcon.png" Height="16" Width="16" x:Name="EditChestBtn" HighlightBrush="#0088ff" HighlightStrokeBrush="#0044ff" HighlightOpacity="0.25" ToolTip="Edit Chest" Click="EditChestBtn_Click"/>
-                <ui:FancyImageButton ImageSource="pack://application:,,,/Images/PlusIcon.png" Height="16" Width="16" x:Name="AddChestBtn" HighlightBrush="#0088ff" HighlightStrokeBrush="#0044ff" HighlightOpacity="0.25" ToolTip="Add Chest" Click="AddChestBtn_Click"/>
-                <ui:FancyImageButton ImageSource="pack://application:,,,/Images/MinusIcon.png" Height="16" Width="16" x:Name="RemoveChestBtn" HighlightBrush="#0088ff" HighlightStrokeBrush="#0044ff" HighlightOpacity="0.25" ToolTip="Remove Chest" Click="RemoveChestBtn_Click"/>
-                <ui:FancyImageButton ImageSource="pack://application:,,,/Images/TrashIcon.png" Height="16" Width="16" x:Name="RemoveAllChestsBtn" HighlightBrush="#0088ff" HighlightStrokeBrush="#0044ff" HighlightOpacity="0.25" ToolTip="Remove All Chests" Click="RemoveAllChestsBtn_Click"/>
+                <ui:FancyImageButton ImageSource="pack://application:,,,/Images/PlusIcon.png" Height="24" Width="24" Margin="5" x:Name="AddChestBtn" HighlightBrush="#0088ff" HighlightStrokeBrush="#0044ff" HighlightOpacity="0.25" ToolTip="Add Chest" Click="AddChestBtn_Click"/>
+                <ui:FancyImageButton ImageSource="pack://application:,,,/Images/MinusIcon.png" Height="24" Width="24" Margin="5" x:Name="RemoveChestBtn" HighlightBrush="#0088ff" HighlightStrokeBrush="#0044ff" HighlightOpacity="0.25" ToolTip="Remove Chest" Click="RemoveChestBtn_Click"/>
                 <Separator/>
-                <ui:FancyImageButton ImageSource="pack://application:,,,/Images/saveIcon.png" Height="16" Width="16" x:Name="SaveChestsBtn" HighlightBrush="#0088ff" HighlightStrokeBrush="#0044ff" HighlightOpacity="0.25" ToolTip="Save" Click="SaveChestsBtn_Click"/>
+                <ui:FancyImageButton ImageSource="pack://application:,,,/Images/editIcon.png" Height="24" Width="24" Margin="5" x:Name="EditChestBtn" HighlightBrush="#0088ff" HighlightStrokeBrush="#0044ff" HighlightOpacity="0.25" ToolTip="Edit Chest" Click="EditChestBtn_Click"/>
+                <Separator/>
+                <ui:FancyImageButton ImageSource="pack://application:,,,/Images/TrashIcon.png" Height="24" Width="24" Margin="5" x:Name="RemoveAllChestsBtn" HighlightBrush="#0088ff" HighlightStrokeBrush="#0044ff" HighlightOpacity="0.25" ToolTip="Remove All Chests" Click="RemoveAllChestsBtn_Click"/>
             </ToolBar>
         </ToolBarTray>
         <Grid Grid.Column="0" Grid.Row="1">
@@ -84,5 +85,10 @@
                 </ListView.View>
             </ListView>
         </Grid>
+        <Grid Grid.Row="4" Height="32" Background="#dfdfdf">
+            <ui:FancyButton RenderMode="TEXT" Text="Save" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="15,5" Padding="30,0"  
+                            Corners="5" BorderBrush="#0044ff" Background="#0066ff" Foreground="#fff" HilightBrush="#0088ff" x:Name="SaveBtn" Click="SaveBtn_Click"/>
+        </Grid>
+        
     </Grid>
 </Window>

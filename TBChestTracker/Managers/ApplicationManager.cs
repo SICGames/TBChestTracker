@@ -23,8 +23,6 @@ namespace TBChestTracker
 
     public class ApplicationManager
     {
-        public  List<ChestTypes> ChestTypes {  get; private set; }
-        public  List<ChestNames> ChestNames { get; private set; } 
         public List<GameChest> Chests { get; private set; }
 
         public static ApplicationManager Instance { get; private set; }
@@ -39,15 +37,13 @@ namespace TBChestTracker
             
             if (Instance == null)
                 Instance = this;
-            
-            this.ChestTypes = new List<ChestTypes>();
-            this.ChestNames = new List<ChestNames>();
+        
             this.Chests = new List<GameChest>();
         }
         ~ApplicationManager()
         {
-            this.ChestTypes.Clear();
-            this.ChestNames.Clear();
+            Chests.Clear();
+            Chests = null;
         }
 
         public void SetChests(List<GameChest> chests)
@@ -69,55 +65,18 @@ namespace TBChestTracker
 
             string ChestsFile = $"{LocalePath}Chests.csv";
 
-            string ChestTypesFile = $"{LocalePath}ChestSources.csv";
-            string ChestNamesFile = $"{LocalePath}ChestNames.csv";
-
+          
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 HasHeaderRecord = false,
             };
-
-            //-- ChestTypes and ChestSources files will be absolute soon.
-
-
-            //--- Chest Types 
-            if (!System.IO.File.Exists(ChestTypesFile))
-            {
-                //-- file doesn't exist. Need to throw it. 
-                throw new Exception($"{ChestTypesFile} doesn't exist.");
-            }
-
-            using (var reader = new StreamReader(ChestTypesFile))
-            {
-                using (var csv = new CsvReader(reader, config))
-                {
-                    ChestTypes = csv.GetRecords<ChestTypes>().ToList();
-                }
-                reader.Close();
-            }
-
-            //--- Chest Names
-            if (!System.IO.File.Exists(ChestNamesFile))
-            {
-                //-- file doesn't exist. Need to throw it. 
-                throw new Exception($"{ChestNamesFile} doesn't exist.");
-            }
-
-            using (var reader = new StreamReader(ChestNamesFile))
-            {
-                using (var csv = new CsvReader(reader, config))
-                {
-                    ChestNames = csv.GetRecords<ChestNames>().ToList();
-                }
-
-                reader.Close();
-            }
-
+            
             //--- Chests
+            //-- Mandatory this file exists. Binds everything together.
             if (!System.IO.File.Exists(ChestsFile))
             {
                 //-- file doesn't exist. Need to throw it. 
-                //throw new Exception($"{ChestsFile} doesn't exist.");
+                throw new Exception($"{ChestsFile} doesn't exist.");
             }
             else
             {
