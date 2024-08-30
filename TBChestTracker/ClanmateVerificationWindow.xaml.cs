@@ -74,7 +74,7 @@ namespace TBChestTracker
         private void VerificationClanmateFile01_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.InitialDirectory = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder;
+            openFileDialog.InitialDirectory = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}";
             openFileDialog.DefaultExt = ".db";
             openFileDialog.Filter = "Databases | *.db";
             if(openFileDialog.ShowDialog() == true)
@@ -137,8 +137,8 @@ namespace TBChestTracker
         {
             if (CreateBackup)
             {
-                var backup_clanmates_file = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\old_clanmates.bak";
-                var backup_chestdata_file = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\old_clanchests.bak";
+                var backup_clanmates_file = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\old_clanmates.bak";
+                var backup_chestdata_file = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\old_clanchests.bak";
                 ClanManager.Instance.ClanmateManager.Save(backup_clanmates_file);
                 ClanManager.Instance.ClanChestManager.SaveData(backup_chestdata_file);
             }

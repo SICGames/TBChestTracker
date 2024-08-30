@@ -115,7 +115,7 @@ namespace TBChestTracker
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            FilePicker01.DefaultFolder = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseExportFolderPath;
+            FilePicker01.DefaultFolder = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseExportFolderPath}";
 
             var GameChests = ApplicationManager.Instance.Chests;
             var previousChestType = String.Empty;
@@ -130,7 +130,7 @@ namespace TBChestTracker
             }
 
             HeadersComboBox.SelectedIndex = 0;
-            var clanRootFolder = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder;
+            var clanRootFolder = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}";
             ExportSettingsFile = $@"{clanRootFolder}\exportSettings.db";
 
             exportSettings = new ExportSettings();

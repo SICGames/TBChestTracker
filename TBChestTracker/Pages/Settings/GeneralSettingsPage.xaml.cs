@@ -35,7 +35,17 @@ namespace TBChestTracker.Pages
             if(dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 var picker = (FancyPicker)sender;
+                var tag = picker.Tag.ToString();
                 picker.Source = dialog.FileName;
+                if(tag == "ClanFolder")
+                {
+                    //-- warn user and if they're okay with it, try to move everything to new clan folder.
+                    var result = MessageBox.Show("Are you sure you want to move all clan databases to new root folder? This will require closing application.", "New Clan Root Folder", MessageBoxButton.YesNo);
+                    if(result == MessageBoxResult.Yes)
+                    {
+                       
+                    }
+                }
             }
         }
 

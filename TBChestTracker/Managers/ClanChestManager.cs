@@ -502,9 +502,9 @@ namespace TBChestTracker
         
         public async void LoadData()
         {
-            var clanmatefile = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile;
-            var clanchestfile = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile;
-            var chestsettingsfile = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanSettingsFile;
+            var clanmatefile = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}";
+            var clanchestfile = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile}";
+            var chestsettingsfile = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanSettingsFile}";
 
             if (ClanManager.Instance.ClanmateManager.Database.Clanmates != null)
                 ClanManager.Instance.ClanmateManager.Database.Clanmates.Clear();
@@ -600,7 +600,7 @@ namespace TBChestTracker
             //-- write to file.
             string file = String.Empty;
             if (String.IsNullOrEmpty(filepath))
-                file = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile;
+                file = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile}";
             else
                 file = filepath;
 
@@ -627,7 +627,7 @@ namespace TBChestTracker
         public void CreateBackup()
         {
             DateTimeOffset dateTimeOffset = DateTimeOffset.Now;
-            string file = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath}//clanchest_backup_{dateTimeOffset.ToUnixTimeSeconds()}.db";
+            string file = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath}//clanchest_backup_{dateTimeOffset.ToUnixTimeSeconds()}.db";
             try
             {
                 using (var sw = File.CreateText(file))

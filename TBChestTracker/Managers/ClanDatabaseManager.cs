@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows;
+using TBChestTracker.Managers;
 
 
 namespace TBChestTracker
@@ -35,7 +36,45 @@ namespace TBChestTracker
                 _clandatabase = value;
             }
         }
+        public void Create(System.Action<bool> result)
+        {
+            var clanname = ClanDatabase.Clanname;
+            var mainpath = SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder;
 
+            if (String.IsNullOrEmpty(clanname) || clanname.Length < 3)
+            {
+                MessageBox.Show("Clan name must be more than three characters.");
+                result(false);
+                return;
+            }
+
+            var clanrootfolder = $"{mainpath}{clanname}";
+
+            ClanDatabase.ClanFolderPath = clanrootfolder;
+            ClanDatabase.ClanDatabaseFolder = $"\\db";
+            ClanDatabase.ClanChestReportFolderPath = $"\\reports";
+            ClanDatabase.ClanChestDatabaseExportFolderPath = $"\\exports";
+            ClanDatabase.ClanDatabaseBackupFolderPath = $"\\backups";
+
+            System.IO.Directory.CreateDirectory($"{ClanDatabase.ClanFolderPath}");
+            System.IO.Directory.CreateDirectory($"{ClanDatabase.ClanFolderPath}{ClanDatabase.ClanDatabaseFolder}");
+            System.IO.Directory.CreateDirectory($"{ClanDatabase.ClanFolderPath}{ClanDatabase.ClanChestReportFolderPath}");
+            System.IO.Directory.CreateDirectory($"{ClanDatabase.ClanFolderPath}{ClanDatabase.ClanChestDatabaseExportFolderPath}");
+            System.IO.Directory.CreateDirectory($"{ClanDatabase.ClanFolderPath}{ClanDatabase.ClanDatabaseBackupFolderPath}");
+            result( true ); 
+        }
+        public void Update()
+        {
+
+        }
+        public void Move()
+        {
+
+        }
+        public void Delete()
+        {
+
+        }
         public void Save()
         {
             var saveFilePath = $"{ClanDatabase.ClanFolderPath}\\clan.cdb";

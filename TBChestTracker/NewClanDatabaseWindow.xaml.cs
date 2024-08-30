@@ -27,37 +27,10 @@ namespace TBChestTracker
             InitializeComponent();
             this.DataContext = ClanManager.Instance.ClanDatabaseManager.ClanDatabase;
         }
-        private void CreateClanFolders(Action<bool> result)
-        {
-            var clanname = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname;
-            var mainpath = SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder;
-
-            if (String.IsNullOrEmpty(clanname) || clanname.Length < 3) 
-            {
-                MessageBox.Show("Clan name must be more than three characters.");
-                result(false);
-                return;
-            }
-
-            var clanrootfolder = $"{mainpath}{clanname}";
-
-            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath = clanrootfolder;
-            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder = $"{clanrootfolder}\\db";
-            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestReportFolderPath = $"{clanrootfolder}\\reports";
-            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseExportFolderPath = $"{clanrootfolder}\\exports";
-            ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath = $"{clanrootfolder}\\backups";
-            
-            System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath);
-            System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder);
-            System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestReportFolderPath);
-            System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseExportFolderPath);
-            System.IO.Directory.CreateDirectory(ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath);
-            result(true);
-        }
 
         private void CreateClanDatabaseBtn_Click(object sender, RoutedEventArgs e)
         {
-            CreateClanFolders(result =>
+            ClanManager.Instance.ClanDatabaseManager.Create(result =>
             {
                 if (result)
                 {

@@ -267,7 +267,7 @@ namespace TBChestTracker
         {
 
             //-- should create backup incase shit hits the fan.
-            var backup_file = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\clanchests.old";
+            var backup_file = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\clanchests.old";
             ClanManager.Instance.ClanChestManager.SaveData(backup_file);
 
             var selected = ListClanMates01.SelectedItems;
