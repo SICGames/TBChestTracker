@@ -32,12 +32,12 @@
         <ui:FancyPicker Grid.Column="1" Grid.Row="0" Margin="0,5,0,5" ToolTip="Root directory where all newly created clans will be stored."
                         Height="18" BorderBrush="#aaa" Source="{Binding ClanRootFolder}"
                         Corners="10" 
-                        BorderThickness="1" Padding="1" Background="#fff" Foreground="#000" Tag="ClanRoot" Click="FancyPicker_Click"/>
+                        BorderThickness="1" Padding="1" Background="#fff" Foreground="#000" Tag="ClanRoot" Click="ClanRootFolderPicker_Click" x:Name="ClanRootFolderPicker"/>
 
         <ui:FancyPicker Grid.Column="1" Grid.Row="1" Margin="0,5,0,5" ToolTip="Where all the Tesseract Learned Data Models are stored."
                 Height="18" BorderBrush="#aaa" 
                 Corners="10" 
-                BorderThickness="1" Padding="1" Background="#fff" Foreground="#000" Tag="TessData" Source="{Binding TessDataFolder}" Click="FancyPicker_Click"/>
+                BorderThickness="1" Padding="1" Background="#fff" Foreground="#000" Tag="TessData" Source="{Binding TessDataFolder}" x:Name="TessDataFolderPicker" Click="TessDataFolderPicker_Click"/>
 
         <ComboBox x:Name="UILanguageComboBox" Grid.Row="2" Grid.Column="1" Width="200" SelectionChanged="UILanguageComboBox_SelectionChanged" HorizontalAlignment="Left" Margin="0,0" SelectedIndex="0" Text="{Binding UILanguage}">
             <ComboBoxItem Content="English"/>

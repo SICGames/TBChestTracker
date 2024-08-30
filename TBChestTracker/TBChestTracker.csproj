@@ -193,6 +193,9 @@
     <Compile Include="MergeClanmateWindow.xaml.cs">
       <DependentUpon>MergeClanmateWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MoveClanFolderWindow.xaml.cs">
+      <DependentUpon>MoveClanFolderWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="NewChestPointWindow.xaml.cs">
       <DependentUpon>NewChestPointWindow.xaml</DependentUpon>
     </Compile>
@@ -411,6 +414,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="MergeClanmateWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MoveClanFolderWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

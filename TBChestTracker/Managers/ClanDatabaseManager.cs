@@ -68,10 +68,13 @@ namespace TBChestTracker
         {
 
         }
-        public void Move()
-        {
 
+        
+        public void Move(string oldClanRoot,string newClanRoot)
+        {
+           // CopyDirectory(oldClanRoot, newClanRoot, true);
         }
+        
         public void Delete()
         {
 

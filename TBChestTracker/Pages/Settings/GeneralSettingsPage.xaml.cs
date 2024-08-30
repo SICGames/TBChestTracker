@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TBChestTracker.UI;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Threading;
 
 
 namespace TBChestTracker.Pages
@@ -27,26 +28,11 @@ namespace TBChestTracker.Pages
         {
             InitializeComponent();
         }
+        private string oldClanRootFolder = String.Empty;
 
         private void FancyPicker_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new CommonOpenFileDialog();
-            dialog.IsFolderPicker = true;
-            if(dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                var picker = (FancyPicker)sender;
-                var tag = picker.Tag.ToString();
-                picker.Source = dialog.FileName;
-                if(tag == "ClanFolder")
-                {
-                    //-- warn user and if they're okay with it, try to move everything to new clan folder.
-                    var result = MessageBox.Show("Are you sure you want to move all clan databases to new root folder? This will require closing application.", "New Clan Root Folder", MessageBoxButton.YesNo);
-                    if(result == MessageBoxResult.Yes)
-                    {
-                       
-                    }
-                }
-            }
+         
         }
 
         private static List<UIElement> ToList(UIElementCollection collection)
@@ -115,6 +101,45 @@ namespace TBChestTracker.Pages
         private void UILanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
+        }
+
+        private void TessDataFolderPicker_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = true;
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                var picker = (FancyPicker)sender;
+                SettingsManager.Instance.Settings.GeneralSettings.TessDataFolder = dialog.FileName;
+
+            }
+        }
+
+        private void ClanRootFolderPicker_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = true;
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                var picker = (FancyPicker)sender;
+
+                oldClanRootFolder = picker.Source;
+
+                var newClanRootFolder = dialog.FileName;
+
+                //-- warn user and if they're okay with it, try to move everything to new clan folder.
+                var result = MessageBox.Show("Are you sure you want to move all clan databases to new root folder?", "New Clan Root Folder", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    MoveClanFolderWindow moveClanFolderWindow = new MoveClanFolderWindow();
+                    moveClanFolderWindow.OldClanRootFOlder = oldClanRootFolder;
+                    moveClanFolderWindow.NewClanRootFolder = newClanRootFolder;
+                    if (moveClanFolderWindow.ShowDialog() == true)
+                    {
+                        SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder = dialog.FileName;
+                    }
+                }
+            }
         }
     }
 }
