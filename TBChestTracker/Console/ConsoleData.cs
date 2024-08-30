@@ -36,6 +36,8 @@ namespace com.HellStormGames.Logging
             get => _logTypeIcon;
             set => _logTypeIcon = value;
         }
+        public string Date { get; set; }
+        public string Time { get; set; }
         public string Tag { get; set; } 
         public string Message { get; set; }
 
@@ -43,6 +45,8 @@ namespace com.HellStormGames.Logging
         {
             this.logType = logType;
             this.Tag = tag;
+            Date = DateTime.Now.ToString("d");
+            Time = DateTime.Now.ToString("t");
             this.Message = message;
         }
     }

@@ -26,6 +26,8 @@
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
                             <GridViewColumn Header="Tag" DisplayMemberBinding="{Binding Tag}" Width="100"/>
+                            <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}" Width="100"/>
+                            <GridViewColumn Header="Time" DisplayMemberBinding="{Binding Time}" Width="100"/>
                             <GridViewColumn Header="Message" DisplayMemberBinding="{Binding Message}" Width="640"/>
                         </GridView.Columns>
                     </GridView>
