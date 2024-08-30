@@ -380,13 +380,10 @@ namespace TBChestTracker
                             this.Dispatcher.BeginInvoke(new Action(() =>
                             {
                                 MenuItem mu = new MenuItem();
-                                //var position = StringHelpers.findNthOccurance(recent.FullClanRootFolder, Convert.ToChar(@"\"), 3);
-                                //var truncated = StringHelpers.truncate_file_name(recent.FullClanRootFolder, position);
                                 mu.Header = recent.ShortClanRootFolder;
                                 mu.Tag = recent.FullClanRootFolder;
                                 mu.Click += Mu_Click;
                                 RecentlyOpenedParent.Items.Add(mu);
-                                //recently_opened_files.Add(file);
                             }));
                         }
                     }
@@ -458,6 +455,29 @@ namespace TBChestTracker
                 }));
             });
         }
+        public Task<Dictionary<string, bool>> ValidateClanDatabases()
+        {
+            return Task.Run(() =>
+            {
+                if (ClanManager != null)
+                {
+                    var clandatabases = ClanManager.Instance.ClanDatabaseManager.ClanDatabasesToUpgrade();
+                    return clandatabases;
+                }
+                else
+                {
+                    return null;
+                }
+            });
+        }
+               
+        public Task UpgradeClanDatabases(Dictionary<string, bool> clandatabases)
+        {
+            return Task.Run(() =>
+            {
+                ClanManager.Instance.ClanDatabaseManager.UpgradeClanDatabases(clandatabases);
+            });
+        }
 
         public async void Init(Window window)
         {
@@ -509,6 +529,23 @@ namespace TBChestTracker
                 await Task.Delay(500);
                 await FinishingUpTask();
 
+                await this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    splashScreen.UpdateStatus("Validating Clan databases...", 91);
+                }));
+                await Task.Delay(500);
+                var databasesNeedUpgrade = await ValidateClanDatabases();
+                if (databasesNeedUpgrade.Count > 0)
+                {
+
+                    await this.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        splashScreen.UpdateStatus("Upgrading Clan databases...", 94);
+                    }));
+                    await Task.Delay(500);
+                    await UpgradeClanDatabases(databasesNeedUpgrade);
+
+                }
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     splashScreen.UpdateStatus("Initializing Tesseract...", 95);

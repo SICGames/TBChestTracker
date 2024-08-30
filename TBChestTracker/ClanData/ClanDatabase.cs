@@ -7,15 +7,11 @@ using System.Threading.Tasks;
 
 namespace TBChestTracker
 {
-    [Serializable]
-    public enum ClanQuota
-    {
-        DAILY,
-        WEEKLY
-    } 
+   
     [Serializable]
     public class ClanDatabase : INotifyPropertyChanged
     {
+        public int Version { get; set; }
         public string ClanAbbreviations { get; set; }
         public string Clanname { get; set; }
         public string ClanDatabaseFolder { get; set; }
