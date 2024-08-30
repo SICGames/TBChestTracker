@@ -1,4 +1,11 @@
-﻿using System;
+﻿#define PREVIEW_BUILD
+#define RC_BUILD
+#define RC1_BUILD
+#define RC2_BUILD
+#define RC3_BUILD 
+#define PRODUCTION_BUILD
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -49,7 +56,12 @@ namespace TBChestTracker
         {
             get
             {
-                return $"v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build}";
+                var extraStr = String.Empty;
+#if PREVIEW_BUILD
+                extraStr = "'Preview Build'";
+#endif
+
+                return $"v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} [{extraStr}]";
             }
         }
         
@@ -86,6 +98,7 @@ namespace TBChestTracker
         public void UpdateApplicationTitle()
         {
             AppTitle = $"{pAppName} {AppVersionString} - {CurrentProject}";
+
         }
         public bool IsCurrentClandatabase
         {
@@ -112,21 +125,6 @@ namespace TBChestTracker
             {
                 isAutomationStopButtonEnabled = value;
                 OnPropertyChanged(nameof(IsAutomationStopButtonEnabled));
-            }
-        }
-
-
-        
-        public int ChestCountTotal
-        {
-            get
-            {
-                return _ChestCountTotal;
-            }
-            set
-            {
-                _ChestCountTotal = value;
-                OnPropertyChanged(nameof(ChestCountTotal));
             }
         }
 
