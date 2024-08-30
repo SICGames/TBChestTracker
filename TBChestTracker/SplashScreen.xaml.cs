@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define PREVIEW_BUILD
+using System;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,17 @@ namespace TBChestTracker
 
         public MainWindow mainWindow { get; set; }
         public StartPageWindow startPageWindow { get; set; }
+
+        private string _buildMode = string.Empty;
+        public string BuildMode
+        {
+            get => _buildMode;
+            set
+            {
+                _buildMode = value;
+                OnPropertyChanged(nameof(BuildMode));   
+            }
+        }
 
         private string pStatusMessage = "Getting Things Ready...";
         public string StatusMessage
@@ -71,7 +83,12 @@ namespace TBChestTracker
             //--- configure AppVersion
             var version = Assembly.GetExecutingAssembly().GetName().Version;
             AppVersion = $"v{version.Major}.{version.Minor}.{version.Build}";
+#if PREVIEW_BUILD
+            BuildMode = "['Preview']";
+#endif
+        
         }
+
         public void Complete()
         {
             SplashScreenComplete(this, new EventArgs());
