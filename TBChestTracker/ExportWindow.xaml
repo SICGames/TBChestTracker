@@ -23,18 +23,11 @@
                 <TabItem Header="General">
                     <StackPanel Orientation="Vertical" Margin="5">
                         <GroupBox Header="Sort Options">
-                            <ComboBox x:Name="SortOptions" SelectedIndex="2" Margin="5">
-                                <ComboBoxItem Content="None"/>
-                                <ComboBoxItem Content="Ascending"/>
-                                <ComboBoxItem Content="Desending"/>
+                            <ComboBox x:Name="SortOptions" SelectedValue="{Binding SortOption}" Margin="5" ItemsSource="{Binding Source={local:EnumBindingSource {x:Type local:SortType}}}">
                             </ComboBox>
                         </GroupBox>
                         <GroupBox Header="Date Range">
-                            <ComboBox x:Name="DateRangeOptions" SelectedIndex="0" Margin="5" SelectionChanged="DateRangeOptions_SelectionChanged">
-                                <ComboBoxItem Content="Today"/>
-                                <ComboBoxItem Content="Week"/>
-                                <ComboBoxItem Content="Month"/>
-                                <ComboBoxItem Content="Custom"/>
+                            <ComboBox x:Name="DateRangeOptions" SelectedValue="{Binding DateRange}" ItemsSource="{Binding Source={local:EnumBindingSource {x:Type local:DateRangeEnum}}}" Margin="5" SelectionChanged="DateRangeOptions_SelectionChanged">
                             </ComboBox>
                         </GroupBox>
                         <Grid Margin="0,5" x:Name="CustomDateRangeGrid" Visibility="Collapsed">
@@ -49,8 +42,8 @@
                             </Grid.RowDefinitions>
                             <TextBlock Text="From" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center"/>
                             <TextBlock Text="To" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center"/>
-                            <DatePicker x:Name="DateRangeFromPicker" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,0"/>
-                            <DatePicker x:Name="DateRangeToPicker" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,0"/>
+                            <DatePicker x:Name="DateRangeFromPicker" Grid.Row="1" Grid.Column="0" SelectedDate="{Binding DateRangeFrom}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,0"/>
+                            <DatePicker x:Name="DateRangeToPicker" Grid.Row="1" Grid.Column="2" SelectedDate="{Binding DateRangeTo}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,0"/>
                         </Grid>
                         
                         <GroupBox Header="Points Correction">

@@ -138,13 +138,15 @@
     <Compile Include="ChestBuilderWindow.xaml.cs">
       <DependentUpon>ChestBuilderWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Chest\ChestOptions.cs" />
     <Compile Include="Chest\ChestPointsData.cs" />
     <Compile Include="Chest\ChestPointsSettings.cs" />
     <Compile Include="Chest\GameChest.cs" />
     <Compile Include="Chest\RefEnum.cs" />
     <Compile Include="ClanData\ClanChestComparer.cs" />
-    <Compile Include="ClanData\ClanRequirements.cs" />
-    <Compile Include="ClanData\ClanSpecifiedRequirements.cs" />
+    <Compile Include="ClanData\ClanChestExporter.cs" />
+    <Compile Include="ClanData\DateRangeEnum.cs" />
+    <Compile Include="ClanData\GeneralClanSettings.cs" />
     <Compile Include="ClanInsightsWindow.xaml.cs">
       <DependentUpon>ClanInsightsWindow.xaml</DependentUpon>
     </Compile>
@@ -175,6 +177,7 @@
     </Compile>
     <Compile Include="ErrorHandlers\ChestProcessingError.cs" />
     <Compile Include="Helpers\DateTimeHelper.cs" />
+    <Compile Include="Helpers\EnumBindingSourceExtension.cs" />
     <Compile Include="Helpers\ImageDpiHelper.cs" />
     <Compile Include="Helpers\IOHelper.cs" />
     <Compile Include="Helpers\JsonHelper.cs" />
@@ -192,9 +195,6 @@
     </Compile>
     <Compile Include="NewChestPointWindow.xaml.cs">
       <DependentUpon>NewChestPointWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="NewRequirementWindow.xaml.cs">
-      <DependentUpon>NewRequirementWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="OCRWizardManualEditorWindow.xaml.cs">
       <DependentUpon>OCRWizardManualEditorWindow.xaml</DependentUpon>
@@ -427,10 +427,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="NewConditionWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="NewRequirementWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

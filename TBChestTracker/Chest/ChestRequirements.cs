@@ -10,33 +10,6 @@ namespace TBChestTracker
 {
     public class ChestRequirements : INotifyPropertyChanged
     {
-        private bool pUseNoChestConditions = true;
-        private bool pUseChestConditions = false;
-        public bool useNoChestConditions
-        {
-            get
-            {
-                return pUseNoChestConditions;
-            }
-            set
-            {
-                pUseNoChestConditions = value;
-                OnPropertyChanged(nameof(useNoChestConditions));   
-            }
-        }
-        public bool useChestConditions
-        {
-            get
-            {
-                return pUseChestConditions;
-            }
-            set
-            {
-                pUseChestConditions = value;
-                OnPropertyChanged(nameof(useChestConditions));
-            }
-        }
-
         public ObservableCollection<ChestConditions> ChestConditions { get; set; }
         public ChestRequirements() 
         { 

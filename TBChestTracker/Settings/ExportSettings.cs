@@ -22,8 +22,8 @@ namespace TBChestTracker
             }
         }
 
-        private string _SortOption = string.Empty;
-        public string SortOption
+        private SortType _SortOption = SortType.DESENDING;
+        public SortType SortOption
         {
             get => _SortOption;
             set
@@ -32,8 +32,8 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(SortOption));  
             }
         }
-        private string _DateRange = string.Empty;
-        public string DateRange
+        private DateRangeEnum _DateRange = DateRangeEnum.Today;
+        public DateRangeEnum DateRange
         {
             get => _DateRange;
             set
@@ -42,8 +42,8 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(DateRange));
             }
         }
-        private string _DateRangeTo;
-        public string DateRangeTo
+        private DateTime _DateRangeTo;
+        public DateTime DateRangeTo
         {
             get => _DateRangeTo;
             set
@@ -52,8 +52,8 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(DateRangeTo));
             }
         }
-        private string _DateRangeFrom;
-        public string DateRangeFrom
+        private DateTime _DateRangeFrom;
+        public DateTime DateRangeFrom
         {
             get => _DateRangeFrom;
             set

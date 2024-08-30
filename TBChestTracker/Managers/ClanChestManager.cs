@@ -67,6 +67,7 @@ namespace TBChestTracker
             SaveData();
             return;
         }
+
         private void FilterChestData(ref List<String> data, String[] words, System.Action<string> onError)
         {
             var filtered = data.Where(d => ContainsAny(d, words));
@@ -79,6 +80,7 @@ namespace TBChestTracker
              
             }
         }
+
         private bool ContainsAny(string str, IEnumerable<string> values)
         {
             if (!string.IsNullOrEmpty(str) || values.Any())
@@ -450,7 +452,7 @@ namespace TBChestTracker
 
                         foreach (var m_chest in m_chestdata.chests.ToList())
                         {
-                            if (ClanManager.Instance.ClanChestSettings.ChestPointsSettings.UseChestPoints)
+                            if (ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions == ChestOptions.UsePoints)
                             {
                                 var pointvalues = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints;
                                 foreach (var pointvalue in pointvalues)
@@ -592,7 +594,7 @@ namespace TBChestTracker
 
             return;
         }
-
+        
         public void SaveData(string filepath = "")
         {
             //-- write to file.
@@ -617,6 +619,11 @@ namespace TBChestTracker
                 //Debug.WriteLine(ex.Message);
             }
         }
+        public Task SaveDataTask()
+        {
+            return Task.Run(() => SaveData());
+        }
+
         public void CreateBackup()
         {
             DateTimeOffset dateTimeOffset = DateTimeOffset.Now;
@@ -636,15 +643,92 @@ namespace TBChestTracker
                 //Debug.WriteLine(ex.Message);
             }
         }
-        public Task SaveDataTask()
-        {
-            return Task.Run(()=>SaveData());
-        }
-        public Task ExportDataAsync(string filename,  List<ChestCountData> chestcountdata, int chest_points_value, int countmethod) => 
-            Task.Run(() =>  ExportData(filename, chestcountdata, chest_points_value,  countmethod));
 
-       
-       
+        public Dictionary<string, List<ClanChestData>> FilterClanChestByConditions()
+        {
+            var dailyChests = new Dictionary<string, List<ClanChestData>>();
+            var chestRequirements = ClanManager.Instance.ClanChestSettings.ChestRequirements;
+            foreach (var dailyChestData in ClanChestDailyData.ToList())
+            {
+                var date = dailyChestData.Key;
+                var dailychest = ClanChestDailyData[date];
+                var newdailychest = new List<ClanChestData>();
+                if (dailychest != null)
+                {
+                    foreach (var chestdata in dailychest)
+                    {
+                        var chests = chestdata.chests;
+                        var newChests = new List<Chest>();
+
+                        if (chests != null)
+                        {
+                            var chestConditions = chestRequirements.ChestConditions;
+
+                            foreach (var chest in chests)
+                            {
+                                foreach (var condition in chestConditions)
+                                {
+
+                                    if (chest.Type.ToLower().Contains( condition.ChestType.ToLower()))
+                                    {
+                                        if (condition.ChestName.Equals("(Any)") == true)
+                                        {
+                                            if (condition.level.Equals("(Any)") == false)
+                                            {
+                                                var level = int.Parse(condition.level);
+                                                if (level >= chest.Level)
+                                                {
+                                                    var c = new Chest(chest.Name, chest.Type, chest.Source, chest.Level);
+                                                    newChests.Add(c);
+                                                    break;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                var c = new Chest(chest.Name, chest.Type, chest.Source, chest.Level);
+                                                newChests.Add(c);
+                                                break;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if(chest.Name.ToLower().Equals(condition.ChestName.ToLower()))
+                                            {
+                                                if (condition.level.Equals("(Any)") == false)
+                                                {
+                                                    var level = int.Parse(condition.level);
+                                                    if (level >= chest.Level)
+                                                    {
+                                                        var c = new Chest(chest.Name, chest.Type, chest.Source, chest.Level);
+                                                        newChests.Add(c);
+                                                        break;
+                                                    }
+                                                    else
+                                                    {
+                                                        var c = new Chest(chest.Name, chest.Type, chest.Source, chest.Level);
+                                                        newChests.Add(c);
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        var ccd = new ClanChestData();
+                        ccd.Clanmate = chestdata.Clanmate;
+                        ccd.chests = newChests;
+                        newdailychest.Add(ccd);
+                    }
+                }
+                dailyChests.Add(date, newdailychest);
+            }
+
+            return dailyChests;
+        }
+        #region "Soon To Be Deleted"
+        /*
         public Task<List<ChestCountData>> BuildAllChestCountDataAsync(SortType sortType = SortType.NONE) => 
             Task.FromResult(Task.Run(() => BuildAllChestCountData(SortType.NONE)).Result);
 
@@ -920,6 +1004,9 @@ namespace TBChestTracker
                 }
             }
         }
+        */
+        #endregion
+
     }
     public class ClanChestDataComparator : IComparer<int>
     {

@@ -103,7 +103,7 @@ namespace TBChestTracker
 
             var chestdata = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
 
-            if (!chestsettings.ChestPointsSettings.UseChestPoints)
+            if (chestsettings.GeneralClanSettings.ChestOptions != ChestOptions.UsePoints)
             {
                 EndValidatingChestData("There's nothing to do.", true, false);
                 return;

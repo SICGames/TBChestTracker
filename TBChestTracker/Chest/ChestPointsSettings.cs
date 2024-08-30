@@ -10,28 +10,6 @@ namespace TBChestTracker
 {
     public class ChestPointsSettings : INotifyPropertyChanged
     {
-        private bool _dontUseChestPoints = true;
-        private bool _useChestPoints = false;
-
-        public bool DontUseChestPoints
-        {
-            get => _dontUseChestPoints;
-            set
-            {
-                _dontUseChestPoints = value;
-                OnPropertyChanged(nameof(DontUseChestPoints));  
-            }
-        }
-        public bool UseChestPoints
-        {
-            get { return _useChestPoints; }
-            set
-            {
-                _useChestPoints = value;
-                OnPropertyChanged(nameof(UseChestPoints));
-            }
-        }
-
         private ObservableCollection<ChestPoints> _ChestPoints;
         public ObservableCollection<ChestPoints> ChestPoints 
         {

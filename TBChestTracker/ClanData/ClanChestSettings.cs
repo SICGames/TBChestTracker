@@ -11,26 +11,21 @@ using System.Windows.Media;
 
 namespace TBChestTracker
 {
-    public class ClanChestSettings
+    public class ClanChestSettings 
     {
         
         private ChestRequirements pChestRequirements  = null;
-        private ClanRequirements pClanRequirements = null;
+       // private ClanRequirements pClanRequirements = null;
         private ChestPointsSettings pChestPointsSettings = null;
-        
-        public int Version { get; set; }
-        public ClanRequirements ClanRequirements
-        {
-            get
-            {
-                return pClanRequirements;
-            }
-            set
-            {
-                pClanRequirements = value;
-            }
-        }
+        private GeneralClanSettings generalClanSettings = null;
 
+        public int Version { get; set; }
+       
+        public GeneralClanSettings GeneralClanSettings
+        {
+            get => generalClanSettings;
+            set => generalClanSettings = value;
+        }
         public ChestRequirements ChestRequirements 
         { 
             get
@@ -56,11 +51,15 @@ namespace TBChestTracker
         }
 
         public ClanChestSettings() 
-        { 
+        {
+            if (generalClanSettings == null)
+            {
+                generalClanSettings = new GeneralClanSettings();
+            }
+
             if(pChestRequirements == null)
                 pChestRequirements = new ChestRequirements();
-            if(pClanRequirements == null)
-                pClanRequirements = new ClanRequirements();
+            
             if(pChestPointsSettings == null)
                 pChestPointsSettings = new ChestPointsSettings();
         }
@@ -70,16 +69,9 @@ namespace TBChestTracker
         }
         public void InitSettings()
         {
-            ChestRequirements.useChestConditions = false;
-            ChestRequirements.useNoChestConditions = true;
+            GeneralClanSettings.ChestOptions = ChestOptions.None;
+            
             ChestRequirements.ChestConditions = new System.Collections.ObjectModel.ObservableCollection<ChestConditions>();
-
-            ClanRequirements.UseNoClanRequirements = true;
-            ClanRequirements.UseSpecifiedClanRequirements = false;
-            ClanRequirements.ClanSpecifiedRequirements = new System.Collections.ObjectModel.ObservableCollection<ClanSpecifiedRequirements>();
-
-            ChestPointsSettings.UseChestPoints = false;
-            ChestPointsSettings.DontUseChestPoints = true;
             ChestPointsSettings.ChestPoints = new System.Collections.ObjectModel.ObservableCollection<ChestPoints> { };
         }
         public bool LoadSettings(string file)
@@ -90,11 +82,12 @@ namespace TBChestTracker
                 serializer.Formatting = Formatting.Indented;
                 var clanChestSettings = new ClanChestSettings();
                 clanChestSettings = (ClanChestSettings)serializer.Deserialize(sr, typeof(ClanChestSettings));
-                this.pClanRequirements = clanChestSettings.ClanRequirements;
+                
                 this.pChestRequirements = clanChestSettings.ChestRequirements;
                 this.pChestPointsSettings = clanChestSettings.ChestPointsSettings;
+                this.generalClanSettings = clanChestSettings.GeneralClanSettings;
 
-                if (pChestRequirements != null || pClanRequirements != null || pChestPointsSettings != null)
+                if (pChestRequirements != null || generalClanSettings != null ||  pChestPointsSettings != null)
                     return true;
                 else
                     return false;
@@ -106,7 +99,6 @@ namespace TBChestTracker
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Formatting = Formatting.Indented;
-                //serializer.Serialize(sw, ChestRequirements);
                 serializer.Serialize(sw, this);
                 sw.Close();
                 sw.Dispose();

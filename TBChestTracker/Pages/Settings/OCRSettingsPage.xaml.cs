@@ -57,7 +57,7 @@ namespace TBChestTracker.Pages.Settings
             //-- let's ensure we have the updated image preview
             var ocr = SettingsManager.Instance.Settings.OCRSettings;
             
-            UpdatePreviewImage((int)ocr.Threshold, (int)ocr.MaxThreshold);
+            UpdatePreviewImage(ocr.GlobalBrightness, (int)ocr.Threshold, (int)ocr.MaxThreshold);
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -67,19 +67,21 @@ namespace TBChestTracker.Pages.Settings
 
         private void FancyNumericValue_ValueChanged(object sender, RoutedEventArgs e)
         {
-            SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness = ((FancyNumericValue)sender).Value;
+            var value = ((FancyNumericValue)sender).Value;
+            var ocr = SettingsManager.Instance.Settings.OCRSettings;
+            SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness = value;
+            UpdatePreviewImage(value, ocr.Threshold, ocr.MaxThreshold);
+
         }
 
-        private void UpdatePreviewImage(int threshold, int maxthreshold)
+        private void UpdatePreviewImage(double brightness, int threshold, int maxthreshold)
         {
             if (String.IsNullOrEmpty(SettingsManager.Instance.Settings.OCRSettings.PreviewImage) == false)
             {
-
                 var bmp = System.Drawing.Bitmap.FromFile(SettingsManager.Instance.Settings.OCRSettings.PreviewImage);
 
                 Image<Gray, byte> image = ((System.Drawing.Bitmap)bmp).ToImage<Gray, byte>();
-
-                var brightness = SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness;
+                
                 var imageBrightened = image.Mul(brightness) + brightness;
                 var imageScaled = imageBrightened.Resize(5, Emgu.CV.CvEnum.Inter.Cubic);
 
@@ -98,13 +100,15 @@ namespace TBChestTracker.Pages.Settings
         private void ThresholdNumericValue_ValueChanged(object sender, RoutedEventArgs e)
         {
             var fancyNumeric = (FancyNumericValue)sender;
-            UpdatePreviewImage((int)fancyNumeric.Value, SettingsManager.Instance.Settings.OCRSettings.MaxThreshold);
+            var brightness = SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness;
+            UpdatePreviewImage((double)brightness, (int)fancyNumeric.Value, SettingsManager.Instance.Settings.OCRSettings.MaxThreshold);
         }
 
         private void MaxThresholdNumericValue_ValueChanged(object sender, RoutedEventArgs e)
         {
             var fancyNumeric = (FancyNumericValue)sender;
-            UpdatePreviewImage(SettingsManager.Instance.Settings.OCRSettings.Threshold, (int)fancyNumeric.Value);
+            var brightness = SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness;
+            UpdatePreviewImage(brightness, SettingsManager.Instance.Settings.OCRSettings.Threshold, (int)fancyNumeric.Value);
         }
     }
 }

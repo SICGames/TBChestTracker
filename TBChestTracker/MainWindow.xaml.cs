@@ -69,6 +69,7 @@ namespace TBChestTracker
         ClanChestProcessResult clanChestProcessResult { get; set; }
         RecentDatabase recentlyOpenedDatabases { get; set; }
         ApplicationManager applicationManager { get; set; }
+        Task AutomationTask { get; set; }
 
         #endregion
 
@@ -171,9 +172,17 @@ namespace TBChestTracker
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
                 GlobalDeclarations.AutomationRunning = true;
+
                 CancellationTokenSource = new CancellationTokenSource();
-            
-                Task automationTask = Task.Run(() => StartAutomationProcess(CancellationTokenSource.Token));
+                AutomationTask = Task.Run(() => StartAutomationProcess(CancellationTokenSource.Token));
+                if (AutomationTask.IsCompleted)
+                {
+                    Debug.WriteLine("Automation is completed");
+                }
+                else if (AutomationTask.IsCanceled)
+                {
+                    Debug.WriteLine("Automation is canceled");
+                }
 
             }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         }
@@ -611,7 +620,7 @@ namespace TBChestTracker
                         previousKey = Key.None;
                         newKey = Key.None;
                     }
-                    else if(keyStr.Equals(SettingsManager.Instance.Settings.HotKeySettings.StopAutomationKeys))
+                    if(keyStr.Equals(SettingsManager.Instance.Settings.HotKeySettings.StopAutomationKeys))
                     {
                         StopAutomation();
                         GlobalDeclarations.hasHotkeyBeenPressed = true;
@@ -945,7 +954,7 @@ namespace TBChestTracker
             var responseData = String.Empty;
 
             //-- build ClanInsightsData
-            var chestdata = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
+            var chestdata = ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions != ChestOptions.UseConditions  ? ClanManager.Instance.ClanChestManager.ClanChestDailyData : ClanManager.Instance.ClanChestManager.FilterClanChestByConditions();
             var gameChests = new List<string>();
             var previousChest = String.Empty;
             foreach(var chest in ApplicationManager.Instance.Chests)
@@ -961,7 +970,7 @@ namespace TBChestTracker
             var size = ClanManager.Instance.ClanmateManager.Database.NumClanmates;
             var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates;
             var clanmateNames = clanmates.Select(n => n.Name).ToList();
-            var usePoints = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.UseChestPoints;
+            var usePoints = ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions == ChestOptions.UsePoints;
 
             ClanInsightsData insightsData = new ClanInsightsData(clan,size,clanmateNames,gameChests, chestdata, usePoints);
 

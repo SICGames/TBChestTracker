@@ -14,6 +14,7 @@
         <Style x:Key="ChestPointsListViewItemStyle" x:Name="ChestPointsListViewItem" TargetType="ListViewItem">
             <EventSetter x:Name="ChestPointsListViewItem" Event="MouseDoubleClick" Handler="ChestPointsListViewItem_MouseDoubleClick"/>
         </Style>
+        <local:EnumToRadioOptionConverter x:Key="ChestOptionConverter"/>
     </Window.Resources>
     <Grid Background="#eeeeee">
         <Grid.RowDefinitions>
@@ -22,7 +23,7 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" LastChildFill="True">
             <TabControl>
-                <TabItem Header="Conditions">
+                <TabItem Header="General">
                     <ScrollViewer>
                         <Grid Margin="5">
                             <Grid.ColumnDefinitions>
@@ -34,15 +35,36 @@
                                 <RowDefinition Height="auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Text="Chest conditions will only include clan chests if specified by their clan chest type and equal to or higher level of the clan chest." 
-                                       FontWeight="Bold" Margin="10,10,10,154" TextWrapping="Wrap" Grid.ColumnSpan="2" />
-                            <GroupBox Header="Condition Options" Margin="0,41,0,72" Grid.ColumnSpan="2">
+                            <GroupBox Header="Clan Chest Options" Margin="0,41,0,72" Grid.ColumnSpan="2">
                                 <StackPanel Orientation="Vertical" Margin="10,5">
-                                    <RadioButton Content="Do not use" Margin="0,2" IsChecked="{Binding ChestRequirements.useNoChestConditions, Mode=TwoWay}"/>
-                                    <RadioButton Content="Use Specific Conditions" IsChecked="{Binding ChestRequirements.useChestConditions, Mode=TwoWay}"/>
+                                    <RadioButton GroupName="ChestOptions" Content="None" Margin="0,2" 
+                                                 IsChecked="{Binding GeneralClanSettings.ChestOptions, Converter={StaticResource ChestOptionConverter}, ConverterParameter={x:Static local:ChestOptions.None}, Mode=TwoWay}" Tag="None"/>
+                                    <RadioButton GroupName="ChestOptions" Content="Use Chest Conditions" Margin="0,2"
+                                                 IsChecked="{Binding GeneralClanSettings.ChestOptions, Converter={StaticResource ChestOptionConverter}, ConverterParameter={x:Static local:ChestOptions.UseConditions}, Mode=TwoWay}" Tag="UseConditions"/>
+                                    <RadioButton GroupName="ChestOptions" Content="Use Chest Points" 
+                                                 IsChecked="{Binding GeneralClanSettings.ChestOptions, Converter={StaticResource ChestOptionConverter}, ConverterParameter={x:Static local:ChestOptions.UsePoints}, Mode=TwoWay}" Tag="UsePoints"/>
                                 </StackPanel>
                             </GroupBox>
-                            <Grid Grid.ColumnSpan="2" Margin="0,113,0,0" Grid.RowSpan="3">
+                        </Grid>
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Conditions" x:Name="ConditionsTab" IsEnabled="{Binding GeneralClanSettings.ChestOptions, Converter={StaticResource ChestOptionConverter}, ConverterParameter={x:Static local:ChestOptions.UseConditions}, Mode=TwoWay}">
+                    <ScrollViewer>
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="54*"/>
+                                <ColumnDefinition Width="29*"/>
+                                <ColumnDefinition Width="300*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Chest conditions will only include clan chests if specified by their clan chest type and equal to or higher level of the clan chest." 
+                                       FontWeight="Bold" Margin="10,10,10,234" TextWrapping="Wrap" Grid.ColumnSpan="3" />
+
+                            <Grid Grid.ColumnSpan="3" Margin="0,50,0,0" Grid.RowSpan="3">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="24"/>
@@ -79,7 +101,7 @@
                     </ScrollViewer>
                 </TabItem>
 
-                <TabItem Header="Chest Points">
+                <TabItem Header="Chest Points" x:Name="ChestPointsTab" IsEnabled="{Binding GeneralClanSettings.ChestOptions, Converter={StaticResource ChestOptionConverter}, ConverterParameter={x:Static local:ChestOptions.UsePoints}, Mode=TwoWay}">
                     <Grid Margin="5">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
@@ -89,14 +111,7 @@
                         <TextBlock Grid.Row="0" 
                                     Text="Chest Points will be converted during exporting chest data. Each clan chest has a specified value attached to them, if your clan prefers this method."
                                     Margin="5" FontWeight="Bold"/>
-                        <GroupBox Header="Chest Points Options" Grid.Row="1">
-                            <StackPanel Orientation="Vertical">
-                                <RadioButton Content="None" 
-                      IsChecked="{Binding ChestPointsSettings.DontUseChestPoints, Mode=TwoWay}"/>
-                                <RadioButton x:Name="UseChestPointsRadio" Content="Use Chest Points" 
-                      IsChecked="{Binding ChestPointsSettings.UseChestPoints, Mode=TwoWay}"/>
-                            </StackPanel>
-                        </GroupBox>
+                        
                         <GroupBox Header="Specify Chest Points" Grid.Row="2" IsEnabled="{Binding ElementName=UseSpecifiedRequirementsRadio, Path=IsEnabled}" Margin="3,5">
                             <Grid>
                                 <Grid.RowDefinitions>

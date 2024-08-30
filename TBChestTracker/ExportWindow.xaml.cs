@@ -19,6 +19,8 @@ using System.Globalization;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using Newtonsoft.Json;
+using System.Linq.Expressions;
+using System.Diagnostics;
 
 namespace TBChestTracker
 {
@@ -29,10 +31,7 @@ namespace TBChestTracker
     {
 
         int extensionFilterIndex = 0;
-        private ExportSettings exportSettings {  get; set; }    
-
-        public ObservableCollection<string> ExtraHeaders { get; set; }
-
+        public ExportSettings exportSettings {  get; set; }    
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(String propertyName)
         {
@@ -67,9 +66,6 @@ namespace TBChestTracker
         {
             InitializeComponent();
             exportBtn.IsEnabled = false;
-            ExtraHeaders = new ObservableCollection<string>();
-
-            this.DataContext = this;
         }
 
         private void FilePicker01_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -80,7 +76,6 @@ namespace TBChestTracker
         private void FilePicker_FileAccepted(object sender, RoutedEventArgs e)
         {
             var filepicker = (FilePicker)sender;    
-
             var file = filepicker.File;
             if (!String.IsNullOrEmpty(file))
             {
@@ -89,123 +84,45 @@ namespace TBChestTracker
             }
         }
 
-        private Task CreateTextFileAsync(string filename, List<ChestCountData> chestdata, int chest_points, int countmethod)
-        {
-            return Task.Run(() => ClanManager.Instance.ClanChestManager.ExportData(filename, chestdata, chest_points, countmethod));
-        }
-        private void CreateCVSFile(string file, List<ChestCountData> chestdata)
-        {
-            //-- CSV file.
-            using (var writer = new StreamWriter(file))
-            {
-                using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-                {
-                    var headers = new List<String>();
-                    headers.Add("Clanmate");
-                    if (chestdata[0].ChestTypes.Count > 0)
-                    {
-                        foreach (var types in chestdata[0].ChestTypes)
-                        {
-                            headers.Add(types.Chest.ToString());
-                        }
-                    }
+       
 
-                    headers.Add("Total");
-
-                    foreach (var heading in headers)
-                    {
-                        csv.WriteField(heading);
-                    }
-                    csv.NextRecord();
-
-                    foreach (var item in chestdata)
-                    {
-                        csv.WriteField(item.Clanmate);
-
-                        if (item.ChestTypes.Count > 0)
-                        {
-                            foreach (var type in item.ChestTypes)
-                            {
-                                csv.WriteField(type.Total);
-                            }
-                        }
-
-                        csv.WriteField(item.Count);
-                        csv.NextRecord();
-                        
-                    }
-                }
-            }
-        }
-        private Task CreateCSVFileAysnc(string file, List<ChestCountData> chestdata)
-        {
-            return Task.Run(() => CreateCVSFile(file, chestdata));
-        }
         private async void exportBtn_Click(object sender, RoutedEventArgs e)
         {
-
             
             var file = FilePicker01.File;
             var sortOption = (SortType)SortOptions.SelectedIndex;
             var chest_points_value = ChestPointsValue.Text;
             int chest_points = 0;
-            var selectedFileExtension = FilePicker01.ExtensionFilterIndex;
 
             if(!Int32.TryParse(chest_points_value, out  chest_points))
             {
                 MessageBox.Show("Chest Points Correction Value must be only numbers.");
                 return;
             }
-
-            var count_method = 0;
-            
-            var clansettings = ClanManager.Instance.ClanChestSettings;
-            List<ChestCountData> chestcountdata = null;
-            if (clansettings.ClanRequirements.UseSpecifiedClanRequirements)
+            var saveExportSettings = (bool)SaveExportSettingsCheckBox.IsChecked;
+            if(saveExportSettings)
             {
-                chestcountdata = await ClanManager.Instance.ClanChestManager.BuildSpecificChestCountDataAsync(sortOption);
-            }
-            else if(clansettings.ChestPointsSettings.UseChestPoints)
-            {
-                chestcountdata = await ClanManager.Instance.ClanChestManager.BuildChestPointsDataAsync(sortOption);
-            }
-            else if(!clansettings.ClanRequirements.UseSpecifiedClanRequirements && !clansettings.ChestPointsSettings.UseChestPoints)
-            {
-                chestcountdata = await ClanManager.Instance.ClanChestManager.BuildAllChestCountDataAsync(sortOption);
+                SaveExportSettings();
             }
 
-            await CreateCSVFileAysnc(file, chestcountdata);
-
-            this.Close();
+            var export = new ClanChestExporter(file,exportSettings);
+            bool result = export.Export();
+            if(result)
+            {
+                this.Close();
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             FilePicker01.DefaultFolder = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseExportFolderPath;
-            var useChestPoints = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.UseChestPoints;
-            var useSpecificChests = ClanManager.Instance.ClanChestSettings.ChestRequirements.useChestConditions || ClanManager.Instance.ClanChestSettings.ClanRequirements.UseSpecifiedClanRequirements;
-            if(useChestPoints)
-            {
-                UseTotalCountMethod = true;
-                UseSpecificCountMethod = false;
-            }
-            else if(useSpecificChests)
-            {
-                UseTotalCountMethod = false;
-                UseSpecificCountMethod = true;
-            }
-            else
-            {
-                UseTotalCountMethod = true;
-                UseSpecificCountMethod = false;
-            }
 
             var GameChests = ApplicationManager.Instance.Chests;
             var previousChestType = String.Empty;
             HeadersComboBox.Items.Clear();
-            foreach(var gamechest in GameChests)
+            foreach (var gamechest in GameChests)
             {
-                if(gamechest.ChestType != previousChestType)
+                if (gamechest.ChestType != previousChestType)
                 {
                     HeadersComboBox.Items.Add(gamechest.ChestType);
                     previousChestType = gamechest.ChestType;
@@ -214,14 +131,48 @@ namespace TBChestTracker
 
             HeadersComboBox.SelectedIndex = 0;
             var clanRootFolder = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder;
-            ExportSettingsFile = $"{clanRootFolder}exportSettings.db";
+            ExportSettingsFile = $@"{clanRootFolder}\exportSettings.db";
 
             exportSettings = new ExportSettings();
 
-            if(System.IO.File.Exists(clanRootFolder))
+            if (System.IO.File.Exists(ExportSettingsFile))
             {
                 LoadExportSettings();
+
             }
+
+            var dailyclanchestdata = ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions != ChestOptions.UseConditions ? ClanManager.Instance.ClanChestManager.ClanChestDailyData : ClanManager.Instance.ClanChestManager.FilterClanChestByConditions();
+            var firstDate = dailyclanchestdata.First().Key;
+            var lastDate = dailyclanchestdata.Last().Key;
+
+            var FirstDateTimeObject = new DateTime();
+            var LastDateTimeObject = new DateTime();
+            if (DateTime.TryParse(firstDate, out FirstDateTimeObject) == false)
+            {
+
+            }
+            if (DateTime.TryParse(lastDate, out LastDateTimeObject) == false)
+            {
+
+            }
+            var pastDateTimeObject = FirstDateTimeObject.AddDays(-1);
+            var futureDateTimeObject = LastDateTimeObject.AddDays(1);
+
+            var beginningOfTime = pastDateTimeObject.AddYears(-1000);
+            var endingOfTime = futureDateTimeObject.AddYears(1000);
+
+            DateRangeToPicker.BlackoutDates.Add(new CalendarDateRange(beginningOfTime, pastDateTimeObject));
+            DateRangeToPicker.BlackoutDates.Add(new CalendarDateRange(futureDateTimeObject, endingOfTime));
+
+            DateRangeFromPicker.BlackoutDates.Add(new CalendarDateRange(beginningOfTime, pastDateTimeObject));
+            DateRangeFromPicker.BlackoutDates.Add(new CalendarDateRange(futureDateTimeObject, endingOfTime));
+
+
+            exportSettings.DateRangeTo = LastDateTimeObject;
+
+            exportSettings.DateRangeFrom = FirstDateTimeObject;
+
+            this.DataContext = exportSettings;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -231,34 +182,55 @@ namespace TBChestTracker
 
         private void AddHeaderItemBtn_Click(object sender, RoutedEventArgs e)
         {
-            ExtraHeaders.Add(HeadersComboBox.SelectedValue.ToString());
+            exportSettings.ExtraHeaders.Add(HeadersComboBox.SelectedValue.ToString());
         }
 
         private void RemoveHeaderItemBtn_Click(object sender, RoutedEventArgs e)
         {
-            ExtraHeaders.Remove(HeadersComboBox.SelectedValue.ToString());  
+            exportSettings.ExtraHeaders.Remove(HeadersComboBox.SelectedValue.ToString());  
         }
 
         private void ClearHeaderItemsBtn_Click(object sender, RoutedEventArgs e)
         {
-            ExtraHeaders.Clear();
+            exportSettings.ExtraHeaders.Clear();
         }
 
         private void MoveUpItemBtn_Click(object sender, RoutedEventArgs e)
         {
-            var selectedIndex = HeadersListView.SelectedIndex;
-            ExtraHeaders.Move(selectedIndex, selectedIndex - 1);
+            try
+            {
+                var selectedIndex = HeadersListView.SelectedIndex;
+                if (selectedIndex > 0)
+                {
+                    exportSettings.ExtraHeaders.Move(selectedIndex, selectedIndex - 1);
+                }
+            }
+            catch 
+            { 
+
+            }
         }
 
         private void MoveDownItemBtn_Click(object sender, RoutedEventArgs e)
         {
-            var selectedIndex = HeadersListView.SelectedIndex;
-            ExtraHeaders.Move(selectedIndex, selectedIndex + 1);
+            try
+            {
+                var selectedIndex = HeadersListView.SelectedIndex;
+                if ((selectedIndex < HeadersListView.Items.Count - 1))
+                {
+                    exportSettings.ExtraHeaders.Move(selectedIndex, selectedIndex + 1);
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
         private void DateRangeOptions_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var c = ((ComboBoxItem)DateRangeOptions.SelectedItem).Content;
+            var c = ((DateRangeEnum)DateRangeOptions.SelectedValue);
+
 
             if (c.ToString() == "Custom")
             {
@@ -282,7 +254,7 @@ namespace TBChestTracker
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Formatting = Formatting.Indented;
-                serializer.Deserialize(sr, typeof(ExportSettings));
+                exportSettings = (ExportSettings)serializer.Deserialize(sr, typeof(ExportSettings));
                 sr.Close();
             }
 
@@ -295,7 +267,7 @@ namespace TBChestTracker
             {
                 var serializer = new JsonSerializer();
                 serializer.Formatting = Formatting.Indented;
-                serializer.Serialize(sw, typeof(ExportSettings));
+                serializer.Serialize(sw, exportSettings);
                 sw.Close();
             }
         }
