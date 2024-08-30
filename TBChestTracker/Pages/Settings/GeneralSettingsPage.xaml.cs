@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using TBChestTracker.UI;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Threading;
+using System.IO;
 
 
 namespace TBChestTracker.Pages
@@ -111,7 +112,6 @@ namespace TBChestTracker.Pages
             {
                 var picker = (FancyPicker)sender;
                 SettingsManager.Instance.Settings.GeneralSettings.TessDataFolder = dialog.FileName;
-
             }
         }
 
@@ -121,22 +121,31 @@ namespace TBChestTracker.Pages
             dialog.IsFolderPicker = true;
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
+                var folder = dialog.FileName;
                 var picker = (FancyPicker)sender;
-
                 oldClanRootFolder = picker.Source;
-
                 var newClanRootFolder = dialog.FileName;
 
                 //-- warn user and if they're okay with it, try to move everything to new clan folder.
                 var result = MessageBox.Show("Are you sure you want to move all clan databases to new root folder?", "New Clan Root Folder", MessageBoxButton.YesNo);
                 if (result == MessageBoxResult.Yes)
                 {
+                    //-- C:\\
+                    var isHardDriveLetter = folder.LastIndexOf("\\") < 4;
+                    //-- fail safe just incase someone wants to get silly.
+                    if (isHardDriveLetter)
+                    {
+                        var forcedDirectory = $"{dialog.FileName}TotalBattleChestTracker";
+                        Directory.CreateDirectory(forcedDirectory);
+                        newClanRootFolder = forcedDirectory;
+                    }
+
                     MoveClanFolderWindow moveClanFolderWindow = new MoveClanFolderWindow();
                     moveClanFolderWindow.OldClanRootFOlder = oldClanRootFolder;
                     moveClanFolderWindow.NewClanRootFolder = newClanRootFolder;
                     if (moveClanFolderWindow.ShowDialog() == true)
                     {
-                        SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder = dialog.FileName;
+                        SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder = newClanRootFolder;
                     }
                 }
             }

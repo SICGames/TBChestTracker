@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -104,6 +105,8 @@ namespace TBChestTracker
 
         private async void CopyDirectoryAsync(string sourceDir, string destinationDir, bool recursive, CancellationToken token) 
         {
+            Debug.WriteLine("Copying files....");
+
             var dir = new DirectoryInfo(sourceDir);
             if (!dir.Exists)
                 throw new DirectoryNotFoundException($"Source directory not found: {dir.FullName}");
@@ -127,6 +130,7 @@ namespace TBChestTracker
                     {
                         Max = Directory.EnumerateFiles(sourceDir).Count();
                         Status = $"Copying - {destFile}";
+                        Progressbar01.IsIndeterminate = false;
                         Progress = index;
                         var percentage = (index / Max) * 100 + "%" ;
                         Percent = percentage;
@@ -142,14 +146,29 @@ namespace TBChestTracker
                     bAborted = true;
                     break;
                 }
+
                 index++;
+                await Task.Delay(20);
             }
+
             index = 0;
             if(bAborted)
             {
-                this.Close();
+                await this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    Max = 100;
+                    Status = $"Aborted!";
+                    Progress = 0;
+                    var percentage = 0 + "%";
+                    Percent = percentage;
+                    AbortButton.Text = "Close";
+                }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+                
+                Task.Delay(1000);
 
+                this.Close();
             }
+
             if(recursive)
             {
                 foreach (DirectoryInfo subDir in dirs)
@@ -159,6 +178,7 @@ namespace TBChestTracker
                 }
             }
 
+            Debug.WriteLine("Copying Complete");
             await this.Dispatcher.BeginInvoke(new Action(() =>
             {
                 Max = 100;
@@ -169,7 +189,34 @@ namespace TBChestTracker
                 AbortButton.Text = "Close";
             }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         }
-     
+
+        //-- knowing people, they'll fuck shit up and then, "TBChestTracker sucks! It deleted my whole entire hard drive." So, manually let them delete any old clan folder.
+        //-- Trust in humans = 0%
+        /*
+        private async void DeleteFoldersAsync(string oldFolder,  CancellationToken token)
+        {
+            Debug.WriteLine("Removing files....");
+
+            var dir = new DirectoryInfo(oldFolder);
+            if (!dir.Exists)
+                throw new DirectoryNotFoundException($"Source directory not found: {dir.FullName}");
+
+            await this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                Status = $"Cleaning Up....";
+                Progressbar01.IsIndeterminate = true;
+                Percent = String.Empty; 
+            }));
+        }
+        private Task BeginRemovingFilesTask(string oldFolder, CancellationToken token)
+        {
+            return Task.Run(() =>
+            {
+                DeleteFoldersAsync(oldFolder, token);
+            });
+        }
+        */
+
         private Task BeginCopyingTask(string oldFolder, string newFolder, CancellationToken token)
         {
             return Task.Run(() =>
@@ -177,10 +224,18 @@ namespace TBChestTracker
                 CopyDirectoryAsync(oldFolder, newFolder, true, token);
             });
         }
+
+        private async void BeginMovingClanDatabasesTask(string oldFolder, string newFolder, CancellationToken token)
+        {
+            await BeginCopyingTask(oldFolder, newFolder, token);
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             _CancellationTokenSource = new CancellationTokenSource();
-            BeginCopyingTask(OldClanRootFOlder, NewClanRootFolder, _CancellationTokenSource.Token);
+            //-- we need to ensure user select only drive letter
+            
+            BeginMovingClanDatabasesTask(OldClanRootFOlder, NewClanRootFolder, _CancellationTokenSource.Token); 
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)

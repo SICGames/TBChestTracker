@@ -21,7 +21,7 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
             <TextBlock Text="{Binding Status}" Grid.Row="0" HorizontalAlignment="Left" Margin="15,10" TextWrapping="Wrap" MinWidth="500"/>
-            <ProgressBar Minimum="0" Maximum="{Binding Max}" Value="{Binding Progress}" Grid.Row="1" Height="8" Margin="15,10" Background="#dfdfdf" Foreground="#00bbff"/>
+            <ProgressBar x:Name="Progressbar01" Minimum="0" Maximum="{Binding Max}" Value="{Binding Progress}" Grid.Row="1" Height="8" Margin="15,10" Background="#dfdfdf" Foreground="#00bbff"/>
             <TextBlock Grid.Row="2" Text="{Binding Percent}" HorizontalAlignment="Center" Margin="0,5"/>
         </Grid>
         <ui:FancyButton Grid.Row="2" Text="Abort" Width="100" RenderMode="TEXT" Background="#00bbff" Margin="0,5" Height="24" Foreground="White" BorderBrush="#00ccff" HilightBrush="#00ccff" x:Name="AbortButton" Click="AbortButton_Click"/>
