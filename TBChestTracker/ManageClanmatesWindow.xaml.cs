@@ -59,8 +59,6 @@ namespace TBChestTracker
                 {
                     ClanManager.Instance.ClanmateManager.ImportFromFileAsync(openFileDialog.FileName);
                     ClanManager.Instance.ClanmateManager.UpdateCount();
-                    //MainWindow.ClanChestManager.ClanmateManager.ImportFromFileAsync(openFileDialog.FileName);
-                    //MainWindow.ClanChestManager.ClanmateManager.UpdateCount();
                     clanmatesAdded =true;
                 }
             }
@@ -76,14 +74,9 @@ namespace TBChestTracker
 
         private void OkayButton_Click(object sender, RoutedEventArgs e)
         {
-            var clanmatefile = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile;//ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile;
+            var clanmatefile = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}";
             ClanManager.Instance.ClanmateManager.Save(clanmatefile);
             ClanManager.Instance.ClanChestManager.BuildData();  
-            /*
-            MainWindow.ClanChestManager.ClanmateManager.Save(clanmatefile);
-            MainWindow.ClanChestManager.BuildData();    
-            */
-
             this.Close();
         }
 
@@ -93,9 +86,7 @@ namespace TBChestTracker
 
             ListClanMates01.ItemsSource = ClanManager.Instance.ClanmateManager.Database.Clanmates; 
             ClanManager.Instance.ClanmateManager.UpdateCount();
-            //MainWindow.ClanChestManager.ClanmateManager.UpdateCount();
             CollectionViewSource.GetDefaultView(ListClanMates01.ItemsSource).Filter = filter_clanmate;
-            //--- reporting duplicates after adding new entry, saving and reopening this window.
         }
        
         private bool filter_clanmate(object item)

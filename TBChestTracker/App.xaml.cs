@@ -20,8 +20,8 @@ namespace TBChestTracker
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            //-- Manually set Culture Language for debugging purposes.
-            //LocalizationManager.Set("fr-FR");
+            //-- Force to English
+            LocalizationManager.Set("en-US");
 
             MainWindow mainwnd = new MainWindow();
             StartPageWindow startPageWindow = new StartPageWindow();
