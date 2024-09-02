@@ -314,7 +314,7 @@
                          HighlightOpacity="0.25" 
                          HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
                          HighlightStrokeBrush="#0044FF" Corners="0"
-                         ImageSource="pack://application:,,,/Images/icons_main_menu_clan_1.png"
+                         ImageSource="pack://application:,,,/Images/clanmatesIcon.png"
                          ToolTip="{x:Static ResourceStrings:Strings.ManageClanmatesTooltip}"
                          Command="Commands:CustomCommandBindings.ManageClanmates" 
                          IsEnabled="{Binding IsCurrentClandatabase}">

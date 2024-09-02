@@ -60,7 +60,7 @@ namespace TBChestTracker
                 var generalSettings = SettingsManager.Instance.Settings.GeneralSettings;
                 if (generalSettings != null)
                 {
-                    if(generalSettings.UILanguage.Equals("English"))
+                    if(generalSettings.UILanguage == null || generalSettings.UILanguage.Equals("English"))
                     {
                         Language = "en-US";
                     }
@@ -88,7 +88,7 @@ namespace TBChestTracker
             if (!System.IO.File.Exists(ChestsFile))
             {
                 //-- file doesn't exist. Need to throw it. 
-                throw new Exception($"{ChestsFile} doesn't exist.");
+                //-- allow user to rebuild it.
             }
             else
             {

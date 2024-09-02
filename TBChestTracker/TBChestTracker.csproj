@@ -615,6 +615,9 @@
     <Content Include="Images\Chest_Lg.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\clanmatesIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\close-button.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
