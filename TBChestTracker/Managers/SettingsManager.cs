@@ -39,9 +39,62 @@ namespace TBChestTracker
                     throw new Exception(ex.Message);
                 }
             }
+
+            //-- configure default settings.
+            DefaultSettings = new Settings();
+            DefaultSettings.OCRSettings.CaptureMethod = "GDI+";
+            DefaultSettings.OCRSettings.GlobalBrightness = 0.65;
+            DefaultSettings.OCRSettings.Tags = new ObservableCollection<string>(new List<string> { "Chest", "From", "Source", "Gift" });
+            DefaultSettings.GeneralSettings.ClanRootFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\TotalBattleChestTracker\\";
+            DefaultSettings.OCRSettings.TessDataFolder = $@"{AppContext.Instance.TesseractData}";
+            DefaultSettings.OCRSettings.Languages = "eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus+pol+por+pus+ukr+deu";
+            DefaultSettings.HotKeySettings.StartAutomationKeys = "F9";
+            DefaultSettings.HotKeySettings.StopAutomationKeys = "F10";
+            DefaultSettings.OCRSettings.PreviewImage = String.Empty;
+            DefaultSettings.OCRSettings.Threshold = 85;
+            DefaultSettings.OCRSettings.MaxThreshold = 255;
+            
+            if (AppContext.Instance.IsFirstRun)
+            {
+                Settings = new Settings();
+                Settings = DefaultSettings;
+                Save();
+            }
+            else
+            {
+                try
+                {
+                    bool result = Load();
+                    if (result == false)
+                    {
+                        Settings = new Settings();
+                        Settings = DefaultSettings;
+                        Save();
+                    }
+                    else
+                    {
+                        if (Settings.OCRSettings.TessDataFolder == null)
+                        {
+                            //--- definately damaged.
+                            System.IO.File.Delete($"{AppContext.Instance.CommonAppFolder}Settings.json");
+                            if (Settings == null)
+                            {
+                                Settings = new Settings();
+
+                            }
+                            Settings = DefaultSettings;
+                            Save();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //-- it's possible it's missing;
+                }
+            }
         }
 
-        public bool Load(string file = "Settings.json")
+        private bool Load(string file = "Settings.json")
         {
             var filePath = $"{AppContext.Instance.CommonAppFolder}{file}";
             if (File.Exists(filePath) == false)

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -22,6 +23,9 @@ namespace TBChestTracker
         {
             //-- Force to English
             LocalizationManager.Set("en-US");
+
+            AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+
             AppContext appContext = new AppContext();
             MainWindow mainwnd = new MainWindow();
             StartPageWindow startPageWindow = new StartPageWindow();
@@ -59,6 +63,11 @@ namespace TBChestTracker
             splashScreen.Show();
         }
 
+        private void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        {
+            Console.WriteLine("I AM PROCESS KILLER! MUAHAHAHA!");
+        }
+
         private void SplashScreen_onSplashScreenComplete(object sender, EventArgs e)
         {
             var splash = (SplashScreen)sender;
@@ -70,7 +79,8 @@ namespace TBChestTracker
 
         private void Application_Exit(object sender, ExitEventArgs e)
         {
-
+            
+            Console.WriteLine("I AM EXITING!!!");
         }
     }
 }

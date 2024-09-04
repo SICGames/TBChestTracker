@@ -333,6 +333,7 @@ namespace TBChestTracker
             {
                 SettingsManager = new SettingsManager();
 
+                /*
                 var settingsFile = $@"{AppContext.Instance.CommonAppFolder}\Settings.json";
 
                 var isFirstRun = await IsFirstLaunch();
@@ -350,6 +351,8 @@ namespace TBChestTracker
                 }
 
                 SettingsManager.Load();
+                */
+
                 com.HellStormGames.Logging.Console.Write("Settings Loaded.", com.HellStormGames.Logging.LogType.INFO);
 
                 //-- init appContext
@@ -504,7 +507,7 @@ namespace TBChestTracker
 
                 if(SettingsManager == null)
                 {
-                    throw new Exception("SettingzManager is null");
+                    throw new Exception("SettingsManager is null");
                 }
 
                 if(String.IsNullOrEmpty(SettingsManager.Instance.Settings.OCRSettings.TessDataFolder))
