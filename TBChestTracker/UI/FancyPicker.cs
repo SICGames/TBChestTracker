@@ -90,6 +90,7 @@ namespace TBChestTracker.UI
         {
             base.OnApplyTemplate();
             pTextBox = base.Template.FindName("TEXT_FIELD", this) as TextBox;
+            pTextBox.Text = this.Source;
             pTextBox.PreviewMouseLeftButtonDown += PTextBox_PreviewMouseLeftButtonDown;
         }
 

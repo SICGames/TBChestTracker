@@ -22,7 +22,7 @@ namespace TBChestTracker
         {
             //-- Force to English
             LocalizationManager.Set("en-US");
-
+            AppContext appContext = new AppContext();
             MainWindow mainwnd = new MainWindow();
             StartPageWindow startPageWindow = new StartPageWindow();
             
@@ -45,11 +45,11 @@ namespace TBChestTracker
                 }
                 if(argumentsDictionary.ContainsKey("--ocr_wizard_debug"))
                 {
-                    GlobalDeclarations.DebugOCRWizardEnabled = true;
+                    appContext.DebugOCRWizardEnabled = true;
                 }
                 else if(argumentsDictionary.ContainsKey("--save_ocr_images"))
                 {
-                    GlobalDeclarations.SaveOCRImages = true;
+                    appContext.SaveOCRImages = true;
                 }
             }
 

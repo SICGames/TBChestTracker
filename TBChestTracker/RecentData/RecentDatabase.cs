@@ -17,7 +17,7 @@ namespace TBChestTracker
         public List<RecentClanDatabase> RecentClanDatabases = new List<RecentClanDatabase>();
         public bool Load(string file = "recent.db")
         {
-            var filePath = $"{GlobalDeclarations.CommonAppFolder}{file}";
+            var filePath = $"{AppContext.Instance.CommonAppFolder}{file}";
             if (File.Exists(filePath) == false)
                 return false;
 
@@ -34,7 +34,7 @@ namespace TBChestTracker
         public bool Save(string file = "recent.db")
         {
             //var saveFilePath = $"Settings.json";
-            var savePath = $"{GlobalDeclarations.CommonAppFolder}{file}";
+            var savePath = $"{AppContext.Instance.CommonAppFolder}{file}";
             try
             {
                 using (System.IO.StreamWriter sw = System.IO.File.CreateText(savePath))

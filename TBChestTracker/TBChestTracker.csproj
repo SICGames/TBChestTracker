@@ -175,6 +175,7 @@
     <Compile Include="EditChestPointValueWindow.xaml.cs">
       <DependentUpon>EditChestPointValueWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Engine\OCREngine.cs" />
     <Compile Include="ErrorHandlers\ChestProcessingError.cs" />
     <Compile Include="Helpers\DateTimeHelper.cs" />
     <Compile Include="Helpers\EnumBindingSourceExtension.cs" />
@@ -319,7 +320,6 @@
     <Compile Include="CustomControls\FilePicker.xaml.cs">
       <DependentUpon>FilePicker.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Shared\GlobalDeclarations.cs" />
     <Compile Include="NewClanDatabaseWindow.xaml.cs">
       <DependentUpon>NewClanDatabaseWindow.xaml</DependentUpon>
     </Compile>

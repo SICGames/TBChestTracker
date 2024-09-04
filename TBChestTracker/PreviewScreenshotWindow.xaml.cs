@@ -243,7 +243,7 @@ namespace TBChestTracker
                     Image<Gray, byte> modified_image = result_image.Mul(brightness) + brightness;
                     var imageScaled = modified_image.Resize(5, Emgu.CV.CvEnum.Inter.Cubic);
 
-                    if (GlobalDeclarations.SaveOCRImages)
+                    if (AppContext.Instance.SaveOCRImages)
                     {
                         imageScaled.Save($"OCR_ImageScaled.png");
                         modified_image.Save($"OCR_ImageOut.png");

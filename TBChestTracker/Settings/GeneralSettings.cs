@@ -23,34 +23,7 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(ClanRootFolder));
             }
         }
-        private string _TessDataFolder;
-        public string TessDataFolder
-        {
-            get
-            {
-                return _TessDataFolder;
-            }
-            set
-            {
-                _TessDataFolder = value;
-                OnPropertyChanged(nameof(TessDataFolder));
-            }
-        }
-        
-        private string _languages;
-
-        public string Languages
-        {
-            get
-            {
-                return _languages;
-            }
-            set
-            {
-                _languages = value;
-            }
-        }
-
+       
         private string _uiLanguage;
         public string UILanguage
         {

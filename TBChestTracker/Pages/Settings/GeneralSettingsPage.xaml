@@ -23,42 +23,16 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        
+
         <TextBlock  Grid.Row="0" Grid.Column="0" Text="Clan Root Path" Margin="5,5" VerticalAlignment="Center"/>
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Tesseract Data Path" Margin="5,5" VerticalAlignment="Center"/>
         <TextBlock Grid.Row="2" Grid.Column="0" Text="UI Language" Margin="5,5" VerticalAlignment="Center"/>
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="Use OCR Languages" Margin="5,5" VerticalAlignment="Top"/>
-        
         <ui:FancyPicker Grid.Column="1" Grid.Row="0" Margin="0,5,0,5" ToolTip="Root directory where all newly created clans will be stored."
                         Height="18" BorderBrush="#aaa" Source="{Binding ClanRootFolder}"
                         Corners="10" 
                         BorderThickness="1" Padding="1" Background="#fff" Foreground="#000" Tag="ClanRoot" Click="ClanRootFolderPicker_Click" x:Name="ClanRootFolderPicker"/>
-
-        <ui:FancyPicker Grid.Column="1" Grid.Row="1" Margin="0,5,0,5" ToolTip="Where all the Tesseract Learned Data Models are stored."
-                Height="18" BorderBrush="#aaa" 
-                Corners="10" 
-                BorderThickness="1" Padding="1" Background="#fff" Foreground="#000" Tag="TessData" Source="{Binding TessDataFolder}" x:Name="TessDataFolderPicker" Click="TessDataFolderPicker_Click"/>
-
+        
         <ComboBox x:Name="UILanguageComboBox" Grid.Row="2" Grid.Column="1" Width="200" SelectionChanged="UILanguageComboBox_SelectionChanged" HorizontalAlignment="Left" Margin="0,0" SelectedIndex="0" Text="{Binding UILanguage}">
             <ComboBoxItem Content="English"/>
         </ComboBox>
-        
-        <UniformGrid Grid.Column="1" Grid.Row="3" Columns="4" HorizontalAlignment="Left" Margin="0,5,0,5" x:Name="CHECKBOXES_PARENT">
-                <CheckBox Content="English" Margin="3,5" Tag="eng"/>
-                <CheckBox Content="French" Margin="3,5" Tag="fra"/>
-                <CheckBox Content="Spanish" Margin="3,5" Tag="spa"/>
-                <CheckBox Content="Arabic" Margin="3,5" Tag="ara"/>
-                <CheckBox Content="Turkish" Margin="3,5" Tag="tur"/>
-                <CheckBox Content="Taditional Chinese" Margin="3,5" Tag="chi_tra"/>
-                <CheckBox Content="Simplified Chinese" Margin="3,5" Tag="chi_sim"/>
-                <CheckBox Content="Korean" Margin="3,5" Tag="kor"/>
-                <CheckBox Content="Ukranian" Margin="3,5" Tag="ukr"/>
-                <CheckBox Content="Russian" Margin="3,5" Tag="rus"/>
-                <CheckBox Content="Polish" Margin="3,5" Tag="pol"/>
-                <CheckBox Content="German" Margin="3,5" Tag="deu"/>
-                <CheckBox Content="Japanese" Margin="3,5" Tag="jpn"/>
-                <CheckBox Content="All" Margin="3,5"/>
-            </UniformGrid>
-        <TextBlock Grid.Column="1" Grid.Row="4" Text="* Using ALL will lead to longer startup time." FontWeight="Bold"/>
     </Grid>
 </Page>

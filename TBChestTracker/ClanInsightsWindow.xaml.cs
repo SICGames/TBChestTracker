@@ -52,8 +52,8 @@ namespace TBChestTracker
             CefSettings settings = new CefSettings();
 
             //--- CefSharp Cache, UserDir will be stored in ProgramData
-            var cache_dir = $@"{GlobalDeclarations.CommonAppFolder}Cache";
-            var user_dir = $@"{GlobalDeclarations.CommonAppFolder}User";
+            var cache_dir = $@"{AppContext.Instance.CommonAppFolder}Cache";
+            var user_dir = $@"{AppContext.Instance.CommonAppFolder}User";
             if (!DirectoryExists(cache_dir))
             {
                 CreateDirectory(cache_dir);

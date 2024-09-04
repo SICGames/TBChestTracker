@@ -162,7 +162,7 @@ namespace TBChestTracker.Pages.Settings
         }
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            GlobalDeclarations.IsConfiguringHotKeys = true;
+            AppContext.Instance.IsConfiguringHotKeys = true;
 
             //--- incase people get curious and mess up the settings file to break program.
             var startAutomationKeys = SettingsManager.Instance.Settings.HotKeySettings.StartAutomationKeys.Split('+').ToList();
@@ -178,7 +178,7 @@ namespace TBChestTracker.Pages.Settings
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            GlobalDeclarations.IsConfiguringHotKeys = false;
+            AppContext.Instance.IsConfiguringHotKeys = false;
             Keys.Clear();
             Keys = null;
         }

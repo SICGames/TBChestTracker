@@ -24,15 +24,36 @@ namespace TBChestTracker
         private bool isAutomationPauseButtonEnabled;
         private bool isAutomationStopButtonEnabled;
         private bool isCurrentClandatabase;
+        private bool newClanDatabaseCreated;
+        private bool clanmatesBeenAdded;
 
         private string pAppName = "Total Battle Chest Tracker";
         private string pCurrentProject = "Untitled";
         private string pAppTitle = $"";
 
-        private int _ChestCountTotal = 0;
-        
         #endregion
 
+        public string CommonAppFolder
+        {
+            get => $@"{System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\SICGames\TotalBattleChestTracker\";
+        }
+        public string AppFolder
+        {
+            get => $@"{System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\";
+        }
+        public string RecentOpenedClanDatabases
+        {
+            get => $@"{CommonAppFolder}recent.db";
+        }
+        public string TesseractData => $@"{AppFolder}TessData";
+
+        public bool IsFirstRun
+        {
+            get
+            {
+                return System.IO.File.Exists($"{CommonAppFolder}.FIRSTRUN");
+            }
+        }
         #region AppContext() & Instance
         public static AppContext Instance { get; private set; }
 
@@ -127,10 +148,123 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(IsAutomationStopButtonEnabled));
             }
         }
-
-        public static string AppFolder
+        public bool NewClandatabaseBeenCreated
         {
-            get => $@"{System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\";
+            get => newClanDatabaseCreated;
+            set
+            {
+                newClanDatabaseCreated = value;
+                OnPropertyChanged(nameof(NewClandatabaseBeenCreated));  
+            }
+        }
+        public bool ClanmatesBeenAdded
+        {
+            get => clanmatesBeenAdded;
+            set
+            {
+                clanmatesBeenAdded = value;
+                OnPropertyChanged(nameof(ClanmatesBeenAdded));
+            }
+        }
+        private bool _TessDataExists = false;
+
+        public bool TessDataExists 
+        {
+            get => _TessDataExists;
+            set
+            {
+                _TessDataExists = value;
+                OnPropertyChanged(nameof(TessDataExists));
+            }
+        }
+        private bool _AutomationRunning = false;
+        public bool AutomationRunning
+        {
+            get => _AutomationRunning;
+            set
+            {
+                _AutomationRunning = value;
+                OnPropertyChanged(nameof(AutomationRunning));
+            }
+        }
+        private bool _IsConfiguringHotKeys = false;
+        public bool IsConfiguringHotKeys
+        {
+            get => _IsConfiguringHotKeys;
+            set
+            {
+                _IsConfiguringHotKeys = value;
+                OnPropertyChanged(nameof(IsConfiguringHotKeys));    
+            }
+        }
+        
+        private bool _DebugOCRWizardEnabled = false;
+        public bool DebugOCRWizardEnabled
+        {
+            get => _DebugOCRWizardEnabled;
+            set
+            {
+                _DebugOCRWizardEnabled = value;
+                OnPropertyChanged(nameof(DebugOCRWizardEnabled));   
+            }
+        }
+        private bool _SaveOCRImages = false;
+        public bool SaveOCRImages
+        {
+            get => _SaveOCRImages;
+            set
+            {
+                _SaveOCRImages = value;
+                OnPropertyChanged(nameof(SaveOCRImages));
+            }
+        }
+
+        private bool _hasHotkeyBeenPressed = false;
+        private bool _isAnyGiftsAvailable = false;
+        private bool _isBusyProcessingClanChests = false;
+        private bool _canCaptureAgain = false;
+
+        public bool hasHotkeyBeenPressed
+        {
+            get => _hasHotkeyBeenPressed;
+            set
+            {
+                _hasHotkeyBeenPressed = value;
+                OnPropertyChanged(nameof(hasHotkeyBeenPressed));    
+            }
+        }
+
+        public bool isAnyGiftsAvailable
+        {
+            get
+            {
+                return _isAnyGiftsAvailable;
+            }
+            set
+            {
+                _isAnyGiftsAvailable = value;
+                OnPropertyChanged(nameof(isAnyGiftsAvailable)); 
+            }
+        }
+
+        public bool isBusyProcessingClanchests
+        {
+            get => _isBusyProcessingClanChests;
+            set
+            {
+                _isBusyProcessingClanChests = value;
+                OnPropertyChanged(nameof(isBusyProcessingClanchests));
+            }
+        }
+
+        public bool canCaptureAgain
+        {
+            get => _canCaptureAgain;
+            set
+            {
+                _canCaptureAgain = value;
+                OnPropertyChanged(nameof(canCaptureAgain));
+            }
         }
 
         #endregion

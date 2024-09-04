@@ -61,6 +61,8 @@ namespace TBChestTracker
         private List<String> BuildDates()
         {
             var datesToSubtract = 0;
+            var Dates = new List<string>();
+            var isCustom = false;
             if (ExportSettings.DateRange == DateRangeEnum.Today)
             {
                 datesToSubtract = 1;
@@ -75,19 +77,43 @@ namespace TBChestTracker
             }
             else if (ExportSettings.DateRange == DateRangeEnum.Custom)
             {
+                isCustom = true;    
                 TimeSpan diff = ExportSettings.DateRangeTo - ExportSettings.DateRangeFrom;
                 datesToSubtract = diff.Days;
+
+                var fromDate = ExportSettings.DateRangeFrom;
+                var toDate = ExportSettings.DateRangeTo;
+
+                if(datesToSubtract == 0)
+                {
+                    var dateStr = fromDate.ToShortDateString();
+                    Dates.Add(dateStr);
+                }
+                else
+                {
+                    for(var da = 0; da  < datesToSubtract; da++)
+                    {
+                        var d = toDate;
+                        d = toDate.AddDays(-da);
+                        var shortD = d.ToShortDateString();
+                        Dates.Add(shortD);
+                    }
+                }
+                
+            }
+            if (isCustom == false)
+            {
+                var Today = DateTime.Now;
+                for (var d = 0; d < datesToSubtract; d++)
+                {
+                    var previousDate = Today;
+                    previousDate = Today.AddDays(-d);
+                    var shortDateString = previousDate.ToShortDateString();
+                    Dates.Add(shortDateString);
+                }
             }
 
-            var Today = DateTime.Now;
-            var Dates = new List<string>();
-            for (var d = 0; d < datesToSubtract; d++)
-            {
-                var previousDate = Today;
-                previousDate = Today.AddDays(-d);
-                var shortDateString = previousDate.ToShortDateString();
-                Dates.Add(shortDateString);
-            }
+            isCustom = false;
             return Dates;
         }
 

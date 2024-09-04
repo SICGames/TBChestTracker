@@ -341,18 +341,18 @@ namespace TBChestTracker
              * ClanChestData should be obsolete.
             */
 
-            GlobalDeclarations.isBusyProcessingClanchests = true;
+            AppContext.Instance.isBusyProcessingClanchests = true;
             var resulttext = result;
 
             if (resulttext[0].ToLower().Contains("no gifts"))
             {
                 ChestProcessingState = ChestProcessingState.IDLE;
-                GlobalDeclarations.isAnyGiftsAvailable = false;
+                AppContext.Instance.isAnyGiftsAvailable = false;
                 return new ClanChestProcessResult("No Gifts", 404, ClanChestProcessEnum.NO_GIFTS);
             }
 
             ChestProcessingState = ChestProcessingState.PROCESSING;
-            GlobalDeclarations.isAnyGiftsAvailable = true;
+            AppContext.Instance.isAnyGiftsAvailable = true;
             ProcessingTextResult textResult = ProcessText3(resulttext);
 
             //List<ChestData> tmpchests = ProcessText3(resulttext);
@@ -494,8 +494,8 @@ namespace TBChestTracker
             var datestr = DateTime.Now.ToString("d", new CultureInfo(CultureInfo.CurrentCulture.Name));   
             ClanChestDailyData[datestr] = clanChestData;
             ChestProcessingState = ChestProcessingState.COMPLETED;
-            GlobalDeclarations.isBusyProcessingClanchests = false;
-            GlobalDeclarations.canCaptureAgain = true;
+            AppContext.Instance.isBusyProcessingClanchests = false;
+            AppContext.Instance.canCaptureAgain = true;
 
             return new ClanChestProcessResult("Success", 200, ClanChestProcessEnum.SUCCESS);
         }
@@ -511,7 +511,7 @@ namespace TBChestTracker
 
             if (!System.IO.File.Exists(clanmatefile))
             {
-                GlobalDeclarations.hasClanmatesBeenAdded = false;
+                AppContext.Instance.ClanmatesBeenAdded = false;
                 return;
             }
             else
@@ -589,7 +589,7 @@ namespace TBChestTracker
                     ClanChestDailyData.Add(DateTime.Now.ToString("d", new CultureInfo(CultureInfo.CurrentCulture.Name)), clanChestData);
                 }
 
-                GlobalDeclarations.hasClanmatesBeenAdded = true;
+                AppContext.Instance.ClanmatesBeenAdded = true;
             }
 
             return;

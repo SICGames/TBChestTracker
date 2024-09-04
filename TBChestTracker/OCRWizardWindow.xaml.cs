@@ -52,7 +52,7 @@ namespace TBChestTracker
             if(page.GetType() == typeof(OCRWizard_Successful))
             {
                 SettingsManager.Instance.Save();
-                var firstRunFile = $@"{GlobalDeclarations.CommonAppFolder}.FIRSTRUN";
+                var firstRunFile = $@"{AppContext.Instance.CommonAppFolder}.FIRSTRUN";
                 if(System.IO.File.Exists(firstRunFile))
                 {
                     System.IO.File.Delete(firstRunFile);    

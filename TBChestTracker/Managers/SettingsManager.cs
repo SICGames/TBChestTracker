@@ -19,6 +19,7 @@ namespace TBChestTracker
         private bool disposedValue;
 
         public Settings Settings { get; private set; }
+        public Settings DefaultSettings { get; private set; }
         public static SettingsManager Instance { get; private set; }
         
         public SettingsManager() 
@@ -26,7 +27,7 @@ namespace TBChestTracker
             if (Instance == null)
                 Instance = this;
 
-            var settingsPathFolder = GlobalDeclarations.CommonAppFolder;
+            var settingsPathFolder = AppContext.Instance.CommonAppFolder;
             if(!System.IO.Directory.Exists(settingsPathFolder))
             {
                 try
@@ -37,13 +38,12 @@ namespace TBChestTracker
                 { 
                     throw new Exception(ex.Message);
                 }
-
             }
         }
 
         public bool Load(string file = "Settings.json")
         {
-            var filePath = $"{GlobalDeclarations.CommonAppFolder}{file}";
+            var filePath = $"{AppContext.Instance.CommonAppFolder}{file}";
             if (File.Exists(filePath) == false)
                 return false;
 
@@ -65,7 +65,7 @@ namespace TBChestTracker
         public bool Save(string file = "Settings.json")
         {
             //var saveFilePath = $"Settings.json";
-            var savePath = $"{GlobalDeclarations.CommonAppFolder}{file}";
+            var savePath = $"{AppContext.Instance.CommonAppFolder}{file}";
             try
             {
                 using (System.IO.StreamWriter sw = System.IO.File.CreateText(savePath))
@@ -93,13 +93,12 @@ namespace TBChestTracker
             if(Settings == null) 
                 Settings = new Settings();
 
-
             Settings.OCRSettings.CaptureMethod = "GDI+";
             Settings.OCRSettings.GlobalBrightness = 0.65;
             Settings.OCRSettings.Tags = new ObservableCollection<string>(new List<string> { "Chest", "From", "Source", "Gift" });
             Settings.GeneralSettings.ClanRootFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\TotalBattleChestTracker\\";
-            Settings.GeneralSettings.TessDataFolder = $@"{AppContext.AppFolder}TessData";
-            Settings.GeneralSettings.Languages = "eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus+pol+por+pus+ukr+deu";
+            Settings.OCRSettings.TessDataFolder = $@"{AppContext.Instance.TesseractData}";
+            Settings.OCRSettings.Languages = "eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus+pol+por+pus+ukr+deu";
             Settings.HotKeySettings.StartAutomationKeys = "F9";
             Settings.HotKeySettings.StopAutomationKeys = "F10";
             Settings.OCRSettings.PreviewImage = String.Empty;

@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:TBChestTracker.Pages.Settings"
       xmlns:ui="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
+      xmlns:uiFancy="clr-namespace:TBChestTracker.UI"
       xmlns:main="clr-namespace:TBChestTracker"
       mc:Ignorable="d" 
       x:Name="OCR_Settings_Page"
@@ -27,54 +28,81 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <TextBlock Text="Global OCR Brightness" Margin="5" Grid.Column="0" Grid.Row="0"/>
-        <TextBlock Text="OCR Filtering" Margin="5"  Grid.Column="0" Grid.Row="1"/>
-        <TextBlock Text="Capture Method" Margin="5" Grid.Column="0" Grid.Row="3"/>
-        <TextBlock Text="Screen Capturer" Margin="5"  Grid.Column="0" Grid.Row="4"/>
-        <TextBlock Text="Preview" Margin="5" Grid.Column="0" Grid.Row="5"/>
-        <TextBlock Text="Threshold" Margin="5" Grid.Column="0" Grid.Row="6"/>
-        <TextBlock Text="Max Threshold" Margin="5" Grid.Column="0" Grid.Row="7"/>
+        <TextBlock Text="TessData Path Folder" Margin="5" Grid.Column="0" Grid.Row="0"/>
+        <TextBlock Text="OCR Languages" Margin="5" Grid.Column="0" Grid.Row="1"/>
+        <TextBlock Text="Global OCR Brightness" Margin="5" Grid.Column="0" Grid.Row="2"/>
+        <TextBlock Text="OCR Filtering" Margin="5"  Grid.Column="0" Grid.Row="3"/>
+        <TextBlock Text="Capture Method" Margin="5" Grid.Column="0" Grid.Row="5"/>
+        <TextBlock Text="Screen Capturer" Margin="5"  Grid.Column="0" Grid.Row="6"/>
+        <TextBlock Text="Preview" Margin="5" Grid.Column="0" Grid.Row="7"/>
+        <TextBlock Text="Threshold" Margin="5" Grid.Column="0" Grid.Row="8"/>
+        <TextBlock Text="Max Threshold" Margin="5" Grid.Column="0" Grid.Row="9"/>
+
+        <uiFancy:FancyPicker Grid.Column="1" Grid.Row="0" Margin="0,2,0,7" ToolTip="Where all the Tesseract Learned Data Models are stored."
+        Height="18" BorderBrush="#aaa" 
+        Corners="10" 
+        BorderThickness="1" Padding="1" Background="#fff" Foreground="#000" Tag="TessData" Source="{Binding TessDataFolder}" x:Name="TessDataFolderPicker" Click="TessDataFolderPicker_Click"/>
+
+        <UniformGrid Grid.Column="1" Grid.Row="1" Columns="4" HorizontalAlignment="Left" Margin="0,5,0,5" x:Name="CHECKBOXES_PARENT">
+            <CheckBox Content="English" Margin="3,5" Tag="eng"/>
+            <CheckBox Content="French" Margin="3,5" Tag="fra"/>
+            <CheckBox Content="Spanish" Margin="3,5" Tag="spa"/>
+            <CheckBox Content="Arabic" Margin="3,5" Tag="ara"/>
+            <CheckBox Content="Turkish" Margin="3,5" Tag="tur"/>
+            <CheckBox Content="Taditional Chinese" Margin="3,5" Tag="chi_tra"/>
+            <CheckBox Content="Simplified Chinese" Margin="3,5" Tag="chi_sim"/>
+            <CheckBox Content="Korean" Margin="3,5" Tag="kor"/>
+            <CheckBox Content="Ukranian" Margin="3,5" Tag="ukr"/>
+            <CheckBox Content="Russian" Margin="3,5" Tag="rus"/>
+            <CheckBox Content="Polish" Margin="3,5" Tag="pol"/>
+            <CheckBox Content="German" Margin="3,5" Tag="deu"/>
+            <CheckBox Content="Japanese" Margin="3,5" Tag="jpn"/>
+            <CheckBox Content="All" Margin="3,5"/>
+        </UniformGrid>
+        
         <ui:FancyNumericValue BorderBrush="LightGray" 
                           HoverBrush="SkyBlue"
                           BorderThickness="2" 
-                          Minimal="0.0" Maximum="1.0" Steps="0.01" Value="{Binding OCRSettings.GlobalBrightness}"
+                          Minimal="0.0" Maximum="1.0" Steps="0.01" Value="{Binding GlobalBrightness}"
                           ValueChanged="FancyNumericValue_ValueChanged"
-                          CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1"/>
+                          CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="1"/>
 
-        <ui:FancyTagBox Grid.Row="1" Grid.Column="1" Height="100" x:Name="TagBox" BorderBrush="Silver" BorderThickness="1" Background="White" Foreground="Black" Margin="5" 
-                        Tags="{Binding OCRSettings.Tags, Mode=TwoWay}">
+        <ui:FancyTagBox Grid.Row="3" Grid.Column="1" Height="100" x:Name="TagBox" BorderBrush="Silver" BorderThickness="1" Background="White" Foreground="Black" Margin="5" 
+                        Tags="{Binding Tags, Mode=TwoWay}">
         </ui:FancyTagBox>
-        <TextBlock Margin="5" FontWeight="Bold" Grid.Column="1" Grid.Row="2">* Use SPACEBAR key to seperate tags.</TextBlock>
+        <TextBlock Margin="5" FontWeight="Bold" Grid.Column="1" Grid.Row="4">* Use SPACEBAR key to seperate tags.</TextBlock>
 
-        <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="1">
+        <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="1">
             <RadioButton GroupName="Capture" Content="Full Desktop" 
                          IsChecked="{Binding Capture, Converter={StaticResource CaptureMethodConverter},
            ConverterParameter={x:Static main:CaptureEnum.ENTIRE_SCREEN}}" Tag="byChestType"
                          Margin="5"/>
             <RadioButton GroupName="Capture" Content="Specific Region" 
-                         IsChecked="{Binding OCRSettings.Capture, Converter={StaticResource CaptureMethodConverter},
+                         IsChecked="{Binding Capture, Converter={StaticResource CaptureMethodConverter},
 ConverterParameter={x:Static main:CaptureEnum.SPECIFIC_REGION}}" Tag="byChestType"
                          Margin="5"/>
         </StackPanel>
-        <ComboBox x:Name="CaptureMethodBox" Grid.Row="4" Grid.Column="1" Width="200" HorizontalAlignment="Left" SelectedIndex="0">
+        <ComboBox x:Name="CaptureMethodBox" Grid.Row="6" Grid.Column="1" Width="200" HorizontalAlignment="Left" SelectedIndex="0">
             <ComboBoxItem Content="GDI+"/>
         </ComboBox>
 
-        <Image x:Name="ImagePreview" Margin="5,25,0,0" Height="500" Width="500" HorizontalAlignment="Left" Stretch="UniformToFill" Grid.ColumnSpan="2" Grid.Row="5"/>
+        <Image x:Name="ImagePreview" Margin="5,25,0,0" Height="500" Width="500" HorizontalAlignment="Left" Stretch="UniformToFill" Grid.ColumnSpan="2" Grid.Row="7"/>
         
         <ui:FancyNumericValue x:Name="ThresholdNumericValue" BorderBrush="LightGray" 
                   HoverBrush="SkyBlue"
                   BorderThickness="2" 
-                  Minimal="0.0" Maximum="255" Steps="1.0" Value="{Binding OCRSettings.Threshold}"
+                  Minimal="0.0" Maximum="255" Steps="1.0" Value="{Binding Threshold}"
                   ValueChanged="ThresholdNumericValue_ValueChanged"
-                  CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="6" Grid.Column="1"/>
+                  CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="8" Grid.Column="1"/>
 
         <ui:FancyNumericValue x:Name="MaxThresholdNumericValue" BorderBrush="LightGray" 
           HoverBrush="SkyBlue"
           BorderThickness="2" 
-          Minimal="0.0" Maximum="255" Steps="1.0" Value="{Binding OCRSettings.MaxThreshold}"
+          Minimal="0.0" Maximum="255" Steps="1.0" Value="{Binding MaxThreshold}"
           ValueChanged="MaxThresholdNumericValue_ValueChanged"
-          CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="7" Grid.Column="1"/>
+          CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="9" Grid.Column="1"/>
     </Grid>
 </Page>

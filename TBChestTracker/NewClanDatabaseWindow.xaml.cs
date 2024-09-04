@@ -36,6 +36,8 @@ namespace TBChestTracker
                 {
                     this.DialogResult = true;
                     ClanManager.Instance.ClanDatabaseManager.Save();
+                    AppContext.Instance.IsCurrentClandatabase = true;
+                    AppContext.Instance.NewClandatabaseBeenCreated = true;
                     this.Close();
                 }
                 

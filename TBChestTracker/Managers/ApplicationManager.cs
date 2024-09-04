@@ -67,12 +67,12 @@ namespace TBChestTracker
                 }
             }
 
-            LocalePath = $@"{GlobalDeclarations.CommonAppFolder}locale\{Language}\";
+            LocalePath = $@"{AppContext.Instance.CommonAppFolder}locale\{Language}\";
 
             if(!System.IO.Directory.Exists(LocalePath))
             {
                 //-- fall back on en-US.
-                LocalePath = $@"{GlobalDeclarations.CommonAppFolder}locale\en-US\";
+                LocalePath = $@"{AppContext.Instance.CommonAppFolder}locale\en-US\";
             }
 
             string ChestsFile = $"{LocalePath}Chests.csv";
@@ -108,7 +108,7 @@ namespace TBChestTracker
 
         public bool StartNodeServer()
         {
-            var working_Directory = $@"{GlobalDeclarations.CommonAppFolder}ClanInsights\";
+            var working_Directory = $@"{AppContext.Instance.CommonAppFolder}ClanInsights\";
             var WindowStyle = ProcessWindowStyle.Normal;
 #if !DEBUG
     WindowStyle = ProcessWindowStyle.Hidden;

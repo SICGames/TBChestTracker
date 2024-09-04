@@ -44,7 +44,7 @@ namespace TBChestTracker
 
         private void LoadRecentFilesList()
         {
-            if(File.Exists(GlobalDeclarations.RecentOpenedClanDatabases))
+            if(File.Exists(AppContext.Instance.RecentOpenedClanDatabases))
             {
                 var recentDatabase = new RecentDatabase();
                 recentDatabase.Load();

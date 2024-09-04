@@ -864,10 +864,10 @@ namespace TBChestTracker
 
             ref_image_files = new List<string>(new string[] 
             {
-                $@"{GlobalDeclarations.AppFolder}Images\Refs\chest_window_ref_top_left.png",
-                $@"{GlobalDeclarations.AppFolder}Images\Refs\chest_window_ref_top_right.png",
-                $@"{GlobalDeclarations.AppFolder}Images\Refs\chest_window_ref_bottom_left.png",
-                $@"{GlobalDeclarations.AppFolder}Images\Refs\chest_window_ref_bottom_right.png"
+                $@"{AppContext.Instance.AppFolder}Images\Refs\chest_window_ref_top_left.png",
+                $@"{AppContext.Instance.AppFolder}Images\Refs\chest_window_ref_top_right.png",
+                $@"{AppContext.Instance.AppFolder}Images\Refs\chest_window_ref_bottom_left.png",
+                $@"{AppContext.Instance.AppFolder}Images\Refs\chest_window_ref_bottom_right.png"
             });
 
             var ref_file_not_found = false;
@@ -901,10 +901,10 @@ namespace TBChestTracker
                 }
             }
 
-            // ChestWindowChestsActiveRefImage = new Image<Bgr, Byte>($@"{GlobalDeclarations.AppFolder}Images\Refs\chest_window_chests_active-{Snapture.MonitorInfo.Monitors[0].Height}.png");
-            // OpenChestRefImage = new Image<Bgr, Byte>($@"{GlobalDeclarations.AppFolder}Images\Refs\chest_window_claim_button-{Snapture.MonitorInfo.Monitors[0].Height}.png");
-            ChestWindowChestsActiveRefImage = new Image<Bgr, Byte>($@"{GlobalDeclarations.AppFolder}Images\Refs\chest_window_chests_active.png");
-            OpenChestRefImage = new Image<Bgr, Byte>($@"{GlobalDeclarations.AppFolder}Images\Refs\chest_window_claim_button.png");
+            // ChestWindowChestsActiveRefImage = new Image<Bgr, Byte>($@"{AppContext.Instance.AppFolder}Images\Refs\chest_window_chests_active-{Snapture.MonitorInfo.Monitors[0].Height}.png");
+            // OpenChestRefImage = new Image<Bgr, Byte>($@"{AppContext.Instance.AppFolder}Images\Refs\chest_window_claim_button-{Snapture.MonitorInfo.Monitors[0].Height}.png");
+            ChestWindowChestsActiveRefImage = new Image<Bgr, Byte>($@"{AppContext.Instance.AppFolder}Images\Refs\chest_window_chests_active.png");
+            OpenChestRefImage = new Image<Bgr, Byte>($@"{AppContext.Instance.AppFolder}Images\Refs\chest_window_claim_button.png");
         }
 
         private void CreateCanvasControls(Canvas canvas)

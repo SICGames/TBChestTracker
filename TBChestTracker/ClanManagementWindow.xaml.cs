@@ -93,7 +93,7 @@ namespace TBChestTracker
         {
             clans.Clear();
             clans = null;
-            if (GlobalDeclarations.hasNewClanDatabaseCreated)
+            if (AppContext.Instance.NewClandatabaseBeenCreated)
                 DialogResult = true;
             else
                 DialogResult = false;
@@ -127,7 +127,7 @@ namespace TBChestTracker
             NewClanDatabaseWindow newClanDatabaseWindow = new NewClanDatabaseWindow();
             if (newClanDatabaseWindow.ShowDialog() == true)
             {
-                GlobalDeclarations.hasNewClanDatabaseCreated = true;
+                AppContext.Instance.NewClandatabaseBeenCreated = true;
                 AppContext.Instance.UpdateCurrentProject($"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}");
                 AppContext.Instance.UpdateApplicationTitle();
                 

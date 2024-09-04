@@ -134,7 +134,7 @@ namespace TBChestTracker
                     //--- %MY_DOCUMENTS% - User Documents
                     
                     m_ClanChestManager.BuildData();
-                    GlobalDeclarations.hasNewClanDatabaseCreated = true;
+                    AppContext.Instance.NewClandatabaseBeenCreated = true;
                     CommandManager.InvalidateRequerySuggested();
                     result(true);
                 }
