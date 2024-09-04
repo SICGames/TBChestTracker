@@ -37,6 +37,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Net;
 using System.Net.Http;
+using TBChestTracker.Engine;
 
 
 namespace TBChestTracker
@@ -71,6 +72,7 @@ namespace TBChestTracker
         ApplicationManager applicationManager { get; set; }
         Task AutomationTask { get; set; }
 
+        OCREngine OCREngine { get; set; }
         #endregion
 
         #region PropertyChanged Event
@@ -92,7 +94,6 @@ namespace TBChestTracker
             this.DataContext = AppContext.Instance;
             this.Closing += MainWindow_Closing;
             recentlyOpenedDatabases = new RecentDatabase();
-
             consoleWindow = new ConsoleWindow();
         }
         #endregion
@@ -129,7 +130,7 @@ namespace TBChestTracker
                 imageThreshold.Save($"OCR_Threshold.png");
             }
 
-            var ocrResult = TesseractHelper.Read(imageThreshold);
+            var ocrResult = OCREngine.Read(imageThreshold);
             
             imageThreshold.Dispose();
             imageScaled.Dispose();
@@ -309,13 +310,7 @@ namespace TBChestTracker
                 com.HellStormGames.Logging.Console.Write("Snapture Started.", com.HellStormGames.Logging.LogType.INFO);
             });
         }
-
-        private Task<bool> IsFirstLaunch()
-        {
-            var firstLaunchTask = Task.Run(() => System.IO.File.Exists($@"{AppContext.Instance.CommonAppFolder}.FIRSTRUN"));
-            return firstLaunchTask;
-        }
-
+       
         private void InitSettingsTask()
         {
             Task t = new Task(new Action(async () =>
@@ -429,7 +424,9 @@ namespace TBChestTracker
                 {
                     AppContext.Instance.TessDataExists = true;
                     var languages = SettingsManager.Instance.Settings.OCRSettings.Languages;
-                    TesseractHelper.Init(SettingsManager.Instance.Settings.OCRSettings.TessDataFolder, languages);
+                    OCREngine = new OCREngine();
+
+                    OCREngine.Init(SettingsManager.Instance.Settings.OCRSettings);
                 }
                 else
                 {
@@ -607,14 +604,14 @@ namespace TBChestTracker
         public void ShowWindow()
         {
             this.Show();
-            
-            if(IsFirstLaunch().Result)
+            if(AppContext.Instance.IsFirstRun || AppContext.Instance.RequiresOCRWizard)
             {
                 //-- prompt the user to set up OCR for the first time.
                 OCRWizardWindow = new OCRWizardWindow();
                 if (OCRWizardWindow != null)
                     OCRWizardWindow.Show();
             }
+            
         }
         
         #region CaptionHook Events
@@ -707,7 +704,7 @@ namespace TBChestTracker
             CaptainHook.Uninstall();
             
             ClanManager.Instance.Destroy();
-            TesseractHelper.Destroy();
+            OCREngine.Destroy();
             com.HellStormGames.Logging.Console.Destroy();
             SettingsManager.Dispose();
             applicationManager = null;
@@ -950,7 +947,7 @@ namespace TBChestTracker
         private void StartAutomationCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             if (AppContext.Instance.NewClandatabaseBeenCreated
-                && AppContext.Instance.ClanmatesBeenAdded)
+                && AppContext.Instance.ClanmatesBeenAdded && AppContext.Instance.OCRCompleted)
             {
                 e.CanExecute = true;
             }
@@ -974,7 +971,7 @@ namespace TBChestTracker
         private void StopAutomationCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             if (AppContext.Instance.ClanmatesBeenAdded 
-                && AppContext.Instance.NewClandatabaseBeenCreated)
+                && AppContext.Instance.NewClandatabaseBeenCreated && AppContext.Instance.OCRCompleted)
                 e.CanExecute = true;
             else
                 e.CanExecute = false;

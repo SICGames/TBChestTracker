@@ -42,18 +42,23 @@ namespace TBChestTracker
 
             //-- configure default settings.
             DefaultSettings = new Settings();
+            DefaultSettings.GeneralSettings.ClanRootFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\TotalBattleChestTracker\\";
+
+            DefaultSettings.GeneralSettings.UILanguage = "English";
             DefaultSettings.OCRSettings.CaptureMethod = "GDI+";
             DefaultSettings.OCRSettings.GlobalBrightness = 0.65;
             DefaultSettings.OCRSettings.Tags = new ObservableCollection<string>(new List<string> { "Chest", "From", "Source", "Gift" });
-            DefaultSettings.GeneralSettings.ClanRootFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\TotalBattleChestTracker\\";
+            
             DefaultSettings.OCRSettings.TessDataFolder = $@"{AppContext.Instance.TesseractData}";
             DefaultSettings.OCRSettings.Languages = "eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus+pol+por+pus+ukr+deu";
-            DefaultSettings.HotKeySettings.StartAutomationKeys = "F9";
-            DefaultSettings.HotKeySettings.StopAutomationKeys = "F10";
+            
             DefaultSettings.OCRSettings.PreviewImage = String.Empty;
             DefaultSettings.OCRSettings.Threshold = 85;
             DefaultSettings.OCRSettings.MaxThreshold = 255;
-            
+
+            DefaultSettings.HotKeySettings.StartAutomationKeys = "F9";
+            DefaultSettings.HotKeySettings.StopAutomationKeys = "F10";
+
             if (AppContext.Instance.IsFirstRun)
             {
                 Settings = new Settings();
@@ -69,6 +74,7 @@ namespace TBChestTracker
                     {
                         Settings = new Settings();
                         Settings = DefaultSettings;
+                        
                         Save();
                     }
                     else
@@ -83,6 +89,7 @@ namespace TBChestTracker
 
                             }
                             Settings = DefaultSettings;
+                          
                             Save();
                         }
                     }
@@ -91,6 +98,12 @@ namespace TBChestTracker
                 {
                     //-- it's possible it's missing;
                 }
+                var aoiHeight = Settings.OCRSettings.SuggestedAreaOfInterest.height;
+                var aoiWidth = Settings.OCRSettings.SuggestedAreaOfInterest.width;
+                var claimButtonsSize = Settings.OCRSettings.ClaimChestButtons.Count;
+
+                AppContext.Instance.RequiresOCRWizard = (aoiHeight > 0 && aoiWidth > 0) ? false : true;
+                AppContext.Instance.OCRCompleted = (aoiHeight > 0 && aoiWidth > 0 && claimButtonsSize > 0) ? true : false;
             }
         }
 
@@ -168,6 +181,7 @@ namespace TBChestTracker
                 {
                     // TODO: dispose managed state (managed objects)
                     Settings.Dispose();
+                    DefaultSettings.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer

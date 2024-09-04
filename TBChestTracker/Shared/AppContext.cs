@@ -19,7 +19,8 @@ namespace TBChestTracker
     public class AppContext : INotifyPropertyChanged
     {
 
-        #region Private fields
+        #region Declarations
+
         private bool isAutomationPlayButtonEnabled;
         private bool isAutomationPauseButtonEnabled;
         private bool isAutomationStopButtonEnabled;
@@ -30,9 +31,7 @@ namespace TBChestTracker
         private string pAppName = "Total Battle Chest Tracker";
         private string pCurrentProject = "Untitled";
         private string pAppTitle = $"";
-
-        #endregion
-
+        
         public string CommonAppFolder
         {
             get => $@"{System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\SICGames\TotalBattleChestTracker\";
@@ -54,18 +53,9 @@ namespace TBChestTracker
                 return System.IO.File.Exists($"{CommonAppFolder}.FIRSTRUN");
             }
         }
-        #region AppContext() & Instance
-        public static AppContext Instance { get; private set; }
-
-        public AppContext() 
-        {
-            if (Instance == null)
-                Instance = this;
-        }
-        #endregion
+     
         public bool isAppClosing = false;
-        
-        #region Public Declarations
+      
         public Version AppVersion
         {
             get
@@ -73,6 +63,7 @@ namespace TBChestTracker
                 return Assembly.GetExecutingAssembly().GetName().Version;
             }
         }
+
         public string AppVersionString
         {
             get
@@ -166,6 +157,7 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(ClanmatesBeenAdded));
             }
         }
+
         private bool _TessDataExists = false;
 
         public bool TessDataExists 
@@ -267,6 +259,30 @@ namespace TBChestTracker
             }
         }
 
+        //-- happens incase Settings.json file is repaired or defaulted.
+        private bool _requiresOCRWizard = true;
+        public bool RequiresOCRWizard
+        {
+            get => _requiresOCRWizard;
+            set
+            {
+                _requiresOCRWizard = value;
+                OnPropertyChanged(nameof(RequiresOCRWizard));
+            }
+        }
+
+        //-- Should unlock Automation Process.
+        private bool _OCRCompleted = false;
+        public bool OCRCompleted
+        {
+            get => _OCRCompleted;
+            set
+            {
+                _OCRCompleted = value;
+                OnPropertyChanged(nameof(OCRCompleted));
+            }
+        }
+
         #endregion
 
         #region OnPropertyChanged 
@@ -275,6 +291,17 @@ namespace TBChestTracker
         {
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion
+
+
+        #region AppContext() & Instance
+        public static AppContext Instance { get; private set; }
+
+        public AppContext()
+        {
+            if (Instance == null)
+                Instance = this;
         }
         #endregion
 

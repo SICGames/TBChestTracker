@@ -19,6 +19,7 @@ using com.HellstormGames.ScreenCapture;
 using Emgu.CV;
 using Emgu.CV.Shape;
 using Emgu.CV.Structure;
+using TBChestTracker.Engine;
 using TBChestTracker.Helpers;
 using TBChestTracker.Managers;
 
@@ -249,7 +250,7 @@ namespace TBChestTracker
                         modified_image.Save($"OCR_ImageOut.png");
                     }
 
-                    var ocrResult = TesseractHelper.Read(imageScaled);
+                    var ocrResult = OCREngine.Instance.Read(imageScaled);
                     if (ocrResult != null)
                     {
                         clanmateName = ocrResult.Words.ToArray();

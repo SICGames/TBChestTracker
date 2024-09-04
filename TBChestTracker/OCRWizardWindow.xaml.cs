@@ -57,6 +57,9 @@ namespace TBChestTracker
                 {
                     System.IO.File.Delete(firstRunFile);    
                 }
+
+                AppContext.Instance.OCRCompleted = true;
+                AppContext.Instance.RequiresOCRWizard = false;
             }
         }
 

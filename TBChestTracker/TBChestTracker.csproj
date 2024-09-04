@@ -308,7 +308,6 @@
     <Compile Include="EditConditionWindow.xaml.cs">
       <DependentUpon>EditConditionWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\TesseractHelper.cs" />
     <Compile Include="Helpers\TessResult.cs" />
     <Compile Include="Helpers\Vector3.cs" />
     <Compile Include="Managers\ClanManager.cs" />

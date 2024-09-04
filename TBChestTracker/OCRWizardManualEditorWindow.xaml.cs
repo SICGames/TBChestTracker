@@ -24,6 +24,7 @@ using TBChestTracker.Managers;
 using Emgu.CV.OCR;
 using System.Security;
 using com.HellstormGames.Imaging;
+using TBChestTracker.Engine;
 
 namespace TBChestTracker
 {
@@ -246,7 +247,7 @@ namespace TBChestTracker
                             //--- ensure to make sure user is happy as a gopher
                             //--- after confirmation, save rectangle and move onto Open button editor.
 
-                            var tessy = TesseractHelper.GetTesseract();
+                            var tessy = OCREngine.Instance.OCR;
                             tessy.SetImage(modified_image);
                             if (tessy.Recognize() == 0)
                             {

@@ -29,6 +29,7 @@ using Emgu.CV.Features2D;
 using System.Windows.Navigation;
 using TBChestTracker.Helpers.Extensions;
 using com.KonquestUI.Controls;
+using TBChestTracker.Engine;
 
 namespace TBChestTracker
 {
@@ -553,7 +554,7 @@ namespace TBChestTracker
 
             Image<Gray, byte> tessy_image = bmp.ToImage<Gray, byte>();
 
-            var tessy = TesseractHelper.GetTesseract();
+            var tessy = OCREngine.Instance.OCR;
             tessy.SetImage(tessy_image);
             if (tessy.Recognize() == 0)
             {
