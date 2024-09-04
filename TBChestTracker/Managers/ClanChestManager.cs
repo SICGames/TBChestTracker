@@ -19,35 +19,54 @@ using static Emgu.CV.Features2D.ORB;
 
 namespace TBChestTracker
 {
+
+    /*
+     Revising ClanChestManager - 9/4/2024
+     Total Battle Chest Tracker 2.0
+     Goal is to improve speed. 
+     Similar to how a game gives resources, this should act the same.
+     Resource.Give("Bob",ResourceType.Gold, 100);
+     ClanChestManager.Give("Hellraiser",new ClanChest("Epic","Harpy Chest", 35));
+     Ideally, this will remove the need to create unnecessary crap in memory and hold up processing time.
+    */
     [System.Serializable]
     public class ClanChestManager
     {
+        #region Declarations
         public List<ClanChestData> clanChestData { get; set; }
         public Dictionary<string, List<ClanChestData>> ClanChestDailyData;
         private ChestProcessingState pChestProcessingState = ChestProcessingState.IDLE;
         bool filteringErrorOccurred = false;
         string lastFilterString = String.Empty;
+        #endregion
 
+        #region ChestProcessingState
         public ChestProcessingState ChestProcessingState
         {
             get => pChestProcessingState;
             set => pChestProcessingState = value;
         }
+        #endregion
 
+        #region Constructor
         public ClanChestManager()
         {
             clanChestData = new List<ClanChestData>();
             ClanChestDailyData = new Dictionary<string, List<ClanChestData>>();
             ChestProcessingState = ChestProcessingState.IDLE;
         }
+        #endregion
 
+        #region ClearData
         public void ClearData()
         {
             ClanChestDailyData.Clear();
             clanChestData.Clear();
             ClanManager.Instance.ClanmateManager.Database.Clanmates.Clear();
         }
+        #endregion
 
+        #region RemoveChestData
         public void RemoveChestData(string clanmatename)
         {
             foreach (var date in ClanChestDailyData.ToList())
@@ -67,7 +86,9 @@ namespace TBChestTracker
             SaveData();
             return;
         }
+        #endregion
 
+        #region FilterChestData & ContainsAny
         private void FilterChestData(ref List<String> data, String[] words, System.Action<string> onError)
         {
             var filtered = data.Where(d => ContainsAny(d, words));
@@ -102,6 +123,7 @@ namespace TBChestTracker
             }
             return false;
         }
+        #endregion
 
         private ProcessingTextResult ProcessText3(List<string> result)
         {
@@ -355,7 +377,6 @@ namespace TBChestTracker
             AppContext.Instance.isAnyGiftsAvailable = true;
             ProcessingTextResult textResult = ProcessText3(resulttext);
 
-            //List<ChestData> tmpchests = ProcessText3(resulttext);
             if (textResult.Status != ProcessingStatus.OK)
             {
                 onError(new ChestProcessingError($"{textResult.Message}"));
