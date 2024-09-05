@@ -35,7 +35,10 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(Clanmates));   
             }
         }
-
+        public Clanmate Find(string clanmatename)
+        {
+            return Clanmates.Where(name => name.Name.ToLower().Equals(clanmatename.ToLower())).FirstOrDefault();   
+        }
         #region OnPropertyChanged 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(String propertyName)

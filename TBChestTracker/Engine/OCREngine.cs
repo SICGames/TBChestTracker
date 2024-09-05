@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Emgu.CV;
 using Emgu.CV.OCR;
 using TBChestTracker.Helpers;
+using System.Diagnostics;
+using Emgu.CV.Structure;
 
 namespace TBChestTracker.Engine
 {
@@ -25,7 +27,7 @@ namespace TBChestTracker.Engine
             {
                 if (OCR == null)
                 {
-                    OCR = new Tesseract(ocrSettings.TessDataFolder, ocrSettings.Languages, OcrEngineMode.TesseractLstmCombined, null, true);
+                    OCR = new Tesseract(ocrSettings.TessDataFolder, ocrSettings.Languages, OcrEngineMode.TesseractOnly);
                 }
             }
             catch (Exception ex)
@@ -73,6 +75,7 @@ namespace TBChestTracker.Engine
                 {
                     return null;
                 }
+
                 //-- AccessViolationException -- Correupted Memory sometimes.
                 OCR.SetImage(image);
                 OCR.Recognize();

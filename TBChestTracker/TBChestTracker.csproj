@@ -14,6 +14,8 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -40,7 +42,7 @@
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>latest</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -51,7 +53,7 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>latest</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
@@ -61,7 +63,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>latest</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
@@ -71,7 +73,7 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>latest</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
@@ -81,7 +83,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>ARM64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>latest</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
@@ -91,7 +93,7 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>ARM64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>latest</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
@@ -133,6 +135,12 @@
     <Compile Include="AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AbsentClanmatesCleanerWindow.xaml.cs">
+      <DependentUpon>AbsentClanmatesCleanerWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AbsentClanmatesWindow.xaml.cs">
+      <DependentUpon>AbsentClanmatesWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Arrays\IDataCollection.cs" />
     <Compile Include="Automation\Automator.cs" />
     <Compile Include="ChestBuilderWindow.xaml.cs">
@@ -153,6 +161,9 @@
     <Compile Include="ClanInsights\ClanInsightsData.cs" />
     <Compile Include="Clanmate\Clanmate.cs" />
     <Compile Include="Clanmate\ClanmateDatabase.cs" />
+    <Compile Include="ClanWealthBuilderWindow.xaml.cs">
+      <DependentUpon>ClanWealthBuilderWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ClanWizardWindow.xaml.cs">
       <DependentUpon>ClanWizardWindow.xaml</DependentUpon>
     </Compile>
@@ -210,6 +221,15 @@
       <DependentUpon>OCRWizardWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="OCRWizard\OCRWizardEventArgs.cs" />
+    <Compile Include="Pages\AbsentClanmates\ErrorPage.xaml.cs">
+      <DependentUpon>ErrorPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\AbsentClanmates\ProcessingPage.xaml.cs">
+      <DependentUpon>ProcessingPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\AbsentClanmates\ResultsPage.xaml.cs">
+      <DependentUpon>ResultsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\ClanPage.xaml.cs">
       <DependentUpon>ClanPage.xaml</DependentUpon>
     </Compile>
@@ -267,6 +287,7 @@
     <Compile Include="Settings\MarkerCollection.cs" />
     <Compile Include="Settings\OCRSettings.cs" />
     <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Shared\AbsentClanmatesViewModel.cs" />
     <Compile Include="Shared\AppContext.cs" />
     <Compile Include="SplashScreen.xaml.cs">
       <DependentUpon>SplashScreen.xaml</DependentUpon>
@@ -344,11 +365,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="AbsentClanmatesCleanerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AbsentClanmatesWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ChestBuilderWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ClanInsightsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ClanWealthBuilderWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -445,6 +478,18 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="OCRWizardWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\AbsentClanmates\ErrorPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\AbsentClanmates\ProcessingPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\AbsentClanmates\ResultsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -569,7 +614,7 @@
       <Version>1.0.1</Version>
     </PackageReference>
     <PackageReference Include="CefSharp.Wpf">
-      <Version>126.2.180</Version>
+      <Version>127.3.50</Version>
     </PackageReference>
     <PackageReference Include="CsvHelper">
       <Version>33.0.1</Version>

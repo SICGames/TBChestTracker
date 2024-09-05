@@ -129,7 +129,7 @@ namespace TBChestTracker
                 imageOut.Save($"OCR_ImageOut.png");
                 imageThreshold.Save($"OCR_Threshold.png");
             }
-
+            
             var ocrResult = OCREngine.Read(imageThreshold);
             
             imageThreshold.Dispose();
@@ -1155,7 +1155,8 @@ namespace TBChestTracker
 
         private void AbsentClanmateCleanerMenuItem_Click(object sender, RoutedEventArgs e)
         {
-
+            AbsentClanmatesCleanerWindow absentClanmatesCleanerWindow = new AbsentClanmatesCleanerWindow();
+            absentClanmatesCleanerWindow.ShowDialog();
         }
 
         private void ClanWealthBuilderMenuItem_Click(object sender, RoutedEventArgs e)

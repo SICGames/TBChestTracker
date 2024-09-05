@@ -11,6 +11,7 @@ using Newtonsoft;
 using Newtonsoft.Json;
 using System.ComponentModel;
 using System.Windows;
+using TBChestTracker.Managers;
 
 namespace TBChestTracker
 {
@@ -156,6 +157,12 @@ namespace TBChestTracker
                 sw.Write(jsondata);
                 sw.Close();
             }
+        }
+        public void CreateBackup()
+        {
+            var clanmatedb = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}";
+            clanmatedb = clanmatedb.Replace(".db", ".old");
+            Save(clanmatedb);
         }
     }
 }

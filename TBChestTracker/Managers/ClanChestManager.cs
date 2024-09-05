@@ -57,6 +57,44 @@ namespace TBChestTracker
         }
         #endregion
 
+        #region Give Chest
+        public void Give(string clanmate, ClanChestData pClanChestData)
+        {
+            //-- needs to finish before release.
+            var todayStr = DateTime.Now.ToShortDateString();
+            var currentClanChestDate = ClanChestDailyData.Where(d => d.Key.Equals(todayStr));
+            var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates.ToList();
+            if (currentClanChestDate.Count() == 0)
+            {
+                //-- new date needs to be placed.
+                clanChestData.Clear();
+                foreach(var mate in clanmates)
+                {
+                    clanChestData.Add(new ClanChestData(mate.Name, null, 0));
+                }
+
+                ClanChestDailyData.Add(DateTime.Now.ToString("d", new CultureInfo(CultureInfo.CurrentCulture.Name)), clanChestData);
+            }
+            bool bAliasFound = false;
+            var bClanmate = ClanManager.Instance.ClanmateManager.Database.Find(clanmate); //clanmates.Select(mate_name => mate_name.Name).Contains(clanmate, StringComparer.CurrentCultureIgnoreCase);
+            if(bClanmate != null)
+            {
+                //-- Check Aliases
+                foreach (var mate in clanmates)
+                {
+                    if (mate.Aliases.Count > 0)
+                    {
+                        var aliasMatches = mate.Aliases.Contains(clanmate, StringComparer.CurrentCultureIgnoreCase);
+                        if (aliasMatches)
+                        {
+
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
+
         #region ClearData
         public void ClearData()
         {
@@ -125,6 +163,7 @@ namespace TBChestTracker
         }
         #endregion
 
+        #region ProcessText3 
         private ProcessingTextResult ProcessText3(List<string> result)
         {
             ProcessingTextResult ProcessingTextResult = new ProcessingTextResult();
@@ -332,7 +371,9 @@ namespace TBChestTracker
 
             return ProcessingTextResult;
         }
+        #endregion
 
+        #region CreateClanChestData
         private List<ClanChestData> CreateClanChestData(List<ChestData> chestdata)
         {
             List<ClanChestData> clanChestData = new List<ClanChestData>();
@@ -352,6 +393,7 @@ namespace TBChestTracker
             }
             return clanChestData;
         }
+        #endregion
 
         public ClanChestProcessResult ProcessChestData(List<string> result, System.Action<ChestProcessingError> onError)
         {
