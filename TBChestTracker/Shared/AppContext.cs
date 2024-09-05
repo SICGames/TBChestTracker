@@ -70,7 +70,7 @@ namespace TBChestTracker
             {
                 var extraStr = String.Empty;
 #if PREVIEW_BUILD
-                extraStr = "'Preview Build'";
+                extraStr = "'Preview 2'";
 #endif
 
                 return $"v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} [{extraStr}]";

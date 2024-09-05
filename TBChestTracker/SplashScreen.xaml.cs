@@ -84,7 +84,7 @@ namespace TBChestTracker
             var version = Assembly.GetExecutingAssembly().GetName().Version;
             AppVersion = $"v{version.Major}.{version.Minor}.{version.Build}";
 #if PREVIEW_BUILD
-            BuildMode = "['Preview']";
+            BuildMode = "['Preview 2']";
 #endif
         
         }

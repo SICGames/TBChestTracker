@@ -95,6 +95,90 @@ namespace TBChestTracker
         }
         #endregion
 
+        //-- RepairChestData returns false if nothing needs to be done. Returns true if it's been repaired.
+        public bool RepairChestData()
+        {
+            int chestErrors = 0;
+
+            var chestsettings = ClanManager.Instance.ClanChestSettings;
+            var chestdata = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
+            if (chestsettings.GeneralClanSettings.ChestOptions != ChestOptions.UsePoints)
+            {
+                return false;
+            }
+
+            var chestpointsvalues = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints;
+
+            foreach (var dates in chestdata.Keys)
+            {
+                var data = chestdata[dates];
+                foreach (var _data in data)
+                {
+                    var clanmate_points = _data.Points;
+                    var chests = _data.chests;
+
+                    var total_chest_points = 0;
+
+                    if (chests != null)
+                    {
+                        foreach (var chest in chests)
+                        {
+                            foreach (var chestpointvalue in chestpointsvalues)
+                            {
+                                var chestname = chest.Name;
+                                var chesttype = chest.Type;
+
+                                if (chesttype.ToLower().Contains(chestpointvalue.ChestType.ToLower()))
+                                {
+                                    if (chestpointvalue.ChestName.Equals("(Any)"))
+                                    {
+                                        if (!chestpointvalue.Level.Equals("(Any)"))
+                                        {
+                                            var chestlevel = Int32.Parse(chestpointvalue.Level);
+                                            if (chest.Level == chestlevel)
+                                            {
+                                                total_chest_points += chestpointvalue.PointValue;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (chestname.ToLower().Contains(chestpointvalue.ChestName.ToLower()))
+                                        {
+                                            if (!chestpointvalue.Level.Equals("(Any)"))
+                                            {
+                                                var chestlevel = Int32.Parse(chestpointvalue.Level);
+                                                if (chest.Level == chestlevel)
+                                                {
+                                                    total_chest_points += chestpointvalue.PointValue;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if (clanmate_points != total_chest_points)
+                        {
+                            _data.Points = total_chest_points;
+                            chestErrors++;
+                        }
+                    }
+                }
+            }
+
+            if(chestErrors > 0)
+            {
+                com.HellStormGames.Logging.Console.Write("Chest Data Automatically Repaired", "Chest Integrity", LogType.INFO);
+                return true;
+            }
+            com.HellStormGames.Logging.Console.Write("Chest Data looks good. No repairs needed.", "Chest Integrity", LogType.INFO);
+            return false;
+        }
+        
         #region ClearData
         public void ClearData()
         {

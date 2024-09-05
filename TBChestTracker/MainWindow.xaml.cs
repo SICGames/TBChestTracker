@@ -767,6 +767,7 @@ namespace TBChestTracker
                     
                     AppContext.Instance.IsCurrentClandatabase = true;
                     AppContext.Instance.IsAutomationPlayButtonEnabled = true;
+                    ClanManager.Instance.ClanChestManager.RepairChestData();
                     response(true);
                 }
                 else
@@ -841,6 +842,7 @@ namespace TBChestTracker
 
                         AppContext.Instance.IsCurrentClandatabase = true;
                         AppContext.Instance.IsAutomationPlayButtonEnabled = true;
+                        ClanManager.Instance.ClanChestManager.RepairChestData();
                         response(true);
                     }
                     else

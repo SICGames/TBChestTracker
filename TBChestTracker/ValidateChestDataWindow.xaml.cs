@@ -68,17 +68,6 @@ namespace TBChestTracker
                             var chesttype = chest.Type;
                             var chestSource = chest.Source;
                             var chestname = chest.Name;
-
-                            /*
-                            if (chestSource.ToLower().Contains("jormungandr"))
-                            {
-                                if (chesttype == ChestType.OTHER)
-                                {
-                                    chest.Type = ChestType.JORMUNGANDR;
-                                    chestErrors++;
-                                }
-                            }
-                            */
                         }
                     }
                 }
@@ -100,7 +89,6 @@ namespace TBChestTracker
             //--- if not, replace point value
             //--- alert or change status to completed and close
             var chestsettings = ClanManager.Instance.ClanChestSettings;
-
             var chestdata = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
 
             if (chestsettings.GeneralClanSettings.ChestOptions != ChestOptions.UsePoints)
@@ -135,6 +123,7 @@ namespace TBChestTracker
                     data = cleaned_data;
                 }
                 */
+
                 foreach (var _data in data)
                 {
                     var clanmate_points = _data.Points;
@@ -149,26 +138,39 @@ namespace TBChestTracker
                             foreach (var chestpointvalue in chestpointsvalues)
                             {
                                 var chestname = chest.Name;
-                                if (chestpointvalue.ChestType.ToLower() == "custom")
+                                var chesttype = chest.Type;
+                                 
+                                if(chesttype.ToLower().Contains(chestpointvalue.ChestType.ToLower()))
                                 {
-                                    if (chestname.ToLower().Equals(chestpointvalue.ChestName.ToLower()))
+                                    if (chestpointvalue.ChestName.Equals("(Any)"))
                                     {
-                                        total_chest_points += chestpointvalue.PointValue;
-                                        break;
-                                    }
-                                }
-                                if (chest.Type.ToString().ToLower() == chestpointvalue.ChestType.ToLower())
-                                {
-                                    if (!chestpointvalue.Level.Equals("(Any)"))
-                                    {
-                                        var chestlevel = Int32.Parse(chestpointvalue.Level);
-                                        if (chest.Level == chestlevel)
+                                        if (!chestpointvalue.Level.Equals("(Any)"))
                                         {
-                                            total_chest_points += chestpointvalue.PointValue;
-                                            break;
+                                            var chestlevel = Int32.Parse(chestpointvalue.Level);
+                                            if (chest.Level == chestlevel)
+                                            {
+                                                total_chest_points += chestpointvalue.PointValue;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (chestname.ToLower().Contains(chestpointvalue.ChestName.ToLower()))
+                                        {
+                                            if (!chestpointvalue.Level.Equals("(Any)"))
+                                            {
+                                                var chestlevel = Int32.Parse(chestpointvalue.Level);
+                                                if (chest.Level == chestlevel)
+                                                {
+                                                    total_chest_points += chestpointvalue.PointValue;
+                                                    break;
+                                                }
+                                            }
                                         }
                                     }
                                 }
+
                             }
                         }
                         if (clanmate_points != total_chest_points)
