@@ -311,7 +311,7 @@
     </Compile>
     <Compile Include="Chest\Chest.cs" />
     <Compile Include="Chest\ChestConditions.cs" />
-    <Compile Include="Chest\ChestCountData.cs" />
+    <Compile Include="Chest\ChestExportData.cs" />
     <Compile Include="Chest\ChestDailyData.cs" />
     <Compile Include="Chest\ChestData.cs" />
     <Compile Include="ChestingRequirementsWindow.xaml.cs">

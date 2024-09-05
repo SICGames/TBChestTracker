@@ -173,6 +173,8 @@ namespace TBChestTracker
             if(chestErrors > 0)
             {
                 com.HellStormGames.Logging.Console.Write("Chest Data Automatically Repaired", "Chest Integrity", LogType.INFO);
+                CreateBackup();
+                SaveData();
                 return true;
             }
             com.HellStormGames.Logging.Console.Write("Chest Data looks good. No repairs needed.", "Chest Integrity", LogType.INFO);

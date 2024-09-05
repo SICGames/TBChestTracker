@@ -38,7 +38,7 @@ namespace TBChestTracker
 
     
 
-        private void InitChestExportData()
+        private void InitChestExportData(bool bUsePoints = false)
         {
             ChestExportDataCollection.Clear();
             var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates;
@@ -55,6 +55,11 @@ namespace TBChestTracker
                     }
                 }
                 chestExportData.Total = 0;
+                if(bUsePoints)
+                {
+                    chestExportData.PointsHeader.Add("Points", 0);
+                }
+
                 ChestExportDataCollection.Add(chestExportData); 
             }
         }
@@ -142,11 +147,21 @@ namespace TBChestTracker
                                     }
                                 }
                             }
-                            chestexportdata.Total += bUsePoints == false ? chestdata.chests.Count() : chestdata.Points;
+
+                            chestexportdata.Total += chestdata.chests.Count();
+                            if(bUsePoints)
+                            {
+
+                                chestexportdata.PointsHeader["Points"] += chestdata.Points;
+                            }
                         }
                         else
                         {
                             chestexportdata.Total += 0;
+                            if (bUsePoints)
+                            {
+                                chestexportdata.PointsHeader["Points"] += 0;
+                            }
                         }
                     }
                 }
@@ -237,11 +252,25 @@ namespace TBChestTracker
 
             if (ExportSettings.SortOption == SortType.ASCENDING)
             {
-                result = ChestExportDataCollection.OrderBy(i => i.Total).ToList();
+                if (ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions == ChestOptions.UsePoints)
+                {
+                    result = ChestExportDataCollection.OrderBy(i => i.PointsHeader["Points"]).ToList();
+                }
+                else
+                {
+                    result = ChestExportDataCollection.OrderBy(i => i.Total).ToList();
+                }
             }
             else if(ExportSettings.SortOption == SortType.DESENDING)
             {
-                result = ChestExportDataCollection.OrderByDescending(i => i.Total).ToList();
+                if (ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions == ChestOptions.UsePoints)
+                {
+                    result = ChestExportDataCollection.OrderByDescending(i => i.PointsHeader["Points"]).ToList();
+                }
+                else
+                {
+                    result = ChestExportDataCollection.OrderByDescending(i => i.Total).ToList();
+                }
             }
             else if(ExportSettings.SortOption == SortType.NONE)
             {
@@ -271,6 +300,10 @@ namespace TBChestTracker
                     }
 
                     headers.Add("Total");
+                    if(ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions == ChestOptions.UsePoints)
+                    {
+                        headers.Add("Points");
+                    }
 
                     foreach (var heading in headers)
                     {
@@ -293,6 +326,10 @@ namespace TBChestTracker
                         }
 
                         csv.WriteField(item.Total);
+                        if(ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions == ChestOptions.UsePoints)
+                        {
+                            csv.WriteField(item.PointsHeader["Points"]);
+                        }
                         csv.NextRecord();
                     }
 
@@ -314,7 +351,9 @@ namespace TBChestTracker
             ChestExportDataCollection = new List<ChestExportData>();
 
             //-- let's figure out the best 
-            InitChestExportData();
+            var bUsePoints = clanSettings.GeneralClanSettings.ChestOptions == ChestOptions.UsePoints ? true : false;
+
+            InitChestExportData(bUsePoints);
 
             if(clanSettings.GeneralClanSettings.ChestOptions == ChestOptions.UseConditions)
             {
