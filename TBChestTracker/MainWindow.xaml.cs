@@ -507,18 +507,16 @@ namespace TBChestTracker
                 {
                     splashScreen.UpdateStatus("Checking For Updates...", 0);
                 }));
-                await Task.Delay(100);
+                await Task.Delay(500);
                 var upgradeAvailable = await CheckForUpgrades();
-                if (upgradeAvailable)
-                {
-
-                }
+                AppContext.Instance.upgradeAvailable = true; //upgradeAvailable;
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     splashScreen.UpdateStatus("Initalizing...", 10);
                 }));
-                
+
+                await Task.Delay(500);
                 SettingsManager = await InitSettings();
 
                 if(SettingsManager == null)
@@ -1181,6 +1179,11 @@ namespace TBChestTracker
         }
 
         private void ClanWealthBuilderMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void UpgradeAlertButton_Click(object sender, RoutedEventArgs e)
         {
 
         }

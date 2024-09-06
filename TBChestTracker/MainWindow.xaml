@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
         xmlns:Commands="clr-namespace:Hellscape.Commands"
-        xmlns:UIControls="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
+        xmlns:ui="clr-namespace:TBChestTracker.UI"
         xmlns:UI="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
         xmlns:locale="clr-namespace:TBChestTracker.Localization"
         xmlns:ResourceStrings="clr-namespace:TBChestTracker.Resources"
@@ -390,6 +390,9 @@
                
             </DockPanel>
             <!-- ui:NotificationButton -->
+            <ui:Notification  Source="pack://application:,,,/Images/notificationBell-Black.png" Grid.Column="1" Margin="15,0" Width="24" Height="24" ShowNotification="{Binding upgradeAvailable}" 
+                              AlertColor="#00aaff" ToolTip="{x:Static ResourceStrings:Strings.UpgradeNotification}" x:Name="UpgradeAlertButton" Click="UpgradeAlertButton_Click"/>
+            <!--
             <UI:FancyImageButton Height="24" Width="24"  Grid.Column="1" Margin="15,0"
               HighlightOpacity="0.25" 
               HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
@@ -397,6 +400,7 @@
               ToolTip="{x:Static ResourceStrings:Strings.UpgradeNotification}"
               ImageSource="pack://application:,,,/Images/notificationBell-Black.png"
               IsEnabled="True" HorizontalAlignment="Right" x:Name="NotificationButton"/>
+            -->
         </Grid>
        
         <Grid x:Name="UpdatePanel" Visibility="Visible" Grid.Row="2">

@@ -31,7 +31,18 @@ namespace TBChestTracker
         private string pAppName = "Total Battle Chest Tracker";
         private string pCurrentProject = "Untitled";
         private string pAppTitle = $"";
-        
+
+        private bool _upgradeAvailable = false;
+        public bool upgradeAvailable
+        {
+            get => _upgradeAvailable;
+            set
+            {
+                _upgradeAvailable = value;
+                OnPropertyChanged(nameof(upgradeAvailable));
+            }
+        }
+
         public string CommonAppFolder
         {
             get => $@"{System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\SICGames\TotalBattleChestTracker\";

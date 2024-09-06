@@ -208,9 +208,23 @@ namespace TBChestTracker
                 SaveUpdateManifest();
                 return false;
             }
-            var hashMatches = MD5Helper.Verify($"{latest.Name}%{latest.Url}%{latest.CreatedAt.DateTime.ToString()}", UpdateManifest.Hash);
 
-            return !hashMatches;
+            var hashMatches = MD5Helper.Verify($"{latest.Name}%{latest.Url}%{latest.CreatedAt.DateTime.ToString()}", UpdateManifest.Hash);
+            if(hashMatches == false)
+            {
+                //-- we have an upgrade available.
+                UpdateManifest.Hash = MD5Helper.Create($"{latest.Name}%{latest.Url}%{latest.CreatedAt.DateTime.ToString()}");
+                UpdateManifest.AssetUrl = latest.Assets[0].BrowserDownloadUrl;
+                UpdateManifest.Url = latest.HtmlUrl;
+                UpdateManifest.Name = latest.Name;
+                UpdateManifest.DateCreated = latest.CreatedAt.DateTime;
+                UpdateManifest.Description = latest.Body;
+
+                return true;
+            }
+
+            return false;
+            
         }
     }
 }

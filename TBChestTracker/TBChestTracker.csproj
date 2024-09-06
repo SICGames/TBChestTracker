@@ -359,6 +359,7 @@
     <Compile Include="UI\MilestoneStep.xaml.cs">
       <DependentUpon>MilestoneStep.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Notification.cs" />
     <Compile Include="UpdateManifest\UpdateManifest.cs" />
     <Compile Include="ValidateChestDataWindow.xaml.cs">
       <DependentUpon>ValidateChestDataWindow.xaml</DependentUpon>
