@@ -367,6 +367,15 @@ namespace TBChestTracker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Upgrade Notification.
+        /// </summary>
+        public static string UpgradeNotification {
+            get {
+                return ResourceManager.GetString("UpgradeNotification", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Verify Chest Data Integrity.
         /// </summary>
         public static string VerifyChestDataIntegrity {

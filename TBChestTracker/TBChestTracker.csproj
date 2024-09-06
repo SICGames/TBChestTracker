@@ -685,6 +685,9 @@
     <Content Include="Images\NewWizardIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\notificationBell-Black.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\OCRWizard\Chests_Highlighted.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

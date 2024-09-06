@@ -245,7 +245,7 @@
     </Window.Resources>
     <!--#endregion-->
 
-    <Grid Background="#dddddd">
+    <Grid Background="#F6F6F6">
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
             <RowDefinition Height="36"/>
@@ -254,7 +254,6 @@
         <DockPanel Grid.Row="0" LastChildFill="True">
             <Menu DockPanel.Dock="Top" Height="auto" VerticalAlignment="Top">
                 <!-- File menu -->
-                
                     <!--="{Binding Path=[FileMenu], Source={x:Static locale:LocalizationManager.LocalizedDictionary}}"-->
                 <MenuItem Header="{x:Static ResourceStrings:Strings.File}">
                     <MenuItem Header="{x:Static ResourceStrings:Strings.ClanManager}" x:Name="ClanManagerMenuItem" Command="Commands:CustomCommandBindings.ClanManager"/>
@@ -295,101 +294,111 @@
                 <MenuItem Header="{x:Static ResourceStrings:Strings.Patreon}" x:Name="Patreon" Click="Patreon_Click"/>
             </Menu>
         </DockPanel>
-        <ToolBarTray Grid.Row="1" Height="36" IsLocked="True">
-            <ToolBar Style="{DynamicResource ToolBarStyle1}" 
-                         Height="36" ToolBar.OverflowMode="Never"
-                         Grid.Row="1"
-                         Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type ToolBarTray}}, Path=ActualWidth}"
-                         VerticalAlignment="Center" HorizontalAlignment="Center">
-
+        <Grid Grid.Row="1" Height="36">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <DockPanel LastChildFill="False" Grid.Column="0" Height="36" Background="#f6f6f6">
                 <UI:FancyImageButton Height="24" Width="24" 
-                                     HighlightOpacity="0.25" 
-                                     HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
-                                     HighlightStrokeBrush="#0044FF" Corners="0"
-                                     ImageSource="pack://application:,,,/Images/ClanManagerIcon.png"
-                                     ToolTip="{x:Static ResourceStrings:Strings.ManageClansTooltip}"
-                                     Command="Commands:CustomCommandBindings.ClanManager" 
-                                     IsEnabled="True"/>
-                <Separator/>
+                              HighlightOpacity="0.25" 
+                              HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
+                              HighlightStrokeBrush="#0044FF" Corners="0"
+                              ImageSource="pack://application:,,,/Images/ClanManagerIcon.png"
+                              ToolTip="{x:Static ResourceStrings:Strings.ManageClansTooltip}"
+                              Command="Commands:CustomCommandBindings.ClanManager" 
+                              IsEnabled="True"/>
+                <Separator Width="2" Background="#777"/>
                 <UI:FancyImageButton Height="24" Width="24" 
-                         HighlightOpacity="0.25" 
-                         HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
-                         HighlightStrokeBrush="#0044FF" Corners="0"
-                         ImageSource="pack://application:,,,/Images/clanmatesIcon.png"
-                         ToolTip="{x:Static ResourceStrings:Strings.ManageClanmatesTooltip}"
-                         Command="Commands:CustomCommandBindings.ManageClanmates" 
-                         IsEnabled="{Binding IsCurrentClandatabase}">
+                  HighlightOpacity="0.25" 
+                  HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
+                  HighlightStrokeBrush="#0044FF" Corners="0"
+                  ImageSource="pack://application:,,,/Images/clanmatesIcon.png"
+                  ToolTip="{x:Static ResourceStrings:Strings.ManageClanmatesTooltip}"
+                  Command="Commands:CustomCommandBindings.ManageClanmates" 
+                  IsEnabled="{Binding IsCurrentClandatabase}">
                 </UI:FancyImageButton>
 
                 <UI:FancyImageButton Height="24" Width="24" 
-                        HighlightOpacity="0.25" 
-                        HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
-                        HighlightStrokeBrush="#0044FF" Corners="0"
-                        ImageSource="pack://application:,,,/Images/icons_chest_1.png"
-                        ToolTip="{x:Static ResourceStrings:Strings.ManageClanChestSettingsTooltip}"
-                        Command="Commands:CustomCommandBindings.ManageClanChestSettings" 
-                        IsEnabled="{Binding IsCurrentClandatabase}"/>
+                 HighlightOpacity="0.25" 
+                 HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
+                 HighlightStrokeBrush="#0044FF" Corners="0"
+                 ImageSource="pack://application:,,,/Images/icons_chest_1.png"
+                 ToolTip="{x:Static ResourceStrings:Strings.ManageClanChestSettingsTooltip}"
+                 Command="Commands:CustomCommandBindings.ManageClanChestSettings" 
+                 IsEnabled="{Binding IsCurrentClandatabase}"/>
 
                 <Separator/>
 
                 <UI:FancyImageButton Height="24" Width="24" 
-                        HighlightOpacity="0.25" 
-                        HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
-                        HighlightStrokeBrush="#0044FF" Corners="0"
-                        ImageSource="pack://application:,,,/Images/StartAutomationIcon.png"
-                        ToolTip="{x:Static ResourceStrings:Strings.StartAutomationTooltip}"
-                        Command="Commands:CustomCommandBindings.StartAutomation" 
-                        IsEnabled="{Binding IsAutomationPlayButtonEnabled}"/>
+                 HighlightOpacity="0.25" 
+                 HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
+                 HighlightStrokeBrush="#0044FF" Corners="0"
+                 ImageSource="pack://application:,,,/Images/StartAutomationIcon.png"
+                 ToolTip="{x:Static ResourceStrings:Strings.StartAutomationTooltip}"
+                 Command="Commands:CustomCommandBindings.StartAutomation" 
+                 IsEnabled="{Binding IsAutomationPlayButtonEnabled}"/>
 
                 <UI:FancyImageButton Height="24" Width="24" 
-                        HighlightOpacity="0.25" 
-                        HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
-                        HighlightStrokeBrush="#0044FF" Corners="0"
-                        ImageSource="pack://application:,,,/Images/StopAutomation.png"
-                        ToolTip="{x:Static ResourceStrings:Strings.StopAutomationTooltip}"
-                        Command="Commands:CustomCommandBindings.StopAutomation" 
-                        IsEnabled="{Binding IsAutomationStopButtonEnabled}"/>
+                 HighlightOpacity="0.25" 
+                 HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
+                 HighlightStrokeBrush="#0044FF" Corners="0"
+                 ImageSource="pack://application:,,,/Images/StopAutomation.png"
+                 ToolTip="{x:Static ResourceStrings:Strings.StopAutomationTooltip}"
+                 Command="Commands:CustomCommandBindings.StopAutomation" 
+                 IsEnabled="{Binding IsAutomationStopButtonEnabled}"/>
                 <Separator/>
                 <UI:FancyImageButton Height="24" Width="24" 
-                      HighlightOpacity="0.25" 
-                      HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
-                      HighlightStrokeBrush="#0044FF" Corners="0"
-                      ImageSource="pack://application:,,,/Images/OCR_Icon.png"
-                      x:Name="OCRWizardButton"
-                      Click="OCRWizardButton_Click"
-                      ToolTip="{x:Static ResourceStrings:Strings.LaunchOCRWizardTooltip}"
-                      IsEnabled="True"/>
+               HighlightOpacity="0.25" 
+               HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
+               HighlightStrokeBrush="#0044FF" Corners="0"
+               ImageSource="pack://application:,,,/Images/OCR_Icon.png"
+               x:Name="OCRWizardButton"
+               Click="OCRWizardButton_Click"
+               ToolTip="{x:Static ResourceStrings:Strings.LaunchOCRWizardTooltip}"
+               IsEnabled="True"/>
 
                 <UI:FancyImageButton Height="24" Width="24" 
-                      HighlightOpacity="0.25" 
-                      HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
-                      HighlightStrokeBrush="#0044FF" Corners="0"
-                      ImageSource="pack://application:,,,/Images/ConsoleIcon.png"
-                      ToolTip="{x:Static ResourceStrings:Strings.ConsoleWindowTooltip}"
-                      IsEnabled="True"
-                      x:Name="ConsoleButton"
-                      Click="ConsoleButton_Click"/>
+               HighlightOpacity="0.25" 
+               HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
+               HighlightStrokeBrush="#0044FF" Corners="0"
+               ImageSource="pack://application:,,,/Images/ConsoleIcon.png"
+               ToolTip="{x:Static ResourceStrings:Strings.ConsoleWindowTooltip}"
+               IsEnabled="True"
+               x:Name="ConsoleButton"
+               Click="ConsoleButton_Click"/>
                 <Separator/>
                 <UI:FancyImageButton Height="24" Width="24" 
-                            HighlightOpacity="0.25" 
-                            HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
-                            HighlightStrokeBrush="#0044FF" Corners="0"
-                            ImageSource="pack://application:,,,/Images/ClanStatsIcon.png"
-                            ToolTip="{x:Static ResourceStrings:Strings.ClanInsightsTooltip}"
-                            Command="Commands:CustomCommandBindings.ClanStats" 
-                            IsEnabled="{Binding IsCurrentClandatabase}"/>
-                
-                <Separator/>
+                     HighlightOpacity="0.25" 
+                     HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
+                     HighlightStrokeBrush="#0044FF" Corners="0"
+                     ImageSource="pack://application:,,,/Images/ClanStatsIcon.png"
+                     ToolTip="{x:Static ResourceStrings:Strings.ClanInsightsTooltip}"
+                     Command="Commands:CustomCommandBindings.ClanStats" 
+                     IsEnabled="{Binding IsCurrentClandatabase}"/>
+
+                <Separator Width="2"/>
                 <UI:FancyImageButton Height="24" Width="24" 
-                      HighlightOpacity="0.25" 
-                      HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
-                      HighlightStrokeBrush="#0044FF" Corners="0"
-                      ToolTip="{x:Static ResourceStrings:Strings.Settings}"
-                      Command="Commands:CustomCommandBindings.ManageSettings" 
-                      ImageSource="pack://application:,,,/Images/SettingsIcon01.png"
-                      IsEnabled="True"/>
-            </ToolBar>
-        </ToolBarTray>
+               HighlightOpacity="0.25" 
+               HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
+               HighlightStrokeBrush="#0044FF" Corners="0"
+               ToolTip="{x:Static ResourceStrings:Strings.Settings}"
+               Command="Commands:CustomCommandBindings.ManageSettings" 
+               ImageSource="pack://application:,,,/Images/SettingsIcon01.png"
+               IsEnabled="True"/>
+
+               
+            </DockPanel>
+            <!-- ui:NotificationButton -->
+            <UI:FancyImageButton Height="24" Width="24"  Grid.Column="1" Margin="15,0"
+              HighlightOpacity="0.25" 
+              HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
+              HighlightStrokeBrush="#0044FF" Corners="0"
+              ToolTip="{x:Static ResourceStrings:Strings.UpgradeNotification}"
+              ImageSource="pack://application:,,,/Images/notificationBell-Black.png"
+              IsEnabled="True" HorizontalAlignment="Right" x:Name="NotificationButton"/>
+        </Grid>
+       
         <Grid x:Name="UpdatePanel" Visibility="Visible" Grid.Row="2">
             
         </Grid>
