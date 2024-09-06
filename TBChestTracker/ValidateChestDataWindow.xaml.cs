@@ -153,6 +153,11 @@ namespace TBChestTracker
                                                 break;
                                             }
                                         }
+                                        else
+                                        {
+                                            total_chest_points += chestpointvalue.PointValue;
+                                            break;
+                                        }
                                     }
                                     else
                                     {
@@ -166,6 +171,11 @@ namespace TBChestTracker
                                                     total_chest_points += chestpointvalue.PointValue;
                                                     break;
                                                 }
+                                            }
+                                            else
+                                            {
+                                                total_chest_points += chestpointvalue.PointValue;
+                                                break;
                                             }
                                         }
                                     }

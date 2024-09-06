@@ -141,6 +141,11 @@ namespace TBChestTracker
                                                 break;
                                             }
                                         }
+                                        else
+                                        {
+                                            total_chest_points += chestpointvalue.PointValue;
+                                            break;
+                                        }
                                     }
                                     else
                                     {
@@ -154,6 +159,12 @@ namespace TBChestTracker
                                                     total_chest_points += chestpointvalue.PointValue;
                                                     break;
                                                 }
+                                              
+                                            }
+                                            else
+                                            {
+                                                total_chest_points += chestpointvalue.PointValue;
+                                                break;
                                             }
                                         }
                                     }
@@ -607,28 +618,47 @@ namespace TBChestTracker
                                 foreach (var pointvalue in pointvalues)
                                 {
                                     var chest_type = m_chest.Type.ToString();
+                                    var chest_name = m_chest.Name.ToString();
+
                                     var level = m_chest.Level;
 
-                                    if(pointvalue.ChestType.ToLower() == "custom")
+                                    if(pointvalue.ChestType.ToLower().Contains(chest_type.ToLower().ToString()))
                                     {
-                                        var chest_name = m_chest.Name;
-                                        if(chest_name.ToLower().Equals(pointvalue.ChestName.ToLower()))
+                                        if (pointvalue.ChestName.Equals("(Any)"))
                                         {
-                                            chestdata.Points += pointvalue.PointValue;
-                                            break;
-                                        }
-                                    }
-                                    else if (chest_type.ToLower() == pointvalue.ChestType.ToLower())
-                                    {
-                                        var chest_level = pointvalue.Level;
-                                        if (!chest_level.Equals("(Any)"))
-                                        {
-                                            var chestlevel = Int32.Parse(chest_level);
-
-                                            if (level == chestlevel)
+                                            if (pointvalue.Level.Equals("(Any)"))
                                             {
                                                 chestdata.Points += pointvalue.PointValue;
                                                 break;
+                                            }
+                                            else
+                                            {
+                                                var chestlevel = Int32.Parse(pointvalue.Level.ToString());
+                                                if (level == chestlevel)
+                                                {
+                                                    chestdata.Points += pointvalue.PointValue;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (chest_name.ToLower().Equals(pointvalue.ChestName.ToLower()))
+                                            {
+                                                if (pointvalue.Level.Equals("(Any)"))
+                                                {
+                                                    chestdata.Points += pointvalue.PointValue;
+                                                    break;
+                                                }
+                                                else
+                                                {
+                                                    var chestlevel = Int32.Parse(pointvalue.Level.ToString());
+                                                    if (level == chestlevel)
+                                                    {
+                                                        chestdata.Points += pointvalue.PointValue;
+                                                        break;
+                                                    }
+                                                }
                                             }
                                         }
                                     }
