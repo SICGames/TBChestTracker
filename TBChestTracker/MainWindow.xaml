@@ -249,6 +249,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
             <RowDefinition Height="36"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" LastChildFill="True">
             <Menu DockPanel.Dock="Top" Height="auto" VerticalAlignment="Top">
@@ -389,5 +390,8 @@
                       IsEnabled="True"/>
             </ToolBar>
         </ToolBarTray>
+        <Grid x:Name="UpdatePanel" Visibility="Visible" Grid.Row="2">
+            
+        </Grid>
     </Grid>
 </Window>

@@ -441,7 +441,7 @@ namespace TBChestTracker
         {
             return Task.Run(() =>
             {
-                applicationManager = new ApplicationManager();
+                //applicationManager = new ApplicationManager();
                 applicationManager.Build();
             });
         }
@@ -490,14 +490,33 @@ namespace TBChestTracker
             });
         }
 
+        public async Task<bool> CheckForUpgrades()
+        {
+            if (applicationManager == null)
+            {
+                applicationManager = new ApplicationManager();
+            }
+            bool updateAvailable = await applicationManager.IsUpdateAvailable();
+            return updateAvailable;
+        }
         public async void Init(Window window)
         {
             if (window is SplashScreen splashScreen)
             {
+                await this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    splashScreen.UpdateStatus("Checking For Updates...", 0);
+                }));
+                await Task.Delay(100);
+                var upgradeAvailable = await CheckForUpgrades();
+                if (upgradeAvailable)
+                {
+
+                }
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    splashScreen.UpdateStatus("Initalizing...", 0);
+                    splashScreen.UpdateStatus("Initalizing...", 10);
                 }));
                 
                 SettingsManager = await InitSettings();

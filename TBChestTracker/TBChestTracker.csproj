@@ -194,6 +194,7 @@
     <Compile Include="Helpers\IOHelper.cs" />
     <Compile Include="Helpers\JsonHelper.cs" />
     <Compile Include="Helpers\ListExtension.cs" />
+    <Compile Include="Helpers\MD5Helper.cs" />
     <Compile Include="Helpers\Table.cs" />
     <Compile Include="Helpers\Translator.cs" />
     <Compile Include="Data\LocaleDictionary.cs" />
@@ -358,6 +359,7 @@
     <Compile Include="UI\MilestoneStep.xaml.cs">
       <DependentUpon>MilestoneStep.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UpdateManifest\UpdateManifest.cs" />
     <Compile Include="ValidateChestDataWindow.xaml.cs">
       <DependentUpon>ValidateChestDataWindow.xaml</DependentUpon>
     </Compile>
@@ -633,6 +635,9 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="Octokit">
+      <Version>13.0.1</Version>
     </PackageReference>
     <PackageReference Include="Snapture">
       <Version>1.0.0</Version>

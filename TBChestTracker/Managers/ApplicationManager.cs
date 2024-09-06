@@ -14,6 +14,9 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using Emgu.CV.Ocl;
 
+using Octokit;
+using Newtonsoft.Json;
+
 namespace TBChestTracker
 {
 
@@ -23,6 +26,8 @@ namespace TBChestTracker
 
     public class ApplicationManager
     {
+
+        public GitHubClient client {  get; private set; }   
         public List<GameChest> Chests { get; private set; }
 
         public static ApplicationManager Instance { get; private set; }
@@ -34,11 +39,13 @@ namespace TBChestTracker
 
         public ApplicationManager() 
         { 
-            
             if (Instance == null)
                 Instance = this;
         
             this.Chests = new List<GameChest>();
+            client = new GitHubClient(new ProductHeaderValue("TBChestTracker"));
+            UpdateManifest = new UpdateManifest();
+
         }
         ~ApplicationManager()
         {
@@ -152,6 +159,58 @@ namespace TBChestTracker
                 }
             }
             return true;
+        }
+
+        public UpdateManifest UpdateManifest { get; private set; }
+
+        private bool LoadUpdateManifest()
+        {
+            var manifestFile = $"{AppContext.Instance.CommonAppFolder}upgrade-manifest.json";
+            if (System.IO.File.Exists(manifestFile) == false)
+            {
+                return false;
+            }
+            using (StreamReader sr = File.OpenText(manifestFile))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Formatting = Formatting.Indented;
+                UpdateManifest = (UpdateManifest)serializer.Deserialize(sr, typeof(UpdateManifest));
+                sr.Close();
+            }
+            return true;
+        }
+        public bool SaveUpdateManifest()
+        {
+            var manifestFile = $"{AppContext.Instance.CommonAppFolder}upgrade-manifest.json";
+            using(StreamWriter sw = File.CreateText(manifestFile))
+            {
+                var serializer = new JsonSerializer();
+                serializer.Formatting = Formatting.Indented;    
+                serializer.Serialize(sw, UpdateManifest);   
+                sw.Close();
+            }
+            return true;
+        }
+        public async Task<bool> IsUpdateAvailable()
+        {
+            var releases = await client.Repository.Release.GetAll("SICGames", "TBChestTracker");
+            var latest = releases[0];
+            if(LoadUpdateManifest() == false)
+            {
+                //-- we don't have any information. 
+                //-- Chances are this isn't a newest upgrade.
+                UpdateManifest.Hash = MD5Helper.Create($"{latest.Name}%{latest.Url}%{latest.CreatedAt.DateTime.ToString()}");
+                UpdateManifest.AssetUrl = latest.Assets[0].BrowserDownloadUrl;
+                UpdateManifest.Url = latest.HtmlUrl;
+                UpdateManifest.Name = latest.Name;
+                UpdateManifest.DateCreated = latest.CreatedAt.DateTime;
+                UpdateManifest.Description = latest.Body;
+                SaveUpdateManifest();
+                return false;
+            }
+            var hashMatches = MD5Helper.Verify($"{latest.Name}%{latest.Url}%{latest.CreatedAt.DateTime.ToString()}", UpdateManifest.Hash);
+
+            return !hashMatches;
         }
     }
 }
