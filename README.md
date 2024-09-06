@@ -68,12 +68,5 @@ Head over to [Contributions section](https://github.com/SICGames/TBChestTracker/
 ## Known Issues
 - Currently is not cultural friendly. Primary developed for only english speaking users.
 
-## Roadmap 
-- Localization will be added to allow other languages to be used
-- Code optimizaiton
-- New Clan Wizard
-- Crash Reporter
-- Theme selection
-- Detailed Clan Insights using Chrome Embedded Browser.
 
 
