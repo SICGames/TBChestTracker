@@ -14,14 +14,14 @@ namespace TBChestTracker.Engine
     public class OCREngine
     {
         public static OCREngine Instance { get; private set; }
-        public Tesseract OCR { get; private set; }
+        public static Tesseract OCR { get; private set; }
         public OCREngine()
         {
             if (Instance == null)
                 Instance = this;
         }
-        public Task<bool> InitAsync(OCRSettings settings) => Task.Run(() => Init(settings));
-        public bool Init(OCRSettings ocrSettings)
+        public static Task<bool> InitAsync(OCRSettings settings) => Task.Run(() => Init(settings));
+        public static bool Init(OCRSettings ocrSettings)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace TBChestTracker.Engine
             return languages;
         }
 
-        public TessResult Read(IInputArray image)
+        public static TessResult Read(IInputArray image)
         {
             try
             {
@@ -106,7 +106,7 @@ namespace TBChestTracker.Engine
             return result;
         }
 
-        public void Destroy()
+        public static void Destroy()
         {
             if (OCR != null)
             {

@@ -250,7 +250,7 @@ namespace TBChestTracker
                         modified_image.Save($"OCR_ImageOut.png");
                     }
 
-                    var ocrResult = OCREngine.Instance.Read(imageScaled);
+                    var ocrResult = OCREngine.Read(imageScaled);
                     if (ocrResult != null)
                     {
                         clanmateName = ocrResult.Words.ToArray();

@@ -60,10 +60,10 @@ namespace TBChestTracker
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var updateManifest = ApplicationManager.Instance.UpdateManifest;
+            var updateManifest = ApplicationManager.Instance.LatestReleaseInfo;
 
             UpgradeTitle = $"TotalBattle Chest Tracker {updateManifest.Name} is available!";
-            Description = updateManifest.Description;
+            Description = updateManifest.Body;
             downloadUrlPath = updateManifest.Url;
 
             this.DataContext = this;

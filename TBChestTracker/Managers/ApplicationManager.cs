@@ -25,8 +25,10 @@ namespace TBChestTracker
     //-- In charge of passing data throughout entire application.
     //-- Localization, ChestTypes, etc...
 
-    public class ApplicationManager
+    public class ApplicationManager : IDisposable
     {
+        private readonly string Tag = "v2.0-preview-2-patch1";
+        private bool disposedValue;
 
         public GitHubClient client {  get; private set; }   
         public List<GameChest> Chests { get; private set; }
@@ -35,8 +37,9 @@ namespace TBChestTracker
         private CultureInfo Culture => System.Globalization.CultureInfo.CurrentCulture;
         public string Language { get; private set; }
         public string LocalePath { get; private set; }
-
         public Process ServerProcess { get; private set; }  
+
+        public Release LatestReleaseInfo { get; private set; }
 
         public ApplicationManager() 
         { 
@@ -45,15 +48,7 @@ namespace TBChestTracker
         
             this.Chests = new List<GameChest>();
             client = new GitHubClient(new ProductHeaderValue("TBChestTracker"));
-            UpdateManifest = new UpdateManifest();
-
         }
-        ~ApplicationManager()
-        {
-            Chests.Clear();
-            Chests = null;
-        }
-
         public void SetChests(List<GameChest> chests)
         {
             this.Chests = chests;
@@ -162,71 +157,51 @@ namespace TBChestTracker
             return true;
         }
 
-        public UpdateManifest UpdateManifest { get; private set; }
-
-        private bool LoadUpdateManifest()
-        {
-            var manifestFile = $"{AppContext.Instance.CommonAppFolder}upgrade-manifest.json";
-            if (System.IO.File.Exists(manifestFile) == false)
-            {
-                return false;
-            }
-            using (StreamReader sr = File.OpenText(manifestFile))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Formatting = Formatting.Indented;
-                UpdateManifest = (UpdateManifest)serializer.Deserialize(sr, typeof(UpdateManifest));
-                sr.Close();
-            }
-            return true;
-        }
-        public bool SaveUpdateManifest()
-        {
-            var manifestFile = $"{AppContext.Instance.CommonAppFolder}upgrade-manifest.json";
-            using(StreamWriter sw = File.CreateText(manifestFile))
-            {
-                var serializer = new JsonSerializer();
-                serializer.Formatting = Formatting.Indented;    
-                serializer.Serialize(sw, UpdateManifest);   
-                sw.Close();
-            }
-            return true;
-        }
         public async Task<bool> IsUpdateAvailable()
         {
             var releases = await client.Repository.Release.GetAll("SICGames", "TBChestTracker");
-            var latest = releases[0];
-            if(LoadUpdateManifest() == false)
+            LatestReleaseInfo = releases[0];
+
+            //Debug.WriteLine($"{latest.Name} - {latest.TagName}");
+
+            //-- v2.0 Preview 2 - Hotfix1 - v2.0-preview-2-patch1
+            var taghash = MD5Helper.Create($"{Tag}");
+            var hashMatches = MD5Helper.Verify($"{LatestReleaseInfo.TagName}", taghash);
+            return hashMatches == true ? false : true;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
             {
-                //-- we don't have any information. 
-                //-- Chances are this isn't a newest upgrade.
-                UpdateManifest.Hash = MD5Helper.Create($"{UpdateManifest.Tag}");
-                UpdateManifest.AssetUrl = latest.Assets[0].BrowserDownloadUrl;
-                UpdateManifest.Url = latest.HtmlUrl;
-                UpdateManifest.Name = latest.Name;
-                UpdateManifest.DateCreated = latest.CreatedAt.DateTime;
-                UpdateManifest.Description = latest.Body;
-                SaveUpdateManifest();
-                return false;
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                    LatestReleaseInfo = null;
+                    client = null;
+                    ServerProcess.Dispose();
+                    Chests.Clear();
+                    Chests = null;
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
             }
+        }
 
-            var hashMatches = MD5Helper.Verify($"{latest.TagName}", UpdateManifest.Hash);
-            if(hashMatches == false)
-            {
-                //-- we have an upgrade available.
-                UpdateManifest.Hash = MD5Helper.Create($"{latest.TagName}");
-                UpdateManifest.AssetUrl = latest.Assets[0].BrowserDownloadUrl;
-                UpdateManifest.Url = latest.HtmlUrl;
-                UpdateManifest.Name = latest.Name;
-                UpdateManifest.DateCreated = latest.CreatedAt.DateTime;
-                UpdateManifest.Description = latest.Body;
-                UpdateManifest.Tag = latest.TagName;
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~ApplicationManager()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
 
-                return true;
-            }
-
-            return false;
-            
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

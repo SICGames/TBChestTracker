@@ -247,7 +247,7 @@ namespace TBChestTracker
                             //--- ensure to make sure user is happy as a gopher
                             //--- after confirmation, save rectangle and move onto Open button editor.
 
-                            var tessy = OCREngine.Instance.OCR;
+                            var tessy = OCREngine.OCR;
                             tessy.SetImage(modified_image);
                             if (tessy.Recognize() == 0)
                             {

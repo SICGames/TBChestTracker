@@ -554,7 +554,7 @@ namespace TBChestTracker
 
             Image<Gray, byte> tessy_image = bmp.ToImage<Gray, byte>();
 
-            var tessy = OCREngine.Instance.OCR;
+            var tessy = OCREngine.OCR;
             tessy.SetImage(tessy_image);
             if (tessy.Recognize() == 0)
             {

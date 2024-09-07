@@ -725,7 +725,7 @@ namespace TBChestTracker
             OCREngine.Destroy();
             com.HellStormGames.Logging.Console.Destroy();
             SettingsManager.Dispose();
-            applicationManager = null;
+            applicationManager.Dispose();
         }
         #endregion
 
