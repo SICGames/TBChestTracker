@@ -16,6 +16,7 @@ using Emgu.CV.Ocl;
 
 using Octokit;
 using Newtonsoft.Json;
+using System.Configuration;
 
 namespace TBChestTracker
 {
@@ -199,7 +200,7 @@ namespace TBChestTracker
             {
                 //-- we don't have any information. 
                 //-- Chances are this isn't a newest upgrade.
-                UpdateManifest.Hash = MD5Helper.Create($"{latest.Name}%{latest.Url}%{latest.CreatedAt.DateTime.ToString()}");
+                UpdateManifest.Hash = MD5Helper.Create($"{UpdateManifest.Tag}");
                 UpdateManifest.AssetUrl = latest.Assets[0].BrowserDownloadUrl;
                 UpdateManifest.Url = latest.HtmlUrl;
                 UpdateManifest.Name = latest.Name;
@@ -209,16 +210,17 @@ namespace TBChestTracker
                 return false;
             }
 
-            var hashMatches = MD5Helper.Verify($"{latest.Name}%{latest.Url}%{latest.CreatedAt.DateTime.ToString()}", UpdateManifest.Hash);
+            var hashMatches = MD5Helper.Verify($"{latest.TagName}", UpdateManifest.Hash);
             if(hashMatches == false)
             {
                 //-- we have an upgrade available.
-                UpdateManifest.Hash = MD5Helper.Create($"{latest.Name}%{latest.Url}%{latest.CreatedAt.DateTime.ToString()}");
+                UpdateManifest.Hash = MD5Helper.Create($"{latest.TagName}");
                 UpdateManifest.AssetUrl = latest.Assets[0].BrowserDownloadUrl;
                 UpdateManifest.Url = latest.HtmlUrl;
                 UpdateManifest.Name = latest.Name;
                 UpdateManifest.DateCreated = latest.CreatedAt.DateTime;
                 UpdateManifest.Description = latest.Body;
+                UpdateManifest.Tag = latest.TagName;
 
                 return true;
             }

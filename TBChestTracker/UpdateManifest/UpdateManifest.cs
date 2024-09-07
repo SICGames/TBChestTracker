@@ -16,6 +16,12 @@ namespace TBChestTracker
         public string Url { get; set; }
         public string Description { get; set; }
         public string AssetUrl { get; set; }
+        private string _tag = "v2.0-preview-2-patch1";
+        public string Tag
+        {
+            get => _tag; 
+            set => _tag = value;
+        }
         public DateTime DateCreated { get; set; }
     }
 }

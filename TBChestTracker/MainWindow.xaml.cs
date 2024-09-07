@@ -38,6 +38,7 @@ using System.Windows.Media;
 using System.Net;
 using System.Net.Http;
 using TBChestTracker.Engine;
+using TBChestTracker.Properties;
 
 
 namespace TBChestTracker
@@ -509,8 +510,8 @@ namespace TBChestTracker
                 }));
                 await Task.Delay(500);
                 var upgradeAvailable = await CheckForUpgrades();
-                AppContext.Instance.upgradeAvailable = true; //upgradeAvailable;
-
+                AppContext.Instance.upgradeAvailable = upgradeAvailable;
+                UpgradeAlertButton.ToolTip = upgradeAvailable == true ? TBChestTracker.Resources.Strings.UpdateAvailable : TBChestTracker.Resources.Strings.UpToDate;
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     splashScreen.UpdateStatus("Initalizing...", 10);
@@ -1185,7 +1186,13 @@ namespace TBChestTracker
 
         private void UpgradeAlertButton_Click(object sender, RoutedEventArgs e)
         {
+            if(AppContext.Instance.upgradeAvailable)
+            {
+                //-- show notificationbox. 
+                UpdateWindow updateWindow = new UpdateWindow();
+                updateWindow.Show();
 
+            }
         }
     }
 }

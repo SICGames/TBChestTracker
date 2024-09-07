@@ -228,4 +228,10 @@
   <data name="UpgradeNotification" xml:space="preserve">
     <value>Upgrade Notification</value>
   </data>
+  <data name="UpToDate" xml:space="preserve">
+    <value>No Update Available</value>
+  </data>
+  <data name="UpdateAvailable" xml:space="preserve">
+    <value>New Update Available</value>
+  </data>
 </root>

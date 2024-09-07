@@ -367,11 +367,29 @@ namespace TBChestTracker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New Update Available.
+        /// </summary>
+        public static string UpdateAvailable {
+            get {
+                return ResourceManager.GetString("UpdateAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Upgrade Notification.
         /// </summary>
         public static string UpgradeNotification {
             get {
                 return ResourceManager.GetString("UpgradeNotification", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Update Available.
+        /// </summary>
+        public static string UpToDate {
+            get {
+                return ResourceManager.GetString("UpToDate", resourceCulture);
             }
         }
         
