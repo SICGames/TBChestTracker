@@ -367,7 +367,16 @@ namespace TBChestTracker
                         //-- Level of crypt: 10
 
                         var ChestSource = chestobtained.Substring(chestobtained.IndexOf(":") + 2);
-                        var levelStartPos = ChestSource.IndexOf(TBChestTracker.Resources.Strings.Level);
+                        var levelStartPos = 0;
+                        if (ChestSource.Contains(TBChestTracker.Resources.Strings.Level))
+                        {
+                          levelStartPos = ChestSource.IndexOf(TBChestTracker.Resources.Strings.Level);
+                        }
+                        else if(ChestSource.Contains(TBChestTracker.Resources.Strings.lvl))
+                        {
+                           levelStartPos = ChestSource.IndexOf(TBChestTracker.Resources.Strings.lvl);
+                        }
+
                         int level = 0;
                         //-- level in en-US is 0 position.
                         //-- level in es-ES is 11 position.

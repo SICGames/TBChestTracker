@@ -250,6 +250,15 @@ namespace TBChestTracker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Lvl.
+        /// </summary>
+        public static string lvl {
+            get {
+                return ResourceManager.GetString("lvl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Manage Clan Chest Settings.
         /// </summary>
         public static string ManageClanChestSettingsTooltip {

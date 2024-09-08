@@ -234,4 +234,7 @@
   <data name="UpdateAvailable" xml:space="preserve">
     <value>New Update Available</value>
   </data>
+  <data name="lvl" xml:space="preserve">
+    <value>Lvl</value>
+  </data>
 </root>
