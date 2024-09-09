@@ -49,6 +49,10 @@ Clanmate Management
  
 </details>
 
+## Are you stuck on something?
+Watch the Youtube videos under Total Battle Chest Tracker Troubleshooting. 
+[TotalBattleGuide - Youtube Channel](https://www.youtube.com/@TotalBattleGuide)
+
 ## How to install
 - Head over to [Releases section](https://github.com/SICGames/TBChestTracker/releases) and download the latest version installation executable.
 
