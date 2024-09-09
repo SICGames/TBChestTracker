@@ -50,7 +50,7 @@ Clanmate Management
 </details>
 
 ## How to install
-- Head over to [Releases section](https://github.com/SICGames/TBChestTracker/releases) and download the latest version TBChestTracker-Setup.exe.
+- Head over to [Releases section](https://github.com/SICGames/TBChestTracker/releases) and download the latest version installation executable.
 
 ## Want to contribute? 
 Head over to [Contributions section](https://github.com/SICGames/TBChestTracker/blob/master/CONTRIBUTING.md) to contribute to this project.
