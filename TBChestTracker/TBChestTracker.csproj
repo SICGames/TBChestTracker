@@ -360,7 +360,7 @@
       <DependentUpon>MilestoneStep.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Notification.cs" />
-    <Compile Include="UpdateManifest\UpdateManifest.cs" />
+    <Compile Include="UpdateManifest\Manifest.cs" />
     <Compile Include="UpdateWindow.xaml.cs">
       <DependentUpon>UpdateWindow.xaml</DependentUpon>
     </Compile>

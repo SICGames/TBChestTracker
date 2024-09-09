@@ -27,8 +27,6 @@ namespace TBChestTracker
 
     public class ApplicationManager : IDisposable
     {
-        private readonly string Tag = "v2.0-preview-3"; //-- needs to match Github Tag every new release.
-        
         private bool disposedValue;
 
         public GitHubClient client {  get; private set; }   
@@ -42,7 +40,7 @@ namespace TBChestTracker
 
         public Release LatestReleaseInfo { get; private set; }
 
-        private UpdateManifest UpdateManifest = null;
+        private Manifest UpdateManifest = null;
 
         public ApplicationManager() 
         { 
@@ -51,7 +49,7 @@ namespace TBChestTracker
         
             this.Chests = new List<GameChest>();
             client = new GitHubClient(new ProductHeaderValue("TBChestTracker"));
-            UpdateManifest = new UpdateManifest();
+            UpdateManifest = new Manifest();
         }
         public void SetChests(List<GameChest> chests)
         {
@@ -173,7 +171,7 @@ namespace TBChestTracker
             {
                 var serializer = new JsonSerializer();
                 serializer.Formatting = Formatting.Indented;
-                UpdateManifest = (UpdateManifest)serializer.Deserialize(sr, typeof(UpdateManifest));
+                UpdateManifest = (Manifest)serializer.Deserialize(sr, typeof(Manifest));
                 serializer = null;
                 sr.Close();
             }
@@ -197,7 +195,7 @@ namespace TBChestTracker
             var releases = await client.Repository.Release.GetAll("SICGames", "TBChestTracker");
             LatestReleaseInfo = releases[0];
 
-            var tagHash = MD5Helper.Create(Tag);
+            var tagHash = MD5Helper.Create(Manifest.Tag);
 
             //-- v2.0 Preview 2 - Hotfix1 - v2.0-preview-2-patch1
             var hashMatches = MD5Helper.Verify($"{LatestReleaseInfo.TagName}", tagHash);

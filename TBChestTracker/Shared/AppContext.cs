@@ -85,10 +85,10 @@ namespace TBChestTracker
             {
                 var extraStr = String.Empty;
 #if PREVIEW_BUILD
-                extraStr = "'Preview 3'";
+                extraStr = Manifest.Build;
 #endif
 
-                return $"v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} [{extraStr}]";
+                return $"v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} ";
             }
         }
         

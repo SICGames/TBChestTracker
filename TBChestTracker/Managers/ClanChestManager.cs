@@ -125,11 +125,15 @@ namespace TBChestTracker
                         {
                             var name = chest.Name;
                             var source = chest.Source;
+
+
+                            /*
+                              Fix Any Chests that start with lvl in it. 
+                            */
                             if (source.Contains(TBChestTracker.Resources.Strings.lvl))
                             {
-                                var levelStartPos = 0;
+                                var levelStartPos = -1;
                                 levelStartPos = source.IndexOf(TBChestTracker.Resources.Strings.lvl);
-
                                 int level = 0;
                                 //-- level in en-US is 0 position.
                                 //-- level in es-ES is 11 position.
@@ -177,10 +181,6 @@ namespace TBChestTracker
 
                                         }
                                     }
-                                    if (level == 0)
-                                    {
-                                        level = 5;
-                                    }
 
                                     //-- now we make sure levelStartPos == 0 or more than 0.
                                     var direction = levelStartPos == 0 ? "forwards" : "backwards";
@@ -206,6 +206,36 @@ namespace TBChestTracker
                                     chest.Level = level;
                                 }
                                 chestErrors++;
+                            }
+
+                            //-- fix corrupted chests
+                            /*
+                                    {
+                                        "Name": "Gladiator's Chest",
+                                        "Type": "rena",
+                                        "Source": "Arena",
+                                        "Level": 5
+                                    }
+                              Most affected are Bank and Arenas. 
+                            */
+
+                            //-- these issues contain no level inside source.
+                            if (chest.Source.Contains(TBChestTracker.Resources.Strings.lvl) == false && chest.Source.Contains(TBChestTracker.Resources.Strings.Level) == false)
+                            {
+                                if (chest.Source.ToLower().Equals(chest.Type.ToLower()) == false)
+                                {
+                                    if (chest.Source.ToLower().EndsWith(chest.Type.ToLower()))
+                                    {
+                                        //-- these errors generally have a level 5 whereas should be 0.
+                                        if (chest.Level == 5)
+                                        {
+                                            chest.Level = 0;
+                                        }
+
+                                        chest.Type = chest.Source;
+                                        chestErrors++;
+                                    }
+                                }
                             }
                             if (chestsettings.GeneralClanSettings.ChestOptions == ChestOptions.UsePoints)
                             {
@@ -245,7 +275,6 @@ namespace TBChestTracker
                                                         total_chest_points += chestpointvalue.PointValue;
                                                         break;
                                                     }
-
                                                 }
                                                 else
                                                 {
@@ -353,7 +382,7 @@ namespace TBChestTracker
             ProcessingTextResult ProcessingTextResult = new ProcessingTextResult();
             bool bFilteringError = false;
             string sFilteringErrorMessage = String.Empty;
-            
+
             lastFilterString = String.Empty;
             filteringErrorOccurred = false;
 
@@ -454,7 +483,7 @@ namespace TBChestTracker
                         //-- Level of crypt: 10
 
                         var ChestSource = chestobtained.Substring(chestobtained.IndexOf(":") + 2);
-                        var levelStartPos = 0;
+                        var levelStartPos = -1;
 
                         if (ChestSource.Contains(TBChestTracker.Resources.Strings.Level))
                         {
