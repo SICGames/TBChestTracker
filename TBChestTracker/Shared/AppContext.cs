@@ -43,6 +43,10 @@ namespace TBChestTracker
             }
         }
 
+        public string LocalApplicationPath
+        {
+            get => $@"{System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\SICGames\TotalBattleChestTracker\";
+        }
         public string CommonAppFolder
         {
             get => $@"{System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\SICGames\TotalBattleChestTracker\";
@@ -81,7 +85,7 @@ namespace TBChestTracker
             {
                 var extraStr = String.Empty;
 #if PREVIEW_BUILD
-                extraStr = "'Preview 2'";
+                extraStr = "'Preview 3'";
 #endif
 
                 return $"v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} [{extraStr}]";

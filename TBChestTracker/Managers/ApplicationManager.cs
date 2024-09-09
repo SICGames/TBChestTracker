@@ -27,7 +27,8 @@ namespace TBChestTracker
 
     public class ApplicationManager : IDisposable
     {
-        private readonly string Tag = "v2.0-preview-2-patch1";
+        private readonly string Tag = "v2.0-preview-3"; //-- needs to match Github Tag every new release.
+        
         private bool disposedValue;
 
         public GitHubClient client {  get; private set; }   
@@ -41,6 +42,8 @@ namespace TBChestTracker
 
         public Release LatestReleaseInfo { get; private set; }
 
+        private UpdateManifest UpdateManifest = null;
+
         public ApplicationManager() 
         { 
             if (Instance == null)
@@ -48,6 +51,7 @@ namespace TBChestTracker
         
             this.Chests = new List<GameChest>();
             client = new GitHubClient(new ProductHeaderValue("TBChestTracker"));
+            UpdateManifest = new UpdateManifest();
         }
         public void SetChests(List<GameChest> chests)
         {
@@ -157,16 +161,47 @@ namespace TBChestTracker
             return true;
         }
 
+        private bool LoadManifest()
+        {
+            var manifestFile = $@"{AppContext.Instance.LocalApplicationPath}Manifest.json";
+            if(!File.Exists(manifestFile))
+            {
+                return false;
+            }
+
+            using (StreamReader sr = File.OpenText(manifestFile))
+            {
+                var serializer = new JsonSerializer();
+                serializer.Formatting = Formatting.Indented;
+                UpdateManifest = (UpdateManifest)serializer.Deserialize(sr, typeof(UpdateManifest));
+                serializer = null;
+                sr.Close();
+            }
+            return true;
+        }
+        public void SaveManifest()
+        {
+            var manifestFile = $@"{AppContext.Instance.LocalApplicationPath}Manifest.json";
+
+            using (StreamWriter sw = File.CreateText(manifestFile))
+            {
+                var serializer = new JsonSerializer();
+                serializer.Formatting = Formatting.Indented;
+                serializer.Serialize(sw, UpdateManifest);
+                serializer = null;
+                sw.Close();
+            }
+        }
         public async Task<bool> IsUpdateAvailable()
         {
             var releases = await client.Repository.Release.GetAll("SICGames", "TBChestTracker");
             LatestReleaseInfo = releases[0];
 
-            //Debug.WriteLine($"{latest.Name} - {latest.TagName}");
+            var tagHash = MD5Helper.Create(Tag);
 
             //-- v2.0 Preview 2 - Hotfix1 - v2.0-preview-2-patch1
-            var taghash = MD5Helper.Create($"{Tag}");
-            var hashMatches = MD5Helper.Verify($"{LatestReleaseInfo.TagName}", taghash);
+            var hashMatches = MD5Helper.Verify($"{LatestReleaseInfo.TagName}", tagHash);
+            
             return hashMatches == true ? false : true;
         }
 

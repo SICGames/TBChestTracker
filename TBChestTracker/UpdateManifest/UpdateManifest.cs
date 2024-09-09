@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -12,10 +13,13 @@ namespace TBChestTracker
     public class UpdateManifest
     {
         public string Hash { get; set; }
-        public string Name { get; set; }
-        public string Url { get; set; }
-        public string Description { get; set; }
-        public string AssetUrl { get; set; }
-        public DateTime DateCreated { get; set; }
+        public string Name
+        {
+            get => "Total Battle Chest Tracker";
+        }
+        public string Version
+        {
+            get => $@"v{Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
+        }
     }
 }
