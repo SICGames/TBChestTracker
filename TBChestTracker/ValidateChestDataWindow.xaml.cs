@@ -215,7 +215,7 @@ namespace TBChestTracker
                                         ChestType = ChestType.Insert(0, $"{TBChestTracker.Resources.Strings.Common} ");
                                     }
 
-                                    chest.Source = ChestType;
+                                    chest.Type = ChestType;
                                     chest.Level = level;
 
                                 }
