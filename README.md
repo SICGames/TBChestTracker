@@ -49,8 +49,12 @@ Clanmate Management
  
 </details>
 
+## Are you stuck on something?
+Watch the Youtube videos under Total Battle Chest Tracker Troubleshooting. 
+[TotalBattleGuide - Youtube Channel](https://www.youtube.com/@TotalBattleGuide)
+
 ## How to install
-- Head over to [Releases section](https://github.com/SICGames/TBChestTracker/releases) and download the latest version TBChestTracker-Setup.exe.
+- Head over to [Releases section](https://github.com/SICGames/TBChestTracker/releases) and download the latest version installation executable.
 
 ## Want to contribute? 
 Head over to [Contributions section](https://github.com/SICGames/TBChestTracker/blob/master/CONTRIBUTING.md) to contribute to this project.
@@ -62,8 +66,7 @@ Head over to [Contributions section](https://github.com/SICGames/TBChestTracker/
 - If you're using chest points, add chest point values via Clan Chest Requirements window under the Chest Points tab.
 - When you're ready to begin the automation process, press F9 to start automation procecss and F10 to stop automation process.
 - Everything is saved when creating new clan and when new clanmate is added, in addition when automation is stopped.
-- When chest period is done, click on File then click on Export and click on the File textbox. Save it as text file or CSV file. CSV file is used to upload to Google Sheets. 
-- In addition of exporting final chest count, have export options set to Delete since it will delete the clanchests.db file and allow the program to begin fresh.
+- When chest period is done, click on File then click on Export and click on the File textbox. Save it as CSV file. CSV file is used to upload to Google Sheets. 
 
 ## Known Issues
 - Currently is not cultural friendly. Primary developed for only english speaking users.
