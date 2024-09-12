@@ -109,10 +109,10 @@ namespace TBChestTracker
 
             }
 
-            foreach (var dates in chestdata.Keys)
+            foreach (var dates in chestdata.Keys.ToList())
             {
                 var data = chestdata[dates];
-                foreach (var _data in data)
+                foreach (var _data in data.ToList())
                 {
                     var clanmate_points = _data.Points;
                     var chests = _data.chests;
@@ -125,8 +125,6 @@ namespace TBChestTracker
                         {
                             var name = chest.Name;
                             var source = chest.Source;
-
-
                             /*
                               Fix Any Chests that start with lvl in it. 
                             */
@@ -153,6 +151,7 @@ namespace TBChestTracker
                                     //-- using a quantifer to check if there is an additional space after the level number. If user is spanish, no space after level number.
                                     levelNumberStr = levelNumberStr.IndexOf(" ") > 0 ? levelNumberStr.Substring(0, levelNumberStr.IndexOf(" ")) : levelNumberStr;
                                     var levelFullStr = String.Empty;
+                                    
                                     if (source.Contains(TBChestTracker.Resources.Strings.Level))
                                     {
                                         levelFullStr = $"{TBChestTracker.Resources.Strings.Level} {levelNumberStr}";
@@ -178,7 +177,6 @@ namespace TBChestTracker
                                         if (Int32.TryParse(levelArray[0], out level) == false)
                                         {
                                             //-- couldn't extract level.
-
                                         }
                                     }
 
@@ -203,9 +201,14 @@ namespace TBChestTracker
                                     }
 
                                     chest.Type = ChestType;
-                                    chest.Level = level;
+                                    if (chest.Level != level)
+                                    {
+                                        chest.Level = level;
+                                        Debug.WriteLine($"Repairing Chest {chest.Source} that contain lvl.");
+                                        chestErrors++;
+                                    }
+                                    
                                 }
-                                chestErrors++;
                             }
 
                             //-- fix corrupted chests
@@ -233,6 +236,7 @@ namespace TBChestTracker
                                         }
 
                                         chest.Type = chest.Source;
+                                        Debug.WriteLine("Fixing Corrupted Chests.");
                                         chestErrors++;
                                     }
                                 }
@@ -291,9 +295,22 @@ namespace TBChestTracker
                         if (clanmate_points != total_chest_points)
                         {
                             _data.Points = total_chest_points;
+                            Debug.WriteLine("Chest Points don't add up.");
                             chestErrors++;
                         }
                     }
+
+                    // Search for clanmates no longer within clanmates db
+                    var clanmate = _data.Clanmate;
+                    var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates;
+                    bool bExists = clanmates.Select(c => c.Name).Contains(clanmate);
+                    if(bExists == false)
+                    {
+                        Debug.WriteLine($"{clanmate} doesn't exist anymore within clanmates database. Removing.");
+                        RemoveChestData(clanmate);
+                        chestErrors++;
+                    }
+
                 }
             }
 
@@ -659,9 +676,11 @@ namespace TBChestTracker
             bool bMatch = false;
             Clanmate matchedClanmate = null;
 
+            var jw = new F23.StringSimilarity.JaroWinkler();
+
             foreach (var clanmate in clanmates)
             {
-                var similarity = ClanmateSimilarities(clanmate.Name, input) * 100.0;
+                var similarity = jw.Similarity(clanmate.Name, input) * 100.0;
                 Debug.WriteLine($"{clanmate.Name} and {input} have a Similiarity Percent => {similarity}%");
                 if(similarity >  similiarityThreshold)
                 {
@@ -738,7 +757,7 @@ namespace TBChestTracker
                 if (!exists)
                 {
                     var tClanmate = tmpchest.Clanmate;
-                    var match_clanmate = Clanmate_Scan(tClanmate,74.0);
+                    var match_clanmate = Clanmate_Scan(tClanmate,80.0);
                     if(match_clanmate != null)
                     {
                         com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} is actually {match_clanmate}.", "Unknown Clanmate Found", LogType.INFO);
@@ -754,7 +773,7 @@ namespace TBChestTracker
                     else
                     {
                         clanChestData.Add(new ClanChestData(tmpchest.Clanmate, tmpchest.chests, tmpchest.Points));
-                        com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} doesn't exist within clanmates database.", "Clanmate Not Found", LogType.WARNING);
+                        com.HellStormGames.Logging.Console.Write($"Adding {tmpchest.Clanmate} to clanmates database.", "Clanmate Not Found", LogType.WARNING);
                         ClanManager.Instance.ClanmateManager.Add(tmpchest.Clanmate);
                         ClanManager.Instance.ClanmateManager.Save($"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}");
                     }

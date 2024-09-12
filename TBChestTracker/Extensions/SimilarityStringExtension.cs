@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace TBChestTracker
@@ -12,12 +13,20 @@ namespace TBChestTracker
      https://github.com/ahmedjawed01/StringSimilarity
     */
 
-    public static class SimilarityExtensions
+    public static class StringExtensions
     {
         /// <summary>
         /// Returns the number of steps required to transform the source string
         /// into the target string.
         /// </summary>
+        /// 
+
+        public static bool Like(this string toSearch, string toFind)
+        {
+            return new Regex(@"\A" + new Regex(@"\.|\$|\^|\{|\[|\(|\||\)|\*|\+|\?|\\").Replace(toFind, ch => @"\" + ch).Replace('_', '.').Replace("%", ".*") + @"\z", RegexOptions.Singleline).IsMatch(toSearch);
+        }
+
+
         public static int ComputeLevenshteinDistance(this string source, string target)
         {
             if (string.IsNullOrEmpty(source))

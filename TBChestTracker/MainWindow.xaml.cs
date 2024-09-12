@@ -884,14 +884,25 @@ namespace TBChestTracker
         #region Window Closing
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            
+
             /*
-            var string1 = "Naida Il";
+             lâl
+             lal
+             lál
+            */
+            /*
+            var l = new F23.StringSimilarity.JaroWinkler();
+            var string1 = "Lâl";
             foreach (var name in ClanManager.Instance.ClanmateManager.Database.Clanmates)
             {
-                var similiarity = string1.CalculateSimilarity(name.Name) * 100;
-                Debug.WriteLine($"{string1} and {name.Name} has similitary percentage => {similiarity}");
+                
+                var similiar = l.Similarity(string1, name.Name) * 100.0;
+                if (similiar >= 80)
+                {
+                    Debug.WriteLine($"{string1} and {name.Name} is similar => {similiar}");
+                }
             }
+            l = null;
             */
 
             AppContext.Instance.isAppClosing = true;
