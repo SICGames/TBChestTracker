@@ -636,11 +636,11 @@ namespace TBChestTracker
         }
         #endregion
 
-        private async Task<double> ClanmateSimilarities(string input1, string input2)
+        private double ClanmateSimilarities(string input1, string input2)
         {
             return input1.CalculateSimilarity(input2);
         }
-        private async Task<Clanmate> Clanmate_Scan(string input, double similiarityThreshold)
+        private Clanmate Clanmate_Scan(string input, double similiarityThreshold)
         {
             /*
                "Name": "Naida Il",
@@ -661,7 +661,7 @@ namespace TBChestTracker
 
             foreach (var clanmate in clanmates)
             {
-                var similarity = await ClanmateSimilarities(clanmate.Name, input);
+                var similarity = ClanmateSimilarities(clanmate.Name, input) * 100.0;
                 Debug.WriteLine($"{clanmate.Name} and {input} have a Similiarity Percent => {similarity}%");
                 if(similarity >  similiarityThreshold)
                 {
@@ -733,29 +733,34 @@ namespace TBChestTracker
             var mate_index = 0;
             foreach (var tmpchest in tmpchestdata.ToList())
             {
-                bool alias_found = false;
                 bool exists = clanmates.Select(mate_name => mate_name.Name).Contains(tmpchest.Clanmate, StringComparer.CurrentCultureIgnoreCase);
                
                 if (!exists)
                 {
                     var tClanmate = tmpchest.Clanmate;
-
-                   
-                   
-
-
-                    var match_clanmate = await Clanmate_Scan(tClanmate,80);
+                    var match_clanmate = Clanmate_Scan(tClanmate,74.0);
                     if(match_clanmate != null)
                     {
                         com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} is actually {match_clanmate}.", "Unknown Clanmate Found", LogType.INFO);
+                        
+                        tmpchestdata[mate_index].Clanmate = match_clanmate.Name; //--- unknown clanmate properly identified and been re-written with correct parent clan name.
+
+                        var parent_data = clanChestData.Select(pd => pd).Where(data => data.Clanmate.Equals(match_clanmate.Name, StringComparison.InvariantCultureIgnoreCase)).ToList()[0];
+                        if (parent_data.chests == null)
+                        {
+                            parent_data.chests = new List<Chest>();
+                        }
                     }
                     else
                     {
-                        com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} doesn't exist within clanmates database. Attempting to find Aliases.", "Unknown Clanmate", LogType.WARNING);
-                        Debug.WriteLine($"{tmpchest.Clanmate} doesn't exist within clanmates database. Attempting to find Aliases.");
+                        clanChestData.Add(new ClanChestData(tmpchest.Clanmate, tmpchest.chests, tmpchest.Points));
+                        com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} doesn't exist within clanmates database.", "Clanmate Not Found", LogType.WARNING);
+                        ClanManager.Instance.ClanmateManager.Add(tmpchest.Clanmate);
+                        ClanManager.Instance.ClanmateManager.Save($"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}");
                     }
                     
                     //-- attempt to check to see if the unfound clanmate is under an alias.
+                    /*
                     foreach (var mate in clanmates)
                     {
                         if (mate.Aliases.Count > 0)
@@ -765,26 +770,12 @@ namespace TBChestTracker
                             {
                                 com.HellStormGames.Logging.Console.Write($"\t\t Unknown clanmate ({tmpchest.Clanmate}) belongs to {mate.Name} aliases.", "Unknown Clanmate", LogType.INFO);
                                 var parent_data = clanChestData.Select(pd => pd).Where(data => data.Clanmate.Equals(mate.Name, StringComparison.InvariantCultureIgnoreCase)).ToList()[0];
-                                if (parent_data.chests == null)
-                                {
-                                    parent_data.chests = new List<Chest>();
-                                }
-
-                                tmpchestdata[mate_index].Clanmate = mate.Name; //--- unknown clanmate properly identified and been re-written with correct parent clan name.
-
                                 alias_found = true;
                                 break;
                             }
                         }
                     }
-
-                    if (!alias_found)
-                    {
-                        clanChestData.Add(new ClanChestData(tmpchest.Clanmate, tmpchest.chests, tmpchest.Points));
-                        com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} doesn't exist within clanmates database.", "Clanmate Not Found", LogType.WARNING);
-                        ClanManager.Instance.ClanmateManager.Add(tmpchest.Clanmate);
-                        ClanManager.Instance.ClanmateManager.Save($"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}");
-                    }
+                    */
                 }
                 else
                 {
