@@ -39,6 +39,7 @@ using System.Net;
 using System.Net.Http;
 using TBChestTracker.Engine;
 using TBChestTracker.Properties;
+using TBChestTracker.Resources;
 
 
 namespace TBChestTracker
@@ -113,17 +114,17 @@ namespace TBChestTracker
             var brightness = ocrSettings.GlobalBrightness;
            
             image = bitmap.ToImage<Gray, Byte>();
+            
             imageOut = image.Mul(brightness) + brightness;
 
             //-- OCR Incorrect Text Bug - e.g. Slash Jr III is read Slash )r III
             //-- Fix: Upscaling input image large enough to read properly.
             var imageScaled = imageOut.Resize(2, Emgu.CV.CvEnum.Inter.Cubic);
-            var blurImage = imageScaled.SmoothMedian(3);
-
+            
             var threshold = new Gray(ocrSettings.Threshold); //-- 85
             var maxThreshold = new Gray(ocrSettings.MaxThreshold); //--- 255
 
-            var imageThreshold = blurImage.ThresholdBinaryInv(threshold, maxThreshold);
+            var imageThreshold = imageScaled.ThresholdBinaryInv(threshold, maxThreshold);
 
             var erodeImage = imageThreshold.Erode(1);
 
@@ -136,13 +137,24 @@ namespace TBChestTracker
 
             if (AppContext.Instance.SaveOCRImages)
             {
-                imageScaled.Save($"OCR_ImageScaled.png");
-                imageOut.Save($"OCR_ImageOut.png");
-                imageThreshold.Save($"OCR_Threshold.png");
+                var outputPath = $@"{AppContext.Instance.AppFolder}\Output";
+                System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(outputPath);
+                if (di.Exists == false)
+                {
+                    di.Create();
+                }
+                bitmap.Save($@"{outputPath}\OCR_ImageOriginal.png", System.Drawing.Imaging.ImageFormat.Png);
+                imageOut.Save($@"{outputPath}\OCR_ImageBrightened.png");
+                image.Save($@"{outputPath}\OCR_ImageGrayscaled.png");
+                imageScaled.Save($@"{outputPath}\OCR_ImageScaled.png");
+                imageThreshold.Save($@"{outputPath}\OCR_Threshold.png");
+                erodeImage.Save($@"{outputPath}\OCR_Eroded.png");
             }
             
             var ocrResult = OCREngine.Read(erodeImage);
             
+            erodeImage.Dispose();
+
             imageThreshold.Dispose();
             imageScaled.Dispose();
             imageOut.Dispose();
@@ -276,7 +288,7 @@ namespace TBChestTracker
 
             if (CaptureMode == CaptureMode.CHESTS && ocrResult != null)
             {
-               clanChestProcessResult = ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words, onError =>
+               clanChestProcessResult = await ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words, onError =>
                 {
                     if (onError != null && !String.IsNullOrEmpty(onError.Message))
                     {
@@ -872,6 +884,16 @@ namespace TBChestTracker
         #region Window Closing
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            
+            /*
+            var string1 = "Naida Il";
+            foreach (var name in ClanManager.Instance.ClanmateManager.Database.Clanmates)
+            {
+                var similiarity = string1.CalculateSimilarity(name.Name) * 100;
+                Debug.WriteLine($"{string1} and {name.Name} has similitary percentage => {similiarity}");
+            }
+            */
+
             AppContext.Instance.isAppClosing = true;
             applicationManager.KillNodeServer();
             CaptainHook.Uninstall();

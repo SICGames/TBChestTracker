@@ -190,6 +190,7 @@
     </Compile>
     <Compile Include="Engine\OCREngine.cs" />
     <Compile Include="ErrorHandlers\ChestProcessingError.cs" />
+    <Compile Include="Extensions\SimilarityStringExtension.cs" />
     <Compile Include="Helpers\DateTimeHelper.cs" />
     <Compile Include="Helpers\EnumBindingSourceExtension.cs" />
     <Compile Include="Helpers\ImageDpiHelper.cs" />

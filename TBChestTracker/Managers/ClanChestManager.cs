@@ -636,7 +636,49 @@ namespace TBChestTracker
         }
         #endregion
 
-        public ClanChestProcessResult ProcessChestData(List<string> result, System.Action<ChestProcessingError> onError)
+        private async Task<double> ClanmateSimilarities(string input1, string input2)
+        {
+            return input1.CalculateSimilarity(input2);
+        }
+        private async Task<Clanmate> Clanmate_Scan(string input, double similiarityThreshold)
+        {
+            /*
+               "Name": "Naida Il",
+                      "Aliases": [
+                         "Naida II",
+                         "Naida ١",
+                         "Naida ll",
+                         "Naida ١١",
+                         "Naida 11",
+                         "Naida l|" 
+            */
+            var inputLength = input.Length; 
+
+            var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates.ToList();
+
+            bool bMatch = false;
+            Clanmate matchedClanmate = null;
+
+            foreach (var clanmate in clanmates)
+            {
+                var similarity = await ClanmateSimilarities(clanmate.Name, input);
+                Debug.WriteLine($"{clanmate.Name} and {input} have a Similiarity Percent => {similarity}%");
+                if(similarity >  similiarityThreshold)
+                {
+                    bMatch = true;
+                    matchedClanmate = clanmate;
+                    break;
+                }
+            }
+            if (bMatch)
+            {
+                return matchedClanmate;
+            }
+
+            return null;
+        }
+
+        public async Task<ClanChestProcessResult> ProcessChestData(List<string> result, System.Action<ChestProcessingError> onError)
         {
 
             /*
@@ -693,10 +735,26 @@ namespace TBChestTracker
             {
                 bool alias_found = false;
                 bool exists = clanmates.Select(mate_name => mate_name.Name).Contains(tmpchest.Clanmate, StringComparer.CurrentCultureIgnoreCase);
+               
                 if (!exists)
                 {
-                    com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} doesn't exist within clanmates database. Attempting to find Aliases.", "Unknown Clanmate", LogType.WARNING);
-                    Debug.WriteLine($"{tmpchest.Clanmate} doesn't exist within clanmates database. Attempting to find Aliases.");
+                    var tClanmate = tmpchest.Clanmate;
+
+                   
+                   
+
+
+                    var match_clanmate = await Clanmate_Scan(tClanmate,80);
+                    if(match_clanmate != null)
+                    {
+                        com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} is actually {match_clanmate}.", "Unknown Clanmate Found", LogType.INFO);
+                    }
+                    else
+                    {
+                        com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} doesn't exist within clanmates database. Attempting to find Aliases.", "Unknown Clanmate", LogType.WARNING);
+                        Debug.WriteLine($"{tmpchest.Clanmate} doesn't exist within clanmates database. Attempting to find Aliases.");
+                    }
+                    
                     //-- attempt to check to see if the unfound clanmate is under an alias.
                     foreach (var mate in clanmates)
                     {

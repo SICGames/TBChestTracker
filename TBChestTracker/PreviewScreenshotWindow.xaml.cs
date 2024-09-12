@@ -243,18 +243,23 @@ namespace TBChestTracker
                     Image<Gray, byte> result_image = result.ToImage<Gray, byte>();
                     Image<Gray, byte> modified_image = result_image.Mul(brightness) + brightness;
                     var imageScaled = modified_image.Resize(5, Emgu.CV.CvEnum.Inter.Cubic);
-                    var blurImage = imageScaled.SmoothMedian(3);
-                    var thresholdImage = blurImage.ThresholdBinaryInv(new Gray(SettingsManager.Instance.Settings.OCRSettings.Threshold), new Gray(SettingsManager.Instance.Settings.OCRSettings.MaxThreshold));
+                    var thresholdImage = imageScaled.ThresholdBinaryInv(new Gray(SettingsManager.Instance.Settings.OCRSettings.Threshold), new Gray(SettingsManager.Instance.Settings.OCRSettings.MaxThreshold));
                     var erodedImage = thresholdImage.Erode(1);
-
+                    
                     if (AppContext.Instance.SaveOCRImages)
                     {
-                        result_image.Save($"OCR_Original.png");
-                        modified_image.Save($"OCR_Brightened.png");
-                        imageScaled.Save($"OCR_ImageScaled.png");
-                        blurImage.Save($"OCR_Blurred.png");
-                        thresholdImage.Save($"OCR_Threshold.png");
-                        erodedImage.Save($"OCR_Eroded.png");
+                        var outputPath = $@"{AppContext.Instance.AppFolder}\Output";
+                        System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(outputPath);
+                        if (di.Exists == false)
+                        {
+                            di.Create();
+                        }
+
+                        result_image.Save($@"{outputPath}\OCR_Original.png");
+                        modified_image.Save($@"{outputPath}\OCR_Brightened.png");
+                        imageScaled.Save($@"{outputPath}\OCR_ImageScaled.png");
+                        thresholdImage.Save($@"{outputPath}\OCR_Threshold.png");
+                        erodedImage.Save($@"{outputPath}\OCR_Eroded.png");
                     }
 
                     var ocrResult = OCREngine.Read(erodedImage);
@@ -274,10 +279,10 @@ namespace TBChestTracker
                         }
                         System.Diagnostics.Debug.WriteLine($"Clan mate name detected as: {ocrResult.Words[0]}");
                     }
+
                     ocrResult.Words.Clear();
                     erodedImage.Dispose();
                     thresholdImage.Dispose();
-                    blurImage.Dispose();
                     imageScaled.Dispose();  
                     modified_image.Dispose();
                     modified_image = null;

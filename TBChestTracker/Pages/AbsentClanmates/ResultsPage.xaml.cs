@@ -47,6 +47,7 @@ namespace TBChestTracker.Pages.AbsentClanmates
 
                 foreach (var absentClanmate in AbsentClanmatesViewModel.Instance.AbsentClanmateList)
                 {
+                    ClanManager.Instance.ClanChestManager.RemoveChestData(absentClanmate);
                     ClanManager.Instance.ClanmateManager.Remove(absentClanmate);
                 }
 
