@@ -75,8 +75,7 @@ namespace TBChestTracker
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.InitialDirectory = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}";
-            openFileDialog.DefaultExt = ".db";
-            openFileDialog.Filter = "Databases | *.db";
+            openFileDialog.Filter = "Text Files|*.txt|Databases|*.db";
             if(openFileDialog.ShowDialog() == true)
             {
                 VerificationFile = openFileDialog.FileName;

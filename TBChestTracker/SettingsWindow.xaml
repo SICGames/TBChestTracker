@@ -7,7 +7,7 @@
         xmlns:ui="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
         xmlns:Pages="clr-namespace:TBChestTracker.Pages" x:Class="TBChestTracker.SettingsWindow"
         mc:Ignorable="d"
-        Title="Settings" Height="720" Width="800" Topmost="True" Loaded="Window_Loaded" Closing="Window_Closing">
+        Title="Settings" Height="720" Width="960" Topmost="True" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
@@ -32,6 +32,11 @@
                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
                 Text="Hot Keys" Height="36" Foreground="White" Background="#111" 
                 BorderBrush="#000" FontWeight="Bold" NavigationSource="/Pages/Settings/HotkeySettingsPage.xaml"/>
+            <ui:FancyNavigationButton 
+                ActiveBrush="#eee" ActiveBackgroundBrush="#444" HoverBrush="#555"
+                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                Text="Automation" Height="36" Foreground="White" Background="#111" 
+                BorderBrush="#000" FontWeight="Bold" NavigationSource="/Pages/Settings/AutomationSettingsPage.xaml"/>
         </StackPanel>
         <Grid Grid.Row="0" Grid.Column="1">
             <Grid.RowDefinitions>

@@ -243,14 +243,21 @@ namespace TBChestTracker
                     Image<Gray, byte> result_image = result.ToImage<Gray, byte>();
                     Image<Gray, byte> modified_image = result_image.Mul(brightness) + brightness;
                     var imageScaled = modified_image.Resize(5, Emgu.CV.CvEnum.Inter.Cubic);
+                    var blurImage = imageScaled.SmoothMedian(3);
+                    var thresholdImage = blurImage.ThresholdBinaryInv(new Gray(SettingsManager.Instance.Settings.OCRSettings.Threshold), new Gray(SettingsManager.Instance.Settings.OCRSettings.MaxThreshold));
+                    var erodedImage = thresholdImage.Erode(1);
 
                     if (AppContext.Instance.SaveOCRImages)
                     {
+                        result_image.Save($"OCR_Original.png");
+                        modified_image.Save($"OCR_Brightened.png");
                         imageScaled.Save($"OCR_ImageScaled.png");
-                        modified_image.Save($"OCR_ImageOut.png");
+                        blurImage.Save($"OCR_Blurred.png");
+                        thresholdImage.Save($"OCR_Threshold.png");
+                        erodedImage.Save($"OCR_Eroded.png");
                     }
 
-                    var ocrResult = OCREngine.Read(imageScaled);
+                    var ocrResult = OCREngine.Read(erodedImage);
                     if (ocrResult != null)
                     {
                         clanmateName = ocrResult.Words.ToArray();
@@ -268,6 +275,10 @@ namespace TBChestTracker
                         System.Diagnostics.Debug.WriteLine($"Clan mate name detected as: {ocrResult.Words[0]}");
                     }
                     ocrResult.Words.Clear();
+                    erodedImage.Dispose();
+                    thresholdImage.Dispose();
+                    blurImage.Dispose();
+                    imageScaled.Dispose();  
                     modified_image.Dispose();
                     modified_image = null;
                     result_image.Dispose();

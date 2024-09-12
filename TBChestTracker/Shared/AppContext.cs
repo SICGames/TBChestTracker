@@ -59,7 +59,7 @@ namespace TBChestTracker
         {
             get => $@"{CommonAppFolder}recent.db";
         }
-        public string TesseractData => $@"{AppFolder}TessData";
+        public string TesseractData => $@"{LocalApplicationPath}TessData";
 
         public bool IsFirstRun
         {
@@ -88,7 +88,7 @@ namespace TBChestTracker
                 extraStr = Manifest.Build;
 #endif
 
-                return $"v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} ";
+                return $"v{AppVersion.Major}.{AppVersion.Minor}.{AppVersion.Build} {extraStr} ";
             }
         }
         

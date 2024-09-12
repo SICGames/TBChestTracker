@@ -58,6 +58,9 @@ namespace TBChestTracker
 
             DefaultSettings.HotKeySettings.StartAutomationKeys = "F9";
             DefaultSettings.HotKeySettings.StopAutomationKeys = "F10";
+            DefaultSettings.AutomationSettings.AutomationClicks = 4;
+            DefaultSettings.AutomationSettings.AutomationScreenshotsAfterClicks = 1250;
+            DefaultSettings.AutomationSettings.AutomationDelayBetweenClicks = 100;
 
             if (AppContext.Instance.IsFirstRun)
             {
@@ -92,11 +95,21 @@ namespace TBChestTracker
                           
                             Save();
                         }
-                    }
+
+                        if(Settings.AutomationSettings.AutomationClicks == 0 && Settings.AutomationSettings.AutomationScreenshotsAfterClicks == 0 && Settings.AutomationSettings.AutomationDelayBetweenClicks == 0)
+                        {
+                            Settings.AutomationSettings.AutomationClicks = DefaultSettings.AutomationSettings.AutomationClicks;
+                            Settings.AutomationSettings.AutomationDelayBetweenClicks = DefaultSettings.AutomationSettings.AutomationDelayBetweenClicks;
+                            Settings.AutomationSettings.AutomationScreenshotsAfterClicks = DefaultSettings.AutomationSettings.AutomationScreenshotsAfterClicks;
+
+                            Save();
+                        }
+                     }
                 }
                 catch (Exception ex)
                 {
                     //-- it's possible it's missing;
+                    throw new Exception("Something happened in SettingsManager");
                 }
                 var aoiHeight = Settings.OCRSettings.SuggestedAreaOfInterest.height;
                 var aoiWidth = Settings.OCRSettings.SuggestedAreaOfInterest.width;

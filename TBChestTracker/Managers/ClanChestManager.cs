@@ -444,7 +444,7 @@ namespace TBChestTracker
 
                     com.HellStormGames.Logging.Console.Write($"OCR RESULT [{chestName}, {clanmate}, {chestobtained}", "OCR Result", LogType.INFO);
 
-                    if (clanmate.Contains(TBChestTracker.Resources.Strings.From))
+                    if (clanmate.ToLower().Contains(TBChestTracker.Resources.Strings.From.ToLower()))
                     {
 
                         //--- clean up
@@ -454,13 +454,21 @@ namespace TBChestTracker
                         {
                             //--- skip the space check and the odd symbol to get straight to the meat.
                             clanmate = clanmate.Substring(clanmate.IndexOf(' ') + 1);
-                            if (clanmate.Contains(TBChestTracker.Resources.Strings.From))
+                            if (clanmate.ToLower().Contains(TBChestTracker.Resources.Strings.From.ToLower()))
                             {
                                 //-- error - shouldn't even have reached this point.
                                 //-- game actually causes this error from not rendering name fast enough 
                                 //-- hasbeen patched but throw exception just in case.
                                 var badname = 0;
-                                throw new Exception("Clanmate name is blank. Increase thread sleep timer to prevent this.");
+                                var fromStartingPos = clanmate.IndexOf(TBChestTracker.Resources.Strings.From);
+                                if(fromStartingPos >= 0)
+                                {
+                                    com.HellStormGames.Logging.Console.Write($"Attempting to correct clanmate name => {clanmate}", "Clanmate Name Issue", LogType.INFO);
+                                    clanmate = clanmate.Remove(fromStartingPos, clanmate.IndexOf(' ') + 1);
+                                    com.HellStormGames.Logging.Console.Write($"Clanmate name after correction => {clanmate}", "Clanmate Repair Result", LogType.INFO);
+                                }
+
+                                //throw new Exception("Clanmate name is blank. Increase thread sleep timer to prevent this.");
                             }
 
                         }
@@ -469,6 +477,7 @@ namespace TBChestTracker
                             bError = true;
                             ProcessingTextResult.Status = ProcessingStatus.CLANMATE_ERROR;
                             ProcessingTextResult.Message = $"Seems to be an issue while extracting clanmate's name. Exception caught => {e.Message}. ";
+                            com.HellStormGames.Logging.Console.Write($"Couldn't Process Clanmate name correctly. Affected Clanmate => {clanmate}", "Clanmate Extraction Failed", LogType.ERROR);
                             break;
                         }
                     }

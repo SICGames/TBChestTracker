@@ -50,6 +50,11 @@ namespace TBChestTracker
 
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+
+        #region TessData Option
+        private string TessData_Option = "tessdata";
+
+        #endregion
         #region Declarations
         System.Threading.Thread InputHookThread { get; set; }
         System.Threading.Thread AutomationThread { get; set; }
@@ -106,21 +111,26 @@ namespace TBChestTracker
             Image<Gray, Byte> imageOut = null;
             var ocrSettings = SettingsManager.Instance.Settings.OCRSettings;
             var brightness = ocrSettings.GlobalBrightness;
+           
             image = bitmap.ToImage<Gray, Byte>();
             imageOut = image.Mul(brightness) + brightness;
 
             //-- OCR Incorrect Text Bug - e.g. Slash Jr III is read Slash )r III
             //-- Fix: Upscaling input image large enough to read properly.
-            var imageScaled = imageOut.Resize(5, Emgu.CV.CvEnum.Inter.Cubic);
+            var imageScaled = imageOut.Resize(2, Emgu.CV.CvEnum.Inter.Cubic);
+            var blurImage = imageScaled.SmoothMedian(3);
 
             var threshold = new Gray(ocrSettings.Threshold); //-- 85
             var maxThreshold = new Gray(ocrSettings.MaxThreshold); //--- 255
-            var imageThreshold = imageScaled.ThresholdBinaryInv(threshold, maxThreshold);
+
+            var imageThreshold = blurImage.ThresholdBinaryInv(threshold, maxThreshold);
+
+            var erodeImage = imageThreshold.Erode(1);
 
             //-- if it is null or empty somehow, we update it.
             if (String.IsNullOrEmpty(ocrSettings.PreviewImage))
             {
-                imageThreshold.Save($@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png");
+                erodeImage.Save($@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png");
                 ocrSettings.PreviewImage = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png";
             }
 
@@ -131,7 +141,7 @@ namespace TBChestTracker
                 imageThreshold.Save($"OCR_Threshold.png");
             }
             
-            var ocrResult = OCREngine.Read(imageThreshold);
+            var ocrResult = OCREngine.Read(erodeImage);
             
             imageThreshold.Dispose();
             imageScaled.Dispose();
@@ -206,7 +216,7 @@ namespace TBChestTracker
                 int automatorClicks = 0;
                 if (AppContext.Instance.canCaptureAgain)
                 {
-                    Thread.Sleep(1250); //-- could prevent the "From:" bug.
+                    Thread.Sleep(SettingsManager.Instance.Settings.AutomationSettings.AutomationScreenshotsAfterClicks); //-- could prevent the "From:" bug.
 
                     CaptureRegion();
 
@@ -217,11 +227,11 @@ namespace TBChestTracker
 
                 if (clanChestProcessResult.Result == ClanChestProcessEnum.SUCCESS)
                 {
-                    while (automatorClicks != 4)
+                    while (automatorClicks != SettingsManager.Instance.Settings.AutomationSettings.AutomationClicks)
                     {
                         Automator.LeftClick(claim_button.X, claim_button.Y);
                         automatorClicks++;
-                        Thread.Sleep(100);
+                        Thread.Sleep(SettingsManager.Instance.Settings.AutomationSettings.AutomationDelayBetweenClicks);
                     }
 
                     //-- canCaptureAgain not being switched back on.
@@ -427,7 +437,9 @@ namespace TBChestTracker
                     var languages = SettingsManager.Instance.Settings.OCRSettings.Languages;
                     OCREngine = new OCREngine();
 
-                    OCREngine.Init(SettingsManager.Instance.Settings.OCRSettings);
+                    var engineModeOption = TessData_Option.Contains("_best") == true ? TessDataOption.Best : TessData_Option.Contains("_fast") == true ? TessDataOption.Fast : TessDataOption.None;
+
+                    OCREngine.Init(SettingsManager.Instance.Settings.OCRSettings, engineModeOption);
                 }
                 else
                 {
@@ -500,6 +512,94 @@ namespace TBChestTracker
             bool updateAvailable = await applicationManager.IsUpdateAvailable();
             return updateAvailable;
         }
+
+        public async Task<bool> ValidateTessDataExists()
+        {
+            var dirInfo = new System.IO.DirectoryInfo(AppContext.Instance.TesseractData);
+            if(dirInfo.Exists == false)
+            {
+                dirInfo.Create();
+                return false;
+            }
+            else
+            {
+                var files = dirInfo.GetFiles("*.traineddata");
+                if(files.Length > 0)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        public async Task<string> GetTesseractGithubDownloadPath()
+        {
+
+            var releases = await ApplicationManager.Instance.client.Repository.Release.GetAll("tesseract-ocr", TessData_Option);
+            var latest = releases[0];
+            if(latest != null)
+            {
+                var downloadUrl = latest.ZipballUrl;
+                return downloadUrl;
+            }
+            return String.Empty;
+        }
+
+        public async Task DownloadTessData(Window window, string downloadUrl, string downloadFolder)
+        {
+            try
+            {
+                if (window is SplashScreen splashScreen)
+                {
+
+                    var downloadFile = $@"{downloadFolder}\{TessData_Option}.zip";
+                    if(System.IO.File.Exists(downloadFile))
+                    {
+                        return;
+                    }
+
+                    CancellationTokenSource s = new CancellationTokenSource();
+
+                    var progress = new Progress<double>(x =>
+                    {
+                        var p = x * 100.0;
+                        Debug.WriteLine(p);
+                        splashScreen.UpdateStatus($"Downloading Tesseract's Trained Models ({Math.Round(p)}%)", Math.Round(p));
+                    });
+
+                    await DownloadManager.Download(window, downloadUrl, downloadFile, progress, s.Token);
+                    splashScreen.UpdateStatus($"Downloading Tesseract's Trained Models (100%)", 100);
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        public async Task ExtractArchive(Window window, string archiveFile, string destinationFolder)
+        {
+            if (window is SplashScreen splashScreen)
+            {
+                if(System.IO.File.Exists(archiveFile))
+                {
+                    var progress = new Progress<ZipProgress>(x =>
+                    {
+                        double total = x.Total;
+                        var current = x.CurrentItem;
+                        double processed = x.Processed;
+                        double percentage = (processed/total) * 100.0;
+                        splashScreen.UpdateStatus($"Extracting Trained Tesseract Models.... ({Math.Round(processed)}/{Math.Round(total)})", percentage);
+                    });
+
+                    await ArchiveManager.Extract(archiveFile, destinationFolder, progress);
+
+                    //-- now we should clean up.
+
+                }
+            }
+        }
         public async void Init(Window window)
         {
             if (window is SplashScreen splashScreen)
@@ -525,12 +625,17 @@ namespace TBChestTracker
                     throw new Exception("SettingsManager is null");
                 }
 
+                //-- New TessData folder Path in Local User Data Folder
+                var localAppFolder = new System.IO.DirectoryInfo(AppContext.Instance.LocalApplicationPath);
+                if (localAppFolder.Exists == false)
+                {
+                    localAppFolder.Create();
+                }
+
                 if(String.IsNullOrEmpty(SettingsManager.Instance.Settings.OCRSettings.TessDataFolder))
                 {
                     throw new Exception("Unable to correctly populate settings.");
                 }
-
-//                await Task.Delay(2000);
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
@@ -569,15 +674,65 @@ namespace TBChestTracker
 
                     await this.Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        splashScreen.UpdateStatus("Upgrading Clan databases...", 94);
+                        splashScreen.UpdateStatus("Upgrading Clan databases...", 92);
                     }));
                     await Task.Delay(500);
                     await UpgradeClanDatabases(databasesNeedUpgrade);
-
                 }
+
+
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    splashScreen.UpdateStatus("Initializing Tesseract...", 95);
+                    splashScreen.UpdateStatus("Verifying Tesseract's TessData Installed...", 93);
+                }));
+
+                await Task.Delay(500);
+                var tessDataExists = await ValidateTessDataExists();    
+                if(tessDataExists == false)
+                {
+                    //-- we need to download the TessData-Best.zip from tesseract-ocr Github page.
+                    await this.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        splashScreen.UpdateStatus("Downloading Tesseract's Trained Models...", 94);
+                    }));
+
+                    var downloadUrl = await GetTesseractGithubDownloadPath();
+
+                    if(String.IsNullOrEmpty(downloadUrl) == false)
+                    {
+                        var downloadFolderPath = $@"{AppContext.Instance.LocalApplicationPath}Temp";
+                        var downloadFolderDirInfo = new System.IO.DirectoryInfo(downloadFolderPath);
+                        if(downloadFolderDirInfo.Exists == false)
+                        {
+                            downloadFolderDirInfo.Create(); 
+                        }
+                        //-- we begin downloading now
+                        await DownloadTessData(splashScreen, downloadUrl, downloadFolderPath);
+
+                        await this.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            splashScreen.UpdateStatus("Extracting trained Tesseract models...", 95);
+                        }));
+                        var archiveFile = $@"{downloadFolderPath}\{TessData_Option}.zip";
+                        await ExtractArchive(splashScreen, archiveFile, $"{AppContext.Instance.TesseractData}");
+
+                        //-- remove archive file
+                        //-- update SettingsManager.OCRSettings
+                        SettingsManager.Instance.Settings.OCRSettings.TessDataFolder = $@"{AppContext.Instance.TesseractData}";
+                        SettingsManager.Instance.Save();
+
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to obtain Tesseract download path.");
+                    }
+                }
+
+                
+
+                await this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    splashScreen.UpdateStatus("Initializing Tesseract...", 98);
                 }));
 
                 await Task.Delay(500);
@@ -586,7 +741,7 @@ namespace TBChestTracker
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    splashScreen.UpdateStatus("Building Chest Variables...", 97);
+                    splashScreen.UpdateStatus("Building Chest Variables...", 99);
                 }));
                 await Task.Delay(250);
 

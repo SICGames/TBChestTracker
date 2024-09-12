@@ -154,14 +154,16 @@ namespace TBChestTracker.Pages.Settings
                 Image<Gray, byte> image = ((System.Drawing.Bitmap)bmp).ToImage<Gray, byte>();
                 
                 var imageBrightened = image.Mul(brightness) + brightness;
-                var imageScaled = imageBrightened.Resize(5, Emgu.CV.CvEnum.Inter.Cubic);
+                var imageScaled = imageBrightened.Resize(2, Emgu.CV.CvEnum.Inter.Cubic);
 
                 var threshold_gray = new Gray(threshold);
                 var maxThreshold_gray = new Gray(maxthreshold);
 
                 var imageThreshold = imageScaled.ThresholdBinaryInv(threshold_gray, maxThreshold_gray);
+                
+                Image<Gray,byte> erodedImage = imageThreshold.Erode(1);
 
-                ImagePreview.Source = imageThreshold.ToBitmap().ToBitmapSource();
+                ImagePreview.Source =  erodedImage.ToBitmap().ToBitmapSource();
                 SettingsManager.Instance.Settings.OCRSettings.Threshold = threshold;
                 SettingsManager.Instance.Settings.OCRSettings.MaxThreshold = maxthreshold;
                 

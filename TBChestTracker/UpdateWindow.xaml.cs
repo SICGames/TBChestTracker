@@ -64,7 +64,7 @@ namespace TBChestTracker
 
             UpgradeTitle = $"TotalBattle Chest Tracker {updateManifest.Name} is available!";
             Description = updateManifest.Body;
-            downloadUrlPath = updateManifest.Url;
+            downloadUrlPath = updateManifest.HtmlUrl;
 
             this.DataContext = this;
         }

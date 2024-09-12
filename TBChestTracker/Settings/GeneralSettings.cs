@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace TBChestTracker
 {
+
     [System.Serializable]
     public class GeneralSettings : INotifyPropertyChanged
     {

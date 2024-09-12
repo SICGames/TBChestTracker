@@ -16,12 +16,13 @@ namespace TBChestTracker
         public GeneralSettings GeneralSettings { get; private set; }
         public OCRSettings OCRSettings { get; set; }
         public HotKeySettings HotKeySettings { get; set; }
-
+        public AutomationSettings AutomationSettings { get; set; }
         public Settings() 
         {
             OCRSettings = new OCRSettings();
             GeneralSettings = new GeneralSettings();
             HotKeySettings = new HotKeySettings();
+            AutomationSettings = new AutomationSettings();  
         }
         protected virtual void Dispose(bool disposing)
         {

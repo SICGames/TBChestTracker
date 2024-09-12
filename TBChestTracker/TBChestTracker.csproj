@@ -113,6 +113,8 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -199,7 +201,9 @@
     <Compile Include="Helpers\Translator.cs" />
     <Compile Include="Data\LocaleDictionary.cs" />
     <Compile Include="Managers\ApplicationManager.cs" />
+    <Compile Include="Managers\ArchiveManager.cs" />
     <Compile Include="Managers\ClanChestProcessResult.cs" />
+    <Compile Include="Managers\DownloadManager.cs" />
     <Compile Include="Managers\LocalizationManager.cs" />
     <Compile Include="Managers\ProcessingTextResult.cs" />
     <Compile Include="Managers\SettingsManager.cs" />
@@ -239,6 +243,9 @@
     </Compile>
     <Compile Include="Pages\OCRWizard\OCRWizard_SelectRegion.xaml.cs">
       <DependentUpon>OCRWizard_SelectRegion.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Settings\AutomationSettingsPage.xaml.cs">
+      <DependentUpon>AutomationSettingsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\Settings\GeneralSettingsPage.xaml.cs">
       <DependentUpon>GeneralSettingsPage.xaml</DependentUpon>
@@ -280,6 +287,7 @@
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings\AOIRect.cs" />
+    <Compile Include="Settings\AutomationSettings.cs" />
     <Compile Include="Settings\ExportSettings.cs" />
     <Compile Include="Settings\GeneralSettings.cs" />
     <Compile Include="Settings\HotKey.cs" />
@@ -290,6 +298,7 @@
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Shared\AbsentClanmatesViewModel.cs" />
     <Compile Include="Shared\AppContext.cs" />
+    <Compile Include="Shared\ZipProgress.cs" />
     <Compile Include="SplashScreen.xaml.cs">
       <DependentUpon>SplashScreen.xaml</DependentUpon>
     </Compile>
@@ -508,6 +517,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\OCRWizard\OCRWizard_SelectRegion.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Settings\AutomationSettingsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
