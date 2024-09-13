@@ -1382,5 +1382,11 @@ namespace TBChestTracker
 
             }
         }
+
+        private void ClanmateValidationMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            ClanmateValidationWindow clanmateValidationWindow = new ClanmateValidationWindow();
+            clanmateValidationWindow.Show();
+        }
     }
 }

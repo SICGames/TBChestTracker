@@ -161,6 +161,9 @@
       <DependentUpon>ClanInsightsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ClanInsights\ClanInsightsData.cs" />
+    <Compile Include="ClanmateValidationWindow.xaml.cs">
+      <DependentUpon>ClanmateValidationWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Clanmate\Clanmate.cs" />
     <Compile Include="Clanmate\ClanmateDatabase.cs" />
     <Compile Include="ClanWealthBuilderWindow.xaml.cs">
@@ -235,6 +238,15 @@
     </Compile>
     <Compile Include="Pages\AbsentClanmates\ResultsPage.xaml.cs">
       <DependentUpon>ResultsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ClanmatesValidation\ClanmatesValidationCompleted.xaml.cs">
+      <DependentUpon>ClanmatesValidationCompleted.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ClanmatesValidation\ClanmatesValidationProcessingPage.xaml.cs">
+      <DependentUpon>ClanmatesValidationProcessingPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ClanmatesValidation\ClanmatesValidationStartPage.xaml.cs">
+      <DependentUpon>ClanmatesValidationStartPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\ClanPage.xaml.cs">
       <DependentUpon>ClanPage.xaml</DependentUpon>
@@ -397,6 +409,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ClanmateValidationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ClanWealthBuilderWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -506,6 +522,18 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\AbsentClanmates\ResultsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\ClanmatesValidation\ClanmatesValidationCompleted.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\ClanmatesValidation\ClanmatesValidationProcessingPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\ClanmatesValidation\ClanmatesValidationStartPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

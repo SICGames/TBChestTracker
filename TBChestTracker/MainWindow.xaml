@@ -286,6 +286,7 @@
                     <MenuItem Header="{x:Static ResourceStrings:Strings.ChestBuilder}" x:Name="ChestBuilderMenuItem" Click="ChestBuilderMenuItem_Click"/>
                     <MenuItem Header="Clan Wealth Builder" x:Name="ClanWealthBuilderMenuItem" Click="ClanWealthBuilderMenuItem_Click" IsEnabled="False"/>
                     <Separator/>
+                    <MenuItem Header="Clanmates Validation" x:Name="ClanmateValidationMenuItem" Click="ClanmateValidationMenuItem_Click"/>
                     <MenuItem Header="Absent Clanmates Cleaner" x:Name="AbsentClanmateCleanerMenuItem" Click="AbsentClanmateCleanerMenuItem_Click"/>
                 </MenuItem>
                 <MenuItem Header="{x:Static ResourceStrings:Strings.Help}" x:Name="HelpMenu" Click="HelpMenu_Click">
