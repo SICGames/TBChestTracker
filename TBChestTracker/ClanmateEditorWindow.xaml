@@ -1,0 +1,65 @@
+﻿<Window x:Class="TBChestTracker.ClanmateEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TBChestTracker"
+        xmlns:ui="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
+        mc:Ignorable="d"
+        Title="ClanmateEditorWindow" Height="450" Width="800" 
+        PreviewKeyDown="Window_PreviewKeyDown" 
+        AllowsTransparency="True" 
+        WindowState="Maximized" 
+        WindowStartupLocation="CenterScreen" 
+        Topmost="True"
+        Loaded="Window_Loaded" Closing="Window_Closing" WindowStyle="None" Background="Transparent">
+    <Grid x:Name="MAIN_GRID">
+        <Canvas x:Name="MAIN_CANVAS" PreviewMouseMove="MAIN_CANVAS_PreviewMouseMove" PreviewMouseLeftButtonUp="MAIN_CANVAS_PreviewMouseLeftButtonUp">
+            <Border x:Name="UI_TOOLBAR" Grid.Column="1"
+                    Background="#222222" 
+                    BorderBrush="#333" 
+                    CornerRadius="5"
+                    Margin="0,14" 
+                    Height="36" 
+                    IsHitTestVisible="True" 
+                    Canvas.Top="25" Canvas.Left="175" PreviewMouseLeftButtonDown="UI_TOOLBAR_PreviewMouseLeftButtonDown">
+                <Grid Margin="10,5" IsHitTestVisible="True" x:Name="TOOLBAR_GRID">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="150"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0" Margin="0,0,5,0" Width="24" HorizontalAlignment="Left" VerticalAlignment="Stretch" x:Name="GRIP" 
+                      MouseEnter="GRIP_MouseEnter" MouseLeave="GRIP_MouseLeave" PreviewMouseLeftButtonDown="GRIP_PreviewMouseLeftButtonDown">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="4"/>
+                            <ColumnDefinition Width="4"/>
+                            <ColumnDefinition Width="4"/>
+                            <ColumnDefinition Width="2"/>
+                        </Grid.ColumnDefinitions>
+                        <Rectangle Grid.Column="1"  Width="2" Fill="#FFF" Height="12" Opacity="0.25"/>
+                        <Rectangle Grid.Column="2"  Width="2" Fill="#FFF" Height="12" Opacity="0.25"/>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Grid.Column="1">
+                        <Border x:Name="CLANMATE_TEXT_BORDER" Background="#fff" Width="200" CornerRadius="15">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="28"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="CLANMATE_TEXTBOX" Background="Transparent" Margin="15,2,5,2" BorderBrush="Transparent" Grid.Column="0"/>
+                                <Image Source="pack://application:,,,/Images/searchIcon-gray.png" Grid.Column="1" Width="16" Height="16" Margin="3,3"/>
+                            </Grid>
+                        </Border>
+                        <ui:FancyImageButton x:Name="CLANMATE_SELECTION_BUTTON" Background="Transparent" HighlightBrush="#0077ff" HighlightOpacity="0.5" HighlightStrokeBrush="#0099ff" 
+                                         ImageSource="pack://application:,,,/Images/Select_ClanmateIcon-White.png" 
+                                         Height="24" Width="24" ToolTip="Quickly Select Clanmates" Margin="5,0" Click="CLANMATE_SELECTION_BUTTON_Click"/>
+                    </StackPanel>
+                    <ui:FancyButton Grid.Column="2" x:Name="CloseBtn" Text="Done"
+                                Width="75" Height="24"  FontWeight="Bold" HorizontalAlignment="Right" Click="CloseBtn_Click" IsHitTestVisible="True" RenderMode="TEXT" Background="#0077ff" HilightBrush="#0099FF" Foreground="White"/>
+                </Grid>
+            </Border>
+
+        </Canvas>
+    </Grid>
+</Window>

@@ -16,24 +16,23 @@ using System.Windows.Shapes;
 namespace TBChestTracker.Pages.ClanmatesValidation
 {
     /// <summary>
-    /// Interaction logic for ClanmatesValidationCompleted.xaml
+    /// Interaction logic for CreateVerifiedClanmatesPage.xaml
     /// </summary>
-    public partial class ClanmatesValidationCompleted : Page
+    public partial class CreateVerifiedClanmatesPage : Page
     {
-        public ClanmatesValidationCompleted()
+
+        public CreateVerifiedClanmatesPage()
         {
             InitializeComponent();
         }
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            var wnd = Window.GetWindow(this) as ClanmateValidationWindow;
-            var affectedClanmates = wnd.affectedClanmates;
-            this.DataContext = wnd;
-        }
+            ClanmateEditorWindow clanmateEditorWindow = new ClanmateEditorWindow();
+            var window = Window.GetWindow(this) as ClanmateValidationWindow;
+            window.WindowState = WindowState.Minimized;
 
-        private void Page_Unloaded(object sender, RoutedEventArgs e)
-        {
+            clanmateEditorWindow.ShowDialog();
 
         }
     }

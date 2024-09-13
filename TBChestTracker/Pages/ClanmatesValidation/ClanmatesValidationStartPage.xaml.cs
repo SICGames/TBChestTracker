@@ -28,7 +28,7 @@ namespace TBChestTracker.Pages.ClanmatesValidation
         private void BeginButton_Click(object sender, RoutedEventArgs e)
         {
             var wnd = Window.GetWindow(this) as ClanmateValidationWindow;
-            wnd.NavigateTo("Pages/ClanmatesValidation/ClanmatesValidationProcessingPage.xaml");
+            wnd.NavigateTo("Pages/ClanmatesValidation/CreateVerifiedClanmatesPage.xaml");
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)

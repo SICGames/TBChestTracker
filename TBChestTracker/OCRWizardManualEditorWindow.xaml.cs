@@ -161,10 +161,10 @@ namespace TBChestTracker
                 endPoint = startPoint;
                 
                 SelectionRectangle = new Rectangle();
-                SelectionRectangle.StrokeThickness = 3;
+                SelectionRectangle.StrokeThickness = 5;
                 SelectionRectangle.Height = 1;
                 SelectionRectangle.Width = 1;
-                SelectionRectangle.Stroke = Brushes.DarkGray;
+                SelectionRectangle.Stroke = Brushes.Red;
                 PreviewCanvas.Children.Add(SelectionRectangle);
 
                 Canvas.SetLeft(SelectionRectangle, startPoint.X * dpi.X);

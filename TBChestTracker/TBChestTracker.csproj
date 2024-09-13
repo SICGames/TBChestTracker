@@ -161,6 +161,12 @@
       <DependentUpon>ClanInsightsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ClanInsights\ClanInsightsData.cs" />
+    <Compile Include="ClanmateEditorWindow.xaml.cs">
+      <DependentUpon>ClanmateEditorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClanmatesFloatingWindow.xaml.cs">
+      <DependentUpon>ClanmatesFloatingWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ClanmateValidationWindow.xaml.cs">
       <DependentUpon>ClanmateValidationWindow.xaml</DependentUpon>
     </Compile>
@@ -193,6 +199,11 @@
     </Compile>
     <Compile Include="Engine\OCREngine.cs" />
     <Compile Include="ErrorHandlers\ChestProcessingError.cs" />
+    <Compile Include="Helpers\WindowHelper.cs" />
+    <Compile Include="Pages\ClanmatesValidation\CreateVerifiedClanmatesPage.xaml.cs">
+      <DependentUpon>CreateVerifiedClanmatesPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\FancyTreeView.cs" />
     <Compile Include="Extensions\SimilarityStringExtension.cs" />
     <Compile Include="Helpers\DateTimeHelper.cs" />
     <Compile Include="Helpers\EnumBindingSourceExtension.cs" />
@@ -409,6 +420,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ClanmateEditorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ClanmatesFloatingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ClanmateValidationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -534,6 +553,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\ClanmatesValidation\ClanmatesValidationStartPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\ClanmatesValidation\CreateVerifiedClanmatesPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -766,6 +789,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\saveIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Select_ClanmateIcon-White.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\SettingsIcon01.png">

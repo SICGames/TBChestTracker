@@ -11,14 +11,16 @@
     <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <TextBlock Text="Clanmates Validation" Grid.Row="0" FontSize="18" FontWeight="Bold" Margin="10"/>
+        <TextBlock Text="Let's Get This Started" Grid.Row="1" FontSize="14" Margin="25,2"/>
         <TextBlock 
             Text="This will attempt to correct any mispelled clanmate names and add chests to the correct clanmate. This is highly experimental. A results window will show up for you to confirm whether or not you want to proceed."
-            Grid.Row="1" TextWrapping="Wrap" Margin="15,5"/>
-        <DockPanel LastChildFill="False" Grid.Row="2" Height="48" HorizontalAlignment="Right">
+            Grid.Row="2" TextWrapping="Wrap" Margin="15,5"/>
+        <DockPanel LastChildFill="False" Grid.Row="3" Height="48" HorizontalAlignment="Right">
             <ui:FancyButton RenderMode="TEXT" Width="125" Height="32" Text="Begin" Foreground="White" Background="#0077ff" Margin="15,0" HilightBrush="#0099ff" x:Name="BeginButton" Click="BeginButton_Click"/>
         </DockPanel>
     </Grid>
