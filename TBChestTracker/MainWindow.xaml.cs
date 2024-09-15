@@ -41,6 +41,7 @@ using TBChestTracker.Engine;
 using TBChestTracker.Properties;
 using TBChestTracker.Resources;
 
+using TBChestTracker.Effects;
 
 namespace TBChestTracker
 {
@@ -53,7 +54,7 @@ namespace TBChestTracker
     {
 
         #region TessData Option
-        private string TessData_Option = "tessdata";
+        private TessDataConfig TessDataConfig { get; set; }
 
         #endregion
         #region Declarations
@@ -98,6 +99,8 @@ namespace TBChestTracker
             //appContext = new AppContext();
             InitializeComponent();
 
+            TessDataConfig = new TessDataConfig(TessDataOption.Best);
+
             this.DataContext = AppContext.Instance;
             this.Closing += MainWindow_Closing;
             recentlyOpenedDatabases = new RecentDatabase();
@@ -108,62 +111,49 @@ namespace TBChestTracker
         #region Image Processing Functions & Other Related Functions
         private Task<TessResult> GetTextFromBitmap(System.Drawing.Bitmap bitmap)
         {
-            Image<Gray, Byte> image = null;
-            Image<Gray, Byte> imageOut = null;
+       
             var ocrSettings = SettingsManager.Instance.Settings.OCRSettings;
             var brightness = ocrSettings.GlobalBrightness;
-           
-            image = bitmap.ToImage<Gray, Byte>();
-            
-            imageOut = image.Mul(brightness) + brightness;
-
-            //-- OCR Incorrect Text Bug - e.g. Slash Jr III is read Slash )r III
-            //-- Fix: Upscaling input image large enough to read properly.
-            var imageScaled = imageOut.Resize(2, Emgu.CV.CvEnum.Inter.Cubic);
-            
             var threshold = new Gray(ocrSettings.Threshold); //-- 85
             var maxThreshold = new Gray(ocrSettings.MaxThreshold); //--- 255
 
-            var imageThreshold = imageScaled.ThresholdBinaryInv(threshold, maxThreshold);
+            bool bSave = false;
+            string outputPath = String.Empty;
 
-            var erodeImage = imageThreshold.Erode(1);
-
-            //-- if it is null or empty somehow, we update it.
-            if (String.IsNullOrEmpty(ocrSettings.PreviewImage))
-            {
-                erodeImage.Save($@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png");
-                ocrSettings.PreviewImage = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png";
-            }
+            Mat outputImage = new Mat();
+            Mat original_image = bitmap.ToImage<Bgr, Byte>().Mat;
 
             if (AppContext.Instance.SaveOCRImages)
             {
-                var outputPath = $@"{AppContext.Instance.AppFolder}\Output";
+                bSave = true;
+                outputPath = $@"{AppContext.Instance.AppFolder}\Output";
                 System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(outputPath);
                 if (di.Exists == false)
                 {
                     di.Create();
                 }
-                bitmap.Save($@"{outputPath}\OCR_ImageOriginal.png", System.Drawing.Imaging.ImageFormat.Png);
-                imageOut.Save($@"{outputPath}\OCR_ImageBrightened.png");
-                image.Save($@"{outputPath}\OCR_ImageGrayscaled.png");
-                imageScaled.Save($@"{outputPath}\OCR_ImageScaled.png");
-                imageThreshold.Save($@"{outputPath}\OCR_Threshold.png");
-                erodeImage.Save($@"{outputPath}\OCR_Eroded.png");
+                original_image.Save($@"{outputPath}\OCR_ImageOriginal.png");
             }
-            
-            var ocrResult = OCREngine.Read(erodeImage);
-            
-            erodeImage.Dispose();
 
-            imageThreshold.Dispose();
-            imageScaled.Dispose();
-            imageOut.Dispose();
-            image.Dispose();
+            outputImage = ImageEffects.ConvertToGrayscale(original_image, bSave, outputPath);
+            outputImage  = ImageEffects.Brighten(outputImage, brightness, bSave, outputPath);
+            
+            //-- OCR Incorrect Text Bug - e.g. Slash Jr III is read Slash )r III
+            //-- Fix: Upscaling input image large enough to read properly.
+            //outputImage = ImageEffects.Resize(outputImage, 2, Emgu.CV.CvEnum.Inter.Cubic, bSave, outputPath);
+            
+            outputImage = ImageEffects.ThresholdBinaryInv(outputImage, threshold, maxThreshold, bSave, outputPath);
+            //-- if it is null or empty somehow, we update it.
+            if (String.IsNullOrEmpty(ocrSettings.PreviewImage))
+            {
+                outputImage.Save($@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png");
+                ocrSettings.PreviewImage = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png";
+            }
 
-            imageThreshold = null;
-            imageScaled = null;
-            imageOut = null;
-            image = null;
+            var ocrResult = OCREngine.Read(outputImage);
+
+            outputImage.Dispose();
+            original_image.Dispose();
 
             return Task.FromResult(ocrResult);
         }
@@ -351,26 +341,6 @@ namespace TBChestTracker
             {
                 SettingsManager = new SettingsManager();
 
-                /*
-                var settingsFile = $@"{AppContext.Instance.CommonAppFolder}\Settings.json";
-
-                var isFirstRun = await IsFirstLaunch();
-
-                if (isFirstRun)
-                {
-                    SettingsManager.Instance.BuildDefaultConfiguration();
-                }
-                else
-                {
-                    if (System.IO.File.Exists(settingsFile) == false)
-                    {
-                        SettingsManager.Instance.BuildDefaultConfiguration();
-                    }
-                }
-
-                SettingsManager.Load();
-                */
-
                 com.HellStormGames.Logging.Console.Write("Settings Loaded.", com.HellStormGames.Logging.LogType.INFO);
 
                 //-- init appContext
@@ -448,10 +418,10 @@ namespace TBChestTracker
                     AppContext.Instance.TessDataExists = true;
                     var languages = SettingsManager.Instance.Settings.OCRSettings.Languages;
                     OCREngine = new OCREngine();
+                    
+                    
 
-                    var engineModeOption = TessData_Option.Contains("_best") == true ? TessDataOption.Best : TessData_Option.Contains("_fast") == true ? TessDataOption.Fast : TessDataOption.None;
-
-                    OCREngine.Init(SettingsManager.Instance.Settings.OCRSettings, engineModeOption);
+                    OCREngine.Init(SettingsManager.Instance.Settings.OCRSettings, TessDataConfig);
                 }
                 else
                 {
@@ -548,7 +518,7 @@ namespace TBChestTracker
         public async Task<string> GetTesseractGithubDownloadPath()
         {
 
-            var releases = await ApplicationManager.Instance.client.Repository.Release.GetAll("tesseract-ocr", TessData_Option);
+            var releases = await ApplicationManager.Instance.client.Repository.Release.GetAll("tesseract-ocr", TessDataConfig.TesseractPackage);
             var latest = releases[0];
             if(latest != null)
             {
@@ -565,7 +535,7 @@ namespace TBChestTracker
                 if (window is SplashScreen splashScreen)
                 {
 
-                    var downloadFile = $@"{downloadFolder}\{TessData_Option}.zip";
+                    var downloadFile = $@"{downloadFolder}\{TessDataConfig.TesseractPackage}.zip";
                     if(System.IO.File.Exists(downloadFile))
                     {
                         return;
@@ -725,7 +695,7 @@ namespace TBChestTracker
                         {
                             splashScreen.UpdateStatus("Extracting trained Tesseract models...", 95);
                         }));
-                        var archiveFile = $@"{downloadFolderPath}\{TessData_Option}.zip";
+                        var archiveFile = $@"{downloadFolderPath}\{TessDataConfig.TesseractPackage}.zip";
                         await ExtractArchive(splashScreen, archiveFile, $"{AppContext.Instance.TesseractData}");
 
                         //-- remove archive file
@@ -904,6 +874,7 @@ namespace TBChestTracker
             }
             l = null;
             */
+            TessDataConfig = null;
 
             AppContext.Instance.isAppClosing = true;
             applicationManager.KillNodeServer();

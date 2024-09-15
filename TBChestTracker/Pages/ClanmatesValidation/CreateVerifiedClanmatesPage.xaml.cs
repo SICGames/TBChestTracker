@@ -31,7 +31,7 @@ namespace TBChestTracker.Pages.ClanmatesValidation
             ClanmateEditorWindow clanmateEditorWindow = new ClanmateEditorWindow();
             var window = Window.GetWindow(this) as ClanmateValidationWindow;
             window.WindowState = WindowState.Minimized;
-
+            clanmateEditorWindow.ParentWindow = window; 
             clanmateEditorWindow.ShowDialog();
 
         }

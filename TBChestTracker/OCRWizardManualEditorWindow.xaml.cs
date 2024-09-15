@@ -240,21 +240,23 @@ namespace TBChestTracker
                         if (result != null)
                         {
                             Image<Gray, byte> result_image = result.ToImage<Gray, byte>();
+                            
+                            //Image<Gray, byte> scaled_image = result_image.Resize(3, Emgu.CV.CvEnum.Inter.Cubic);
+                            
                             var brightness = SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness;
-                            Image<Gray, byte> modified_image = result_image.Mul(brightness) + brightness;
-
                             var threshold = new Gray(SettingsManager.Instance.Settings.OCRSettings.Threshold);
                             var maxThreshold = new Gray(SettingsManager.Instance.Settings.OCRSettings.MaxThreshold);
-
+                            
+                            Image<Gray, byte> modified_image = result_image.Mul(brightness) + brightness;
                             var thresholdImage = modified_image.ThresholdBinaryInv(threshold, maxThreshold);
-                            var erodedImage = thresholdImage.Erode(1);
+                            //var erodedImage = thresholdImage.Erode(1);6
 
                             //--- grab words from region 
                             //--- ensure to make sure user is happy as a gopher
                             //--- after confirmation, save rectangle and move onto Open button editor.
 
                             var tessy = OCREngine.OCR;
-                            tessy.SetImage(erodedImage);
+                            tessy.SetImage(thresholdImage);
                             if (tessy.Recognize() == 0)
                             {
                                 tessy_result = tessy.GetWords();
@@ -263,10 +265,12 @@ namespace TBChestTracker
 
                             //-- clean up
                             tessy = null;
-                            erodedImage.Dispose();
+                            //erodedImage.Dispose();
                             thresholdImage.Dispose();
                             modified_image.Dispose();
                             modified_image = null;
+                            // scaled_image.Dispose();
+                            // scaled_image = null;
                             result_image.Dispose();
                             result_image = null;
                             result.Dispose();

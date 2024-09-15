@@ -91,16 +91,24 @@ namespace TBChestTracker.Pages.Settings
                 {
                     if (cb.Tag != null)
                     {
-                        foreach (var language in LanguagesArray)
+                        if (languages.ToLower().Contains("all"))
                         {
-                            if (cb.Tag.ToString().ToLower().Equals(language.ToLower()))
+                            cb.IsChecked = true;
+                        }
+                        else
+                        {
+                            foreach (var language in LanguagesArray)
                             {
-                                cb.IsChecked = true;
-                                break;
-                            }
-                            else
-                            {
-                                cb.IsChecked = false;
+
+                                if (cb.Tag.ToString().ToLower().Equals(language.ToLower()))
+                                {
+                                    cb.IsChecked = true;
+                                    break;
+                                }
+                                else
+                                {
+                                    cb.IsChecked = false;
+                                }
                             }
                         }
                     }
@@ -182,6 +190,32 @@ namespace TBChestTracker.Pages.Settings
             var fancyNumeric = (FancyNumericValue)sender;
             var brightness = SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness;
             UpdatePreviewImage(brightness, SettingsManager.Instance.Settings.OCRSettings.Threshold, (int)fancyNumeric.Value);
+        }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            var checkboxes = CHECKBOXES_PARENT.Children;
+            foreach (var checkbox in checkboxes)
+            {
+                var cb = (CheckBox)checkbox;
+                if (cb != null)
+                {
+                    cb.IsChecked = true;
+                }
+            }
+        }
+
+        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            var checkboxes = CHECKBOXES_PARENT.Children;
+            foreach (var checkbox in checkboxes)
+            {
+                var cb = (CheckBox)checkbox;
+                if (cb != null)
+                {
+                    cb.IsChecked = false;
+                }
+            }
         }
     }
 }

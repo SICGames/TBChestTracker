@@ -244,7 +244,6 @@ namespace TBChestTracker
                     Image<Gray, byte> modified_image = result_image.Mul(brightness) + brightness;
                     var imageScaled = modified_image.Resize(5, Emgu.CV.CvEnum.Inter.Cubic);
                     var thresholdImage = imageScaled.ThresholdBinaryInv(new Gray(SettingsManager.Instance.Settings.OCRSettings.Threshold), new Gray(SettingsManager.Instance.Settings.OCRSettings.MaxThreshold));
-                    var erodedImage = thresholdImage.Erode(1);
                     
                     if (AppContext.Instance.SaveOCRImages)
                     {
@@ -259,10 +258,9 @@ namespace TBChestTracker
                         modified_image.Save($@"{outputPath}\OCR_Brightened.png");
                         imageScaled.Save($@"{outputPath}\OCR_ImageScaled.png");
                         thresholdImage.Save($@"{outputPath}\OCR_Threshold.png");
-                        erodedImage.Save($@"{outputPath}\OCR_Eroded.png");
                     }
 
-                    var ocrResult = OCREngine.Read(erodedImage);
+                    var ocrResult = OCREngine.Read(thresholdImage);
                     if (ocrResult != null)
                     {
                         clanmateName = ocrResult.Words.ToArray();
@@ -281,7 +279,6 @@ namespace TBChestTracker
                     }
 
                     ocrResult.Words.Clear();
-                    erodedImage.Dispose();
                     thresholdImage.Dispose();
                     imageScaled.Dispose();  
                     modified_image.Dispose();

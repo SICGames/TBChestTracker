@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TBChestTracker.ViewModels;
 
 namespace TBChestTracker
 {
@@ -35,6 +36,55 @@ namespace TBChestTracker
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
 
+        }
+
+        private void RemoveClanmate_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedClanmates = VERIFIED_CLANMATES_LISTVIEW.SelectedItems;
+            var garbagePileList = new List<VerifiedClanmate>();
+
+            foreach (var selectedItem in selectedClanmates)
+            {
+                var selectedClanmate = selectedItem as VerifiedClanmate;
+                garbagePileList.Add(selectedClanmate);
+                
+            }
+            foreach (var garbage in garbagePileList)
+            {
+                TBChestTracker.ViewModels.VerifiedClanmatesViewModel.Instance.Remove(garbage);
+            }
+
+            garbagePileList.Clear();
+            garbagePileList = null;
+
+        }
+
+        private void Window_MouseEnter(object sender, MouseEventArgs e)
+        {
+            var clanmateEditor = (ClanmateEditorWindow)ParentWindow;
+            if(clanmateEditor.editorMode == EditorMode.SELECTION)
+            {
+                clanmateEditor.bCanDraw = false; 
+            }
+            
+        }
+
+        private void Window_MouseLeave(object sender, MouseEventArgs e)
+        {
+            var clanmateEditor = (ClanmateEditorWindow)ParentWindow;
+            if(clanmateEditor.editorMode == EditorMode.SELECTION)
+            {
+                clanmateEditor.bCanDraw = true;
+            }
+        }
+
+        private void Window_LocationChanged(object sender, EventArgs e)
+        {
+            var clanmateEditor = (ClanmateEditorWindow)ParentWindow;
+            if (clanmateEditor.editorMode == EditorMode.SELECTION)
+            {
+                clanmateEditor.bCanDraw = false;
+            }
         }
     }
 }

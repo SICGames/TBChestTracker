@@ -200,9 +200,11 @@
     <Compile Include="Engine\OCREngine.cs" />
     <Compile Include="ErrorHandlers\ChestProcessingError.cs" />
     <Compile Include="Helpers\WindowHelper.cs" />
+    <Compile Include="ImageEffects\ImageEffects.cs" />
     <Compile Include="Pages\ClanmatesValidation\CreateVerifiedClanmatesPage.xaml.cs">
       <DependentUpon>CreateVerifiedClanmatesPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Settings\TessDataConfig.cs" />
     <Compile Include="UI\FancyTreeView.cs" />
     <Compile Include="Extensions\SimilarityStringExtension.cs" />
     <Compile Include="Helpers\DateTimeHelper.cs" />
@@ -400,6 +402,7 @@
     <Compile Include="ValidateChestDataWindow.xaml.cs">
       <DependentUpon>ValidateChestDataWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\VerifiedClanmatesViewModel.cs" />
     <Page Include="AboutWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -820,6 +823,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Images\trashIcon-white.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\trashIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

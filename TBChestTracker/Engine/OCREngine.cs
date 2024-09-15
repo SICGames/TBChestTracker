@@ -12,12 +12,6 @@ using Emgu.CV.Structure;
 
 namespace TBChestTracker.Engine
 {
-    public enum TessDataOption
-    {
-        None,
-        Best,
-        Fast
-    };
 
     public class OCREngine
     {
@@ -28,22 +22,39 @@ namespace TBChestTracker.Engine
             if (Instance == null)
                 Instance = this;
         }
-        public static Task<bool> InitAsync(OCRSettings settings,TessDataOption option) => Task.Run(() => Init(settings,option));
-        public static bool Init(OCRSettings ocrSettings, TessDataOption option)
+        public static Task<bool> InitAsync(OCRSettings settings,TessDataConfig config) => Task.Run(() => Init(settings,config));
+        public static bool Init(OCRSettings ocrSettings, TessDataConfig config)
         {
             try
             {
                 if (OCR == null)
                 {
-                    var enginemode = option == TessDataOption.None ? 
-                        OcrEngineMode.Default : 
-                        (option == TessDataOption.Best ? 
-                        OcrEngineMode.LstmOnly : OcrEngineMode.TesseractOnly);
+                    OcrEngineMode ocrmode = OcrEngineMode.TesseractOnly;
 
-                    OCR = new Tesseract();
-                    OCR.PageSegMode = PageSegMode.SparseTextOsd;
+                    if(config.Prefix.Equals("_best") || config.Prefix.Equals("_fast"))
+                    {
+                        ocrmode = OcrEngineMode.LstmOnly;
+                    }
                     
-                    OCR.Init($@"{ocrSettings.TessDataFolder}\", ocrSettings.Languages, enginemode);
+                    OCR = new Tesseract();
+
+                    var languages = String.Empty;
+                    if(ocrSettings.Languages.ToLower().Contains("all"))
+                    {
+                        languages = LoadAllLanguages(ocrSettings).ToString();
+                    }
+                    else
+                    {
+                        languages = ocrSettings.Languages;
+                    }
+                    
+                    OCR.Init($@"{ocrSettings.TessDataFolder}\", languages, ocrmode);
+                    OCR.PageSegMode = PageSegMode.SparseTextOsd;
+
+                    OCR.SetVariable("tessedit_char_whitelist", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:-' ");
+                    //OCR.SetVariable("load_system_dawg", "F");
+                    //OCR.SetVariable("load_freq_dawg", "F");
+
                     var psm = OCR.PageSegMode;
 
                 }
@@ -95,13 +106,13 @@ namespace TBChestTracker.Engine
                 }
 
                 //OCR.SetVariable("tessedit_char_whitelist", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-                OCR.SetVariable("load_system_dawg", "false");
-                OCR.SetVariable("load_freq_dawg", "false");
+                //OCR.SetVariable("load_system_dawg", "false");
+                //OCR.SetVariable("load_freq_dawg", "false");
 
                 //-- AccessViolationException -- Correupted Memory sometimes.
                 OCR.SetImage(image);
                 OCR.Recognize();
-
+                
                 var resultstr = OCR.GetUTF8Text();
                 resultstr = resultstr.Replace("\r\n", ",");
                 string[] results = resultstr.Split(',');

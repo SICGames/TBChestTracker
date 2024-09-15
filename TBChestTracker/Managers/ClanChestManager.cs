@@ -760,7 +760,7 @@ namespace TBChestTracker
                     var match_clanmate = Clanmate_Scan(tClanmate,80.0);
                     if(match_clanmate != null)
                     {
-                        com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} is actually {match_clanmate}.", "Unknown Clanmate Found", LogType.INFO);
+                        com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} is actually {match_clanmate.Name}.", "Unknown Clanmate Found", LogType.INFO);
                         
                         tmpchestdata[mate_index].Clanmate = match_clanmate.Name; //--- unknown clanmate properly identified and been re-written with correct parent clan name.
 

@@ -14,7 +14,7 @@
         Topmost="True"
         Loaded="Window_Loaded" Closing="Window_Closing" WindowStyle="None" Background="Transparent">
     <Grid x:Name="MAIN_GRID">
-        <Canvas x:Name="MAIN_CANVAS" PreviewMouseMove="MAIN_CANVAS_PreviewMouseMove" PreviewMouseLeftButtonUp="MAIN_CANVAS_PreviewMouseLeftButtonUp">
+        <Canvas x:Name="MAIN_CANVAS" PreviewMouseMove="MAIN_CANVAS_PreviewMouseMove" PreviewMouseLeftButtonUp="MAIN_CANVAS_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="MAIN_CANVAS_PreviewMouseLeftButtonDown">
             <Border x:Name="UI_TOOLBAR" Grid.Column="1"
                     Background="#222222" 
                     BorderBrush="#333" 
@@ -22,7 +22,8 @@
                     Margin="0,14" 
                     Height="36" 
                     IsHitTestVisible="True" 
-                    Canvas.Top="25" Canvas.Left="175" PreviewMouseLeftButtonDown="UI_TOOLBAR_PreviewMouseLeftButtonDown">
+                    Canvas.Top="25" Canvas.Left="175" 
+                    PreviewMouseLeftButtonDown="UI_TOOLBAR_PreviewMouseLeftButtonDown" MouseEnter="UI_TOOLBAR_MouseEnter" MouseLeave="UI_TOOLBAR_MouseLeave">
                 <Grid Margin="10,5" IsHitTestVisible="True" x:Name="TOOLBAR_GRID">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto"/>
@@ -30,7 +31,7 @@
                         <ColumnDefinition Width="150"/>
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0" Margin="0,0,5,0" Width="24" HorizontalAlignment="Left" VerticalAlignment="Stretch" x:Name="GRIP" 
-                      MouseEnter="GRIP_MouseEnter" MouseLeave="GRIP_MouseLeave" PreviewMouseLeftButtonDown="GRIP_PreviewMouseLeftButtonDown">
+                      MouseEnter="GRIP_MouseEnter" MouseLeave="GRIP_MouseLeave">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="4"/>
                             <ColumnDefinition Width="4"/>

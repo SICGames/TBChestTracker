@@ -5,16 +5,32 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
         xmlns:ui="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
+        xmlns:viewmodel="clr-namespace:TBChestTracker.ViewModels"
         mc:Ignorable="d"
-        Title="Clanmates View" Height="450" Width="250" WindowStartupLocation="Manual" Topmost="True" WindowStyle="ToolWindow" Background="#444" Loaded="Window_Loaded" Closing="Window_Closing">
+        Title="Clanmates View" Height="450" Width="250" WindowStartupLocation="Manual" Topmost="True" WindowStyle="ToolWindow" Background="#444" Loaded="Window_Loaded" Closing="Window_Closing"
+        MouseEnter="Window_MouseEnter" MouseLeave="Window_MouseLeave" LocationChanged="Window_LocationChanged">
+    <Window.Resources>
+        <DataTemplate x:Key="VerifiedClanmateItemTemplate">
+            <Grid MaxWidth="250">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="{Binding Path=Name}" Grid.Row="0" Grid.Column="0" Width="325"/>
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="36"/>
         </Grid.RowDefinitions>
-        <ListView Grid.Row="0" x:Name="ClanmatesView" Margin="5"/>
+        <ListView x:Name="VERIFIED_CLANMATES_LISTVIEW" DataContext="{Binding Source={x:Static viewmodel:VerifiedClanmatesViewModel.Instance}}" Grid.Row="0" Margin="5" ItemTemplate="{DynamicResource VerifiedClanmateItemTemplate}" ItemsSource="{Binding Path=VerifiedClanmates}"/>
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5">
-            <ui:FancyImageButton x:Name="RemoveClanmate" Background="Transparent" HighlightBrush="#0077ff" ImageSource="pack://application:,,,/Images/trashIcon.png" Height="24" Width="24" HighlightStrokeBrush="#0099FF" HighlightOpacity="0.5"/>
+            <ui:FancyImageButton x:Name="RemoveClanmate" Background="Transparent" HighlightBrush="#0077ff" 
+                                 ImageSource="pack://application:,,,/Images/trashIcon-White.png" Height="24" Width="24" HighlightStrokeBrush="#0099FF" HighlightOpacity="0.5" Click="RemoveClanmate_Click"/>
         </StackPanel>
     </Grid>
 </Window>

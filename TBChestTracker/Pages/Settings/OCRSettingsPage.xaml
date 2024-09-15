@@ -59,7 +59,7 @@
             <CheckBox Content="Polish" Margin="3,5" Tag="pol"/>
             <CheckBox Content="German" Margin="3,5" Tag="deu"/>
             <CheckBox Content="Japanese" Margin="3,5" Tag="jpn"/>
-            <CheckBox Content="All" Margin="3,5"/>
+            <CheckBox Content="All" Margin="3,5" Tag="all" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
         </UniformGrid>
         
        

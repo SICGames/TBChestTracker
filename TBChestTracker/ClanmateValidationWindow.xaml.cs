@@ -14,9 +14,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using TBChestTracker.ViewModels;
+
 namespace TBChestTracker
 {
-
 
     public class AffectedClanmate
     {
@@ -36,11 +37,13 @@ namespace TBChestTracker
     {
         public ObservableCollection<AffectedClanmate> affectedClanmates { get; private set; }
 
+        public VerifiedClanmatesViewModel VerifiedClanmatesViewModel { get; private set; }
 
         public ClanmateValidationWindow()
         {
             InitializeComponent();
-            affectedClanmates = new ObservableCollection<AffectedClanmate>();   
+            affectedClanmates = new ObservableCollection<AffectedClanmate>();
+            VerifiedClanmatesViewModel = new VerifiedClanmatesViewModel();
         }
 
         public void NavigateTo(string page)
@@ -54,6 +57,7 @@ namespace TBChestTracker
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            VerifiedClanmatesViewModel.Dispose();
             affectedClanmates.Clear();
             affectedClanmates = null;
         }
