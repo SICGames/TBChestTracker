@@ -158,16 +158,19 @@
     <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <TextBlock Text="Clanmates Validation" Grid.Row="0" FontSize="18" FontWeight="Bold" Margin="10"/>
-        <Grid Grid.Row="1" Margin="10">
+        <TextBlock Text="Validation Results" Grid.Row="1" FontSize="14" Margin="20,5"/>
+        <Grid Grid.Row="2" Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Here are the results showing the affected clanmates. By clicking on Repair, it will remove any mispelled names and give chests to the proper clanmate." TextWrapping="Wrap" Grid.Row="0"/>
+            <TextBlock 
+                Text="Here are the results showing the affected clanmates. By clicking on Repair, it will remove any mispelled names (under the verified clanmate's name) and give chests to the proper verifed clanmate." TextWrapping="Wrap" Grid.Row="0"/>
             <UserInterface:FancyTreeView ItemContainerStyle="{StaticResource MultiSelectTreeViewItemStyle}" x:Name="AffectedClanmatesViewBox" 
                                          Grid.Row="1" Margin="10" Width="250" 
                                          HorizontalAlignment="Left" ItemsSource="{Binding affectedClanmates}">
@@ -180,7 +183,7 @@
                 </UserInterface:FancyTreeView.ItemTemplate>
             </UserInterface:FancyTreeView>
         </Grid>
-        <DockPanel LastChildFill="False" Grid.Row="2" HorizontalAlignment="Right" Height="48">
+        <DockPanel LastChildFill="False" Grid.Row="3" HorizontalAlignment="Right" Height="48">
             <ui:FancyButton RenderMode="TEXT" Width="120" Height="24" Background="#0077ff" Foreground="White" HilightBrush="#0099ff" x:Name="ApplyFixButton" Text="Fix" Margin="15,0"/>
         </DockPanel>
     </Grid>

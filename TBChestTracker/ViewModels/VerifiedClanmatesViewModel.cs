@@ -20,7 +20,6 @@ namespace TBChestTracker.ViewModels
         }
 
         private ObservableCollection<VerifiedClanmate> _verifiedClanmates = new ObservableCollection<VerifiedClanmate>();
-
         public ObservableCollection<VerifiedClanmate> VerifiedClanmates
         {
             get => _verifiedClanmates;
@@ -28,6 +27,16 @@ namespace TBChestTracker.ViewModels
             {
                 _verifiedClanmates = value;
                 OnPropertyChanged(nameof(VerifiedClanmates));   
+            }
+        }
+        private int _Total = 0;
+        public int Total
+        {
+            get => _Total;
+            set
+            {
+                _Total = value;
+                OnPropertyChanged(nameof(Total));
             }
         }
 
@@ -42,6 +51,7 @@ namespace TBChestTracker.ViewModels
         public void Add(string name)
         {
             VerifiedClanmates.Add(new VerifiedClanmate(name));
+            Total = VerifiedClanmates.Count();
         }
         private VerifiedClanmate _selected = null;
         private bool disposedValue;
@@ -59,6 +69,7 @@ namespace TBChestTracker.ViewModels
         public void Remove(VerifiedClanmate verifiedClanmate)
         {
             VerifiedClanmates.Remove(verifiedClanmate);
+            Total = VerifiedClanmates.Count();
         }
 
         protected virtual void Dispose(bool disposing)

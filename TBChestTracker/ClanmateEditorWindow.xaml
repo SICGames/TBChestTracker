@@ -13,6 +13,17 @@
         WindowStartupLocation="CenterScreen" 
         Topmost="True"
         Loaded="Window_Loaded" Closing="Window_Closing" WindowStyle="None" Background="Transparent">
+    <Window.Resources>
+        <Style x:Key="TextBoxFocusVisualStyle1" TargetType="{x:Type Control}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Control}">
+                        <Grid/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid x:Name="MAIN_GRID">
         <Canvas x:Name="MAIN_CANVAS" PreviewMouseMove="MAIN_CANVAS_PreviewMouseMove" PreviewMouseLeftButtonUp="MAIN_CANVAS_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="MAIN_CANVAS_PreviewMouseLeftButtonDown">
             <Border x:Name="UI_TOOLBAR" Grid.Column="1"
@@ -48,7 +59,9 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="28"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox x:Name="CLANMATE_TEXTBOX" Background="Transparent" Margin="15,2,5,2" BorderBrush="Transparent" Grid.Column="0"/>
+                                <TextBox FocusVisualStyle="{DynamicResource TextBoxFocusVisualStyle1}" x:Name="CLANMATE_TEXTBOX" 
+                                         Background="Transparent" Margin="15,2,5,2" 
+                                         BorderBrush="Transparent" Grid.Column="0" BorderThickness="0" PreviewKeyDown="CLANMATE_TEXTBOX_PreviewKeyDown"/>
                                 <Image Source="pack://application:,,,/Images/searchIcon-gray.png" Grid.Column="1" Width="16" Height="16" Margin="3,3"/>
                             </Grid>
                         </Border>

@@ -110,15 +110,19 @@ namespace TBChestTracker.Pages.ClanmatesValidation
 
         private async Task ValidateClanmates(IProgress<ClanmatesValidationProgress> progress)
         {
+            var parentWindow = Window.GetWindow(this) as ClanmateValidationWindow;
+
             var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates;
+            var verifiedClanmates = parentWindow.VerifiedClanmatesViewModel.VerifiedClanmates;
+
             double processedClanmates = 0;
             double totalClanmates = clanmates.Count;
-
-            var parentWindow = Window.GetWindow(this) as ClanmateValidationWindow;
 
             var jacko = new F23.StringSimilarity.JaroWinkler();
 
             var ignoreList = new List<string>();
+
+            //-- needs to be configured for verifiedClanmates and clanmates 
 
             foreach (var clanmate in clanmates)
             {
@@ -133,31 +137,30 @@ namespace TBChestTracker.Pages.ClanmatesValidation
                 var bAlreadyIgnoreList = ignoreList.Select(c => c).Contains(clanmate.Name);
                 if (bAlreadyIgnoreList == false)
                 {
-                    foreach (var name in clanmates)
+                    foreach (var verifedClanmate in verifiedClanmates)
                     {
-                        if (name.Name != clanmate.Name)
+                        if (clanmate.Name != verifedClanmate.Name)
                         {
-                            var similiarity = jacko.Similarity(clanmate.Name, name.Name) * 100.0;
+                            var similiarity = jacko.Similarity(clanmate.Name, verifedClanmate.Name) * 100.0;
 
                             if (similiarity >= 92)
                             {
                                 //-- we have a winner.
-                                Debug.WriteLine($"{clanmate.Name} and {name.Name} similiarity => {similiarity}%");
+                                Debug.WriteLine($"{clanmate.Name} and {verifedClanmate.Name} similiarity => {similiarity}%");
 
                                 var bExists = parentWindow.affectedClanmates.Where(c => c.Name.ToLower().Equals(clanmate.Name.ToLower())).FirstOrDefault();
 
                                 if (bExists == null)
                                 {
                                     var af = new AffectedClanmate();
-                                    af.Name = clanmate.Name;
+                                    af.Name = verifedClanmate.Name;
 
                                     parentWindow.affectedClanmates.Add(af);
                                 }
 
-                                var _af = parentWindow.affectedClanmates.Select(c => c).Where(cn => cn.Name.Equals(clanmate.Name)).ToList()[0];
-                                _af.AddAlias(name.Name);
-
-                                ignoreList.Add(name.Name);
+                                var _af = parentWindow.affectedClanmates.Select(c => c).Where(cn => cn.Name.Equals(verifedClanmate.Name)).ToList()[0];
+                                _af.AddAlias(clanmate.Name);
+                                ignoreList.Add(clanmate.Name);
                             }
                         }
                     }
@@ -276,10 +279,10 @@ namespace TBChestTracker.Pages.ClanmatesValidation
                 UpdateProgress(e.Message, e.Progress);
             };
             await ValidateClanmates(_progress);
-            await FineTuneResults(_progress);
-
+          
+            // await FineTuneResults(_progress);
             //-- time to finalize results.
-            await FinalizeResults(_progress);
+            // await FinalizeResults(_progress);
 
             //-- we're done
             await Task.Delay(500);

@@ -17,6 +17,8 @@ using CefSharp.DevTools.Runtime;
 using TBChestTracker.Engine;
 
 using TBChestTracker.Effects;
+using System.Linq;
+using TBChestTracker.ViewModels;
 
 namespace TBChestTracker
 {
@@ -103,21 +105,27 @@ namespace TBChestTracker
             if (!isDrawingSelectionRect && editorMode == EditorMode.SELECTION && bCanDraw == true)
             {
                 Debug.WriteLine($"Mouse Pos => x: {x} y: {y}");
+                try
+                {
+                    startPoint = PointFromScreen(new System.Windows.Point(x, y));
+                    endPoint = startPoint;
+                    SelectionRect = new Rectangle();
+                    SelectionRect.Name = $"SelectionRectangle";
+                    SelectionRect.StrokeThickness = 5;
+                    SelectionRect.Stroke = Brushes.Red;
+                    SelectionRect.Height = 1;
+                    SelectionRect.Width = 1;
+                    MAIN_CANVAS.Children.Add(SelectionRect);
 
-                startPoint = PointFromScreen(new System.Windows.Point(x, y));
-                endPoint = startPoint;
-                SelectionRect = new Rectangle();
-                SelectionRect.Name = $"SelectionRectangle";
-                SelectionRect.StrokeThickness = 5;
-                SelectionRect.Stroke = Brushes.Red;
-                SelectionRect.Height = 1;
-                SelectionRect.Width = 1;
-                MAIN_CANVAS.Children.Add(SelectionRect);
+                    Canvas.SetLeft(SelectionRect, startPoint.X * dpi.ScaleFactor);
+                    Canvas.SetTop(SelectionRect, startPoint.Y * dpi.ScaleFactor);
 
-                Canvas.SetLeft(SelectionRect, startPoint.X * dpi.ScaleFactor);
-                Canvas.SetTop(SelectionRect, startPoint.Y * dpi.ScaleFactor);
+                    isDrawingSelectionRect = true;
+                }
+                catch (Exception ex)
+                {
 
-                isDrawingSelectionRect = true;
+                }
             }
         }
         private void UpdateRenderingRectangle(int x, int y)
@@ -126,22 +134,23 @@ namespace TBChestTracker
             {
                 if (SelectionRect != null)
                 {
-                    endPoint = PointFromScreen(new System.Windows.Point(x, y));
+                    try
+                    {
+                        endPoint = PointFromScreen(new System.Windows.Point(x, y));
 
-                    SelectionRect.Width = Math.Abs(endPoint.X - startPoint.X);
-                    SelectionRect.Height = Math.Abs(endPoint.Y - startPoint.Y);
+                        SelectionRect.Width = Math.Abs(endPoint.X - startPoint.X);
+                        SelectionRect.Height = Math.Abs(endPoint.Y - startPoint.Y);
 
-                    Canvas.SetLeft(SelectionRect, Math.Min(endPoint.X, startPoint.X));
-                    Canvas.SetTop(SelectionRect, Math.Min(endPoint.Y, startPoint.Y));
+                        Canvas.SetLeft(SelectionRect, Math.Min(endPoint.X, startPoint.X));
+                        Canvas.SetTop(SelectionRect, Math.Min(endPoint.Y, startPoint.Y));
 
-                    System.Windows.Point ScreenStart = MAIN_CANVAS.PointToScreen(startPoint);
-                    System.Windows.Point ScreenEnd = MAIN_CANVAS.PointToScreen(endPoint);
-                    /*
-                    CroppedRect = new Int32Rect((int)Math.Min(ScreenEnd.X, ScreenStart.X),
-                        (int)Math.Min(ScreenEnd.Y, ScreenStart.Y),
-                        (int)Math.Abs(ScreenEnd.X - ScreenStart.X),
-                         (int)Math.Abs(ScreenEnd.Y - ScreenStart.Y));
-                    */
+                        System.Windows.Point ScreenStart = MAIN_CANVAS.PointToScreen(startPoint);
+                        System.Windows.Point ScreenEnd = MAIN_CANVAS.PointToScreen(endPoint);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
                 }
 
             }
@@ -277,6 +286,23 @@ namespace TBChestTracker
 
         private void CloseBtn_Click(object sender, RoutedEventArgs e)
         {
+
+            bool bHasVerifiedClanmates = false;
+            foreach(var wnd in Application.Current.Windows.OfType<ClanmateValidationWindow>())
+            {
+                var window = wnd as ClanmateValidationWindow;
+                window.WindowState = WindowState.Normal;
+                if (VerifiedClanmatesViewModel.Instance.VerifiedClanmates.Count > 0)
+                {
+                    bHasVerifiedClanmates = true;
+                }
+                if (bHasVerifiedClanmates)
+                {
+                    window.NavigateTo("Pages/ClanmatesValidation/ClanmatesValidationProcessingPage.xaml");
+                    this.DialogResult = true;
+                }
+            }
+
             this.Close();
         }
 
@@ -298,9 +324,6 @@ namespace TBChestTracker
 
                 captainHook.onMouseHookMessage += CaptainHookMouseHookMessageHandler;
                 captainHook.Install();
-
-                //MAIN_CANVAS.Background = Brushes.Black;
-                //this.Background = Brushes.White;
             }
             else
             {
@@ -310,21 +333,26 @@ namespace TBChestTracker
 
                 captainHook.onMouseHookMessage -= CaptainHookMouseHookMessageHandler;   
                 captainHook.Uninstall();
-                //this.Background = Brushes.Transparent;
             }
 
         }
 
         private void GRIP_MouseEnter(object sender, MouseEventArgs e)
         {
-            this.Cursor = Cursors.SizeAll;
-            bCanDragElement = true;
+            if (!bEnableSelection)
+            {
+                this.Cursor = Cursors.SizeAll;
+                bCanDragElement = true;
+            }
         }
 
         private void GRIP_MouseLeave(object sender, MouseEventArgs e)
         {
-            this.Cursor = Cursors.Arrow;
-            bCanDragElement = false;
+            if (!bEnableSelection)
+            {
+                this.Cursor = Cursors.Arrow;
+                bCanDragElement = false;
+            }
         }
       
         private void MAIN_CANVAS_PreviewMouseMove(object sender, MouseEventArgs e)
@@ -372,8 +400,8 @@ namespace TBChestTracker
         private void UI_TOOLBAR_MouseEnter(object sender, MouseEventArgs e)
         {
             editorMode = EditorMode.NONE;
+            Cursor = Cursors.Arrow;
             isDrawingSelectionRect = false;
-
         }
 
         private void UI_TOOLBAR_MouseLeave(object sender, MouseEventArgs e)
@@ -381,6 +409,23 @@ namespace TBChestTracker
             if(bEnableSelection)
             {
                 editorMode = EditorMode.SELECTION;
+                Cursor = Cursors.SizeAll;
+            }
+        }
+
+        private void CLANMATE_TEXTBOX_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            var tb = (TextBox)sender;
+            if (e.Key == Key.Enter)
+            {
+                var text = tb.Text;
+                if (String.IsNullOrEmpty(text))
+                {
+                    return;
+                }
+
+                VerifiedClanmatesViewModel.Instance.Add(text);
+                tb.Text = String.Empty;
             }
         }
 

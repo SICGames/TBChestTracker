@@ -7,7 +7,7 @@
         xmlns:ui="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
         xmlns:viewmodel="clr-namespace:TBChestTracker.ViewModels"
         mc:Ignorable="d"
-        Title="Clanmates View" Height="450" Width="250" WindowStartupLocation="Manual" Topmost="True" WindowStyle="ToolWindow" Background="#444" Loaded="Window_Loaded" Closing="Window_Closing"
+        Title="Clanmates View" Height="450" Width="325" MinWidth="325" MaxWidth="500" MinHeight="450" MaxHeight="720" WindowStartupLocation="Manual" Topmost="True" WindowStyle="ToolWindow" Background="#444" Loaded="Window_Loaded" Closing="Window_Closing"
         MouseEnter="Window_MouseEnter" MouseLeave="Window_MouseLeave" LocationChanged="Window_LocationChanged">
     <Window.Resources>
         <DataTemplate x:Key="VerifiedClanmateItemTemplate">
@@ -18,7 +18,8 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="{Binding Path=Name}" Grid.Row="0" Grid.Column="0" Width="325"/>
+                <TextBlock x:Name="_TEXTBLOCK_" Text="{Binding Path=Name}" FontWeight="Bold" Grid.Row="0" Grid.Column="0" Width="325" PreviewMouseLeftButtonDown="_TEXTBLOCK__PreviewMouseLeftButtonDown"/>
+                <TextBox x:Name="_TEXTBOX_" Text="{Binding Path=Name}" FontWeight="Bold" Grid.Row="0" Grid.Column="0" Width="325" Visibility="Collapsed" LostFocus="TextBox_LostFocus" PreviewKeyDown="TextBox_PreviewKeyDown" TextChanged="TextBox_TextChanged"/>
             </Grid>
         </DataTemplate>
     </Window.Resources>
@@ -27,10 +28,25 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="36"/>
         </Grid.RowDefinitions>
-        <ListView x:Name="VERIFIED_CLANMATES_LISTVIEW" DataContext="{Binding Source={x:Static viewmodel:VerifiedClanmatesViewModel.Instance}}" Grid.Row="0" Margin="5" ItemTemplate="{DynamicResource VerifiedClanmateItemTemplate}" ItemsSource="{Binding Path=VerifiedClanmates}"/>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5">
-            <ui:FancyImageButton x:Name="RemoveClanmate" Background="Transparent" HighlightBrush="#0077ff" 
-                                 ImageSource="pack://application:,,,/Images/trashIcon-White.png" Height="24" Width="24" HighlightStrokeBrush="#0099FF" HighlightOpacity="0.5" Click="RemoveClanmate_Click"/>
-        </StackPanel>
+        <ListView x:Name="VERIFIED_CLANMATES_LISTVIEW" DataContext="{Binding Source={x:Static viewmodel:VerifiedClanmatesViewModel.Instance}}" 
+                  Grid.Row="0" Margin="5" 
+                  ItemTemplate="{DynamicResource VerifiedClanmateItemTemplate}" ItemsSource="{Binding Path=VerifiedClanmates}"/>
+        <Grid Grid.Row="1" Margin="5" VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <ui:FancyImageButton x:Name="EditClanmate" Background="Transparent" HighlightBrush="#0077ff" 
+                         ImageSource="pack://application:,,,/Images/editIcon-White.png" Height="24" Width="24" ToolTip="Edit Verified Clanmate" HighlightStrokeBrush="#0099FF" HighlightOpacity="0.5" Click="EditClanmate_Click" Margin="5,0"/>
+                <ui:FancyImageButton x:Name="RemoveClanmate" Background="Transparent" HighlightBrush="#0077ff" Margin="5,0" 
+                         ImageSource="pack://application:,,,/Images/trashIcon-White.png" ToolTip="Remove Verified Clanmate From list" Height="24" Width="24" HighlightStrokeBrush="#0099FF" HighlightOpacity="0.5" Click="RemoveClanmate_Click"/>
+            </StackPanel>
+            <TextBlock Grid.Column="1" Text="Clanmates Total" Foreground="White" Margin="2,0"/>
+            <TextBlock DataContext="{Binding Source={x:Static viewmodel:VerifiedClanmatesViewModel.Instance}}" Grid.Column="2" Text="{Binding Total}" 
+                       Foreground="White" Width="32" TextAlignment="Center" Margin="2,0"/>
+        </Grid>
+        
     </Grid>
 </Window>

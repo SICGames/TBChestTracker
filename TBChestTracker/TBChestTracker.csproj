@@ -204,6 +204,9 @@
     <Compile Include="Pages\ClanmatesValidation\CreateVerifiedClanmatesPage.xaml.cs">
       <DependentUpon>CreateVerifiedClanmatesPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\ClanmatesValidation\RepairClanmatesPage.xaml.cs">
+      <DependentUpon>RepairClanmatesPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Settings\TessDataConfig.cs" />
     <Compile Include="UI\FancyTreeView.cs" />
     <Compile Include="Extensions\SimilarityStringExtension.cs" />
@@ -563,6 +566,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\ClanmatesValidation\RepairClanmatesPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\ClanPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -759,6 +766,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\DownArrow-Icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\EditIcon-White.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\NewFileIcon.png">
