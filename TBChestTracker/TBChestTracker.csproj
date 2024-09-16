@@ -405,6 +405,8 @@
     <Compile Include="ValidateChestDataWindow.xaml.cs">
       <DependentUpon>ValidateChestDataWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\ClanmatesReparProgress.cs" />
+    <Compile Include="ViewModels\ClanmatesValidationProgress.cs" />
     <Compile Include="ViewModels\VerifiedClanmatesViewModel.cs" />
     <Page Include="AboutWindow.xaml">
       <SubType>Designer</SubType>

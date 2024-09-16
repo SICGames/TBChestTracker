@@ -15,62 +15,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TBChestTracker.Managers;
+using TBChestTracker.ViewModels;
 
 namespace TBChestTracker.Pages.ClanmatesValidation
 {
-    
-    public class ClanmatesValidationProgress : INotifyPropertyChanged
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-        public ClanmatesValidationProgress() { }
-        public ClanmatesValidationProgress(string msg, double progress)
-        {
-            Message = msg;
-            Progress = progress;
-            ProgressStr = $"{Progress}%";
-        }
-
-        private string _Message = String.Empty;
-        public string Message
-        {
-            get => _Message;
-            set
-            {
-                _Message = value;
-                OnPropertyChanged(nameof(Message));
-            }
-        }
-
-        private double _progress = 0;
-        public double Progress
-        {
-            get => _progress;
-            set
-            {
-                _progress = value;
-                OnPropertyChanged(nameof(Progress));
-            }
-        }
-
-        private string _progressStr = String.Empty;
-        public string ProgressStr
-        {
-            get => _progressStr;
-            set
-            {
-                _progressStr = value;
-                OnPropertyChanged(nameof(ProgressStr));
-            }
-        }
-    }
-
     public partial class ClanmatesValidationProcessingPage : Page
     {
         /*
