@@ -140,8 +140,7 @@ namespace TBChestTracker
             
             //-- OCR Incorrect Text Bug - e.g. Slash Jr III is read Slash )r III
             //-- Fix: Upscaling input image large enough to read properly.
-            //outputImage = ImageEffects.Resize(outputImage, 2, Emgu.CV.CvEnum.Inter.Cubic, bSave, outputPath);
-            
+            outputImage = ImageEffects.Resize(outputImage, 2, Emgu.CV.CvEnum.Inter.Cubic, bSave, outputPath);
             outputImage = ImageEffects.ThresholdBinaryInv(outputImage, threshold, maxThreshold, bSave, outputPath);
             //-- if it is null or empty somehow, we update it.
             if (String.IsNullOrEmpty(ocrSettings.PreviewImage))

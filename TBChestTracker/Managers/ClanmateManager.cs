@@ -107,49 +107,21 @@ namespace TBChestTracker
                     Database = JsonConvert.DeserializeObject<ClanmatesDatabase>(data);
                     sr.Close();
                 }
-                else
-                {
-                    requiresUpdate = true;
-                    backuptext = data;
-                    //--- we'd need to update it to new format.
-                    if (data.Contains("\r\n"))
-                        data = data.Replace("\r\n", ",");
-                    else
-                        data = data.Replace("\n", ",");
-
-                    data = data.Substring(0, data.LastIndexOf(","));
-                    string[] dataCollection = data.Split(',');
-
-                    Database.Version = 2;
-                    Database.Clanmates.Clear();
-                    foreach (var c in dataCollection)
-                    {
-                        if (!string.IsNullOrEmpty(c))
-                            Database.Clanmates.Add(new Clanmate(c));
-                    }
-
-                    UpdateCount();
-                    sr.Close();
-                }
-            }
-
-            if (requiresUpdate)
-            {
-                //-- create back up.
-
-                var backupfile = path.Substring(0, path.LastIndexOf("."));
-                backupfile += ".old";
-
-                using (StreamWriter bsw = File.CreateText(backupfile))
-                {
-                    bsw.Write(backuptext);
-                    bsw.Close();
-                }
-                Save(path);
             }
         }
         
-        public void Save(string path)
+        public void Save()
+        {
+            var clanmatedb = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}";
+            using (StreamWriter sw = File.CreateText(clanmatedb))
+            {
+                string jsondata = StringHelpers.ConvertToUTF8(JsonConvert.SerializeObject(Database, Formatting.Indented));
+                sw.Write(jsondata);
+                sw.Close();
+            }
+        }
+        
+        private void SaveAs(string path)
         {
             using (StreamWriter sw = File.CreateText(path))
             {
@@ -160,9 +132,16 @@ namespace TBChestTracker
         }
         public void CreateBackup()
         {
-            var clanmatedb = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}";
-            clanmatedb = clanmatedb.Replace(".db", ".old");
-            Save(clanmatedb);
+            DateTimeOffset dateTimeOffset = DateTimeOffset.Now;
+            var clanmateBackupFolder = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath}//Clanmates";
+            var di = new DirectoryInfo(clanmateBackupFolder);   
+            if(di.Exists == false)
+            {
+                di.Create();    
+            }
+            
+            string file = $"{clanmateBackupFolder}//clanmates_backup_{dateTimeOffset.ToUnixTimeSeconds()}.db";
+            SaveAs(file);   
         }
     }
 }

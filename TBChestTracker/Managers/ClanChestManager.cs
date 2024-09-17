@@ -775,7 +775,7 @@ namespace TBChestTracker
                         clanChestData.Add(new ClanChestData(tmpchest.Clanmate, tmpchest.chests, tmpchest.Points));
                         com.HellStormGames.Logging.Console.Write($"Adding {tmpchest.Clanmate} to clanmates database.", "Clanmate Not Found", LogType.WARNING);
                         ClanManager.Instance.ClanmateManager.Add(tmpchest.Clanmate);
-                        ClanManager.Instance.ClanmateManager.Save($"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}");
+                        ClanManager.Instance.ClanmateManager.Save();
                     }
                     
                     //-- attempt to check to see if the unfound clanmate is under an alias.
@@ -1018,7 +1018,15 @@ namespace TBChestTracker
         public void CreateBackup()
         {
             DateTimeOffset dateTimeOffset = DateTimeOffset.Now;
-            string file = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath}//clanchest_backup_{dateTimeOffset.ToUnixTimeSeconds()}.db";
+            var clanchestsBackupFolder = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath}//Clanchests";
+            var di = new DirectoryInfo(clanchestsBackupFolder);
+            if (di.Exists == false)
+            {
+                di.Create();
+            }
+
+
+            string file = $"{clanchestsBackupFolder}//clanchest_backup_{dateTimeOffset.ToUnixTimeSeconds()}.db";
             try
             {
                 using (var sw = File.CreateText(file))

@@ -97,6 +97,14 @@ namespace TBChestTracker
             Snapture.Start(FrameCapturingMethod.GDI);
 
             captainHook = new CaptainHook();
+
+            if(ParentWindow is ClanmateValidationWindow clanmateValidationWindow)
+            {
+                if(clanmateValidationWindow.VerifiedClanmatesViewModel.VerifiedClanmates == null)
+                {
+                    clanmateValidationWindow.VerifiedClanmatesViewModel.VerifiedClanmates = new System.Collections.ObjectModel.ObservableCollection<VerifiedClanmate>();
+                }
+            }
         }
 
 

@@ -36,5 +36,11 @@ namespace TBChestTracker.Pages.ClanmatesValidation
         {
 
         }
+
+        private void ApplyFixButton_Click(object sender, RoutedEventArgs e)
+        {
+            var wnd = Window.GetWindow(this) as ClanmateValidationWindow;
+            wnd.NavigateTo("Pages/ClanmatesValidation/RepairClanmatesPage.xaml");
+        }
     }
 }

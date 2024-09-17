@@ -51,7 +51,7 @@ namespace TBChestTracker.Pages.AbsentClanmates
                     ClanManager.Instance.ClanmateManager.Remove(absentClanmate);
                 }
 
-                ClanManager.Instance.ClanmateManager.Save(clanmatedatabaseFile);
+                ClanManager.Instance.ClanmateManager.Save();
             }
             var wnd = Window.GetWindow(this) as AbsentClanmatesWindow;
             wnd.DialogResult = true;

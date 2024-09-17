@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -136,6 +138,56 @@ namespace TBChestTracker
         private void _TEXTBLOCK__PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             parent = ((Grid)((TextBlock)sender).Parent);
+        }
+
+        private void LoadFromFile_Click(object sender, RoutedEventArgs e)
+        {
+            var ofd = new OpenFileDialog();
+            ofd.RestoreDirectory = true;
+            ofd.Filter = "Text Files|*.txt";
+            if (ofd.ShowDialog() == true)
+            {
+                using (var sr = System.IO.File.OpenText(ofd.FileName))
+                {
+                    var data = sr.ReadToEnd();
+                    var hasReturnCarriageNewLine = data.Contains("\r\n");
+                    if(hasReturnCarriageNewLine)
+                    {
+                      data = data.Replace("\r\n", "\n"); 
+                    }
+
+                    var dataArray = data.Split('\n');
+
+                    VerifiedClanmatesViewModel.Instance.VerifiedClanmates.Clear();
+                    foreach (var item in dataArray)
+                    {
+                        if (!String.IsNullOrEmpty(item))
+                        {
+                            VerifiedClanmatesViewModel.Instance.Add(item);
+                        }
+
+                    }
+                    sr.Close();
+                }
+            }
+        }
+
+        private void SaveToFile_Click(object sender, RoutedEventArgs e)
+        {
+            var sfd = new SaveFileDialog();
+            sfd.RestoreDirectory = true;
+            sfd.Filter = "Text Files|*.txt";
+            if (sfd.ShowDialog() == true)
+            {
+                using(var sw = System.IO.File.CreateText(sfd.FileName))
+                {
+                    foreach(var verifiedClanmate in VerifiedClanmatesViewModel.Instance.VerifiedClanmates)
+                    {
+                        sw.WriteLine(verifiedClanmate.Name);
+                    }
+                    sw.Close();
+                }
+            }
         }
     }
 }

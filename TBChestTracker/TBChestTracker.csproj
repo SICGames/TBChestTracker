@@ -201,6 +201,9 @@
     <Compile Include="ErrorHandlers\ChestProcessingError.cs" />
     <Compile Include="Helpers\WindowHelper.cs" />
     <Compile Include="ImageEffects\ImageEffects.cs" />
+    <Compile Include="Pages\ClanmatesValidation\CompletedPage.xaml.cs">
+      <DependentUpon>CompletedPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\ClanmatesValidation\CreateVerifiedClanmatesPage.xaml.cs">
       <DependentUpon>CreateVerifiedClanmatesPage.xaml</DependentUpon>
     </Compile>
@@ -564,6 +567,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\ClanmatesValidation\CompletedPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\ClanmatesValidation\CreateVerifiedClanmatesPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -736,11 +743,23 @@
     <PackageReference Include="String.Similarity">
       <Version>3.0.0</Version>
     </PackageReference>
+    <PackageReference Include="System.Net.Http">
+      <Version>4.3.4</Version>
+    </PackageReference>
+    <PackageReference Include="System.Text.Json">
+      <Version>8.0.4</Version>
+    </PackageReference>
+    <PackageReference Include="System.Text.RegularExpressions">
+      <Version>4.3.1</Version>
+    </PackageReference>
     <PackageReference Include="WindowsAPICodePack-Core">
       <Version>1.1.2</Version>
     </PackageReference>
     <PackageReference Include="WindowsAPICodePack-Shell">
       <Version>1.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="WpfAnimatedGif">
+      <Version>2.0.2</Version>
     </PackageReference>
     <PackageReference Include="WriteableBitmapEx">
       <Version>1.6.8</Version>

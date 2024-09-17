@@ -75,7 +75,7 @@ namespace TBChestTracker
         private void OkayButton_Click(object sender, RoutedEventArgs e)
         {
             var clanmatefile = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}";
-            ClanManager.Instance.ClanmateManager.Save(clanmatefile);
+            ClanManager.Instance.ClanmateManager.Save();
             ClanManager.Instance.ClanChestManager.BuildData();
             this.DialogResult = true;
             AppContext.Instance.ClanmatesBeenAdded = true;

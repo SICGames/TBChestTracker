@@ -184,7 +184,7 @@
             </UserInterface:FancyTreeView>
         </Grid>
         <DockPanel LastChildFill="False" Grid.Row="3" HorizontalAlignment="Right" Height="48">
-            <ui:FancyButton RenderMode="TEXT" Width="120" Height="24" Background="#0077ff" Foreground="White" HilightBrush="#0099ff" x:Name="ApplyFixButton" Text="Fix" Margin="15,0"/>
+            <ui:FancyButton RenderMode="TEXT" Width="120" Height="24" Background="#0077ff" Foreground="White" HilightBrush="#0099ff" x:Name="ApplyFixButton" Text="Fix" Margin="15,0" Click="ApplyFixButton_Click"/>
         </DockPanel>
     </Grid>
 </Page>
