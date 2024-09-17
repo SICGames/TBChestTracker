@@ -15,15 +15,14 @@ namespace TBChestTracker.Engine
 
     public class OCREngine
     {
-        public static OCREngine Instance { get; private set; }
+        //public static OCREngine Instance { get; private set; }
         public static Tesseract OCR { get; private set; }
         public OCREngine()
         {
-            if (Instance == null)
-                Instance = this;
+          
         }
-        public static Task<bool> InitAsync(OCRSettings settings,TessDataConfig config) => Task.Run(() => Init(settings,config));
-        public static bool Init(OCRSettings ocrSettings, TessDataConfig config)
+        public static Task<bool> InitAsync(OCRSettings settings) => Task.Run(() => Init(settings));
+        public static bool Init(OCRSettings ocrSettings)
         {
             try
             {
@@ -31,7 +30,7 @@ namespace TBChestTracker.Engine
                 {
                     OcrEngineMode ocrmode = OcrEngineMode.TesseractOnly;
 
-                    if(config.Prefix.Equals("_best") || config.Prefix.Equals("_fast"))
+                    if(ocrSettings.TessDataConfig.Prefix.Equals("_best") || ocrSettings.TessDataConfig.Prefix.Equals("_fast"))
                     {
                         ocrmode = OcrEngineMode.LstmOnly;
                     }
@@ -104,11 +103,6 @@ namespace TBChestTracker.Engine
                 {
                     return null;
                 }
-
-                //OCR.SetVariable("tessedit_char_whitelist", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-                //OCR.SetVariable("load_system_dawg", "false");
-                //OCR.SetVariable("load_freq_dawg", "false");
-
                 //-- AccessViolationException -- Correupted Memory sometimes.
                 OCR.SetImage(image);
                 OCR.Recognize();

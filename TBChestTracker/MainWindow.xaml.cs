@@ -54,8 +54,7 @@ namespace TBChestTracker
     {
 
         #region TessData Option
-        private TessDataConfig TessDataConfig { get; set; }
-
+        //private TessDataConfig TessDataConfig { get; set; }
         #endregion
         #region Declarations
         System.Threading.Thread InputHookThread { get; set; }
@@ -78,9 +77,9 @@ namespace TBChestTracker
         ClanChestProcessResult clanChestProcessResult { get; set; }
         RecentDatabase recentlyOpenedDatabases { get; set; }
         ApplicationManager applicationManager { get; set; }
+        
         Task AutomationTask { get; set; }
-
-        OCREngine OCREngine { get; set; }
+        //OCREngine OCREngine { get; set; }
         #endregion
 
         #region PropertyChanged Event
@@ -99,7 +98,7 @@ namespace TBChestTracker
             //appContext = new AppContext();
             InitializeComponent();
 
-            TessDataConfig = new TessDataConfig(TessDataOption.Best);
+            //TessDataConfig = new TessDataConfig(TessDataOption.Best);
 
             this.DataContext = AppContext.Instance;
             this.Closing += MainWindow_Closing;
@@ -169,8 +168,8 @@ namespace TBChestTracker
             Snapture.CaptureRegion(ca_x, ca_y, ca_width, ca_height);
 
             AppContext.Instance.canCaptureAgain = false;
-
         }
+
         public void CaptureDesktop()
         {
             CaptureMode = CaptureMode.CHESTS;
@@ -416,11 +415,7 @@ namespace TBChestTracker
                 {
                     AppContext.Instance.TessDataExists = true;
                     var languages = SettingsManager.Instance.Settings.OCRSettings.Languages;
-                    OCREngine = new OCREngine();
-                    
-                    
-
-                    OCREngine.Init(SettingsManager.Instance.Settings.OCRSettings, TessDataConfig);
+                    OCREngine.Init(SettingsManager.Instance.Settings.OCRSettings);
                 }
                 else
                 {
@@ -517,7 +512,7 @@ namespace TBChestTracker
         public async Task<string> GetTesseractGithubDownloadPath()
         {
 
-            var releases = await ApplicationManager.Instance.client.Repository.Release.GetAll("tesseract-ocr", TessDataConfig.TesseractPackage);
+            var releases = await ApplicationManager.Instance.client.Repository.Release.GetAll("tesseract-ocr", SettingsManager.Instance.Settings.OCRSettings.TessDataConfig.TesseractPackage);
             var latest = releases[0];
             if(latest != null)
             {
@@ -534,7 +529,7 @@ namespace TBChestTracker
                 if (window is SplashScreen splashScreen)
                 {
 
-                    var downloadFile = $@"{downloadFolder}\{TessDataConfig.TesseractPackage}.zip";
+                    var downloadFile = $@"{downloadFolder}\{SettingsManager.Instance.Settings.OCRSettings.TessDataConfig.TesseractPackage}.zip";
                     if(System.IO.File.Exists(downloadFile))
                     {
                         return;
@@ -694,7 +689,7 @@ namespace TBChestTracker
                         {
                             splashScreen.UpdateStatus("Extracting trained Tesseract models...", 95);
                         }));
-                        var archiveFile = $@"{downloadFolderPath}\{TessDataConfig.TesseractPackage}.zip";
+                        var archiveFile = $@"{downloadFolderPath}\{SettingsManager.Instance.Settings.OCRSettings.TessDataConfig.TesseractPackage}.zip";
                         await ExtractArchive(splashScreen, archiveFile, $"{AppContext.Instance.TesseractData}");
 
                         //-- remove archive file
@@ -853,28 +848,6 @@ namespace TBChestTracker
         #region Window Closing
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-
-            /*
-             lâl
-             lal
-             lál
-            */
-            /*
-            var l = new F23.StringSimilarity.JaroWinkler();
-            var string1 = "Lâl";
-            foreach (var name in ClanManager.Instance.ClanmateManager.Database.Clanmates)
-            {
-                
-                var similiar = l.Similarity(string1, name.Name) * 100.0;
-                if (similiar >= 80)
-                {
-                    Debug.WriteLine($"{string1} and {name.Name} is similar => {similiar}");
-                }
-            }
-            l = null;
-            */
-            TessDataConfig = null;
-
             AppContext.Instance.isAppClosing = true;
             applicationManager.KillNodeServer();
             CaptainHook.Uninstall();

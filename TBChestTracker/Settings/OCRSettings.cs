@@ -20,9 +20,14 @@ namespace TBChestTracker
     }
 
     [System.Serializable]
-    public class OCRSettings : INotifyPropertyChanged
+    public class OCRSettings : INotifyPropertyChanged, IDisposable
     {
         private string _TessDataFolder;
+        public string CaptureMethod { get; set; }
+        public AOIRect AreaOfInterest { get; set; }
+        public AOIRect SuggestedAreaOfInterest { get; set; }
+        public List<Point> ClaimChestButtons { get; set; }
+
         public string TessDataFolder
         {
             get
@@ -88,12 +93,6 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(Capture));
             }
         }
-
-        public string CaptureMethod { get; set; }
-        public AOIRect AreaOfInterest { get; set; }
-        public AOIRect SuggestedAreaOfInterest { get; set; }
-        public List<Point> ClaimChestButtons {  get; set; }
-
         private String _previewImage = null;
         public String PreviewImage
         {
@@ -141,11 +140,25 @@ namespace TBChestTracker
             }
         }
 
+        private TessDataConfig _TessDataConfig = null;
+        private bool disposedValue;
+
+        public TessDataConfig TessDataConfig
+        {
+            get => _TessDataConfig;
+            set
+            {
+                _TessDataConfig = value;
+                OnPropertyChanged(nameof(TessDataConfig));
+            }
+        }
+
         public OCRSettings() 
         { 
             AreaOfInterest = new AOIRect();
             SuggestedAreaOfInterest = new AOIRect();
             ClaimChestButtons = new List<Point>();
+            TessDataConfig = new TessDataConfig(TessDataOption.Best);
         }
 
         protected void OnPropertyChanged(string propertyName)
@@ -155,5 +168,41 @@ namespace TBChestTracker
         }
         public event PropertyChangedEventHandler PropertyChanged;
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                    TessDataConfig = null;
+                    if (ClaimChestButtons != null)
+                    {
+                        ClaimChestButtons.Clear();
+                        ClaimChestButtons = null;
+                    }
+                    SuggestedAreaOfInterest.Dispose();
+                    AreaOfInterest.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~OCRSettings()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
     }
 }
