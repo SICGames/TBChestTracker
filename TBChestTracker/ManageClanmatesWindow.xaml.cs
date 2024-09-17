@@ -29,6 +29,7 @@ namespace TBChestTracker
         CollectionViewSource viewSource { get; set; }
         public bool clanmatesAdded { get; set; }
         public string previous_Clanmate_Name { get; set; }
+        private Grid SelectedItemGrid { get; set; }
 
         public ManageClanmatesWindow()
         {
@@ -45,30 +46,6 @@ namespace TBChestTracker
                 ClanManager.Instance.ClanmateManager.Add(name);
                 clanmatenameBox.Text = "";
                 clanmatesAdded = true;
-            }
-        }
-
-        private void LoadFromFileBtn_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if(e.LeftButton == MouseButtonState.Pressed) 
-            { 
-                OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Title = "Import Clanmates From File";
-                openFileDialog.Filter = "Text Files | *.txt | DB Files | *.db";
-                if(openFileDialog.ShowDialog() ==  true)
-                {
-                    ClanManager.Instance.ClanmateManager.ImportFromFileAsync(openFileDialog.FileName);
-                    ClanManager.Instance.ClanmateManager.UpdateCount();
-                    clanmatesAdded =true;
-                }
-            }
-        }
-
-        private void LoadFromCapturing_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if(e.LeftButton == MouseButtonState.Pressed)
-            {
-                MessageBox.Show("This feature is not ready.");
             }
         }
 
@@ -110,46 +87,17 @@ namespace TBChestTracker
             this.DialogResult = clanmatesAdded;
         }
 
-        private void DeleteSelectedItems_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                if (ListClanMates01.SelectedItems.Count > 0)
-                {
-                    List<Clanmate> removalList = new List<Clanmate>();
-
-                    foreach (var selectedclanmate in ListClanMates01.SelectedItems)
-                    {
-                        var selectedname = selectedclanmate as Clanmate;
-                        if (selectedname != null)
-                        {
-                            removalList.Add(new Clanmate(selectedname.Name));
-                        }
-                    }
-
-                    //-- we will also need to remove the chest data because clan mate was removed.
-
-                    foreach (var c in removalList.ToList())
-                    {
-                        ClanManager.Instance.ClanChestManager.RemoveChestData(c.Name);
-                        ClanManager.Instance.ClanmateManager.Remove(c.Name);
-                    }
-                    removalList.Clear();
-                    removalList = null;
-                    ClanManager.Instance.ClanmateManager.UpdateCount();
-                }
-            }
-        }
-
         private void TextBlock_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if(e.MouseDevice.LeftButton == MouseButtonState.Pressed && e.ClickCount > 1)
+            if(e.MouseDevice.LeftButton == MouseButtonState.Pressed)
             {
-
+                SelectedItemGrid = ((Grid)((TextBlock)sender).Parent);
+                /*
                 TextBox txt = (TextBox)((Grid)((TextBlock)sender).Parent).Children[1];
                 txt.Visibility = Visibility.Visible;
                 ((TextBlock)sender).Visibility = Visibility.Collapsed;
                 previous_Clanmate_Name = txt.Text;
+                */
             }
         }
 
@@ -361,12 +309,6 @@ namespace TBChestTracker
             //-- after that, we remove aliases from chest count database. 
         }
 
-        private void SelectClanmateNameMenuItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            PreviewScreenshotWindow previewWindow = new PreviewScreenshotWindow();
-            previewWindow.Show();
-        }
-       
         private void ListClanMates01_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.A && e.SystemKey == Key.LeftCtrl)
@@ -376,6 +318,65 @@ namespace TBChestTracker
                 {
                     item.IsSelected = !item.IsSelected;
                 }
+            }
+        }
+
+        private void EditSelectedItems_Click(object sender, RoutedEventArgs e)
+        {
+
+            if(SelectedItemGrid != null)
+            {
+                TextBox txt = (TextBox)SelectedItemGrid.Children[1];
+                txt.Visibility = Visibility.Visible;
+                ((TextBlock)SelectedItemGrid.Children[0]).Visibility = Visibility.Collapsed;
+                previous_Clanmate_Name = txt.Text;
+            }
+        }
+
+        private void LoadFromFileBtn_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Title = "Import Clanmates From File";
+            openFileDialog.Filter = "Text Files | *.txt | DB Files | *.db";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                ClanManager.Instance.ClanmateManager.ImportFromFileAsync(openFileDialog.FileName);
+                ClanManager.Instance.ClanmateManager.UpdateCount();
+                clanmatesAdded = true;
+            }
+        }
+
+        private void SelectClanmateNameMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            PreviewScreenshotWindow previewWindow = new PreviewScreenshotWindow();
+            previewWindow.Show();
+        }
+
+        private void DeleteSelectedItems_Click(object sender, RoutedEventArgs e)
+        {
+            if (ListClanMates01.SelectedItems.Count > 0)
+            {
+                List<Clanmate> removalList = new List<Clanmate>();
+
+                foreach (var selectedclanmate in ListClanMates01.SelectedItems)
+                {
+                    var selectedname = selectedclanmate as Clanmate;
+                    if (selectedname != null)
+                    {
+                        removalList.Add(new Clanmate(selectedname.Name));
+                    }
+                }
+
+                //-- we will also need to remove the chest data because clan mate was removed.
+
+                foreach (var c in removalList.ToList())
+                {
+                    ClanManager.Instance.ClanChestManager.RemoveChestData(c.Name);
+                    ClanManager.Instance.ClanmateManager.Remove(c.Name);
+                }
+                removalList.Clear();
+                removalList = null;
+                ClanManager.Instance.ClanmateManager.UpdateCount();
             }
         }
     }

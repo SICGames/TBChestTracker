@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TBChestTracker"
         xmlns:UI="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
+        
         mc:Ignorable="d"
         Title="Manage Clanmates" Height="450" Width="355" Topmost="True" WindowStyle="ToolWindow" ShowInTaskbar="False" Loaded="Window_Loaded" ResizeMode="NoResize" 
         Closing="Window_Closing" WindowStartupLocation="CenterScreen">
@@ -38,30 +39,32 @@
         <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="0" Background="#eeeeeeff" x:Name="Tray">
             <ToolBarPanel VerticalAlignment="Top" Grid.Row="0" Grid.Column="0">
                 <ToolBar Height="25" ToolBarTray.IsLocked="True" IsOverflowOpen="False" Width="{Binding ElementName=Tray, Path=ActualWidth}">
-                    <Image Source="Images/folderIcon.png" Height="16" Width="16" 
+                    
+                    <UI:FancyImageButton ImageSource="Images/folderIcon.png" Height="20" Width="20" HighlightBrush="#0077FF" HighlightOpacity="0.5"
                            x:Name="LoadFromFileBtn" 
-                           PreviewMouseDown="LoadFromFileBtn_PreviewMouseDown" 
+                           Click="LoadFromFileBtn_Click" 
                            ToolTip="Load From Text File" 
                            Margin="5,0,0,0"/>
-                    <Image Source="Images/camera_64x64.png" Height="16" Width="16" 
-                           x:Name="LoadFromCapturing" 
-                           ToolTip="Screen Capture Clanmates names." 
-                           Margin="5,0,0,0"
-                           PreviewMouseDown="LoadFromCapturing_PreviewMouseDown" Visibility="Collapsed"/>
-                    <Image Source="Images/Select_ClanmateIcon.png" Height="16" Width="16" 
+                    <UI:FancyImageButton ImageSource="Images/Select_ClanmateIcon.png" Height="20" Width="20"  HighlightBrush="#0077FF" HighlightOpacity="0.5"
                             x:Name="SelectClanmateNameMenuItem" 
                             ToolTip="Select Clanmate name" 
                             Margin="5,0,0,0"
-                            PreviewMouseDown="SelectClanmateNameMenuItem_PreviewMouseDown"/>
-                    <Separator Margin="5,3" Height="20"/>
+                            Click="SelectClanmateNameMenuItem_Click"/>
+
+                    <!--
                     <Button Content="M" Height="20" Width="20" x:Name="MergeClanmate" ToolTip="Group A Clanmate with known Aliases." Margin="5,0" Click="MergeClanmate_Click"/>
-                    <Button Content="V" Height="20" Width="20" x:Name="VerifyClanmates" ToolTip="Verify Clanmates" Margin="5,0" Click="VerifyClanmates_Click"/>
-                    <Separator Margin="5,3" Height="20"/>
-                    <Image Source="Images/trashIcon.png" Height="16" Width="16" 
+                    -->
+                    
+                    <UI:FancyImageButton ImageSource="Images/EditIcon.png" Height="20" Width="20" HighlightBrush="#0077FF" HighlightOpacity="0.5"
+                           x:Name="EditSelectedItems" 
+                           ToolTip="Edit Clanmate" 
+                           Margin="5,0,0,0"
+                           Click="EditSelectedItems_Click"/>
+                    <UI:FancyImageButton ImageSource="Images/trashIcon.png" Height="20" Width="20" HighlightBrush="#0077FF" HighlightOpacity="0.5"
                            x:Name="DeleteSelectedItems" 
                            ToolTip="Delete selected clanmates" 
                            Margin="5,0,0,0"
-                           PreviewMouseDown="DeleteSelectedItems_PreviewMouseDown"/>
+                           Click="DeleteSelectedItems_Click"/>
                 </ToolBar>
             </ToolBarPanel>
         </StackPanel>
