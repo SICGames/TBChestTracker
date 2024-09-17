@@ -14,6 +14,8 @@ using TBChestTracker.Managers;
 using Emgu.CV.Structure;
 using TBChestTracker.Effects;
 using TBChestTracker.Helpers;
+using System.Diagnostics;
+using System.Threading;
 
 namespace TBChestTracker.Automation
 {
@@ -21,12 +23,52 @@ namespace TBChestTracker.Automation
     {
         public Snapture Snapture { get; private set; }
         private ClanChestProcessResult clanChestProcessResult { get; set; }
+        private CancellationTokenSource CancellationToken { get; set; }
+
+        public bool isInitialized { get; private set; }
+        public bool isRunning { get; private set; }
+        public bool isCancelled { get; private set; }
+
+        public bool isCompleted { get; private set; }
+        public bool isFaulted { get; private set; }
+
+
+        public event EventHandler<AutomationEventArguments> AutomationStarted = null;
+        public event EventHandler<AutomationEventArguments> AutomationStopped = null;
+        public event EventHandler<AutomationErrorEventArguments> AutomationError = null;
+
+        protected virtual void onAutomationStarted(AutomationEventArguments args)
+        {
+            EventHandler<AutomationEventArguments> handler = AutomationStarted;
+            if (handler != null)
+            {
+                handler(this, args);
+            }
+        }
+        protected virtual void onAutomationStopped(AutomationEventArguments args) {
+            EventHandler<AutomationEventArguments> handler = AutomationStopped;
+            if(handler != null)
+            {
+                handler(this, args);
+            }
+        }
+
+        protected virtual void onAutomationError(AutomationErrorEventArguments args) 
+        {
+            EventHandler<AutomationErrorEventArguments> handler = AutomationError;
+            if(handler != null)
+            {
+                handler (this, args);   
+            }
+        }
 
         public ChestAutomation() 
         {
-            
+            isCompleted = false;
+            isRunning = false;
+            isCompleted = true;
+            isFaulted = false;
         }
-
 
         public bool Initialize(OCRSettings ocrSettings)
         {
@@ -47,9 +89,11 @@ namespace TBChestTracker.Automation
             Snapture = new Snapture();
             Snapture.isDPIAware = true;
             Snapture.SetBitmapResolution((int)ocrSettings.Dpi);
+            Snapture.onFrameCaptured += Snapture_onFrameCaptured;
             Snapture.Start(FrameCapturingMethod.GDI);
 
             com.HellStormGames.Logging.Console.Write("Snapture Started.", com.HellStormGames.Logging.LogType.INFO);
+            isInitialized = true;
             return true;
         }
 
@@ -150,14 +194,186 @@ namespace TBChestTracker.Automation
             return Task.FromResult(ocrResult);
         }
 
-        #endregion
-        public async Task StartAutomation()
+        /*
+        #region Start Automation Thread
+        void StartAutomationThread()
         {
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                AppContext.Instance.AutomationRunning = true;
+
+                CancellationTokenSource = new CancellationTokenSource();
+                AutomationTask = Task.Run(() => StartAutomationProcess(CancellationTokenSource.Token));
+                if (AutomationTask.IsCompleted)
+                {
+                    Debug.WriteLine("Automation is completed");
+                }
+                else if (AutomationTask.IsCanceled)
+                {
+                    Debug.WriteLine("Automation is canceled");
+                }
+
+            }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        }
+        #endregion
+
+        #region StartAutomation 
+        void StartAutomationProcess(CancellationToken token)
+        {
+
+            var claim_button = SettingsManager.Instance.Settings.OCRSettings.ClaimChestButtons[0];
+            com.HellStormGames.Logging.Console.Write("Automation Started", com.HellStormGames.Logging.LogType.INFO);
+            AppContext.Instance.canCaptureAgain = true;
+
+            //-- we want to speed up this.
+            while (!token.IsCancellationRequested)
+            {
+
+                int automatorClicks = 0;
+                if (AppContext.Instance.canCaptureAgain)
+                {
+                    Thread.Sleep(SettingsManager.Instance.Settings.AutomationSettings.AutomationScreenshotsAfterClicks); //-- could prevent the "From:" bug.
+
+                    CaptureRegion();
+
+                    while (ClanManager.Instance.ClanChestManager.ChestProcessingState != ChestProcessingState.COMPLETED)
+                    {
+                    }
+                }
+
+                if (clanChestProcessResult.Result == ClanChestProcessEnum.SUCCESS)
+                {
+                    while (automatorClicks != SettingsManager.Instance.Settings.AutomationSettings.AutomationClicks)
+                    {
+                        Automator.LeftClick(claim_button.X, claim_button.Y);
+                        automatorClicks++;
+                        Thread.Sleep(SettingsManager.Instance.Settings.AutomationSettings.AutomationDelayBetweenClicks);
+                    }
+
+                    //-- canCaptureAgain not being switched back on.
+                    AppContext.Instance.canCaptureAgain = true;
+                }
+            }
+
+            StopAutomation();
+        }
+        #endregion
+
+        #region StopAutomation
+        void StopAutomation()
+        {
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                CancellationTokenSource.Cancel();
+
+                AppContext.Instance.AutomationRunning = false;
+                AppContext.Instance.isBusyProcessingClanchests = false;
+                ClanManager.Instance.ClanChestManager.SaveDataTask();
+                ClanManager.Instance.ClanChestManager.CreateBackup();
+                AppContext.Instance.IsAutomationPlayButtonEnabled = true;
+                AppContext.Instance.IsAutomationStopButtonEnabled = false;
+                com.HellStormGames.Logging.Console.Write("Automation stopped.", com.HellStormGames.Logging.LogType.INFO);
+            }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
         }
-        public async Task StopAutomation()
-        {
+        #endregion
+        */
 
+        #endregion
+
+        private void StartAutomationTask(CancellationToken token)
+        {
+            isRunning = true;
+            AppContext.Instance.AutomationRunning = true;
+            Task.Run(() => PerformAutomation(token));
+        }
+
+        private async Task PerformAutomation(CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            var claim_button = SettingsManager.Instance.Settings.OCRSettings.ClaimChestButtons[0];
+            AppContext.Instance.canCaptureAgain = true;
+
+            while (isRunning)
+            {
+                try
+                {
+                    token.ThrowIfCancellationRequested();
+                    int automatorClicks = 0;
+                    if (AppContext.Instance.canCaptureAgain)
+                    {
+                        Thread.Sleep(SettingsManager.Instance.Settings.AutomationSettings.AutomationScreenshotsAfterClicks); //-- could prevent the "From:" bug.
+
+                        CaptureRegion();
+
+                        while (ClanManager.Instance.ClanChestManager.ChestProcessingState != ChestProcessingState.COMPLETED)
+                        {
+                        }
+                    }
+
+                    if (clanChestProcessResult.Result == ClanChestProcessEnum.SUCCESS)
+                    {
+                        while (automatorClicks != SettingsManager.Instance.Settings.AutomationSettings.AutomationClicks)
+                        {
+                            Automator.LeftClick(claim_button.X, claim_button.Y);
+                            automatorClicks++;
+                            Thread.Sleep(SettingsManager.Instance.Settings.AutomationSettings.AutomationDelayBetweenClicks);
+                        }
+
+                        //-- canCaptureAgain not being switched back on.
+                        AppContext.Instance.canCaptureAgain = true;
+                    }
+                }
+                catch (OperationCanceledException o_ex)
+                {
+
+                }
+                catch (Exception e)
+                {
+                    //-- real exception.
+                }
+            }
+
+            StopAutomation();
+        }
+        public void StartAutomation()
+        {
+            onAutomationStarted(new AutomationEventArguments(true, false));
+            CancellationToken = new CancellationTokenSource();
+            StartAutomationTask(CancellationToken.Token);
+        }
+
+        public void StopAutomation()
+        {
+            if(CancellationToken != null)
+            {
+                CancellationToken.Cancel();
+                isRunning = false;
+                isCancelled = true;
+                isFaulted = false;
+
+                onAutomationStopped(new AutomationEventArguments(false, true));
+            }
+        }
+
+        public void Release()
+        {
+            if(isRunning)
+            {
+                StopAutomation();
+            }
+            if(CancellationToken != null)
+            {
+                CancellationToken.Dispose();
+            }
+            if (clanChestProcessResult != null)
+            {
+                clanChestProcessResult = null;
+            }
+            if(Snapture != null)
+            {
+                Snapture.Dispose();
+            }
         }
     }
 }
