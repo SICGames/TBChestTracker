@@ -546,10 +546,8 @@ namespace TBChestTracker
                 }));
 
                 await Task.Delay(500);
-
-                //await InitTesseract();
+                
                 await InitChestAutomation();
-                await Task.Delay(200);
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
@@ -644,7 +642,6 @@ namespace TBChestTracker
                     if(keyStr.Equals(SettingsManager.Instance.Settings.HotKeySettings.StartAutomationKeys))
                     {
                         ChestAutomation.StartAutomation();
-                        //StartAutomationThread();
                         AppContext.Instance.hasHotkeyBeenPressed = true;
                         keyStr = String.Empty;
                         previousKey = Key.None;
@@ -653,7 +650,7 @@ namespace TBChestTracker
                     if(keyStr.Equals(SettingsManager.Instance.Settings.HotKeySettings.StopAutomationKeys))
                     {
                         ChestAutomation.StopAutomation();
-                        //StopAutomation();
+                        
                         AppContext.Instance.hasHotkeyBeenPressed = true;
                         keyStr = String.Empty;
                         previousKey = Key.None;
@@ -678,7 +675,7 @@ namespace TBChestTracker
             CaptainHook.Uninstall();
             
             ClanManager.Instance.Destroy();
-            OCREngine.Destroy();
+            
             com.HellStormGames.Logging.Console.Destroy();
             SettingsManager.Dispose();
             applicationManager.Dispose();
@@ -956,8 +953,6 @@ namespace TBChestTracker
             if (AppContext.Instance.AutomationRunning)
             {
                 ChestAutomation.StopAutomation();
-                AppContext.Instance.IsAutomationStopButtonEnabled = false;
-                AppContext.Instance.IsAutomationPlayButtonEnabled = true;
             }
         }
         #endregion

@@ -374,6 +374,9 @@ namespace TBChestTracker.Automation
             {
                 Snapture.Dispose();
             }
+
+            OCREngine.Destroy();
+
         }
     }
 }
