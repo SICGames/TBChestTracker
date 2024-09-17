@@ -304,7 +304,7 @@ namespace TBChestTracker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Patreon.
+        ///   Looks up a localized string similar to Become An Patreon.
         /// </summary>
         public static string Patreon {
             get {

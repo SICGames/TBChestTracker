@@ -1311,18 +1311,43 @@ namespace TBChestTracker
         {
             var mi = (MenuItem)e.OriginalSource;
             var _tag = mi.Tag;
-
-            if (_tag.Equals("AboutApp"))
+            if (_tag != null)
             {
-                AboutWindow aboutWindow = new AboutWindow();
-                aboutWindow.Show();
+                switch(_tag)
+                {
+                    case "AboutApp":
+                        {
+                            AboutWindow aboutWindow = new AboutWindow();
+                            aboutWindow.Show();
+                        }
+                        break;
+                    case "Tutorial":
+                        {
+
+                        }
+                        break;
+                    case "ReportIssue":
+                        {
+                            Process.Start("https://github.com/SICGames/TBChestTracker/issues");
+                        }
+                        break;
+                    case "VisitGithub":
+                        {
+                            Process.Start("https://www.github.com/SICGames/TBChestTracker");
+                        }
+                        break;
+                    case "Youtube":
+                        {
+                            Process.Start("https://www.youtube.com/@TotalBattleGuide");
+                        }
+                        break;
+                    case "Patreon":
+                        {
+                            Process.Start($"https://www.patreon.com/TotalBattleGuide");
+                        }
+                        break;
+                }
             }
-
-        }
-
-        private void Patreon_Click(object sender, RoutedEventArgs e)
-        {
-            Process.Start($"https://www.patreon.com/TotalBattleGuide");
         }
 
         private void ChestBuilderMenuItem_Click(object sender, RoutedEventArgs e)

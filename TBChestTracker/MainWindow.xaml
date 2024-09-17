@@ -290,9 +290,18 @@
                     <MenuItem Header="Absent Clanmates Cleaner" x:Name="AbsentClanmateCleanerMenuItem" Click="AbsentClanmateCleanerMenuItem_Click"/>
                 </MenuItem>
                 <MenuItem Header="{x:Static ResourceStrings:Strings.Help}" x:Name="HelpMenu" Click="HelpMenu_Click">
+                    <MenuItem Header="Github">
+                        <MenuItem Header="Visit Project Page" Tag="VisitGithub"/>
+                        <MenuItem Header="Report An Issue" Tag="ReportIssue"/>
+                    </MenuItem>
+                    <MenuItem Header="TotalBattleGuide on Youtube" Tag="Youtube"/>
+                    <Separator/>
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.Patreon}" Tag="Patron"/>
+                    <Separator/>
+                    <MenuItem Header="Tutorial" Tag="Tutorial"/>
+                    <Separator/>
                     <MenuItem Header="{x:Static ResourceStrings:Strings.About}" Tag="AboutApp"/>
                 </MenuItem>
-                <MenuItem Header="{x:Static ResourceStrings:Strings.Patreon}" x:Name="Patreon" Click="Patreon_Click"/>
             </Menu>
         </DockPanel>
         <Grid Grid.Row="1" Height="36">
