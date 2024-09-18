@@ -145,8 +145,11 @@
     </Compile>
     <Compile Include="Arrays\IDataCollection.cs" />
     <Compile Include="Automation\ChestAutomation.cs" />
+    <Compile Include="Automation\Events\AutomationChestProcessedEventArguments.cs" />
+    <Compile Include="Automation\Events\AutomationClicksEventArguments.cs" />
     <Compile Include="Automation\Events\AutomationErrorEventArguments.cs" />
     <Compile Include="Automation\Events\AutomationEventArguments.cs" />
+    <Compile Include="Automation\Events\AutomationTextProcessedEventArguments.cs" />
     <Compile Include="Automation\Native\Automator.cs" />
     <Compile Include="ChestBuilderWindow.xaml.cs">
       <DependentUpon>ChestBuilderWindow.xaml</DependentUpon>

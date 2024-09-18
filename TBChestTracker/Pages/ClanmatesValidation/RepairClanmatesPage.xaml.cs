@@ -74,8 +74,8 @@ namespace TBChestTracker.Pages.ClanmatesValidation
                 var affectedAliases = affectedClanmate.Aliases;
                 foreach (var alias in affectedAliases)
                 {
-                    var aliasName = alias.Name; 
-
+                    var aliasName = alias.Name;
+                    
                     foreach(var dailychestdata in ClanManager.Instance.ClanChestManager.ClanChestDailyData.ToList())
                     {
                         var alias_clanchestdata = dailychestdata.Value.Where(chestdata => chestdata.Clanmate.Equals(aliasName, StringComparison.CurrentCultureIgnoreCase)).ToList();
@@ -84,9 +84,12 @@ namespace TBChestTracker.Pages.ClanmatesValidation
                         {
                             temp_clanchest.Add(new ClanChestData(affectedClanmate.Name, alias_chestdata.chests));
                             previous_chestdata.Add(dailychestdata.Key, temp_clanchest);
+                            Debug.WriteLine($"Giving {aliasName}'s chests to {affectedClanmate.Name}");
                         }
                     }
-                    
+
+                    Debug.WriteLine($"Removing {aliasName}");
+
                     ClanManager.Instance.ClanmateManager.Remove(aliasName);
                     ClanManager.Instance.ClanChestManager.RemoveChestData(aliasName);
                 }
@@ -120,7 +123,7 @@ namespace TBChestTracker.Pages.ClanmatesValidation
                 processed += 1;
             }
             
-            var _completed = new ClanmatesRepairProgress("Everything is repaired...", 100);
+            var _completed = new ClanmatesRepairProgress("Completed Repairing...", 100);
             progress.Report(_completed);
             await Task.Delay(500);
 
@@ -156,6 +159,9 @@ namespace TBChestTracker.Pages.ClanmatesValidation
                 var percent = Math.Round((processed / total) * 100.0);
                 var _progres = new ClanmatesRepairProgress($"Removing Invalid Clanmate {dirtyClanmate}...", percent);
                 progress.Report(_progres);
+
+                Debug.WriteLine($"Removing Invalid Clanmate {dirtyClanmate}");
+
                 ClanManager.Instance.ClanmateManager.Remove(dirtyClanmate);
                 ClanManager.Instance.ClanChestManager.RemoveChestData(dirtyClanmate);
                 processed++;

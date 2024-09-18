@@ -69,7 +69,7 @@ namespace TBChestTracker
                                 var data = StringHelpers.ConvertToUTF8(sr.ReadToEnd());
 
                                 tmp_clanmates_db = JsonConvert.DeserializeObject<ClanmatesDatabase>(data);
-                                clan.Members = tmp_clanmates_db.Clanmates.Count - 1;
+                                clan.Members = tmp_clanmates_db.Clanmates.Count;
                                 sr.Close();
                             }
 

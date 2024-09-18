@@ -16,6 +16,8 @@ using TBChestTracker.Effects;
 using TBChestTracker.Helpers;
 using System.Diagnostics;
 using System.Threading;
+using Newtonsoft.Json.Linq;
+using System.Drawing;
 
 namespace TBChestTracker.Automation
 {
@@ -31,11 +33,18 @@ namespace TBChestTracker.Automation
 
         public bool isCompleted { get; private set; }
         public bool isFaulted { get; private set; }
+        public bool canCaptureAgain { get; private set; }
 
 
         public event EventHandler<AutomationEventArguments> AutomationStarted = null;
         public event EventHandler<AutomationEventArguments> AutomationStopped = null;
         public event EventHandler<AutomationErrorEventArguments> AutomationError = null;
+
+        private event EventHandler<AutomationTextProcessedEventArguments> TextProcessed = null;
+        private event EventHandler<AutomationChestProcessedEventArguments> ChestProcessed = null;
+
+        private event EventHandler<AutomationClicksEventArguments> ProcessingClicks = null;
+        private event EventHandler<AutomationClicksEventArguments> ProcessedClicks = null;  
 
         protected virtual void onAutomationStarted(AutomationEventArguments args)
         {
@@ -60,6 +69,45 @@ namespace TBChestTracker.Automation
             {
                 handler (this, args);   
             }
+        }
+
+        protected virtual void onTextProcessed(AutomationTextProcessedEventArguments args)
+        {
+            EventHandler<AutomationTextProcessedEventArguments> handler = TextProcessed;
+            if(handler != null)
+            {
+                handler(this, args);
+            }
+        }
+
+        protected virtual void onChestProcessed(AutomationChestProcessedEventArguments args)
+        {
+            EventHandler<AutomationChestProcessedEventArguments> handler = ChestProcessed;
+            if( handler != null)
+            {
+                handler(this, args);
+            }
+        }
+        protected virtual void onProcessingClicks(AutomationClicksEventArguments args)
+        {
+            EventHandler<AutomationClicksEventArguments> handler = ProcessingClicks;
+            if(handler != null)
+            {
+                handler(this, args);
+            }
+        }
+        protected virtual void onProcessedClicks(AutomationClicksEventArguments args)
+        {
+            EventHandler<AutomationClicksEventArguments> handler = ProcessedClicks;
+            if(handler != null)
+            {
+                handler(this, args);
+            }
+        }
+
+        public void InvokeChestProcessed(AutomationChestProcessedEventArguments args)
+        {
+            onChestProcessed (args);
         }
 
         public ChestAutomation() 
@@ -94,25 +142,69 @@ namespace TBChestTracker.Automation
 
             com.HellStormGames.Logging.Console.Write("Snapture Started.", com.HellStormGames.Logging.LogType.INFO);
             isInitialized = true;
+
+            TextProcessed += ChestAutomation_TextProcessed;
+            ChestProcessed += ChestAutomation_ChestProcessed;
+            ProcessingClicks += ChestAutomation_ProcessingClicks;
+            ProcessedClicks += ChestAutomation_ProcessedClicks;
+                
             return true;
         }
 
-
-        #region Snapture onFrameCaptured Event
-        private async void Snapture_onFrameCaptured(object sender, FrameCapturedEventArgs e)
+        private void ChestAutomation_ProcessedClicks(object sender, AutomationClicksEventArguments e)
         {
-            var ocrResult = await GetTextFromBitmap(e.ScreenCapturedBitmap); //LoadBitmap(e.ScreenCapturedBitmap, new Windows.Globalization.Language("en"));
-            if (ocrResult == null)
+            if(e.ProcessedClicks == true)
             {
+                this.canCaptureAgain = true;
+            }
+        }
 
+        private void ChestAutomation_ProcessingClicks(object sender, AutomationClicksEventArguments e)
+        {
+            if(e.CurrentClick >= e.MaxClicks)
+            {
+                AutomationClicksEventArguments arg = new AutomationClicksEventArguments(true, e.CurrentClick, e.MaxClicks);
+                onProcessedClicks(arg);
+            }
+        }
+
+        private async void ChestAutomation_ChestProcessed(object sender, AutomationChestProcessedEventArguments e)
+        {
+            var result = e.ProcessResult;
+            if(result.Result == ClanChestProcessEnum.NO_GIFTS)
+            {
+                StopAutomation();
+                com.HellStormGames.Logging.Console.Write($"There are no more gifts to collect.", "Automation Result", com.HellStormGames.Logging.LogType.INFO);
+            }
+            if (result.Result == ClanChestProcessEnum.SUCCESS)
+            {
+                int automationClicks = 0;
+                int maxClicks = SettingsManager.Instance.Settings.AutomationSettings.AutomationClicks;
+                var claim_button = SettingsManager.Instance.Settings.OCRSettings.ClaimChestButtons[0];
+
+                while (automationClicks != maxClicks)
+                {
+                    Automator.LeftClick(claim_button.X, claim_button.Y);
+                    automationClicks++;
+                    await Task.Delay(SettingsManager.Instance.Settings.AutomationSettings.AutomationDelayBetweenClicks);
+                    
+                    onProcessingClicks(new AutomationClicksEventArguments(false, automationClicks, maxClicks));
+
+                }
+
+                //-- canCaptureAgain not being switched back on.
+                AppContext.Instance.canCaptureAgain = true;
             }
 
-            //-- here we process data.
-            e.ScreenCapturedBitmap.Dispose();
+        }
 
-            if (ocrResult != null)
+        private async void ChestAutomation_TextProcessed(object sender, AutomationTextProcessedEventArguments e)
+        {
+            var ocrResult = e.TessResult;
+            if(ocrResult != null)
             {
-                clanChestProcessResult = await ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words, onError =>
+                //clanChestProcessResult = await ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words, onError =>
+                ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words, this, onError =>
                 {
                     if (onError != null && !String.IsNullOrEmpty(onError.Message))
                     {
@@ -125,12 +217,100 @@ namespace TBChestTracker.Automation
                         }
                     }
                 });
-                if (clanChestProcessResult.Result == ClanChestProcessEnum.NO_GIFTS)
-                {
-                    StopAutomation();
-                    com.HellStormGames.Logging.Console.Write($"There are no more gifts to collect.", "Automation Result", com.HellStormGames.Logging.LogType.INFO);
-                }
             }
+        }
+
+        #region Snapture onFrameCaptured Event
+        private async void Snapture_onFrameCaptured(object sender, FrameCapturedEventArgs e)
+        {
+            try
+            {
+                CancellationToken.Token.ThrowIfCancellationRequested();
+                
+                var bitmap = e.ScreenCapturedBitmap;
+                var ocrSettings = SettingsManager.Instance.Settings.OCRSettings;
+                var brightness = ocrSettings.GlobalBrightness;
+                var threshold = new Gray(ocrSettings.Threshold); //-- 85
+                var maxThreshold = new Gray(ocrSettings.MaxThreshold); //--- 255
+
+                bool bSave = false;
+                string outputPath = String.Empty;
+
+                Mat outputImage = new Mat();
+                Mat original_image = bitmap.ToImage<Bgr, Byte>().Mat;
+
+                if (AppContext.Instance.SaveOCRImages)
+                {
+                    bSave = true;
+                    outputPath = $@"{AppContext.Instance.AppFolder}\Output";
+                    System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(outputPath);
+                    if (di.Exists == false)
+                    {
+                        di.Create();
+                    }
+                    original_image.Save($@"{outputPath}\OCR_ImageOriginal.png");
+                }
+
+                outputImage = ImageEffects.ConvertToGrayscale(original_image, bSave, outputPath);
+                outputImage = ImageEffects.Brighten(outputImage, brightness, bSave, outputPath);
+
+                //-- OCR Incorrect Text Bug - e.g. Slash Jr III is read Slash )r III
+                //-- Fix: Upscaling input image large enough to read properly.
+                outputImage = ImageEffects.Resize(outputImage, 2, Emgu.CV.CvEnum.Inter.Cubic, bSave, outputPath);
+                outputImage = ImageEffects.ThresholdBinaryInv(outputImage, threshold, maxThreshold, bSave, outputPath);
+                //-- if it is null or empty somehow, we update it.
+                if (String.IsNullOrEmpty(ocrSettings.PreviewImage))
+                {
+                    outputImage.Save($@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png");
+                    ocrSettings.PreviewImage = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png";
+                }
+
+                var ocrResult = OCREngine.Read(outputImage);
+                
+                AutomationTextProcessedEventArguments arg = new AutomationTextProcessedEventArguments(ocrResult);
+                onTextProcessed(arg);
+
+                /*
+                if (ocrResult != null)
+                {
+                    clanChestProcessResult = await ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words, onError =>
+                    {
+                        if (onError != null && !String.IsNullOrEmpty(onError.Message))
+                        {
+
+                            var result = MessageBox.Show($"Stopping automation and saving chest data. Reason: {onError.Message}", "OCR Error", MessageBoxButton.OK);
+                            if (result == MessageBoxResult.OK)
+                            {
+                                com.HellStormGames.Logging.Console.Write($"Error Occured Processing Chests. Automation Stopped.", "Automation Result", com.HellStormGames.Logging.LogType.ERROR);
+                                StopAutomation();
+                            }
+                        }
+                    });
+
+                    if (clanChestProcessResult.Result == ClanChestProcessEnum.NO_GIFTS)
+                    {
+                        StopAutomation();
+                        com.HellStormGames.Logging.Console.Write($"There are no more gifts to collect.", "Automation Result", com.HellStormGames.Logging.LogType.INFO);
+                    }
+                }
+
+                */
+                outputImage.Dispose();
+                original_image.Dispose();
+                bitmap.Dispose();
+
+                e.ScreenCapturedBitmap.Dispose();
+
+            }
+            catch (OperationCanceledException ex) when (ex.CancellationToken == CancellationToken.Token)
+            {
+
+            }
+            catch(Exception ex)
+            {
+
+            }
+
         }
         private void CaptureRegion()
         {
@@ -142,56 +322,9 @@ namespace TBChestTracker.Automation
             int ca_height = (int)capture_region.height;
 
             Snapture.CaptureRegion(ca_x, ca_y, ca_width, ca_height);
+            this.canCaptureAgain = false;
 
             AppContext.Instance.canCaptureAgain = false;
-        }
-
-        private Task<TessResult> GetTextFromBitmap(System.Drawing.Bitmap bitmap)
-        {
-
-            var ocrSettings = SettingsManager.Instance.Settings.OCRSettings;
-            var brightness = ocrSettings.GlobalBrightness;
-            var threshold = new Gray(ocrSettings.Threshold); //-- 85
-            var maxThreshold = new Gray(ocrSettings.MaxThreshold); //--- 255
-
-            bool bSave = false;
-            string outputPath = String.Empty;
-
-            Mat outputImage = new Mat();
-            Mat original_image = bitmap.ToImage<Bgr, Byte>().Mat;
-
-            if (AppContext.Instance.SaveOCRImages)
-            {
-                bSave = true;
-                outputPath = $@"{AppContext.Instance.AppFolder}\Output";
-                System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(outputPath);
-                if (di.Exists == false)
-                {
-                    di.Create();
-                }
-                original_image.Save($@"{outputPath}\OCR_ImageOriginal.png");
-            }
-
-            outputImage = ImageEffects.ConvertToGrayscale(original_image, bSave, outputPath);
-            outputImage = ImageEffects.Brighten(outputImage, brightness, bSave, outputPath);
-
-            //-- OCR Incorrect Text Bug - e.g. Slash Jr III is read Slash )r III
-            //-- Fix: Upscaling input image large enough to read properly.
-            outputImage = ImageEffects.Resize(outputImage, 2, Emgu.CV.CvEnum.Inter.Cubic, bSave, outputPath);
-            outputImage = ImageEffects.ThresholdBinaryInv(outputImage, threshold, maxThreshold, bSave, outputPath);
-            //-- if it is null or empty somehow, we update it.
-            if (String.IsNullOrEmpty(ocrSettings.PreviewImage))
-            {
-                outputImage.Save($@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png");
-                ocrSettings.PreviewImage = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png";
-            }
-
-            var ocrResult = OCREngine.Read(outputImage);
-
-            outputImage.Dispose();
-            original_image.Dispose();
-
-            return Task.FromResult(ocrResult);
         }
 
         /*
@@ -290,19 +423,20 @@ namespace TBChestTracker.Automation
 
         private async Task PerformAutomation(CancellationToken token)
         {
-            token.ThrowIfCancellationRequested();
             var claim_button = SettingsManager.Instance.Settings.OCRSettings.ClaimChestButtons[0];
-            AppContext.Instance.canCaptureAgain = true;
-
-            while (isRunning)
+            //AppContext.Instance.canCaptureAgain = true;
+            this.canCaptureAgain = true;
+            try
             {
-                try
+                token.ThrowIfCancellationRequested();
+
+                while (isRunning)
                 {
                     token.ThrowIfCancellationRequested();
-                    int automatorClicks = 0;
-                    if (AppContext.Instance.canCaptureAgain)
+                    
+                    if (this.canCaptureAgain)
                     {
-                        Thread.Sleep(SettingsManager.Instance.Settings.AutomationSettings.AutomationScreenshotsAfterClicks); //-- could prevent the "From:" bug.
+                        //await Task.Delay(SettingsManager.Instance.Settings.AutomationSettings.AutomationScreenshotsAfterClicks); //-- could prevent the "From:" bug.
 
                         CaptureRegion();
 
@@ -311,27 +445,29 @@ namespace TBChestTracker.Automation
                         }
                     }
 
+                    /*
                     if (clanChestProcessResult.Result == ClanChestProcessEnum.SUCCESS)
                     {
                         while (automatorClicks != SettingsManager.Instance.Settings.AutomationSettings.AutomationClicks)
                         {
                             Automator.LeftClick(claim_button.X, claim_button.Y);
                             automatorClicks++;
-                            Thread.Sleep(SettingsManager.Instance.Settings.AutomationSettings.AutomationDelayBetweenClicks);
+                            await Task.Delay(SettingsManager.Instance.Settings.AutomationSettings.AutomationDelayBetweenClicks);
                         }
 
                         //-- canCaptureAgain not being switched back on.
                         AppContext.Instance.canCaptureAgain = true;
                     }
+                    */
                 }
-                catch (OperationCanceledException o_ex)
-                {
+            }
+            catch (OperationCanceledException e) when (e.CancellationToken == token)
+            {
 
-                }
-                catch (Exception e)
-                {
-                    //-- real exception.
-                }
+            }
+            catch (Exception e)
+            {
+
             }
 
             StopAutomation();

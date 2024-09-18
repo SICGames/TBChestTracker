@@ -13,6 +13,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Markup;
+using TBChestTracker.Automation;
 using TBChestTracker.Managers;
 
 using static Emgu.CV.Features2D.ORB;
@@ -697,7 +698,7 @@ namespace TBChestTracker
             return null;
         }
 
-        public async Task<ClanChestProcessResult> ProcessChestData(List<string> result, System.Action<ChestProcessingError> onError)
+        public void ProcessChestData(List<string> result, ChestAutomation chestAutomation, System.Action<ChestProcessingError> onError)
         {
 
             /*
@@ -709,12 +710,15 @@ namespace TBChestTracker
 
             AppContext.Instance.isBusyProcessingClanchests = true;
             var resulttext = result;
-
+            
             if (resulttext[0].ToLower().Contains("no gifts"))
             {
                 ChestProcessingState = ChestProcessingState.IDLE;
                 AppContext.Instance.isAnyGiftsAvailable = false;
-                return new ClanChestProcessResult("No Gifts", 404, ClanChestProcessEnum.NO_GIFTS);
+                
+                chestAutomation.InvokeChestProcessed(new Automation.AutomationChestProcessedEventArguments(new ClanChestProcessResult("No Gifts", 404, ClanChestProcessEnum.NO_GIFTS)));
+                
+                //return new ClanChestProcessResult("No Gifts", 404, ClanChestProcessEnum.NO_GIFTS);
             }
 
             ChestProcessingState = ChestProcessingState.PROCESSING;
@@ -724,7 +728,10 @@ namespace TBChestTracker
             if (textResult.Status != ProcessingStatus.OK)
             {
                 onError(new ChestProcessingError($"{textResult.Message}"));
-                return new ClanChestProcessResult($"{textResult.Message}", 0, ClanChestProcessEnum.ERROR);
+
+                chestAutomation.InvokeChestProcessed(new Automation.AutomationChestProcessedEventArguments(new ClanChestProcessResult($"{textResult.Message}", 0, ClanChestProcessEnum.ERROR)));
+
+                //return new ClanChestProcessResult($"{textResult.Message}", 0, ClanChestProcessEnum.ERROR);
             }
 
             List<ChestData> tmpchests = textResult.ChestData;
@@ -888,7 +895,10 @@ namespace TBChestTracker
             AppContext.Instance.isBusyProcessingClanchests = false;
             AppContext.Instance.canCaptureAgain = true;
 
-            return new ClanChestProcessResult("Success", 200, ClanChestProcessEnum.SUCCESS);
+            Automation.AutomationChestProcessedEventArguments args = new AutomationChestProcessedEventArguments(new ClanChestProcessResult("200", 200, ClanChestProcessEnum.SUCCESS));
+            chestAutomation.InvokeChestProcessed(args);
+
+            //return new ClanChestProcessResult("Success", 200, ClanChestProcessEnum.SUCCESS);
         }
         
         public async void LoadData()

@@ -95,6 +95,8 @@ namespace TBChestTracker.Engine
             return languages;
         }
 
+        public static Task<TessResult> ReadAsync(IInputArray image) => Task.Run(() => Read(image));
+
         public static TessResult Read(IInputArray image)
         {
             try
