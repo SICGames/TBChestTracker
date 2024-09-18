@@ -698,7 +698,7 @@ namespace TBChestTracker
             return null;
         }
 
-        public void ProcessChestData(List<string> result, ChestAutomation chestAutomation, System.Action<ChestProcessingError> onError)
+        public void ProcessChestData(List<string> result, ChestAutomation chestAutomation)
         {
 
             /*
@@ -717,7 +717,7 @@ namespace TBChestTracker
                 AppContext.Instance.isAnyGiftsAvailable = false;
                 
                 chestAutomation.InvokeChestProcessed(new Automation.AutomationChestProcessedEventArguments(new ClanChestProcessResult("No Gifts", 404, ClanChestProcessEnum.NO_GIFTS)));
-                
+                return;
                 //return new ClanChestProcessResult("No Gifts", 404, ClanChestProcessEnum.NO_GIFTS);
             }
 
@@ -727,10 +727,9 @@ namespace TBChestTracker
 
             if (textResult.Status != ProcessingStatus.OK)
             {
-                onError(new ChestProcessingError($"{textResult.Message}"));
-
-                chestAutomation.InvokeChestProcessed(new Automation.AutomationChestProcessedEventArguments(new ClanChestProcessResult($"{textResult.Message}", 0, ClanChestProcessEnum.ERROR)));
-
+                //onError(new ChestProcessingError($"{textResult.Message}"));
+                chestAutomation.InvokeChestProcessingFailed(new AutomationChestProcessingFailedEventArguments($"{textResult.Message}", 0));
+                return;
                 //return new ClanChestProcessResult($"{textResult.Message}", 0, ClanChestProcessEnum.ERROR);
             }
 

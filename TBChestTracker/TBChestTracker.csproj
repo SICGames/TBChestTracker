@@ -146,6 +146,7 @@
     <Compile Include="Arrays\IDataCollection.cs" />
     <Compile Include="Automation\ChestAutomation.cs" />
     <Compile Include="Automation\Events\AutomationChestProcessedEventArguments.cs" />
+    <Compile Include="Automation\Events\AutomationChestProcessingFailedEventArguments.cs" />
     <Compile Include="Automation\Events\AutomationClicksEventArguments.cs" />
     <Compile Include="Automation\Events\AutomationErrorEventArguments.cs" />
     <Compile Include="Automation\Events\AutomationEventArguments.cs" />

@@ -18,6 +18,7 @@ using System.Diagnostics;
 using System.Threading;
 using Newtonsoft.Json.Linq;
 using System.Drawing;
+using CefSharp.DevTools.Database;
 
 namespace TBChestTracker.Automation
 {
@@ -45,6 +46,8 @@ namespace TBChestTracker.Automation
 
         private event EventHandler<AutomationClicksEventArguments> ProcessingClicks = null;
         private event EventHandler<AutomationClicksEventArguments> ProcessedClicks = null;  
+
+        private event EventHandler<AutomationChestProcessingFailedEventArguments> ChestProcessingFailed = null;
 
         protected virtual void onAutomationStarted(AutomationEventArguments args)
         {
@@ -105,11 +108,24 @@ namespace TBChestTracker.Automation
             }
         }
 
+        protected virtual void onChestProcessingFailed(AutomationChestProcessingFailedEventArguments args)
+        {
+            EventHandler<AutomationChestProcessingFailedEventArguments> handler = ChestProcessingFailed;
+            if(handler!= null)
+            {
+                handler (this, args);
+            }
+        }
+        public void InvokeChestProcessingFailed(AutomationChestProcessingFailedEventArguments args)
+        {
+            onChestProcessingFailed (args); 
+        }
         public void InvokeChestProcessed(AutomationChestProcessedEventArguments args)
         {
             onChestProcessed (args);
         }
 
+     
         public ChestAutomation() 
         {
             isCompleted = false;
@@ -145,11 +161,14 @@ namespace TBChestTracker.Automation
 
             TextProcessed += ChestAutomation_TextProcessed;
             ChestProcessed += ChestAutomation_ChestProcessed;
+            ChestProcessingFailed += ChestAutomation_ChestProcessingFailed;
             ProcessingClicks += ChestAutomation_ProcessingClicks;
             ProcessedClicks += ChestAutomation_ProcessedClicks;
                 
             return true;
         }
+
+        
 
         private void ChestAutomation_ProcessedClicks(object sender, AutomationClicksEventArguments e)
         {
@@ -176,6 +195,7 @@ namespace TBChestTracker.Automation
                 StopAutomation();
                 com.HellStormGames.Logging.Console.Write($"There are no more gifts to collect.", "Automation Result", com.HellStormGames.Logging.LogType.INFO);
             }
+
             if (result.Result == ClanChestProcessEnum.SUCCESS)
             {
                 int automationClicks = 0;
@@ -200,22 +220,24 @@ namespace TBChestTracker.Automation
             if(ocrResult != null)
             {
                 //clanChestProcessResult = await ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words, onError =>
-                ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words, this, onError =>
-                {
-                    if (onError != null && !String.IsNullOrEmpty(onError.Message))
-                    {
-
-                        var result = MessageBox.Show($"Stopping automation and saving chest data. Reason: {onError.Message}", "OCR Error", MessageBoxButton.OK);
-                        if (result == MessageBoxResult.OK)
-                        {
-                            com.HellStormGames.Logging.Console.Write($"Error Occured Processing Chests. Automation Stopped.", "Automation Result", com.HellStormGames.Logging.LogType.ERROR);
-                            StopAutomation();
-                        }
-                    }
-                });
+                ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words, this);
             }
         }
 
+        private void ChestAutomation_ChestProcessingFailed(object sender, AutomationChestProcessingFailedEventArguments e)
+        {
+            var errormessage = e.ErrorMessage;
+            if (!String.IsNullOrEmpty(errormessage))
+            {
+                canCaptureAgain = false;
+                var result = MessageBox.Show($"Stopping automation and saving chest data. Reason: {errormessage}", "OCR Error", MessageBoxButton.OK);
+                if (result == MessageBoxResult.OK)
+                {
+                    com.HellStormGames.Logging.Console.Write($"Error Occured Processing Chests. Automation Stopped.", "Automation Result", com.HellStormGames.Logging.LogType.ERROR);
+                    StopAutomation();
+                }
+            }
+        }
         #region Snapture onFrameCaptured Event
         private async void Snapture_onFrameCaptured(object sender, FrameCapturedEventArgs e)
         {
