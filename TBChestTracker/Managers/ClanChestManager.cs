@@ -892,6 +892,7 @@ namespace TBChestTracker
             var datestr = DateTime.Now.ToString("d", new CultureInfo(CultureInfo.CurrentCulture.Name));   
             ClanChestDailyData[datestr] = clanChestData;
             ChestProcessingState = ChestProcessingState.COMPLETED;
+           
             AppContext.Instance.isBusyProcessingClanchests = false;
             AppContext.Instance.canCaptureAgain = true;
 
