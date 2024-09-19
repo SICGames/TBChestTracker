@@ -263,8 +263,6 @@
                     <MenuItem Header="{x:Static ResourceStrings:Strings.SaveClanDatabase}" x:Name="SaveClanDB" Command="Commands:CustomCommandBindings.SaveClanDatabase"/>
                     <MenuItem Header="{x:Static ResourceStrings:Strings.SaveClanDatabaseAs}" x:Name="SaveClanDBAs" Command="Commands:CustomCommandBindings.SaveAsClanDatabase"/>
                     <Separator/>
-                    <MenuItem Header="{x:Static ResourceStrings:Strings.VerifyChestDataIntegrity}" Command="Commands:CustomCommandBindings.ValidateChestData"/>
-                    <Separator/>
                     <MenuItem Header="{x:Static ResourceStrings:Strings.ExportChestData}" Command="Commands:CustomCommandBindings.ExportClanDatabase"/>
                     <Separator/>
                     <MenuItem x:Name="RecentlyOpenedParent" Header="Recently Opened Databases">
@@ -288,6 +286,12 @@
                     <Separator/>
                     <MenuItem Header="Clanmates Validation" x:Name="ClanmateValidationMenuItem" Click="ClanmateValidationMenuItem_Click"/>
                     <MenuItem Header="Absent Clanmates Cleaner" x:Name="AbsentClanmateCleanerMenuItem" Click="AbsentClanmateCleanerMenuItem_Click"/>
+                    <Separator/>
+                    <MenuItem Header="Restore Clan Chest Data" x:Name="RestoreClanChestDataMenuItem" Click="RestoreClanChestDataMenuItem_Click"/>
+                    <!--
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.VerifyChestDataIntegrity}" Command="Commands:CustomCommandBindings.ValidateChestData"/>
+                    -->
+                    
                 </MenuItem>
                 <MenuItem Header="{x:Static ResourceStrings:Strings.Help}" x:Name="HelpMenu" Click="HelpMenu_Click">
                     <MenuItem Header="Github">

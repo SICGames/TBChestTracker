@@ -35,6 +35,7 @@ namespace TBChestTracker.Automation
         public bool isCompleted { get; private set; }
         public bool isFaulted { get; private set; }
         public bool canCaptureAgain { get; private set; }
+        public bool isStoppingAutomation { get; private set; }
 
 
         public event EventHandler<AutomationEventArguments> AutomationStarted = null;
@@ -54,6 +55,7 @@ namespace TBChestTracker.Automation
             EventHandler<AutomationEventArguments> handler = AutomationStarted;
             if (handler != null)
             {
+                isStoppingAutomation = false;
                 handler(this, args);
             }
         }
@@ -364,21 +366,27 @@ namespace TBChestTracker.Automation
         }
         public void StartAutomation()
         {
-            onAutomationStarted(new AutomationEventArguments(true, false));
             CancellationToken = new CancellationTokenSource();
+            onAutomationStarted(new AutomationEventArguments(true, false));
             StartAutomationTask(CancellationToken.Token);
         }
 
         public void StopAutomation()
         {
-            if(CancellationToken != null)
+            if (isStoppingAutomation == false)
             {
-                CancellationToken.Cancel();
-                isRunning = false;
-                isCancelled = true;
-                isFaulted = false;
+                //-- to prevent from being called twice or more times.
+                isStoppingAutomation = true;
 
-                onAutomationStopped(new AutomationEventArguments(false, true));
+                if (CancellationToken != null)
+                {
+                    CancellationToken.Cancel();
+                    isRunning = false;
+                    isCancelled = true;
+                    isFaulted = false;
+
+                    onAutomationStopped(new AutomationEventArguments(false, true));
+                }
             }
         }
 

@@ -1180,5 +1180,10 @@ namespace TBChestTracker
             ClanmateValidationWindow clanmateValidationWindow = new ClanmateValidationWindow();
             clanmateValidationWindow.Show();
         }
+
+        private void RestoreClanChestDataMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
