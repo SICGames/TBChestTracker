@@ -368,7 +368,6 @@ namespace TBChestTracker
                     await ArchiveManager.Extract(archiveFile, destinationFolder, progress);
 
                     //-- now we should clean up.
-
                 }
             }
         }
@@ -405,8 +404,14 @@ namespace TBChestTracker
             {
                 AppContext.Instance.AutomationRunning = false;
                 AppContext.Instance.isBusyProcessingClanchests = false;
+                
+               
                 ClanManager.Instance.ClanChestManager.SaveDataTask();
                 ClanManager.Instance.ClanChestManager.CreateBackup();
+                
+                //-- automatically repairs chest data if necessary
+                ClanManager.Instance.ClanChestManager.RepairChestData();
+
                 AppContext.Instance.IsAutomationPlayButtonEnabled = true;
                 AppContext.Instance.IsAutomationStopButtonEnabled = false;
                 com.HellStormGames.Logging.Console.Write("Automation stopped.", com.HellStormGames.Logging.LogType.INFO);

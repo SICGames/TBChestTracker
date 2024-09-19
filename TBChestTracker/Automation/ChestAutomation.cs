@@ -342,6 +342,7 @@ namespace TBChestTracker.Automation
                     
                     if (this.canCaptureAgain)
                     {
+                        await Task.Delay(SettingsManager.Instance.Settings.AutomationSettings.AutomationScreenshotsAfterClicks);
                         CaptureRegion();
 
                         while (ClanManager.Instance.ClanChestManager.ChestProcessingState != ChestProcessingState.COMPLETED)
