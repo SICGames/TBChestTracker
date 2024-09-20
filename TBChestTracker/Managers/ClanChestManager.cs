@@ -205,190 +205,265 @@ namespace TBChestTracker
             }
 
             bool bError = false;
+            var increment = 3;
+            var chestboxes = new List<ChestBox>();
+            var clicks = SettingsManager.Instance.Settings.AutomationSettings.AutomationClicks;
 
-            for (var x = 0; x < result.Count; x += 3)
+            var tmpResult = new List<string>();
+
+            for (var b = 0; b < result.Count; b++)
             {
-                var word = result[x];
+                ChestBox cb = new ChestBox();
 
-                if (word == null)
-                    break;
-
-                if (!word.Contains(TBChestTracker.Resources.Strings.Clan))
+                //-- 4 clicks 
+                //-- 3 lines each box
+                //-- expired chest gives 4 lines.
+                for(var a = b; a < result.Count; a++)
                 {
-                    var chestName = "";
-                    var clanmate = "";
-                    var chestobtained = "";
-                    try
+                    tmpResult.Add(result[a]);
+                }
+
+                var bContainsIndex = tmpResult.FindIndex(r => r.StartsWith("Contains:"));
+                var _inc = bContainsIndex > -1 ? 4 : 3;
+                for(var c = 0; c < _inc; c++)
+                {
+                    var w = tmpResult[c];
+                    cb.Content.Add(w);
+                }
+                
+                tmpResult.Clear();
+
+                b += cb.Content.Count - 1;
+
+                chestboxes.Add(cb);
+                
+                cb.Dispose();
+
+            }
+
+            tmpResult.Clear();
+            tmpResult = null;
+
+            foreach (var chestbox in chestboxes)
+            {
+                for (var x = 0; x < chestbox.Content.Count; x += chestbox.Content.Count)
+                {
+                    var word = chestbox.Content[x];
+
+                    var bHasContains = !String.IsNullOrEmpty(chestbox.Content.Where(s => s.StartsWith("Contains:")).FirstOrDefault());
+                    if (bHasContains)
                     {
-                        chestName = result[x + 0];
-                        clanmate = result[x + 1];
-                        chestobtained = result[x + 2];
+                        Debug.WriteLine($"Expired Chest detected.");
                     }
-                    catch (Exception e)
-                    {
-                        ProcessingTextResult.Status = ProcessingStatus.INDEX_OUT_OF_RANGE;
-                        ProcessingTextResult.Message = $"An error occured while processing OCR text from screen. This could indicate a word not added to filtering list. Go to Settings -> OCR and add the appropriate chest name to the filter list.";
-                        bError = true;
+
+                    if (word == null)
                         break;
-                    }
 
-                    com.HellStormGames.Logging.Console.Write($"OCR RESULT [{chestName}, {clanmate}, {chestobtained}", "OCR Result", LogType.INFO);
 
-                    if (clanmate.ToLower().Contains(TBChestTracker.Resources.Strings.From.ToLower()))
+                    if (!word.Contains(TBChestTracker.Resources.Strings.Clan))
                     {
-
-                        //--- clean up
-                        //--- Sometimes there's a From : Playername
-                        //--- Causing The Iroh Bug.
+                        var chestName = "";
+                        var clanmate = "";
+                        var chestobtained = "";
+                        var chestcontains = "";
                         try
                         {
-                            //--- skip the space check and the odd symbol to get straight to the meat.
-                            clanmate = clanmate.Substring(clanmate.IndexOf(' ') + 1);
-                            if (clanmate.ToLower().Contains(TBChestTracker.Resources.Strings.From.ToLower()))
-                            {
-                                //-- error - shouldn't even have reached this point.
-                                //-- game actually causes this error from not rendering name fast enough 
-                                //-- hasbeen patched but throw exception just in case.
-                                var badname = 0;
-                                var fromStartingPos = clanmate.IndexOf(TBChestTracker.Resources.Strings.From);
-                                if(fromStartingPos >= 0)
-                                {
-                                    com.HellStormGames.Logging.Console.Write($"Attempting to correct clanmate name => {clanmate}", "Clanmate Name Issue", LogType.INFO);
-                                    clanmate = clanmate.Remove(fromStartingPos, clanmate.IndexOf(' ') + 1);
-                                    com.HellStormGames.Logging.Console.Write($"Clanmate name after correction => {clanmate}", "Clanmate Repair Result", LogType.INFO);
-                                }
+                            chestName = chestbox.Content[x + 0];
+                            clanmate = chestbox.Content[x + 1];
+                            chestobtained = chestbox.Content[x + 2];
 
-                                //throw new Exception("Clanmate name is blank. Increase thread sleep timer to prevent this.");
+                            if (bHasContains)
+                            {
+                                chestcontains = chestbox.Content[x + 3];
                             }
 
                         }
                         catch (Exception e)
                         {
+                            ProcessingTextResult.Status = ProcessingStatus.INDEX_OUT_OF_RANGE;
+                            ProcessingTextResult.Message = $"An error occured while processing OCR text from screen. This could indicate a word not added to filtering list. Go to Settings -> OCR and add the appropriate chest name to the filter list.";
                             bError = true;
-                            ProcessingTextResult.Status = ProcessingStatus.CLANMATE_ERROR;
-                            ProcessingTextResult.Message = $"Seems to be an issue while extracting clanmate's name. Exception caught => {e.Message}. ";
-                            com.HellStormGames.Logging.Console.Write($"Couldn't Process Clanmate name correctly. Affected Clanmate => {clanmate}", "Clanmate Extraction Failed", LogType.ERROR);
                             break;
                         }
-                    }
 
-                    //-- building tmpchestdata
-                    if (chestobtained.Contains(TBChestTracker.Resources.Strings.Source))
-                    {
-                        //-- foreign language prevent speeding this up.
-                        //-- Spanish - Cripta de nivel 10 translate to english Level 10 Crypt.
-                        //-- First approach was extract type of crypt and phase out chesttype completely. 
-                        //-- Source: Cripta de 
-                        //-- Level of crypt: 10
+                        com.HellStormGames.Logging.Console.Write($"OCR RESULT [{chestName}, {clanmate}, {chestobtained}", "OCR Result", LogType.INFO);
 
-                        var ChestSource = chestobtained.Substring(chestobtained.IndexOf(":") + 2);
-                        var levelStartPos = -1;
-
-                        if (ChestSource.Contains(TBChestTracker.Resources.Strings.Level))
+                        if (clanmate.ToLower().Contains(TBChestTracker.Resources.Strings.From.ToLower()))
                         {
-                          levelStartPos = ChestSource.IndexOf(TBChestTracker.Resources.Strings.Level);
-                        }
-                        else if(ChestSource.Contains(TBChestTracker.Resources.Strings.lvl))
-                        {
-                           levelStartPos = ChestSource.IndexOf(TBChestTracker.Resources.Strings.lvl);
+
+                            //--- clean up
+                            //--- Sometimes there's a From : Playername
+                            //--- Causing The Iroh Bug.
+                            try
+                            {
+                                //--- skip the space check and the odd symbol to get straight to the meat.
+                                clanmate = clanmate.Substring(clanmate.IndexOf(' ') + 1);
+                                if (clanmate.ToLower().Contains(TBChestTracker.Resources.Strings.From.ToLower()))
+                                {
+                                    //-- error - shouldn't even have reached this point.
+                                    //-- game actually causes this error from not rendering name fast enough 
+                                    //-- hasbeen patched but throw exception just in case.
+                                    var badname = 0;
+                                    var fromStartingPos = clanmate.IndexOf(TBChestTracker.Resources.Strings.From);
+                                    if (fromStartingPos >= 0)
+                                    {
+                                        com.HellStormGames.Logging.Console.Write($"Attempting to correct clanmate name => {clanmate}", "Clanmate Name Issue", LogType.INFO);
+                                        clanmate = clanmate.Remove(fromStartingPos, clanmate.IndexOf(' ') + 1);
+                                        com.HellStormGames.Logging.Console.Write($"Clanmate name after correction => {clanmate}", "Clanmate Repair Result", LogType.INFO);
+                                    }
+
+                                    //throw new Exception("Clanmate name is blank. Increase thread sleep timer to prevent this.");
+                                }
+
+                            }
+                            catch (Exception e)
+                            {
+                                bError = true;
+                                ProcessingTextResult.Status = ProcessingStatus.CLANMATE_ERROR;
+                                ProcessingTextResult.Message = $"Seems to be an issue while extracting clanmate's name. Exception caught => {e.Message}. ";
+                                com.HellStormGames.Logging.Console.Write($"Couldn't Process Clanmate name correctly. Affected Clanmate => {clanmate}", "Clanmate Extraction Failed", LogType.ERROR);
+                                break;
+                            }
                         }
 
+                        //-- building tmpchestdata
                         int level = 0;
-                        //-- level in en-US is 0 position.
-                        //-- level in es-ES is 11 position.
-                        //-- crypt in en-US is 9 position 
-                        //-- crypt in es-ES is 0 position.
-
-                        //-- we can check direction of level position.
-                        //-- if more than 1 then we know we should go backwares. If 0 then we know to go forwards.
-                        var levelFullLength = 0;
                         var ChestType = String.Empty;
+                        var ChestSource = String.Empty;
+                        var ChestReward = String.Empty;
 
-                        if (levelStartPos > -1)
+                        if (chestobtained.Contains(TBChestTracker.Resources.Strings.Source))
                         {
-                            var levelStr = ChestSource.Substring(levelStartPos).ToLower();
-                            var levelNumberStr = levelStr.Substring(levelStr.IndexOf(" ") + 1);
+                            //-- foreign language prevent speeding this up.
+                            //-- Spanish - Cripta de nivel 10 translate to english Level 10 Crypt.
+                            //-- First approach was extract type of crypt and phase out chesttype completely. 
+                            //-- Source: Cripta de 
+                            //-- Level of crypt: 10
 
-                            //-- using a quantifer to check if there is an additional space after the level number. If user is spanish, no space after level number.
-                            levelNumberStr = levelNumberStr.IndexOf(" ") > 0 ? levelNumberStr.Substring(0, levelNumberStr.IndexOf(" ")) : levelNumberStr;
-                            var levelFullStr = String.Empty;
+                            ChestSource = chestobtained.Substring(chestobtained.IndexOf(":") + 2);
+                            var levelStartPos = -1;
+
                             if (ChestSource.Contains(TBChestTracker.Resources.Strings.Level))
                             {
-                               levelFullStr =  $"{TBChestTracker.Resources.Strings.Level} {levelNumberStr}";
+                                levelStartPos = ChestSource.IndexOf(TBChestTracker.Resources.Strings.Level);
                             }
-                            else if(ChestSource.Contains(TBChestTracker.Resources.Strings.lvl))
+                            else if (ChestSource.Contains(TBChestTracker.Resources.Strings.lvl))
                             {
-                                levelFullStr = $"{TBChestTracker.Resources.Strings.lvl} {levelNumberStr}";
+                                levelStartPos = ChestSource.IndexOf(TBChestTracker.Resources.Strings.lvl);
                             }
 
-                            levelFullLength = levelFullStr.Length; //-- 'level|nivel 10' should equal to 8 characters in length.
 
-                            var levelArray = levelNumberStr.Split('-');
-                                
-                            if(levelArray.Count() == 1)
+                            //-- level in en-US is 0 position.
+                            //-- level in es-ES is 11 position.
+                            //-- crypt in en-US is 9 position 
+                            //-- crypt in es-ES is 0 position.
+
+                            //-- we can check direction of level position.
+                            //-- if more than 1 then we know we should go backwares. If 0 then we know to go forwards.
+                            var levelFullLength = 0;
+
+
+                            if (levelStartPos > -1)
                             {
-                                if (Int32.TryParse(levelArray[0], out level) == false)
+                                var levelStr = ChestSource.Substring(levelStartPos).ToLower();
+                                var levelNumberStr = levelStr.Substring(levelStr.IndexOf(" ") + 1);
+
+                                //-- using a quantifer to check if there is an additional space after the level number. If user is spanish, no space after level number.
+                                levelNumberStr = levelNumberStr.IndexOf(" ") > 0 ? levelNumberStr.Substring(0, levelNumberStr.IndexOf(" ")) : levelNumberStr;
+                                var levelFullStr = String.Empty;
+                                if (ChestSource.Contains(TBChestTracker.Resources.Strings.Level))
                                 {
-                                    //-- couldn't extract level.
+                                    levelFullStr = $"{TBChestTracker.Resources.Strings.Level} {levelNumberStr}";
                                 }
-                            }
-                            else if(levelArray.Count() > 1)
-                            {
-                                if(Int32.TryParse(levelArray[0],out level) == false)
+                                else if (ChestSource.Contains(TBChestTracker.Resources.Strings.lvl))
                                 {
-                                    //-- couldn't extract level.
+                                    levelFullStr = $"{TBChestTracker.Resources.Strings.lvl} {levelNumberStr}";
+                                }
+
+                                levelFullLength = levelFullStr.Length; //-- 'level|nivel 10' should equal to 8 characters in length.
+
+                                var levelArray = levelNumberStr.Split('-');
+
+                                if (levelArray.Count() == 1)
+                                {
+                                    if (Int32.TryParse(levelArray[0], out level) == false)
+                                    {
+                                        //-- couldn't extract level.
+                                    }
+                                }
+                                else if (levelArray.Count() > 1)
+                                {
+                                    if (Int32.TryParse(levelArray[0], out level) == false)
+                                    {
+                                        //-- couldn't extract level.
+
+                                    }
+                                }
+                                if (level == 0)
+                                {
+                                    level = 5;
+                                }
+
+                                //-- now we make sure levelStartPos == 0 or more than 0.
+                                var direction = levelStartPos == 0 ? "forwards" : "backwards";
+                                if (direction == "forwards")
+                                {
+                                    ChestType = ChestSource.Substring(levelFullLength + 1);
+                                }
+                                else
+                                {
+                                    //-- Cripta de nivel 10 = 18 characters long.
+                                    //-- Cripta de = 10 characters long
+                                    //-- nivel 10 =  8 characters long.
+
+                                    ChestType = ChestSource.Substring(0, ChestSource.Length - levelFullLength);
+                                    ChestType = ChestType.Trim(); //-- remove any whitespaces at the end 
 
                                 }
-                            }
-                            if(level == 0)
-                            {
-                                level = 5;
-                            }
-
-                            //-- now we make sure levelStartPos == 0 or more than 0.
-                            var direction = levelStartPos == 0 ? "forwards" : "backwards";
-                            if (direction == "forwards")
-                            {
-                                ChestType = ChestSource.Substring(levelFullLength + 1);
+                                if (ChestType.StartsWith(TBChestTracker.Resources.Strings.OnlyCrypt))
+                                {
+                                    ChestType = ChestType.Insert(0, $"{TBChestTracker.Resources.Strings.Common} ");
+                                }
                             }
                             else
                             {
-                                //-- Cripta de nivel 10 = 18 characters long.
-                                //-- Cripta de = 10 characters long
-                                //-- nivel 10 =  8 characters long.
-
-                                ChestType = ChestSource.Substring(0, ChestSource.Length - levelFullLength);
-                                ChestType = ChestType.Trim(); //-- remove any whitespaces at the end 
-
+                                //--- there is no level
+                                ChestType = ChestSource;
+                                level = 0;
                             }
-                            if(ChestType.StartsWith(TBChestTracker.Resources.Strings.OnlyCrypt))
-                            {
-                              ChestType = ChestType.Insert(0, $"{TBChestTracker.Resources.Strings.Common} ");
-                            }
+
+
                         }
-                        else
+
+                        if (chestcontains.Contains("Contains"))
                         {
-                            //--- there is no level
-                            ChestType = ChestSource;
-                            level = 0;
+                            ChestReward = chestcontains.Substring(chestcontains.IndexOf(":") + 2);
                         }
 
-                        tmpchests.Add(new ChestData(clanmate, new Chest(chestName, ChestType, ChestSource, level)));
+                        tmpchests.Add(new ChestData(clanmate, new Chest(chestName, ChestType, ChestSource, level, ChestReward)));
                         var dbg_msg = String.Empty;
+                        var reward_msg = String.Empty;
+                        if (String.IsNullOrEmpty(ChestReward) == false)
+                        {
+                            reward_msg = $" that contained chest rewards => {ChestReward}";
+                        }
 
                         if (level != 0)
                         {
-                            dbg_msg = $"--- ADDING level {level} {ChestType.ToString()}  '{chestName}' from {clanmate} ----";
+                            dbg_msg = $"--- ADDING level {level} {ChestType.ToString()}  '{chestName}' from {clanmate} {reward_msg} ----";
                         }
                         else
                         {
-                            dbg_msg = $"--- ADDING {ChestType.ToString()}  '{chestName}' from {clanmate} ----";
+                            dbg_msg = $"--- ADDING {ChestType.ToString()}  '{chestName}' from {clanmate} {reward_msg} ----";
                         }
 
                         com.HellStormGames.Logging.Console.Write(dbg_msg, "OCR Result", com.HellStormGames.Logging.LogType.INFO);
                     }
                 }
             }
+
+            chestboxes.Clear();
+            chestboxes = null;  
 
             if (bError)
             {
@@ -617,8 +692,11 @@ namespace TBChestTracker
                                     if (chest_type.ToLower().Contains(pointvalue.ChestType.ToLower()))
                                     {
                                         Debug.WriteLine($"Chest name in Points -> {pointvalue.ChestName}");
-                                        Debug.WriteLine($"Chest Level in Points -> {Int32.Parse(pointvalue.Level.ToString())} and Chest Level -> {level}");
 
+                                        if (pointvalue.Level.Equals("(Any)") == false)
+                                        {
+                                            Debug.WriteLine($"Chest Level in Points -> {Int32.Parse(pointvalue.Level.ToString())} and Chest Level -> {level}");
+                                        }
                                         if (pointvalue.ChestName.Equals("(Any)"))
                                         {
 
@@ -631,7 +709,7 @@ namespace TBChestTracker
                                             {
 
                                                 var chestlevel = Int32.Parse(pointvalue.Level.ToString());
-                                                
+
 
                                                 if (level == chestlevel)
                                                 {
@@ -643,8 +721,10 @@ namespace TBChestTracker
                                         else
                                         {
                                             Debug.WriteLine($"Chest name in Points -> {pointvalue.ChestName}");
-                                            Debug.WriteLine($"Chest Level in Points -> {Int32.Parse(pointvalue.Level.ToString())} and Chest Level -> {level}");
-
+                                            if (pointvalue.Level.Equals("(Any)") == false)
+                                            {
+                                                Debug.WriteLine($"Chest Level in Points -> {Int32.Parse(pointvalue.Level.ToString())} and Chest Level -> {level}");
+                                            }
 
                                             if (chest_name.ToLower().Equals(pointvalue.ChestName.ToLower()))
                                             {

@@ -155,6 +155,7 @@
     <Compile Include="ChestBuilderWindow.xaml.cs">
       <DependentUpon>ChestBuilderWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Chest\ChestBox.cs" />
     <Compile Include="Chest\ChestOptions.cs" />
     <Compile Include="Chest\ChestPointsData.cs" />
     <Compile Include="Chest\ChestPointsSettings.cs" />
@@ -216,6 +217,9 @@
     </Compile>
     <Compile Include="Pages\ClanmatesValidation\RepairClanmatesPage.xaml.cs">
       <DependentUpon>RepairClanmatesPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RestoreClanChestDataWindow.xaml.cs">
+      <DependentUpon>RestoreClanChestDataWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings\TessDataConfig.cs" />
     <Compile Include="UI\FancyTreeView.cs" />
@@ -631,6 +635,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PreviewScreenshotWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RestoreClanChestDataWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
