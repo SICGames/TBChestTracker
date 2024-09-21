@@ -40,24 +40,28 @@ namespace TBChestTracker.Pages.Settings
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            
-            if(bIsEditing)
+
+            if (bIsEditing)
             {
                 TextBox tb = (TextBox)sender;
-                if (tb.Tag.ToString() == "ScreenshotDelay")
+                
+                if (!String.IsNullOrEmpty(tb.Text) && tb.Text.IsNumber())
                 {
-                    var t = tb.Text;
-                    SettingsManager.Instance.Settings.AutomationSettings.AutomationScreenshotsAfterClicks = Int32.Parse(t);
-                }
-                if(tb.Tag.ToString() == "Clicks")
-                {
-                    var t = tb.Text;
-                    SettingsManager.Instance.Settings.AutomationSettings.AutomationClicks = Int32.Parse(t);
-                }
-                if(tb.Tag.ToString() == "ClicksDelay")
-                {
-                    var t = tb.Text;
-                    SettingsManager.Instance.Settings.AutomationSettings.AutomationDelayBetweenClicks = Int32.Parse(t);
+                    if (tb.Tag.ToString() == "ScreenshotDelay")
+                    {
+                        var t = tb.Text;
+                        SettingsManager.Instance.Settings.AutomationSettings.AutomationScreenshotsAfterClicks = Int32.Parse(t);
+                    }
+                    if (tb.Tag.ToString() == "Clicks")
+                    {
+                        var t = tb.Text;
+                        SettingsManager.Instance.Settings.AutomationSettings.AutomationClicks = Int32.Parse(t);
+                    }
+                    if (tb.Tag.ToString() == "ClicksDelay")
+                    {
+                        var t = tb.Text;
+                        SettingsManager.Instance.Settings.AutomationSettings.AutomationDelayBetweenClicks = Int32.Parse(t);
+                    }
                 }
             }
         }

@@ -49,5 +49,15 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(AutomationScreenshotsAfterClicks));    
             }
         }
+        private int _stopautomationAfterClicks;
+        public int StopAutomationAfterClicks
+        {
+            get => _stopautomationAfterClicks;
+            set
+            {
+                _stopautomationAfterClicks = value;
+                OnPropertyChanged(nameof(StopAutomationAfterClicks));  
+            }
+        }
     }
 }

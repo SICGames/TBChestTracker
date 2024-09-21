@@ -35,11 +35,8 @@
         <TextBlock Text="TessData Path Folder" Margin="5" Grid.Column="0" Grid.Row="0"/>
         <TextBlock Text="OCR Languages" Margin="5" Grid.Column="0" Grid.Row="1"/>
         <TextBlock Text="OCR Filtering" Margin="5"  Grid.Column="0" Grid.Row="3"/>
-        <TextBlock Text="Capture Method" Margin="5" Grid.Column="0" Grid.Row="5"/>
         <TextBlock Text="Screen Capturer" Margin="5"  Grid.Column="0" Grid.Row="6"/>
         <TextBlock Text="Preview" Margin="5" Grid.Column="0" Grid.Row="7"/>
-        
-
         <uiFancy:FancyPicker Grid.Column="1" Grid.Row="0" Margin="0,2,0,7" ToolTip="Where all the Tesseract Learned Data Models are stored."
         Height="18" BorderBrush="#aaa" 
         Corners="10" 
@@ -67,17 +64,6 @@
                         Tags="{Binding Tags, Mode=TwoWay}">
         </ui:FancyTagBox>
         <TextBlock Margin="5" FontWeight="Bold" Grid.Column="1" Grid.Row="4">* Use SPACEBAR key to seperate tags.</TextBlock>
-
-        <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="1">
-            <RadioButton GroupName="Capture" Content="Full Desktop" 
-                         IsChecked="{Binding Capture, Converter={StaticResource CaptureMethodConverter},
-           ConverterParameter={x:Static main:CaptureEnum.ENTIRE_SCREEN}}" Tag="byChestType"
-                         Margin="5"/>
-            <RadioButton GroupName="Capture" Content="Specific Region" 
-                         IsChecked="{Binding Capture, Converter={StaticResource CaptureMethodConverter},
-ConverterParameter={x:Static main:CaptureEnum.SPECIFIC_REGION}}" Tag="byChestType"
-                         Margin="5"/>
-        </StackPanel>
         <ComboBox x:Name="CaptureMethodBox" Grid.Row="6" Grid.Column="1" Width="200" HorizontalAlignment="Left" SelectedIndex="0">
             <ComboBoxItem Content="GDI+"/>
         </ComboBox>
@@ -88,7 +74,7 @@ ConverterParameter={x:Static main:CaptureEnum.SPECIFIC_REGION}}" Tag="byChestTyp
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Image x:Name="ImagePreview"  Height="500" Width="500" HorizontalAlignment="Left" Stretch="UniformToFill" Grid.Column="0"/>
-            <ListView x:Name="ocrResultsListView" Grid.Column="1">
+            <ListView x:Name="ocrResultsListView" Grid.Column="1" Visibility="Hidden">
             </ListView>
         </Grid>
         

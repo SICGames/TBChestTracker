@@ -14,14 +14,12 @@ namespace TBChestTracker
         public string Type { get; set; }
         public string Source { get; set; }
         public int Level { get; set; }
-        public string Reward { get; set; }
-        public Chest(string name, string type, string source, int level, string reward = "")
+        public Chest(string name, string type, string source, int level)
         {
             Name = name;
             Type = type;
             Source = source;
             Level = level;
-            Reward = reward;
         }
     }
 }

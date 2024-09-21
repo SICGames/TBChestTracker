@@ -23,11 +23,12 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <TextBlock  Grid.Row="0" Grid.Column="0" Text="Automation Clicks" Margin="5,5" VerticalAlignment="Center"/>
-        <TextBlock Grid.Row="1" Grid.Column="1" Text="** If you have a 720 or lower resolution monitor, choose 3 instead of 4 clicks." FontWeight="Bold"/>
-        <TextBlock Grid.Row="2" Grid.Column="1" Text="*** If you have changed Clicks, re-run OCR Wizard and adjust the Area Of Interest." FontWeight="Bold"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" Text="* If you have a 1024 or lower resolution monitor, choose 3 instead of 4 clicks." FontWeight="Bold"/>
+        <TextBlock Grid.Row="2" Grid.Column="1" Text="** If you have changed Clicks, re-run OCR Wizard and adjust the Area Of Interest for the selected rows instead normally 4 rows." TextWrapping="Wrap"  FontWeight="Bold"/>
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Delay Between Clicks" Margin="5,5" VerticalAlignment="Center"/>
         <TextBlock Grid.Row="4" Grid.Column="0" Text="Delay Screenshot after Clicks" Margin="5,5" VerticalAlignment="Center"/>
-        
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="Stop Automation After x amount of clicks" Margin="5" VerticalAlignment="Center"/>
+       
         <Grid Grid.Row="0" Grid.Column="1" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -36,6 +37,7 @@
             <Slider Grid.Column="0" Minimum="1" Maximum="4" Value="{Binding AutomationClicks}" TickPlacement="BottomRight" TickFrequency="1" x:Name="AutomationClicksSlider" Margin="10,0"/>
             <TextBox Grid.Column="1" Text="{Binding ElementName=AutomationClicksSlider, Path=Value}" Width="50" FontSize="14" FontWeight="Bold" TextAlignment="Center" Tag="Clicks" TextChanged="TextBox_TextChanged" GotKeyboardFocus="TextBox_GotKeyboardFocus" LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
         </Grid>
+        
         <Grid Grid.Row="3" Grid.Column="1" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -56,7 +58,29 @@
             <TextBox Grid.Column="1" Text="{Binding ElementName=ScreenShotDelaySlider, Path=Value}" Width="75" FontSize="14" FontWeight="Bold" TextAlignment="Center" Tag="ScreenshotDelay" GotKeyboardFocus="TextBox_GotKeyboardFocus" LostKeyboardFocus="TextBox_LostKeyboardFocus" TextChanged="TextBox_TextChanged"/>
             <TextBlock Grid.Column="2" Text="ms" Width="50" FontSize="14" TextAlignment="Center"/>
         </Grid>
+        
         <TextBlock Grid.Row="5" Grid.Column="1" Text="** ms stands for milliseconds. 1,000 ms would equal 1 second." FontWeight="Bold"/>
         
+        <Grid Grid.Row="6" Grid.Column="1" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <Slider Grid.Column="0" 
+                    Minimum="0" Maximum="500" 
+                    Value="{Binding StopAutomationAfterClicks}" 
+                    TickPlacement="BottomRight" 
+                    SmallChange="25" 
+                    LargeChange="100" 
+                    x:Name="StopAutomationSlider" Margin="10,0"/>
+            <TextBox Grid.Column="1" 
+                     Text="{Binding ElementName=StopAutomationSlider, Path=Value}" 
+                     Width="75" FontSize="14" FontWeight="Bold" TextAlignment="Center" 
+                     Tag="StopAutomation" 
+                     GotKeyboardFocus="TextBox_GotKeyboardFocus" 
+                     LostKeyboardFocus="TextBox_LostKeyboardFocus" 
+                     TextChanged="TextBox_TextChanged"/>
+        </Grid>
     </Grid>
 </Page>

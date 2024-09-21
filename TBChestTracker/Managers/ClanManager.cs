@@ -40,7 +40,8 @@ namespace TBChestTracker.Managers
         public void Destroy()
         {
             _clansettings.Clear();
-            _chestmanager.ClearData();
+            _chestmanager.Dispose();
+            //_chestmanager.ClearData();
             _databasemanager = null;
             _clanmatemanager.Database.Clanmates.Clear();
             _clanmatemanager.Database.Clanmates = null;

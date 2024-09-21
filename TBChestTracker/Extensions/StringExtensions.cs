@@ -7,14 +7,15 @@ using System.Threading.Tasks;
 
 namespace TBChestTracker
 {
-
-    /*
-     * Obtained from ahmedgawed01
-     https://github.com/ahmedjawed01/StringSimilarity
-    */
-
     public static class StringExtensions
     {
+        public static bool IsNumber(this string str)
+        {
+            var number = -1;
+            bool result = Int32.TryParse(str, out number);    
+            return result;
+        }
+
         /// <summary>
         /// Returns the number of steps required to transform the source string
         /// into the target string.
@@ -78,5 +79,6 @@ namespace TBChestTracker
             double stepsToSame = ComputeLevenshteinDistance(source, target);
             return (1.0 - (stepsToSame / (double)Math.Max(source.Length, target.Length)));
         }
+
     }
 }

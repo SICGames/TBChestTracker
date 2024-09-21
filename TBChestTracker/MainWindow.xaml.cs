@@ -131,7 +131,7 @@ namespace TBChestTracker
         //--- missing Settings.json file causes headaches for people. Need to fix this.
         private Task<SettingsManager> InitSettings()
         {
-            return Task.Run(async () =>
+            return Task.Run(() =>
             {
                 SettingsManager = new SettingsManager();
 
