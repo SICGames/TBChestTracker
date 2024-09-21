@@ -37,6 +37,7 @@ namespace TBChestTracker.Automation
         public bool canCaptureAgain { get; private set; }
         public bool isStoppingAutomation { get; private set; }
 
+        private int clicksTotal = 0;
 
         public event EventHandler<AutomationEventArguments> AutomationStarted = null;
         public event EventHandler<AutomationEventArguments> AutomationStopped = null;
@@ -184,6 +185,8 @@ namespace TBChestTracker.Automation
         {
             if(e.CurrentClick >= e.MaxClicks)
             {
+                clicksTotal++;
+
                 AutomationClicksEventArguments arg = new AutomationClicksEventArguments(true, e.CurrentClick, e.MaxClicks);
                 onProcessedClicks(arg);
             }
@@ -340,6 +343,15 @@ namespace TBChestTracker.Automation
 
                 while (isRunning)
                 {
+                    var automationSettings = SettingsManager.Instance.Settings.AutomationSettings;
+                    if(automationSettings.StopAutomationAfterClicks > 0)
+                    {
+                        if(clicksTotal >= automationSettings.StopAutomationAfterClicks)
+                        {
+                            break;
+                        }
+                    }
+
                     token.ThrowIfCancellationRequested();
                     
                     if (this.canCaptureAgain)

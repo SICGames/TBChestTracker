@@ -1183,7 +1183,11 @@ namespace TBChestTracker
 
         private void RestoreClanChestDataMenuItem_Click(object sender, RoutedEventArgs e)
         {
+            RestoreClanChestDataWindow restoreclandatabasewindow = new RestoreClanChestDataWindow();
+            if(restoreclandatabasewindow.ShowDialog() == true)
+            {
 
+            }
         }
     }
 }

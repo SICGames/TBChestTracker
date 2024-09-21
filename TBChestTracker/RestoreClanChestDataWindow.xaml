@@ -12,7 +12,8 @@
         MaxHeight="450" MaxWidth="800"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
-        SizeToContent="WidthAndHeight">
+        SizeToContent="WidthAndHeight"
+        Topmost="True" WindowStartupLocation="CenterScreen" WindowStyle="ToolWindow">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -23,11 +24,18 @@
         <TextBlock Grid.Row="0" Text="Restore Clan Chest Data" FontSize="18" FontWeight="Bold" Margin="10,5"/>
         <TextBlock Grid.Row="1" Text="Incase, clan chests are invalid, select a date that was prior to the invalid clan chest data. This will replace the clanchest.db file." TextWrapping="Wrap"
                    Margin="15,5"/>
-        <ListView Grid.Row="2">
-            
+        <ListView Grid.Row="2" SelectionChanged="ListView_SelectionChanged" SelectionMode="Single" ItemsSource="{Binding BackupItems}">
+            <ListView.View>
+                <GridView>
+                    <GridView.Columns>
+                        <GridViewColumn Header="Date" Width="150" DisplayMemberBinding="{Binding Date}"/>
+                        <GridViewColumn Header="Time" Width="150" DisplayMemberBinding="{Binding Time}"/>
+                    </GridView.Columns>
+                </GridView>
+            </ListView.View>
         </ListView>
         <Grid Grid.Row="3" Height="32" HorizontalAlignment="Right" VerticalAlignment="Center">
-            <ui:FancyButton RenderMode="TEXT" Text="Restore" Height="20" Width="100" Background="#0077ff" HilightBrush="#0099FF" Foreground="White" Margin="15,0"/>
+            <ui:FancyButton RenderMode="TEXT" Text="Restore" Height="20" Width="100" Background="#0077ff" HilightBrush="#0099FF" Foreground="White" Margin="15,0" x:Name="RestoreButton" Click="RestoreButton_Click"/>
         </Grid>
     </Grid>
 </Window>

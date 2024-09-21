@@ -1002,6 +1002,15 @@ namespace TBChestTracker
             return false;
         }
 
+        public void LoadBackup(string file)
+        {
+            ClanChestDailyData.Clear();
+            using (var sw = File.OpenText(file))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                ClanChestDailyData = (Dictionary<string, List<ClanChestData>>)serializer.Deserialize(sw, typeof(Dictionary<string, List<ClanChestData>>));
+            }
+        }
         public async void LoadData()
         {
             var clanmatefile = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}";
