@@ -30,6 +30,8 @@ namespace TBChestTracker.Pages.AbsentClanmates
 
         private bool bIsCanceled { get; set; }
 
+        private ObservableCollection<AbsentClanmate> AbsentClanmates { get; set; }  
+
         public ProcessingPage()
         {
             InitializeComponent();
@@ -86,17 +88,14 @@ namespace TBChestTracker.Pages.AbsentClanmates
             var DayCount = 0;
 
             //-- NaughtyList[Clanmate] = daysAbsent.
-            Dictionary<string, int> naughtyList = new Dictionary<string, int>();
+            //Dictionary<string, int> naughtyList = new Dictionary<string, int>();
+
+            AbsentClanmates = new ObservableCollection<AbsentClanmate>();
 
             //-- quick init
             var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates;
             AbsentClanmatesViewModel.Instance.MaxProcessingProgress = clanmates.Count;
-
-            foreach (var clanmate in clanmates)
-            {
-                naughtyList[clanmate.Name] = 0;
-            }
-
+                       
             for (var d = 0; d < dailyChestData.Count; d++)
             {
                 try
@@ -107,25 +106,30 @@ namespace TBChestTracker.Pages.AbsentClanmates
                     var clanchestdata = dailyChestData[date];
                     if (clanchestdata != null)
                     {
+
                         foreach (var chestdata in clanchestdata)
                         {
                             //--- we iterate through checking chests to be null. 
                             //--- if clanmate exists we count. If not, they could've recently joined.
-                            bool bClanmateExists = naughtyList.ContainsKey(chestdata.Clanmate);
-
-                            if (bClanmateExists)
+                            var clanmateOnAbsentList = AbsentClanmates.Where(n => n.Clanmate.ToLower().Equals(chestdata.Clanmate.ToLower())).Select(c => c).FirstOrDefault();
+                            if(clanmateOnAbsentList != null)
                             {
-                                if (chestdata.chests == null)
+                                var absentClanmateIndex = AbsentClanmates.IndexOf(clanmateOnAbsentList);
+
+                                if(chestdata.chests != null)
                                 {
-                                    naughtyList[chestdata.Clanmate] += 1;
+                                    AbsentClanmates[absentClanmateIndex].ActivityDates ??= new List<string>();
+                                    AbsentClanmates[absentClanmateIndex].ActivityDates.Add(date);
                                 }
-                                else
+                                
+                            }
+                            else
+                            {
+                                if (chestdata.chests != null)
                                 {
-                                    var currentValue = naughtyList[chestdata.Clanmate];
-                                    if (currentValue > 0)
-                                    {
-                                        naughtyList[chestdata.Clanmate] = 0; // reset it. 
-                                    }
+                                    var absentName = chestdata.Clanmate;
+                                    var activityDates = new List<string>();
+                                    AbsentClanmates.Add(new AbsentClanmate(absentName, activityDates));
                                 }
                             }
                         }
@@ -141,20 +145,37 @@ namespace TBChestTracker.Pages.AbsentClanmates
             //-- now we go through the naughtylist and check to see whomever is above 0.
 
             ProcessingProgressBar.IsIndeterminate = false;
-            foreach (var naughty in naughtyList)
+            foreach (var absentClanmate in AbsentClanmates)
             {
-                var absentDays = naughty.Value;
-                if (absentDays >= daysToSubtract)
+                
+                var lastActiveDate = absentClanmate.LastActivityDate;
+                if(String.IsNullOrEmpty(lastActiveDate))
                 {
-                    absentClanmates.Add(naughty.Key);
+                    absentClanmates.Add(absentClanmate.Clanmate);
                 }
+                else
+                {
+                    try
+                    {
+                        var activityDate = DateTime.Today - DateTime.Parse(lastActiveDate);
+                        if (activityDate.TotalDays >= daysToSubtract)
+                        {
+                            absentClanmates.Add(absentClanmate.Clanmate);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception("BOO BOO!");
+                    }
+
+                }
+
                 AbsentClanmatesViewModel.Instance.ProcessedText = $"Processed {AbsentClanmatesViewModel.Instance.ProcessingProgressValue} out of {AbsentClanmatesViewModel.Instance.MaxProcessingProgress} clanmates.";
                 AbsentClanmatesViewModel.Instance.ProcessingProgressValue += 1;
                 await Task.Delay(100);
             }
 
             AbsentClanmatesViewModel.Instance.ProcessingProgressValue = AbsentClanmatesViewModel.Instance.MaxProcessingProgress;
-
 
             return absentClanmates;
         }

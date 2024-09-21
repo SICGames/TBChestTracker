@@ -57,5 +57,19 @@ namespace TBChestTracker.Pages.AbsentClanmates
             wnd.DialogResult = true;
             wnd.Close();
         }
+
+        private void RemoveClanmateButton_Click(object sender, RoutedEventArgs e)
+        {
+            var removelist = new List<string>();
+
+            foreach(var selecteditem in AbsentClanmatesListView.SelectedItems)
+            {
+                removelist.Add(selecteditem.ToString());    
+            }
+            foreach(var removeItem in removelist)
+            {
+                AbsentClanmatesViewModel.Instance.AbsentClanmateList.Remove(removeItem);
+            }
+        }
     }
 }

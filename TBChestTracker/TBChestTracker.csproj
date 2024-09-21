@@ -179,6 +179,7 @@
     <Compile Include="ClanmateValidationWindow.xaml.cs">
       <DependentUpon>ClanmateValidationWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Clanmate\AbsentClanmate.cs" />
     <Compile Include="Clanmate\Clanmate.cs" />
     <Compile Include="Clanmate\ClanmateDatabase.cs" />
     <Compile Include="ClanWealthBuilderWindow.xaml.cs">
