@@ -44,7 +44,10 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
-            <Slider Grid.Column="0" Minimum="1" Maximum="5000" Value="{Binding AutomationDelayBetweenClicks}" TickPlacement="BottomRight" LargeChange="100" SmallChange="5" x:Name="ClicksDelaySlider" Margin="10,0"/>
+            <Slider Grid.Column="0" Minimum="1" Maximum="5000" Value="{Binding AutomationDelayBetweenClicks}" TickPlacement="BottomRight"
+                    LargeChange="100" SmallChange="50" TickFrequency="50"
+                    x:Name="ClicksDelaySlider" Margin="10,0"/>
+            
             <TextBox Grid.Column="1" Text="{Binding ElementName=ClicksDelaySlider, Path=Value}" Width="50" FontSize="14" FontWeight="Bold" TextAlignment="Center" Tag="ClicksDelay" TextChanged="TextBox_TextChanged"  GotKeyboardFocus="TextBox_GotKeyboardFocus" LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
             <TextBlock Grid.Column="2" Text="ms" Width="50" FontSize="14" TextAlignment="Center"/>
         </Grid>
@@ -54,7 +57,10 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
-            <Slider Grid.Column="0" Minimum="1" Maximum="5000" Value="{Binding AutomationScreenshotsAfterClicks}" TickPlacement="BottomRight" LargeChange="100" SmallChange="10" x:Name="ScreenShotDelaySlider" Margin="10,0"/>
+            <Slider Grid.Column="0" 
+                    Minimum="1" Maximum="5000" 
+                    Value="{Binding AutomationScreenshotsAfterClicks}" 
+                    TickPlacement="BottomRight" LargeChange="100" SmallChange="50" TickFrequency="50" x:Name="ScreenShotDelaySlider" Margin="10,0"/>
             <TextBox Grid.Column="1" Text="{Binding ElementName=ScreenShotDelaySlider, Path=Value}" Width="75" FontSize="14" FontWeight="Bold" TextAlignment="Center" Tag="ScreenshotDelay" GotKeyboardFocus="TextBox_GotKeyboardFocus" LostKeyboardFocus="TextBox_LostKeyboardFocus" TextChanged="TextBox_TextChanged"/>
             <TextBlock Grid.Column="2" Text="ms" Width="50" FontSize="14" TextAlignment="Center"/>
         </Grid>
@@ -73,6 +79,7 @@
                     TickPlacement="BottomRight" 
                     SmallChange="25" 
                     LargeChange="100" 
+                    TickFrequency="25"
                     x:Name="StopAutomationSlider" Margin="10,0"/>
             <TextBox Grid.Column="1" 
                      Text="{Binding ElementName=StopAutomationSlider, Path=Value}" 

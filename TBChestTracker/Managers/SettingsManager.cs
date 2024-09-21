@@ -37,7 +37,6 @@ namespace TBChestTracker
 
             //-- configure default settings.
             DefaultSettings = new Settings();
-            
             DefaultSettings.GeneralSettings.ClanRootFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\TotalBattleChestTracker\\";
             DefaultSettings.GeneralSettings.UILanguage = "English";
             
@@ -57,6 +56,7 @@ namespace TBChestTracker
             DefaultSettings.AutomationSettings.AutomationScreenshotsAfterClicks = 1250;
             DefaultSettings.AutomationSettings.AutomationDelayBetweenClicks = 100;
             DefaultSettings.AutomationSettings.StopAutomationAfterClicks = 0;
+
 
             if (AppContext.Instance.IsFirstRun)
             {
