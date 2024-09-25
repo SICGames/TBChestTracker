@@ -277,7 +277,7 @@ namespace TBChestTracker
             outputMat = ImageEffects.ThresholdBinaryInv(outputMat, threshold, maxThreshold, save, $@"{outputPath}");
             outputMat = ImageEffects.Erode(outputMat, 2, save, outputPath);
 
-            var ocrResult = OCREngine.Read(outputMat);
+            var ocrResult = OCREngine.Instance.Read(outputMat);
             
             if (ocrResult != null)
             {

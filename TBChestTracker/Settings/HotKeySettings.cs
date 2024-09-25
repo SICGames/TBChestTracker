@@ -10,8 +10,31 @@ namespace TBChestTracker
     [System.Serializable]
     public class HotKeySettings
     {
-        public string StartAutomationKeys { get; set; }
-        public string StopAutomationKeys { get; set; }
+        private string _StartAutomationKeys;
+        private string _StopAutomationKeys;
+
+        public string StartAutomationKeys {
+            get
+            {
+               return String.IsNullOrEmpty(_StartAutomationKeys) == true ? "F9" : _StartAutomationKeys;
+            }
+            set
+            {
+                _StartAutomationKeys = value;
+            }
+        }
+        public string StopAutomationKeys
+        { 
+            get
+            {
+                return String.IsNullOrEmpty(_StopAutomationKeys) == true ? "F10" : _StopAutomationKeys;
+            }
+            set
+            {
+                _StopAutomationKeys = value;
+            }
+        }
+
         public HotKeySettings() 
         { 
         }

@@ -11,12 +11,18 @@ namespace TBChestTracker
     [System.Serializable]
     public class GeneralSettings : INotifyPropertyChanged
     {
-        private string _ClanRootFolder;
+        private bool? _bIsFirstRun;
+        public bool IsFirstRun
+        {
+            get => _bIsFirstRun.GetValueOrDefault(true);
+            set => _bIsFirstRun = value;
+        }
+        private string? _ClanRootFolder;
         public string ClanRootFolder
         {
             get
             {
-                return _ClanRootFolder;
+                return String.IsNullOrEmpty(_ClanRootFolder) == true ? $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\TotalBattleChestTracker\\" : _ClanRootFolder;
             }
             set
             {
@@ -25,10 +31,10 @@ namespace TBChestTracker
             }
         }
        
-        private string _uiLanguage;
+        private string? _uiLanguage;
         public string UILanguage
         {
-            get => _uiLanguage;
+            get => String.IsNullOrEmpty(_uiLanguage) == true ? "English" : _uiLanguage;
             set
             {
                 _uiLanguage = value;

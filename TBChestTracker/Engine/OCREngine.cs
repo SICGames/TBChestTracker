@@ -16,26 +16,25 @@ namespace TBChestTracker.Engine
     public class OCREngine
     {
         //public static OCREngine Instance { get; private set; }
-        public static Tesseract OCR { get; private set; }
+        public Tesseract OCR { get; private set; }
+        public static OCREngine Instance { get; private set; }
         public OCREngine()
         {
-          
+          Instance = this;
         }
-        public static Task<bool> InitAsync(OCRSettings settings) => Task.Run(() => Init(settings));
-        public static bool Init(OCRSettings ocrSettings)
+        public Task<bool> InitAsync(OCRSettings settings) => Task.Run(() => Init(settings));
+        public bool Init(OCRSettings ocrSettings)
         {
             try
             {
                 if (OCR == null)
                 {
-                    OcrEngineMode ocrmode = OcrEngineMode.TesseractOnly;
+                    OcrEngineMode ocrmode = OcrEngineMode.LstmOnly;
 
                     if(ocrSettings.TessDataConfig.Prefix.Equals("_best") || ocrSettings.TessDataConfig.Prefix.Equals("_fast"))
                     {
                         ocrmode = OcrEngineMode.LstmOnly;
                     }
-                    
-                    OCR = new Tesseract();
 
                     var languages = String.Empty;
                     if(ocrSettings.Languages.ToLower().Contains("all"))
@@ -46,14 +45,24 @@ namespace TBChestTracker.Engine
                     {
                         languages = ocrSettings.Languages;
                     }
-                    
-                    OCR.Init($@"{ocrSettings.TessDataFolder}\", languages, ocrmode);
-                    OCR.PageSegMode = PageSegMode.SparseTextOsd;
+                    try
+                    {
+                        var tessdata = $@"{ocrSettings.TessDataFolder}\";
+                        
+                        OCR = new Tesseract();
 
-                    OCR.SetVariable("tessedit_char_whitelist", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:-' ");
-                    //OCR.SetVariable("load_system_dawg", "F");
-                    //OCR.SetVariable("load_freq_dawg", "F");
+                        //-- accessviolationexception being tossed because of OcrEngineMode.LstmOnly
+                        OCR.Init(tessdata, languages, ocrmode);
+                        OCR.PageSegMode = PageSegMode.SparseTextOsd;
 
+                        OCR.SetVariable("tessedit_char_whitelist", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:-' ");
+                        //OCR.SetVariable("load_system_dawg", "F");
+                        //OCR.SetVariable("load_freq_dawg", "F");
+                    }
+                    catch(Exception ex)
+                    {
+                        throw new Exception($"Failed to initialize Tesseract due to AccessViolationException. Main Cause => {ex.Message}");
+                    }
                     var psm = OCR.PageSegMode;
 
                 }
@@ -69,8 +78,8 @@ namespace TBChestTracker.Engine
             return true;
         }
 
-        public static Task<StringBuilder> LoadAllLanguagesAsync(OCRSettings settings) => Task.Run(() => LoadAllLanguages(settings));
-        public static StringBuilder LoadAllLanguages(OCRSettings settings)
+        public Task<StringBuilder> LoadAllLanguagesAsync(OCRSettings settings) => Task.Run(() => LoadAllLanguages(settings));
+        public StringBuilder LoadAllLanguages(OCRSettings settings)
         {
             var tessdata_path = settings.TessDataFolder;
 
@@ -95,9 +104,9 @@ namespace TBChestTracker.Engine
             return languages;
         }
 
-        public static Task<TessResult> ReadAsync(IInputArray image) => Task.Run(() => Read(image));
+        public Task<TessResult> ReadAsync(IInputArray image) => Task.Run(() => Read(image));
 
-        public static TessResult Read(IInputArray image)
+        public TessResult Read(IInputArray image)
         {
             try
             {
@@ -136,7 +145,7 @@ namespace TBChestTracker.Engine
             }
         }
 
-        public static void Destroy()
+        public void Destroy()
         {
             if (OCR != null)
             {

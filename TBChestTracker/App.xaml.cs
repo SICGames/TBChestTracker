@@ -43,9 +43,9 @@ namespace TBChestTracker
             if(e.Args.Length > 0)
             {
                 string[] args = Environment.GetCommandLineArgs();
-                for (var x = 0; x < args.Length; x++)
+                for (var x = 1; x < args.Length; x++)
                 {
-                    argumentsDictionary.Add(args[x], args[x + 1]);
+                    argumentsDictionary.Add(args[x], args[x]);
                 }
                 if(argumentsDictionary.ContainsKey("--ocr_wizard_debug"))
                 {
@@ -54,6 +54,10 @@ namespace TBChestTracker
                 else if(argumentsDictionary.ContainsKey("--save_ocr_images"))
                 {
                     appContext.SaveOCRImages = true;
+                }
+                else if(argumentsDictionary.ContainsKey("--delete_tessdata"))
+                {
+                    appContext.bDeleteTessData = true;
                 }
             }
 

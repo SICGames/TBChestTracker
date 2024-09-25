@@ -18,33 +18,42 @@ namespace TBChestTracker
         public static async Task DownloadAsync(this HttpClient client, string requestUri, Stream destination, IProgress<double> progress, CancellationToken cancellationToken = default)
         {
             // Get the http headers first to examine the content length
-            using (var response = await client.GetAsync(requestUri, HttpCompletionOption.ResponseHeadersRead))
+            using (var response = client.GetAsync(requestUri, HttpCompletionOption.ResponseHeadersRead).Result)
             {
-                var responseCode = response.EnsureSuccessStatusCode();
-                var contentLength = response.Content.Headers.ContentLength;
-                using (var download = await response.Content.ReadAsStreamAsync())
+                try
                 {
-                 
-                    // Ignore progress reporting when no progress reporter was 
-                    // passed or when the content length is unknown
+                    await Task.Delay(1000);
 
-                    if (progress == null || !contentLength.HasValue)
+                    var responseCode = response.EnsureSuccessStatusCode();
+                    var contentLength = response.Content.Headers.ContentLength;
+                    using (var download = await response.Content.ReadAsStreamAsync())
                     {
-                        await download.CopyToAsync(destination);
-                        return;
+
+                        // Ignore progress reporting when no progress reporter was 
+                        // passed or when the content length is unknown
+
+                        if (progress == null || !contentLength.HasValue)
+                        {
+                            await download.CopyToAsync(destination);
+                            return;
+                        }
+
+                        // Convert absolute progress (bytes downloaded) into relative progress (0% - 100%)
+                        var relativeProgress = new Progress<long>(totalBytes => progress.Report((float)totalBytes / contentLength.Value));
+                        // Use extension method to report progress while downloading
+
+                        await download.CopyToAsync(destination, 81920, relativeProgress, cancellationToken).ConfigureAwait(false);
+
+                        progress.Report(1);
+
                     }
 
-                    // Convert absolute progress (bytes downloaded) into relative progress (0% - 100%)
-                    var relativeProgress = new Progress<long>(totalBytes => progress.Report((float)totalBytes / contentLength.Value));
-                    // Use extension method to report progress while downloading
-                    
-                    await download.CopyToAsync(destination,81920,relativeProgress, cancellationToken);
-
-                    progress.Report(1);
-                    
+                    response.Dispose();
                 }
-               
-                response.Dispose();
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message);
+                }
             }
         }
     }
@@ -98,11 +107,29 @@ namespace TBChestTracker
 
                 HttpClient client = new HttpClient();
                 client.Timeout = TimeSpan.FromMinutes(10);
-                client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36");
+                
+                //-- Sometimes new user agent will help get download progress bar rolling.
+                List<string> userAgents = new List<string>
+                {
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:130.0) Gecko/20100101 Firefox/130.0",
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 Edg/128.0.0.0",
+                };
+                var random = new Random();
+                int randomIndex = random.Next(userAgents.Count);
+
+                // Select a random UA using the randomIndex
+                string randomUserAgent = userAgents[randomIndex];
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(randomUserAgent);
+                
+
                 using (var filestream = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
 
-                    await client.DownloadAsync(url, filestream, progress, token).ConfigureAwait(false);
+                    await client.DownloadAsync(url, filestream, progress, token);
+                    filestream.Close();
+                    filestream.Dispose();
                 };
             }
         }

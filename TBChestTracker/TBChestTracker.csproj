@@ -725,7 +725,7 @@
       <Version>1.0.1</Version>
     </PackageReference>
     <PackageReference Include="CefSharp.Wpf">
-      <Version>127.3.50</Version>
+      <Version>128.4.90</Version>
     </PackageReference>
     <PackageReference Include="CsvHelper">
       <Version>33.0.1</Version>
@@ -738,6 +738,12 @@
     </PackageReference>
     <PackageReference Include="Emgu.CV.runtime.windows">
       <Version>4.9.0.5494</Version>
+    </PackageReference>
+    <PackageReference Include="Emgu.runtime.windows.msvc.rt.x64">
+      <Version>19.39.33523</Version>
+    </PackageReference>
+    <PackageReference Include="Emgu.runtime.windows.msvc.rt.x86">
+      <Version>19.39.33523</Version>
     </PackageReference>
     <PackageReference Include="KonquestUI">
       <Version>1.0.1</Version>

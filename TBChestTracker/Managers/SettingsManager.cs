@@ -19,10 +19,9 @@ namespace TBChestTracker
         private bool disposedValue;
 
         public Settings Settings { get; private set; }
-        public Settings DefaultSettings { get; private set; }
         public static SettingsManager Instance { get; private set; }
-        
-        public SettingsManager() 
+
+        public SettingsManager()
         {
             if (Instance == null)
                 Instance = this;
@@ -30,11 +29,11 @@ namespace TBChestTracker
 
             var settingsPathFolder = AppContext.Instance.LocalApplicationPath;
             var di = new DirectoryInfo(settingsPathFolder);
-            if(di.Exists == false)
+            if (di.Exists == false)
             {
                 di.Create();
             }
-
+            /*
             //-- configure default settings.
             DefaultSettings = new Settings();
             DefaultSettings.GeneralSettings.ClanRootFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\TotalBattleChestTracker\\";
@@ -57,7 +56,20 @@ namespace TBChestTracker
             DefaultSettings.AutomationSettings.AutomationScreenshotsAfterClicks = 1250;
             DefaultSettings.AutomationSettings.AutomationDelayBetweenClicks = 100;
             DefaultSettings.AutomationSettings.StopAutomationAfterClicks = 0;
+            */
 
+            Settings = new Settings();
+
+            try
+            {
+                bool loadResult = Load();
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            /*
 
             if (AppContext.Instance.IsFirstRun)
             {
@@ -106,14 +118,23 @@ namespace TBChestTracker
                     //-- it's possible it's missing;
                     throw new Exception("Something happened in SettingsManager");
                 }
-                var aoiHeight = Settings.OCRSettings.SuggestedAreaOfInterest.height;
-                var aoiWidth = Settings.OCRSettings.SuggestedAreaOfInterest.width;
-                var claimButtonsSize = Settings.OCRSettings.ClaimChestButtons.Count;
-
-                AppContext.Instance.RequiresOCRWizard = (aoiHeight > 0 && aoiWidth > 0) ? false : true;
-                AppContext.Instance.OCRCompleted = (aoiHeight > 0 && aoiWidth > 0 && claimButtonsSize > 0) ? true : false;
+            */
+            if(Settings == null)
+            {
+                //-- it got corrupted 
+                Settings = new Settings();
             }
+
+            var aoiHeight = Settings.OCRSettings.SuggestedAreaOfInterest.height;
+            var aoiWidth = Settings.OCRSettings.SuggestedAreaOfInterest.width;
+            var claimButtonsSize = Settings.OCRSettings.ClaimChestButtons.Count;
+
+            AppContext.Instance.RequiresOCRWizard = (aoiHeight > 0 && aoiWidth > 0) ? false : true;
+            AppContext.Instance.OCRCompleted = (aoiHeight > 0 && aoiWidth > 0 && claimButtonsSize > 0) ? true : false;
+
+            Save();
         }
+        
 
         private bool Load(string file = "Settings.json")
         {
@@ -126,11 +147,6 @@ namespace TBChestTracker
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Formatting = Formatting.Indented;
                 
-                if(Settings != null)
-                    Settings.Dispose();
-
-                Settings = new Settings();
-
                 Settings = (Settings)serializer.Deserialize(sr, typeof(Settings));
                 CommandManager.InvalidateRequerySuggested();
                 return true;
@@ -169,7 +185,6 @@ namespace TBChestTracker
                 {
                     // TODO: dispose managed state (managed objects)
                     Settings.Dispose();
-                    DefaultSettings.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer

@@ -260,7 +260,7 @@ namespace TBChestTracker
                         thresholdImage.Save($@"{outputPath}\OCR_Threshold.png");
                     }
 
-                    var ocrResult = OCREngine.Read(thresholdImage);
+                    var ocrResult = OCREngine.Instance.Read(thresholdImage);
                     if (ocrResult != null)
                     {
                         clanmateName = ocrResult.Words.ToArray();

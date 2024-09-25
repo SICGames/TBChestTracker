@@ -19,40 +19,40 @@ namespace TBChestTracker
             }
         }
 
-        private int _automationClicks;
+        private int? _automationClicks;
         public int AutomationClicks
         {
-            get => _automationClicks;
+            get => _automationClicks.GetValueOrDefault(4);
             set
             {
                 _automationClicks = value;
                 OnPropertyChanged(nameof(AutomationClicks));    
             }
         }
-        private int _automationDelayBetweenClicks;
+        private int? _automationDelayBetweenClicks;
         public int AutomationDelayBetweenClicks
         {
-            get => _automationDelayBetweenClicks;
+            get => _automationDelayBetweenClicks.GetValueOrDefault(250);
             set
             {
                 _automationDelayBetweenClicks = value;
                 OnPropertyChanged(nameof(AutomationDelayBetweenClicks));    
             }
         }
-        private int _automationScreenshotsAfterClicks;
+        private int? _automationScreenshotsAfterClicks;
         public int AutomationScreenshotsAfterClicks
         {
-            get => _automationScreenshotsAfterClicks;
+            get => _automationScreenshotsAfterClicks.GetValueOrDefault(500);
             set
             {
                 _automationScreenshotsAfterClicks = value;
                 OnPropertyChanged(nameof(AutomationScreenshotsAfterClicks));    
             }
         }
-        private int _stopautomationAfterClicks;
+        private int? _stopautomationAfterClicks;
         public int StopAutomationAfterClicks
         {
-            get => _stopautomationAfterClicks;
+            get => _stopautomationAfterClicks.GetValueOrDefault(0);
             set
             {
                 _stopautomationAfterClicks = value;

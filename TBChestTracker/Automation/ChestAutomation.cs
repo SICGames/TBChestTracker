@@ -26,6 +26,7 @@ namespace TBChestTracker.Automation
     public class ChestAutomation
     {
         public Snapture Snapture { get; private set; }
+        public OCREngine OCREngine { get; private set; }
         private ClanChestProcessResult clanChestProcessResult { get; set; }
         private CancellationTokenSource CancellationToken { get; set; }
 
@@ -141,6 +142,8 @@ namespace TBChestTracker.Automation
         public bool Initialize(OCRSettings ocrSettings)
         {
             bool result = false;
+            OCREngine = new OCREngine();
+
             if (System.IO.Directory.Exists(ocrSettings.TessDataFolder))
             {
                 AppContext.Instance.TessDataExists = true;
@@ -198,7 +201,7 @@ namespace TBChestTracker.Automation
         {
             var result = e.ProcessResult;
 
-            Benchmarker.Stop();
+            //Benchmarker.Stop();
 
             if(result.Result == ClanChestProcessEnum.NO_GIFTS)
             {
@@ -361,12 +364,14 @@ namespace TBChestTracker.Automation
                     
                     if (this.canCaptureAgain)
                     {
+                        /*
                         Benchmarker.onElapsed += (s, e) =>
                         {
                             var msg = $"Processed Chest Data in {e.Message}";
                             com.HellStormGames.Logging.Console.Write(msg,"Benchmark Result", LogType.INFO);
                         };
                         Benchmarker.Start();
+                        */
 
                         await Task.Delay(SettingsManager.Instance.Settings.AutomationSettings.AutomationScreenshotsAfterClicks);
                         CaptureRegion();

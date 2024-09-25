@@ -33,7 +33,7 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <TextBlock Text="TessData Path Folder" Margin="5" Grid.Column="0" Grid.Row="0"/>
+        
         <TextBlock Text="OCR Languages" Margin="5" Grid.Column="0" Grid.Row="1"/>
         <TextBlock Text="OCR Filtering" Margin="5"  Grid.Column="0" Grid.Row="3"/>
         
@@ -46,11 +46,6 @@
         <TextBlock Text="Threshold" Margin="5" Grid.Column="0" Grid.Row="9"/>
         <TextBlock Text="Max Threshold" Margin="5" Grid.Column="0" Grid.Row="10"/>
         
-        <uiFancy:FancyPicker Grid.Column="1" Grid.Row="0" Margin="0,2,0,7" ToolTip="Where all the Tesseract Learned Data Models are stored."
-        Height="18" BorderBrush="#aaa" 
-        Corners="10" 
-        BorderThickness="1" Padding="1" Background="#fff" Foreground="#000" Tag="TessData" Source="{Binding TessDataFolder}" x:Name="TessDataFolderPicker" Click="TessDataFolderPicker_Click"/>
-
         <UniformGrid Grid.Column="1" Grid.Row="1" Columns="4" HorizontalAlignment="Left" Margin="0,5,0,5" x:Name="CHECKBOXES_PARENT">
             <CheckBox Content="English" Margin="3,5" Tag="eng"/>
             <CheckBox Content="French" Margin="3,5" Tag="fra"/>

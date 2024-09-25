@@ -77,8 +77,11 @@ namespace TBChestTracker
         {
             return Task.Run(() =>
             {
-                var archive = ZipFile.OpenRead(archiveFile);
-                archive.ExtractToDirectory(destinationFolder, progress, bOverwrite);
+                using (var archive = ZipFile.OpenRead(archiveFile))
+                {
+                    archive.ExtractToDirectory(destinationFolder, progress, bOverwrite);
+                    archive.Dispose();
+                }
             });
         }
         public static async Task Extract(string archiveFile, string destinationFolder, IProgress<ZipProgress> progress, bool bOverwrite = true)

@@ -754,7 +754,6 @@ namespace TBChestTracker
             ChestProcessingState = ChestProcessingState.COMPLETED;
            
             AppContext.Instance.isBusyProcessingClanchests = false;
-            AppContext.Instance.canCaptureAgain = true;
 
             Automation.AutomationChestProcessedEventArguments args = new AutomationChestProcessedEventArguments(new ClanChestProcessResult("200", 200, ClanChestProcessEnum.SUCCESS));
             chestAutomation.InvokeChestProcessed(args);

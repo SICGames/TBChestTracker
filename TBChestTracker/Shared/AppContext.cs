@@ -31,8 +31,21 @@ namespace TBChestTracker
         private string pAppName = "Total Battle Chest Tracker";
         private string pCurrentProject = "Untitled";
         private string pAppTitle = $"";
-
         private bool _upgradeAvailable = false;
+
+        private bool? _bDeleteTessData;
+        public bool bDeleteTessData
+        {
+            get
+            {
+                return _bDeleteTessData.GetValueOrDefault(false);
+            }
+            set
+            {
+                _bDeleteTessData = value;
+            }
+        }
+
         public bool upgradeAvailable
         {
             get => _upgradeAvailable;
@@ -61,14 +74,6 @@ namespace TBChestTracker
         }
         public string TesseractData => $@"{LocalApplicationPath}TessData";
 
-        public bool IsFirstRun
-        {
-            get
-            {
-                return System.IO.File.Exists($"{CommonAppFolder}.FIRSTRUN");
-            }
-        }
-     
         public bool isAppClosing = false;
       
         public Version AppVersion
@@ -229,7 +234,6 @@ namespace TBChestTracker
         private bool _hasHotkeyBeenPressed = false;
         private bool _isAnyGiftsAvailable = false;
         private bool _isBusyProcessingClanChests = false;
-        private bool _canCaptureAgain = false;
 
         public bool hasHotkeyBeenPressed
         {
@@ -261,16 +265,6 @@ namespace TBChestTracker
             {
                 _isBusyProcessingClanChests = value;
                 OnPropertyChanged(nameof(isBusyProcessingClanchests));
-            }
-        }
-
-        public bool canCaptureAgain
-        {
-            get => _canCaptureAgain;
-            set
-            {
-                _canCaptureAgain = value;
-                OnPropertyChanged(nameof(canCaptureAgain));
             }
         }
 

@@ -22,8 +22,8 @@ namespace TBChestTracker
     [System.Serializable]
     public class OCRSettings : INotifyPropertyChanged, IDisposable
     {
-        private string _TessDataFolder;
-        public string CaptureMethod { get; set; }
+        private string? _TessDataFolder;
+        public string? CaptureMethod { get; set; }
         public AOIRect AreaOfInterest { get; set; }
         public AOIRect SuggestedAreaOfInterest { get; set; }
         public List<Point> ClaimChestButtons { get; set; }
@@ -32,7 +32,7 @@ namespace TBChestTracker
         {
             get
             {
-                return _TessDataFolder;
+                return String.IsNullOrEmpty(_TessDataFolder) == true ? $@"{AppContext.Instance.TesseractData}" : _TessDataFolder;
             }
             set
             {
@@ -47,7 +47,7 @@ namespace TBChestTracker
         {
             get
             {
-                return _languages;
+                return String.IsNullOrEmpty(_languages) == true ? "eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus+pol+por+pus+ukr+deu" : _languages;
             }
             set
             {
@@ -57,7 +57,7 @@ namespace TBChestTracker
         private double? _ClanmateSimilarity;
         public double ClanmateSimilarity
         {
-            get => _ClanmateSimilarity.GetValueOrDefault(90);
+            get => _ClanmateSimilarity.GetValueOrDefault(80);
             set
             {
                 _ClanmateSimilarity = value;
@@ -65,12 +65,12 @@ namespace TBChestTracker
             }
         }
 
-        private double _GlobalBrightness;
+        private double? _GlobalBrightness;
         public double GlobalBrightness
         {
             get
             {
-                return _GlobalBrightness;
+                return _GlobalBrightness.GetValueOrDefault(0.65);
             }
             set
             {
@@ -84,7 +84,7 @@ namespace TBChestTracker
         {
             get {
          
-                return _tags;
+                return  _tags.Count() < 1  ? new ObservableCollection<string>(new List<string> { "Chest", "From", "Source", "Gift", "Contains" }) : _tags;
             }
             set {
                 _tags = value;
@@ -103,12 +103,12 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(Capture));
             }
         }
-        private String _previewImage = null;
+        private String _previewImage;
         public String PreviewImage
         {
             get
             {
-                return _previewImage;
+                return String.IsNullOrEmpty(_previewImage) == true ? String.Empty : _previewImage;
             }
             set
             {
@@ -117,10 +117,10 @@ namespace TBChestTracker
             }
         }
 
-        private Int32 _threshold = 135;
+        private Int32? _threshold;
         public Int32 Threshold
         {
-            get => _threshold;
+            get => _threshold.GetValueOrDefault(85);
             set
             {
                 _threshold = value;
@@ -128,10 +128,10 @@ namespace TBChestTracker
             }
         }
 
-        private Int32 _maxThreshold = 255;
+        private Int32? _maxThreshold;
         public Int32 MaxThreshold
         {
-            get => _maxThreshold;
+            get => _maxThreshold.GetValueOrDefault(255);
             set
             {
                 _maxThreshold = value;
@@ -168,7 +168,7 @@ namespace TBChestTracker
             AreaOfInterest = new AOIRect();
             SuggestedAreaOfInterest = new AOIRect();
             ClaimChestButtons = new List<Point>();
-            TessDataConfig = new TessDataConfig(TessDataOption.Best);
+            TessDataConfig = new TessDataConfig(TessDataOption.None);
         }
 
         protected void OnPropertyChanged(string propertyName)
