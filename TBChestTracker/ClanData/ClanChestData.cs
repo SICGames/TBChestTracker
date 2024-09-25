@@ -11,18 +11,18 @@ namespace TBChestTracker
     {
 
         public string Clanmate { get; set; }
-        public List<Chest> chests { get; set; }
+        public IList<Chest> chests { get; set; }
         public int Points { get; set; }
         public ClanChestData()
         {
 
         }
-        public ClanChestData(string name, List<Chest> chests)
+        public ClanChestData(string name, IList<Chest> chests)
         {
             Clanmate = name;
             this.chests = chests;
         }
-        public ClanChestData(string name, List<Chest> chests, int points)
+        public ClanChestData(string name, IList<Chest> chests, int points)
         {
             this.Clanmate = name;
             this.chests = chests;

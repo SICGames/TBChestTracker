@@ -1,4 +1,5 @@
-﻿using System;
+﻿using com.KonquestUI.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,9 +31,28 @@ namespace TBChestTracker.Pages.ClanmatesValidation
         {
             ClanmateEditorWindow clanmateEditorWindow = new ClanmateEditorWindow();
             var window = Window.GetWindow(this) as ClanmateValidationWindow;
+            
             window.WindowState = WindowState.Minimized;
             clanmateEditorWindow.ParentWindow = window; 
             clanmateEditorWindow.ShowDialog();
+
+        }
+
+        private void SimiliarityPercentageNumericValue_ValueChanged(object sender, RoutedEventArgs e)
+        {
+            var wnd = Window.GetWindow(this) as ClanmateValidationWindow;
+            var nv = (FancyNumericValue)sender;
+            wnd.ClanmateSimilarity = nv.Value;
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            var wnd = Window.GetWindow(this) as ClanmateValidationWindow;
+            SimiliarityPercentageNumericValue.Value = wnd.ClanmateSimilarity;
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
 
         }
     }

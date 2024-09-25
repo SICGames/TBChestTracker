@@ -143,6 +143,7 @@
     <Compile Include="AbsentClanmatesWindow.xaml.cs">
       <DependentUpon>AbsentClanmatesWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Arrays\Collection.cs" />
     <Compile Include="Arrays\IDataCollection.cs" />
     <Compile Include="Automation\ChestAutomation.cs" />
     <Compile Include="Automation\Events\AutomationChestProcessedEventArguments.cs" />
@@ -152,6 +153,7 @@
     <Compile Include="Automation\Events\AutomationEventArguments.cs" />
     <Compile Include="Automation\Events\AutomationTextProcessedEventArguments.cs" />
     <Compile Include="Automation\Native\Automator.cs" />
+    <Compile Include="Benchmark\Benchmarker.cs" />
     <Compile Include="ChestBuilderWindow.xaml.cs">
       <DependentUpon>ChestBuilderWindow.xaml</DependentUpon>
     </Compile>
@@ -182,6 +184,7 @@
     <Compile Include="Clanmate\AbsentClanmate.cs" />
     <Compile Include="Clanmate\Clanmate.cs" />
     <Compile Include="Clanmate\ClanmateDatabase.cs" />
+    <Compile Include="Clanmate\LazyClanmates.cs" />
     <Compile Include="ClanWealthBuilderWindow.xaml.cs">
       <DependentUpon>ClanWealthBuilderWindow.xaml</DependentUpon>
     </Compile>
@@ -419,9 +422,6 @@
     <Compile Include="UpdateManifest\Manifest.cs" />
     <Compile Include="UpdateWindow.xaml.cs">
       <DependentUpon>UpdateWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ValidateChestDataWindow.xaml.cs">
-      <DependentUpon>ValidateChestDataWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\ClanDatabaseBackupItem.cs" />
     <Compile Include="ViewModels\ClanmatesReparProgress.cs" />
@@ -677,10 +677,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UpdateWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ValidateChestDataWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

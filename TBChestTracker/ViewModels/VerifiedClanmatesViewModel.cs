@@ -19,7 +19,7 @@ namespace TBChestTracker.ViewModels
             }
         }
 
-        private ObservableCollection<VerifiedClanmate> _verifiedClanmates = new ObservableCollection<VerifiedClanmate>();
+        private ObservableCollection<VerifiedClanmate> _verifiedClanmates = null;
         public ObservableCollection<VerifiedClanmate> VerifiedClanmates
         {
             get => _verifiedClanmates;
@@ -41,11 +41,10 @@ namespace TBChestTracker.ViewModels
         }
 
         public static VerifiedClanmatesViewModel Instance { get; private set; }
-        public VerifiedClanmatesViewModel() 
+        public VerifiedClanmatesViewModel()
         {
-            if (Instance == null)
-                Instance = this;
-
+            Instance = this;
+            _verifiedClanmates = new ObservableCollection<VerifiedClanmate>();
         }
 
         public void Add(string name)
@@ -54,8 +53,7 @@ namespace TBChestTracker.ViewModels
             Total = VerifiedClanmates.Count();
         }
         private VerifiedClanmate _selected = null;
-        private bool disposedValue;
-
+        
         public VerifiedClanmate Selected
         {
             get => _selected;
@@ -72,35 +70,10 @@ namespace TBChestTracker.ViewModels
             Total = VerifiedClanmates.Count();
         }
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects)
-                    VerifiedClanmates.Clear();
-                    VerifiedClanmates = null;
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                disposedValue = true;
-            }
-        }
-
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~VerifiedClanmatesViewModel()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
-
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
+            _verifiedClanmates.Clear();
+            _verifiedClanmates = null;
         }
     }
     public class VerifiedClanmate

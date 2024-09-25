@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,17 +34,36 @@ namespace TBChestTracker
         }
     }
 
-    public partial class ClanmateValidationWindow : Window
+    public partial class ClanmateValidationWindow : Window, INotifyPropertyChanged
     {
         public ObservableCollection<AffectedClanmate> affectedClanmates { get; private set; }
 
         public VerifiedClanmatesViewModel VerifiedClanmatesViewModel { get; private set; }
 
+        
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        private double? _ClanmateSimilarity;
+        public double ClanmateSimilarity
+        {
+            get => _ClanmateSimilarity.GetValueOrDefault(97);
+            set
+            {
+                _ClanmateSimilarity = value;
+                OnPropertyChanged(nameof(ClanmateSimilarity));
+            }
+        }
+
         public ClanmateValidationWindow()
         {
             InitializeComponent();
-            affectedClanmates = new ObservableCollection<AffectedClanmate>();
-            VerifiedClanmatesViewModel = new VerifiedClanmatesViewModel();
         }
 
         public void NavigateTo(string page)
@@ -53,6 +73,8 @@ namespace TBChestTracker
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             NavigateTo($"Pages/ClanmatesValidation/ClanmatesValidationStartPage.xaml");
+            affectedClanmates = new ObservableCollection<AffectedClanmate>();
+            VerifiedClanmatesViewModel = new VerifiedClanmatesViewModel();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

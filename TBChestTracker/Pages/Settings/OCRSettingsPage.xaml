@@ -31,12 +31,21 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <TextBlock Text="TessData Path Folder" Margin="5" Grid.Column="0" Grid.Row="0"/>
         <TextBlock Text="OCR Languages" Margin="5" Grid.Column="0" Grid.Row="1"/>
         <TextBlock Text="OCR Filtering" Margin="5"  Grid.Column="0" Grid.Row="3"/>
+        
+        <TextBlock Text="Clanmate Similarity %" Margin="5"  Grid.Column="0" Grid.Row="5"/>
+        
         <TextBlock Text="Screen Capturer" Margin="5"  Grid.Column="0" Grid.Row="6"/>
         <TextBlock Text="Preview" Margin="5" Grid.Column="0" Grid.Row="7"/>
+        
+        <TextBlock Text="Global OCR Brightness" Margin="5" Grid.Column="0" Grid.Row="8"/>
+        <TextBlock Text="Threshold" Margin="5" Grid.Column="0" Grid.Row="9"/>
+        <TextBlock Text="Max Threshold" Margin="5" Grid.Column="0" Grid.Row="10"/>
+        
         <uiFancy:FancyPicker Grid.Column="1" Grid.Row="0" Margin="0,2,0,7" ToolTip="Where all the Tesseract Learned Data Models are stored."
         Height="18" BorderBrush="#aaa" 
         Corners="10" 
@@ -63,7 +72,16 @@
         <ui:FancyTagBox Grid.Row="3" Grid.Column="1" Height="100" x:Name="TagBox" BorderBrush="Silver" BorderThickness="1" Background="White" Foreground="Black" Margin="5" 
                         Tags="{Binding Tags, Mode=TwoWay}">
         </ui:FancyTagBox>
+        
         <TextBlock Margin="5" FontWeight="Bold" Grid.Column="1" Grid.Row="4">* Use SPACEBAR key to seperate tags.</TextBlock>
+
+        <ui:FancyNumericValue BorderBrush="LightGray" x:Name="ClanmateSimilarityNumericValue"
+           HoverBrush="SkyBlue"
+           BorderThickness="2" 
+           Minimal="0.0" Maximum="100.0" Steps="1.0" Value="{Binding ClanmateSimilarity}"
+           ValueChanged="ClanmateSimilarityNumericValue_ValueChanged"
+           CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="5" Grid.Column="1"/>
+        
         <ComboBox x:Name="CaptureMethodBox" Grid.Row="6" Grid.Column="1" Width="200" HorizontalAlignment="Left" SelectedIndex="0">
             <ComboBoxItem Content="GDI+"/>
         </ComboBox>
@@ -79,9 +97,7 @@
         </Grid>
         
 
-        <TextBlock Text="Global OCR Brightness" Margin="5" Grid.Column="0" Grid.Row="8"/>
-        <TextBlock Text="Threshold" Margin="5" Grid.Column="0" Grid.Row="9"/>
-        <TextBlock Text="Max Threshold" Margin="5" Grid.Column="0" Grid.Row="10"/>
+        
         <ui:FancyNumericValue BorderBrush="LightGray" 
                    HoverBrush="SkyBlue"
                    BorderThickness="2" 

@@ -71,17 +71,45 @@ namespace TBChestTracker
                     }
                 }
             }
-
-            LocalePath = $@"{AppContext.Instance.CommonAppFolder}locale\{Language}\";
-
-            if(!System.IO.Directory.Exists(LocalePath))
+            var localeFolder = $@"{AppContext.Instance.LocalApplicationPath}locale";
+            var di = new DirectoryInfo(localeFolder);
+            if(di.Exists == false)
             {
-                //-- fall back on en-US.
-                LocalePath = $@"{AppContext.Instance.CommonAppFolder}locale\en-US\";
+                di.Create();
+                var languageFolder = $@"{di.FullName}\{Language}";
+                var di2 = new DirectoryInfo(languageFolder);
+                if(!di2.Exists)
+                {
+                    di2.Create();
+                    //-- need to acquire old Chests.csv and stuff them in new folder.
+                    var oldLocalePath = $@"{AppContext.Instance.CommonAppFolder}locale\{Language}\";
+                    var oldChestsPath = $@"{oldLocalePath}Chests.csv";
+                    if (System.IO.File.Exists(oldChestsPath))
+                    {
+                        var newLocalePath = di2.FullName;
+                        var newChestsPath = $@"{newLocalePath}\Chests.csv";
+                        using (System.IO.FileStream fileStream = File.Open(oldChestsPath, System.IO.FileMode.Open))
+                        {
+                            using (System.IO.FileStream destinationStream = File.OpenWrite(newChestsPath))
+                            {
+                                fileStream.CopyTo(destinationStream);
+                            }
+                        }
+
+                        var oldLocaleDirInfo = new DirectoryInfo($@"{AppContext.Instance.CommonAppFolder}locale");
+                        if(oldLocaleDirInfo.Exists)
+                        {
+                            File.Delete(oldChestsPath);
+                            oldLocaleDirInfo.Delete(true);
+                        }
+                    }
+                    
+                }
             }
 
+            LocalePath = $@"{AppContext.Instance.LocalApplicationPath}locale\{Language}\";
+          
             string ChestsFile = $"{LocalePath}Chests.csv";
-
           
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
@@ -192,15 +220,21 @@ namespace TBChestTracker
         }
         public async Task<bool> IsUpdateAvailable()
         {
-            var releases = await client.Repository.Release.GetAll("SICGames", "TBChestTracker");
-            LatestReleaseInfo = releases[0];
+            try
+            {
+                var releases = await client.Repository.Release.GetAll("SICGames", "TBChestTracker");
+                LatestReleaseInfo = releases[0];
+                var tagHash = MD5Helper.Create(Manifest.Tag);
+                //-- v2.0 Preview 2 - Hotfix1 - v2.0-preview-2-patch1
+                var hashMatches = MD5Helper.Verify($"{LatestReleaseInfo.TagName}", tagHash);
 
-            var tagHash = MD5Helper.Create(Manifest.Tag);
-
-            //-- v2.0 Preview 2 - Hotfix1 - v2.0-preview-2-patch1
-            var hashMatches = MD5Helper.Verify($"{LatestReleaseInfo.TagName}", tagHash);
-            
-            return hashMatches == true ? false : true;
+                return hashMatches == true ? false : true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"OCTOKIT EXCEPTION => {ex.Message}");
+            }
+            return false;
         }
 
         protected virtual void Dispose(bool disposing)

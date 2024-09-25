@@ -133,7 +133,7 @@ namespace TBChestTracker
                             previous_clanmatestatistic_data.Add(date.Key, clandata);
                         }
 
-                        date.Value.RemoveAll(n => n.Clanmate.Equals(clanmate_newname, StringComparison.CurrentCultureIgnoreCase));
+                        date.Value.ToList().RemoveAll(n => n.Clanmate.Equals(clanmate_newname, StringComparison.CurrentCultureIgnoreCase));
                     }
                     
                     foreach (var clanmates in ClanManager.Instance.ClanmateManager.Database.Clanmates.ToList())
@@ -160,7 +160,7 @@ namespace TBChestTracker
                                         d.chests = new List<Chest>();
 
                                     if(chests != null)
-                                        d.chests.AddRange(chests);
+                                        d.chests.ToList().AddRange(chests);
                                 }
                             }
                         }
@@ -256,7 +256,7 @@ namespace TBChestTracker
                             }
                         }
 
-                        date.Value.RemoveAll(n => n.Clanmate.Equals(alias, StringComparison.CurrentCultureIgnoreCase));
+                        date.Value.ToList().RemoveAll(n => n.Clanmate.Equals(alias, StringComparison.CurrentCultureIgnoreCase));
                     }
 
                     //-- clean up chest count.
@@ -294,7 +294,7 @@ namespace TBChestTracker
                                     d.chests = new List<Chest>();
 
                                 if (chests != null)
-                                    d.chests.InsertRange(d.chests.Count,chests);
+                                    d.chests.ToList().InsertRange(d.chests.Count,chests);
                             }
                         }
                     }

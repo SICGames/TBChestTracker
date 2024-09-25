@@ -42,6 +42,7 @@ namespace TBChestTracker
             
             DefaultSettings.OCRSettings.CaptureMethod = "GDI+";
             DefaultSettings.OCRSettings.GlobalBrightness = 0.65;
+            DefaultSettings.OCRSettings.ClanmateSimilarity = 90;
             DefaultSettings.OCRSettings.Tags = new ObservableCollection<string>(new List<string> { "Chest", "From", "Source", "Gift", "Contains" });
             DefaultSettings.OCRSettings.TessDataFolder = $@"{AppContext.Instance.TesseractData}";
             DefaultSettings.OCRSettings.Languages = "eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus+pol+por+pus+ukr+deu";
@@ -73,7 +74,6 @@ namespace TBChestTracker
                     {
                         Settings = new Settings();
                         Settings = DefaultSettings;
-                        
                         Save();
                     }
                     else
@@ -98,6 +98,7 @@ namespace TBChestTracker
                             Settings.AutomationSettings.AutomationScreenshotsAfterClicks = DefaultSettings.AutomationSettings.AutomationScreenshotsAfterClicks;
                             Save();
                         }
+
                      }
                 }
                 catch (Exception ex)

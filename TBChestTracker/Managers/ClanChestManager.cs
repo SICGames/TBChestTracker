@@ -1,4 +1,5 @@
-﻿using com.HellStormGames.Logging;
+﻿using com.HellStormGames.Diagnosis;
+using com.HellStormGames.Logging;
 using Emgu.CV.CvEnum;
 using Microsoft.Win32;
 using Newtonsoft.Json;
@@ -34,8 +35,8 @@ namespace TBChestTracker
     public class ClanChestManager : IDisposable
     {
         #region Declarations
-        public List<ClanChestData> clanChestData { get; set; }
-        public Dictionary<string, List<ClanChestData>> ClanChestDailyData;
+        public IList<ClanChestData> clanChestData { get; set; }
+        public Dictionary<string, IList<ClanChestData>> ClanChestDailyData;
         private ChestProcessingState pChestProcessingState = ChestProcessingState.IDLE;
         bool filteringErrorOccurred = false;
         string lastFilterString = String.Empty;
@@ -55,7 +56,7 @@ namespace TBChestTracker
         public ClanChestManager()
         {
             clanChestData = new List<ClanChestData>();
-            ClanChestDailyData = new Dictionary<string, List<ClanChestData>>();
+            ClanChestDailyData = new Dictionary<string, IList<ClanChestData>>();
             ChestProcessingState = ChestProcessingState.IDLE;
             ChestRewards = new ChestRewardsManager();
 
@@ -514,26 +515,15 @@ namespace TBChestTracker
         }
         private Clanmate Clanmate_Scan(string input, double similiarityThreshold)
         {
-            /*
-               "Name": "Naida Il",
-                      "Aliases": [
-                         "Naida II",
-                         "Naida ١",
-                         "Naida ll",
-                         "Naida ١١",
-                         "Naida 11",
-                         "Naida l|" 
-            */
             var inputLength = input.Length; 
-
-            var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates.ToList();
-
+            IList<Clanmate> clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates.ToList();
             bool bMatch = false;
+            
             Clanmate matchedClanmate = null;
 
             var jw = new F23.StringSimilarity.JaroWinkler();
-
-            foreach (var clanmate in clanmates)
+            
+            Parallel.ForEach(clanmates, (clanmate,state) => 
             {
                 var similarity = jw.Similarity(clanmate.Name, input) * 100.0;
                 Debug.WriteLine($"{clanmate.Name} and {input} have a Similiarity Percent => {similarity}%");
@@ -541,9 +531,9 @@ namespace TBChestTracker
                 {
                     bMatch = true;
                     matchedClanmate = clanmate;
-                    break;
+                    state.Break();
                 }
-            }
+            });
             if (bMatch)
             {
                 return matchedClanmate;
@@ -552,7 +542,7 @@ namespace TBChestTracker
             return null;
         }
 
-        public void ProcessChestData(List<string> result, ChestAutomation chestAutomation)
+        public async Task ProcessChestData(List<string> result, ChestAutomation chestAutomation)
         {
 
             /*
@@ -588,8 +578,7 @@ namespace TBChestTracker
             }
 
             List<ChestData> tmpchests = textResult.ChestData;
-            
-            List<ClanChestData> tmpchestdata = CreateClanChestData(tmpchests);
+            IList<ClanChestData> tmpchestdata = CreateClanChestData(tmpchests);
             var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates.ToList();
 
             //-- do we need to insert new entry?
@@ -610,61 +599,61 @@ namespace TBChestTracker
 
             //-- make sure clanmate exists.
             var mate_index = 0;
-            foreach (var tmpchest in tmpchestdata.ToList())
-            {
-                bool exists = clanmates.Select(mate_name => mate_name.Name).Contains(tmpchest.Clanmate, StringComparer.CurrentCultureIgnoreCase);
-               
-                if (!exists)
-                {
-                    var tClanmate = tmpchest.Clanmate;
-                    var match_clanmate = Clanmate_Scan(tClanmate,80.0);
-                    if(match_clanmate != null)
-                    {
-                        com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} is actually {match_clanmate.Name}.", "Unknown Clanmate Found", LogType.INFO);
-                        
-                        tmpchestdata[mate_index].Clanmate = match_clanmate.Name; //--- unknown clanmate properly identified and been re-written with correct parent clan name.
+            Parallel.ForEach(tmpchestdata.ToList(), tmpchest =>  //foreach (var tmpchest in tmpchestdata.ToList())
+             {
+                 bool exists = clanmates.Select(mate_name => mate_name.Name).Contains(tmpchest.Clanmate, StringComparer.CurrentCultureIgnoreCase);
+                 if(exists)
+                 {
+                     mate_index++;
+                     return;
+                 }
 
-                        var parent_data = clanChestData.Select(pd => pd).Where(data => data.Clanmate.Equals(match_clanmate.Name, StringComparison.InvariantCultureIgnoreCase)).ToList()[0];
-                        if (parent_data.chests == null)
-                        {
-                            parent_data.chests = new List<Chest>();
-                        }
-                    }
-                    else
-                    {
-                        clanChestData.Add(new ClanChestData(tmpchest.Clanmate, tmpchest.chests, tmpchest.Points));
-                        com.HellStormGames.Logging.Console.Write($"Adding {tmpchest.Clanmate} to clanmates database.", "Clanmate Not Found", LogType.WARNING);
-                        ClanManager.Instance.ClanmateManager.Add(tmpchest.Clanmate);
-                        ClanManager.Instance.ClanmateManager.Save();
-                    }
-                    
-                    //-- attempt to check to see if the unfound clanmate is under an alias.
-                    /*
-                    foreach (var mate in clanmates)
-                    {
-                        if (mate.Aliases.Count > 0)
-                        {
-                            bool isMatch = mate.Aliases.Contains(tmpchest.Clanmate, StringComparer.InvariantCultureIgnoreCase);
-                            if (isMatch)
-                            {
-                                com.HellStormGames.Logging.Console.Write($"\t\t Unknown clanmate ({tmpchest.Clanmate}) belongs to {mate.Name} aliases.", "Unknown Clanmate", LogType.INFO);
-                                var parent_data = clanChestData.Select(pd => pd).Where(data => data.Clanmate.Equals(mate.Name, StringComparison.InvariantCultureIgnoreCase)).ToList()[0];
-                                alias_found = true;
-                                break;
-                            }
-                        }
-                    }
-                    */
-                }
-                else
-                {
-                    mate_index += 1;
-                    continue;
-                }
-            }
+                 if (!exists)
+                 {
+                     var tClanmate = tmpchest.Clanmate;
+                     var match_clanmate = Clanmate_Scan(tClanmate, SettingsManager.Instance.Settings.OCRSettings.ClanmateSimilarity);
+                     if (match_clanmate != null)
+                     {
+                         com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} is actually {match_clanmate.Name}.", "Unknown Clanmate Found", LogType.INFO);
+
+                         tmpchestdata[mate_index].Clanmate = match_clanmate.Name; //--- unknown clanmate properly identified and been re-written with correct parent clan name.
+
+                         var parent_data = clanChestData.Select(pd => pd).Where(data => data.Clanmate.Equals(match_clanmate.Name, StringComparison.InvariantCultureIgnoreCase)).ToList()[0];
+                         if (parent_data.chests == null)
+                         {
+                             parent_data.chests = new List<Chest>();
+                         }
+                     }
+                     else
+                     {
+                         clanChestData.Add(new ClanChestData(tmpchest.Clanmate, tmpchest.chests, tmpchest.Points));
+                         com.HellStormGames.Logging.Console.Write($"Adding {tmpchest.Clanmate} to clanmates database.", "Clanmate Not Found", LogType.WARNING);
+                         ClanManager.Instance.ClanmateManager.Add(tmpchest.Clanmate);
+                         ClanManager.Instance.ClanmateManager.Save();
+                     }
+
+                     //-- attempt to check to see if the unfound clanmate is under an alias.
+                     /*
+                     foreach (var mate in clanmates)
+                     {
+                         if (mate.Aliases.Count > 0)
+                         {
+                             bool isMatch = mate.Aliases.Contains(tmpchest.Clanmate, StringComparer.InvariantCultureIgnoreCase);
+                             if (isMatch)
+                             {
+                                 com.HellStormGames.Logging.Console.Write($"\t\t Unknown clanmate ({tmpchest.Clanmate}) belongs to {mate.Name} aliases.", "Unknown Clanmate", LogType.INFO);
+                                 var parent_data = clanChestData.Select(pd => pd).Where(data => data.Clanmate.Equals(mate.Name, StringComparison.InvariantCultureIgnoreCase)).ToList()[0];
+                                 alias_found = true;
+                                 break;
+                             }
+                         }
+                     }
+                     */
+                 }
+             });
 
             //-- update clanchestdata
-            foreach (var chestdata in clanChestData)
+            Parallel.ForEach(clanChestData, chestdata => //foreach (var chestdata in clanChestData)
             {
                 var _chestdata = tmpchestdata.Where(name => name.Clanmate.Equals(chestdata.Clanmate,
                     StringComparison.CurrentCultureIgnoreCase)).Select(chests => chests).ToList();
@@ -682,83 +671,83 @@ namespace TBChestTracker
                             chestdata.Points = 0;
                         }
 
-                        foreach (var m_chest in m_chestdata.chests.ToList())
-                        {
-                            if (ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions == ChestOptions.UsePoints)
-                            {
-                                var pointvalues = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints;
-                                foreach (var pointvalue in pointvalues)
-                                {
-                                    var chest_type = m_chest.Type.ToString();
-                                    var chest_name = m_chest.Name.ToString();
+                        Parallel.ForEach(m_chestdata.chests.ToList(), m_chest => //foreach (var m_chest in m_chestdata.chests.ToList())
+                         {
+                             if (ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions == ChestOptions.UsePoints)
+                             {
+                                 var pointvalues = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints;
+                                 foreach (var pointvalue in pointvalues)
+                                 {
+                                     var chest_type = m_chest.Type.ToString();
+                                     var chest_name = m_chest.Name.ToString();
 
-                                    var level = m_chest.Level;
-                                    Debug.WriteLine($" Chest Type is -> {chest_type} and Point Value Chest Type is -> {pointvalue.ChestType}");
+                                     var level = m_chest.Level;
+                                     //Debug.WriteLine($" Chest Type is -> {chest_type} and Point Value Chest Type is -> {pointvalue.ChestType}");
 
-                                    //if (pointvalue.ChestType.ToLower().Contains(chest_type.ToLower().ToString()))
-                                    if (chest_type.ToLower().Contains(pointvalue.ChestType.ToLower()))
-                                    {
-                                        Debug.WriteLine($"Chest name in Points -> {pointvalue.ChestName}");
+                                     //if (pointvalue.ChestType.ToLower().Contains(chest_type.ToLower().ToString()))
+                                     if (chest_type.ToLower().Contains(pointvalue.ChestType.ToLower()))
+                                     {
+                                         //Debug.WriteLine($"Chest name in Points -> {pointvalue.ChestName}");
 
-                                        if (pointvalue.Level.Equals("(Any)") == false)
-                                        {
-                                            Debug.WriteLine($"Chest Level in Points -> {Int32.Parse(pointvalue.Level.ToString())} and Chest Level -> {level}");
-                                        }
-                                        if (pointvalue.ChestName.Equals("(Any)"))
-                                        {
+                                         if (pointvalue.Level.Equals("(Any)") == false)
+                                         {
+                                             // Debug.WriteLine($"Chest Level in Points -> {Int32.Parse(pointvalue.Level.ToString())} and Chest Level -> {level}");
+                                         }
+                                         if (pointvalue.ChestName.Equals("(Any)"))
+                                         {
 
-                                            if (pointvalue.Level.Equals("(Any)"))
-                                            {
-                                                chestdata.Points += pointvalue.PointValue;
-                                                break;
-                                            }
-                                            else
-                                            {
+                                             if (pointvalue.Level.Equals("(Any)"))
+                                             {
+                                                 chestdata.Points += pointvalue.PointValue;
+                                                 break;
+                                             }
+                                             else
+                                             {
 
-                                                var chestlevel = Int32.Parse(pointvalue.Level.ToString());
+                                                 var chestlevel = Int32.Parse(pointvalue.Level.ToString());
 
 
-                                                if (level == chestlevel)
-                                                {
-                                                    chestdata.Points += pointvalue.PointValue;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            Debug.WriteLine($"Chest name in Points -> {pointvalue.ChestName}");
-                                            if (pointvalue.Level.Equals("(Any)") == false)
-                                            {
-                                                Debug.WriteLine($"Chest Level in Points -> {Int32.Parse(pointvalue.Level.ToString())} and Chest Level -> {level}");
-                                            }
+                                                 if (level == chestlevel)
+                                                 {
+                                                     chestdata.Points += pointvalue.PointValue;
+                                                     break;
+                                                 }
+                                             }
+                                         }
+                                         else
+                                         {
+                                             // Debug.WriteLine($"Chest name in Points -> {pointvalue.ChestName}");
+                                             if (pointvalue.Level.Equals("(Any)") == false)
+                                             {
+                                                 //   Debug.WriteLine($"Chest Level in Points -> {Int32.Parse(pointvalue.Level.ToString())} and Chest Level -> {level}");
+                                             }
 
-                                            if (chest_name.ToLower().Equals(pointvalue.ChestName.ToLower()))
-                                            {
-                                                if (pointvalue.Level.Equals("(Any)"))
-                                                {
-                                                    chestdata.Points += pointvalue.PointValue;
-                                                    break;
-                                                }
-                                                else
-                                                {
-                                                    var chestlevel = Int32.Parse(pointvalue.Level.ToString());
-                                                    if (level == chestlevel)
-                                                    {
-                                                        chestdata.Points += pointvalue.PointValue;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            chestdata.chests.Add(m_chest);
-                        }
+                                             if (chest_name.ToLower().Equals(pointvalue.ChestName.ToLower()))
+                                             {
+                                                 if (pointvalue.Level.Equals("(Any)"))
+                                                 {
+                                                     chestdata.Points += pointvalue.PointValue;
+                                                     break;
+                                                 }
+                                                 else
+                                                 {
+                                                     var chestlevel = Int32.Parse(pointvalue.Level.ToString());
+                                                     if (level == chestlevel)
+                                                     {
+                                                         chestdata.Points += pointvalue.PointValue;
+                                                         break;
+                                                     }
+                                                 }
+                                             }
+                                         }
+                                     }
+                                 }
+                             }
+                             chestdata.chests.Add(m_chest);
+                         });
                     }
                 }
-            }
+            });
 
             var datestr = DateTime.Now.ToString("d", new CultureInfo(CultureInfo.CurrentCulture.Name));   
             ClanChestDailyData[datestr] = clanChestData;
@@ -770,7 +759,6 @@ namespace TBChestTracker
             Automation.AutomationChestProcessedEventArguments args = new AutomationChestProcessedEventArguments(new ClanChestProcessResult("200", 200, ClanChestProcessEnum.SUCCESS));
             chestAutomation.InvokeChestProcessed(args);
 
-            //return new ClanChestProcessResult("Success", 200, ClanChestProcessEnum.SUCCESS);
         }
 
         //-- RepairChestData returns false if nothing needs to be done. Returns true if it's been repaired.
@@ -1008,7 +996,7 @@ namespace TBChestTracker
             using (var sw = File.OpenText(file))
             {
                 JsonSerializer serializer = new JsonSerializer();
-                ClanChestDailyData = (Dictionary<string, List<ClanChestData>>)serializer.Deserialize(sw, typeof(Dictionary<string, List<ClanChestData>>));
+                ClanChestDailyData = (Dictionary<string, IList<ClanChestData>>)serializer.Deserialize(sw, typeof(Dictionary<string, List<ClanChestData>>));
             }
         }
         public async void LoadData()
@@ -1045,7 +1033,7 @@ namespace TBChestTracker
                 using (var sw = File.OpenText(clanchestfile))
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    ClanChestDailyData = (Dictionary<string, List<ClanChestData>>)serializer.Deserialize(sw, typeof(Dictionary<string, List<ClanChestData>>));
+                    ClanChestDailyData = (Dictionary<string, IList<ClanChestData>>)serializer.Deserialize(sw, typeof(Dictionary<string, IList<ClanChestData>>));
                 }
             }
             //-- load clan chest settings
@@ -1096,7 +1084,7 @@ namespace TBChestTracker
                     clanChestData = ClanChestDailyData[lastDate];
                     foreach (var member in ClanManager.Instance.ClanmateManager.Database.Clanmates)
                     {
-                        var clanmate_exists = clanChestData.Exists(mate => mate.Clanmate.ToLower().Contains(member.Name.ToLower()));
+                        var clanmate_exists = clanChestData.ToList().Exists(mate => mate.Clanmate.ToLower().Contains(member.Name.ToLower()));
                         if (!clanmate_exists)
                         {
                             clanChestData.Add(new ClanChestData(member.Name, null));
@@ -1176,9 +1164,9 @@ namespace TBChestTracker
             }
         }
 
-        public Dictionary<string, List<ClanChestData>> FilterClanChestByConditions()
+        public Dictionary<string, IList<ClanChestData>> FilterClanChestByConditions()
         {
-            var dailyChests = new Dictionary<string, List<ClanChestData>>();
+            var dailyChests = new Dictionary<string, IList<ClanChestData>>();
             var chestRequirements = ClanManager.Instance.ClanChestSettings.ChestRequirements;
             foreach (var dailyChestData in ClanChestDailyData.ToList())
             {

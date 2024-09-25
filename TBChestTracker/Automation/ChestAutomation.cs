@@ -19,6 +19,7 @@ using System.Threading;
 using Newtonsoft.Json.Linq;
 using System.Drawing;
 using CefSharp.DevTools.Database;
+using com.HellStormGames.Diagnosis;
 
 namespace TBChestTracker.Automation
 {
@@ -183,6 +184,7 @@ namespace TBChestTracker.Automation
 
         private void ChestAutomation_ProcessingClicks(object sender, AutomationClicksEventArguments e)
         {
+
             if(e.CurrentClick >= e.MaxClicks)
             {
                 clicksTotal++;
@@ -195,6 +197,9 @@ namespace TBChestTracker.Automation
         private async void ChestAutomation_ChestProcessed(object sender, AutomationChestProcessedEventArguments e)
         {
             var result = e.ProcessResult;
+
+            Benchmarker.Stop();
+
             if(result.Result == ClanChestProcessEnum.NO_GIFTS)
             {
                 StopAutomation();
@@ -356,6 +361,13 @@ namespace TBChestTracker.Automation
                     
                     if (this.canCaptureAgain)
                     {
+                        Benchmarker.onElapsed += (s, e) =>
+                        {
+                            var msg = $"Processed Chest Data in {e.Message}";
+                            com.HellStormGames.Logging.Console.Write(msg,"Benchmark Result", LogType.INFO);
+                        };
+                        Benchmarker.Start();
+
                         await Task.Delay(SettingsManager.Instance.Settings.AutomationSettings.AutomationScreenshotsAfterClicks);
                         CaptureRegion();
 

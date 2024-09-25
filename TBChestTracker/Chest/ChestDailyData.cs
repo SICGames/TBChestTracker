@@ -10,12 +10,12 @@ namespace TBChestTracker
     public class ChestDailyData
     {
         public DateTime Date { get; set; }
-        public List<ClanChestData> ChestData { get; set; }
+        public IList<ClanChestData> ChestData { get; set; }
         public ChestDailyData()
         {
 
         }
-        public ChestDailyData(DateTime date, List<ClanChestData> chestData)
+        public ChestDailyData(DateTime date, IList<ClanChestData> chestData)
         {
             Date = date;
             ChestData = chestData;

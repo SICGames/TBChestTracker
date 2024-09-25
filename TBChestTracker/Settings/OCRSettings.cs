@@ -54,6 +54,16 @@ namespace TBChestTracker
                 _languages = value;
             }
         }
+        private double? _ClanmateSimilarity;
+        public double ClanmateSimilarity
+        {
+            get => _ClanmateSimilarity.GetValueOrDefault(90);
+            set
+            {
+                _ClanmateSimilarity = value;
+                OnPropertyChanged(nameof(ClanmateSimilarity));  
+            }
+        }
 
         private double _GlobalBrightness;
         public double GlobalBrightness

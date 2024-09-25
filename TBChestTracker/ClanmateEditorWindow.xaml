@@ -25,10 +25,12 @@
         </Style>
     </Window.Resources>
     <Grid x:Name="MAIN_GRID">
-        <Canvas x:Name="MAIN_CANVAS" PreviewMouseMove="MAIN_CANVAS_PreviewMouseMove" PreviewMouseLeftButtonUp="MAIN_CANVAS_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="MAIN_CANVAS_PreviewMouseLeftButtonDown">
-            <Border x:Name="UI_TOOLBAR" Grid.Column="1"
+        <Canvas x:Name="MAIN_CANVAS" PreviewMouseMove="MAIN_CANVAS_PreviewMouseMove" 
+                PreviewMouseLeftButtonUp="MAIN_CANVAS_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="MAIN_CANVAS_PreviewMouseLeftButtonDown">
+            <Border x:Name="UI_TOOLBAR"
                     Background="#222222" 
-                    BorderBrush="#333" 
+                    BorderBrush="#555" 
+                    BorderThickness="2"
                     CornerRadius="5"
                     Margin="0,14" 
                     Height="36" 
@@ -38,8 +40,9 @@
                 <Grid Margin="10,5" IsHitTestVisible="True" x:Name="TOOLBAR_GRID">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0" Margin="0,0,5,0" Width="24" HorizontalAlignment="Left" VerticalAlignment="Stretch" x:Name="GRIP" 
                       MouseEnter="GRIP_MouseEnter" MouseLeave="GRIP_MouseLeave">
@@ -52,25 +55,50 @@
                         <Rectangle Grid.Column="1"  Width="2" Fill="#FFF" Height="12" Opacity="0.25"/>
                         <Rectangle Grid.Column="2"  Width="2" Fill="#FFF" Height="12" Opacity="0.25"/>
                     </Grid>
-                    <StackPanel Orientation="Horizontal" Grid.Column="1">
-                        <Border x:Name="CLANMATE_TEXT_BORDER" Background="#fff" Width="200" CornerRadius="15">
+                    <DockPanel Grid.Column="1" LastChildFill="True" HorizontalAlignment="Left">
+                        <Border x:Name="CLANMATE_TEXT_BORDER" Background="#fff" Width="200" CornerRadius="10" VerticalAlignment="Center">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="28"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBox FocusVisualStyle="{DynamicResource TextBoxFocusVisualStyle1}" x:Name="CLANMATE_TEXTBOX" 
-                                         Background="Transparent" Margin="15,2,5,2" 
-                                         BorderBrush="Transparent" Grid.Column="0" BorderThickness="0" PreviewKeyDown="CLANMATE_TEXTBOX_PreviewKeyDown"/>
+                                         Background="Transparent" Margin="15,3,5,2" 
+                                         BorderBrush="Transparent" Grid.Column="0" BorderThickness="0" 
+                                         PreviewKeyDown="CLANMATE_TEXTBOX_PreviewKeyDown" TextChanged="CLANMATE_TEXTBOX_TextChanged"/>
                                 <Image Source="pack://application:,,,/Images/searchIcon-gray.png" Grid.Column="1" Width="16" Height="16" Margin="3,3"/>
                             </Grid>
                         </Border>
-                        <ui:FancyImageButton x:Name="CLANMATE_SELECTION_BUTTON" Background="Transparent" HighlightBrush="#0077ff" HighlightOpacity="0.5" HighlightStrokeBrush="#0099ff" 
-                                         ImageSource="pack://application:,,,/Images/Select_ClanmateIcon-White.png" 
-                                         Height="24" Width="24" ToolTip="Quickly Select Clanmates" Margin="5,0" Click="CLANMATE_SELECTION_BUTTON_Click"/>
+                    </DockPanel>
+                    <StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Left" Margin="5,0">
+                        <ui:FancyImageButton x:Name="CLANMATE_ADD_BUTTON" 
+                                             HighlightBrush="#0077FF" HighlightOpacity="0.5" 
+                                             ImageSource="pack://application:,,,/Images/PlusIcon.png" 
+                                             Width="20" Height="20" 
+                                             ToolTip="Add Clanmate" Click="CLANMATE_ADD_BUTTON_Click"/>
+                        <ui:FancyImageButton x:Name="CLANMATE_SELECTION_BUTTON" Background="Transparent" Margin="3,0"
+                                             HighlightBrush="#0077ff" HighlightOpacity="0.5" HighlightStrokeBrush="#0099ff" 
+                                             ImageSource="pack://application:,,,/Images/Select_ClanmateIcon-White.png"
+                                             Height="20" Width="20" ToolTip="Quickly Select Clanmates" Click="CLANMATE_SELECTION_BUTTON_Click"/>
+
                     </StackPanel>
-                    <ui:FancyButton Grid.Column="2" x:Name="CloseBtn" Text="Done"
-                                Width="75" Height="24"  FontWeight="Bold" HorizontalAlignment="Right" Click="CloseBtn_Click" IsHitTestVisible="True" RenderMode="TEXT" Background="#0077ff" HilightBrush="#0099FF" Foreground="White"/>
+                    
+                    <Grid  Grid.Column="3" HorizontalAlignment="Right" Margin="15,0,5,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <ui:FancyImageButton Grid.Column="0" ImageSource="pack://application:,,,/Images/Checkmark.png" x:Name="AcceptBtn"
+                                Width="24" Height="24"  FontWeight="Bold" HorizontalAlignment="Right" Click="AcceptBtn_Click"  IsHitTestVisible="True"
+                                HighlightOpacity="0.5" HighlightBrush="#0099FF" Margin="5,0" ToolTip="Accept"/>
+
+                        <ui:FancyImageButton Grid.Column="1" ImageSource="pack://application:,,,/Images/close-button.png" x:Name="ExitBtn"
+                                Width="24" Height="24"  FontWeight="Bold" HorizontalAlignment="Right" Click="ExitBtn_Click"  IsHitTestVisible="True"
+                                HighlightOpacity="0.75" HighlightBrush="#FF0000" Margin="5,0" ToolTip="Cancel"/>
+                        
+                    </Grid>
+                    
                 </Grid>
             </Border>
 

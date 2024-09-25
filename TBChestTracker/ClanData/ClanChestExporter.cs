@@ -122,7 +122,7 @@ namespace TBChestTracker
             return Dates;
         }
 
-        private void BuildChestExportData(List<ClanChestData> dailyChestData, bool bUsePoints = false)
+        private void BuildChestExportData(IList<ClanChestData> dailyChestData, bool bUsePoints = false)
         {
             if (dailyChestData != null)
             {
@@ -174,7 +174,7 @@ namespace TBChestTracker
 
             foreach (var date in Dates)
             {
-                List<ClanChestData> dailyChestData = null;
+                IList<ClanChestData> dailyChestData = null;
                 try
                 {
                     dailyChestData = ClanChestDailyData[date];
@@ -187,7 +187,7 @@ namespace TBChestTracker
                     break;
                 }
 
-                BuildChestExportData(dailyChestData);   
+                BuildChestExportData(dailyChestData.ToList());   
                
             }
 
@@ -202,7 +202,7 @@ namespace TBChestTracker
             
             foreach(var date in  Dates)
             {
-                List<ClanChestData> dailyChestData = null;
+                IList<ClanChestData> dailyChestData = null;
                 try
                 {
                     dailyChestData = ClanChestDailyData[date];
@@ -226,7 +226,7 @@ namespace TBChestTracker
 
             foreach (var date in Dates)
             {
-                List<ClanChestData> dailyChestData = null;
+                IList<ClanChestData> dailyChestData = null;
                 try
                 {
                     dailyChestData = ClanChestDailyData[date];

@@ -217,5 +217,12 @@ namespace TBChestTracker.Pages.Settings
                 }
             }
         }
+
+        private void ClanmateSimilarityNumericValue_ValueChanged(object sender, RoutedEventArgs e)
+        {
+            var value = ((FancyNumericValue)sender).Value;
+            var ocr = SettingsManager.Instance.Settings.OCRSettings;
+            SettingsManager.Instance.Settings.OCRSettings.ClanmateSimilarity = value;
+        }
     }
 }

@@ -1046,19 +1046,7 @@ namespace TBChestTracker
         #endregion
 
         #region Validate Chest Data Integrity
-        private void ValidateChestData_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            if (AppContext.Instance.ClanmatesBeenAdded)
-                e.CanExecute = true;
-            else 
-                e.CanExecute = false;
-        }
-
-        private void ValidateChestData_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            ValidateChestDataWindow validateChestDataWindow = new ValidateChestDataWindow();
-            validateChestDataWindow.Show();
-        }
+        
         #endregion
 
         #region Manage Settings

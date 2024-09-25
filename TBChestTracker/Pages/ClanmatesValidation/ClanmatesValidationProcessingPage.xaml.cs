@@ -21,23 +21,12 @@ namespace TBChestTracker.Pages.ClanmatesValidation
 {
     public partial class ClanmatesValidationProcessingPage : Page
     {
-        /*
-         "Name": "Naida Il",
-      "Aliases": [
-        "Naida II",
-        "Naida ١",
-        "Naida ll",
-        "Naida ١١",
-        "Naida 11",
-        "Naida l|"
-        */
-
 
         private Dictionary<string, int> ClanmateFineTuningList = new Dictionary<string, int>();
-
         public ClanmatesValidationProgress ClanmatesValidationProgress { get; private set; }
-
         private Progress<ClanmatesValidationProgress> _progress;
+
+        private int errors = 0;
 
         public ClanmatesValidationProcessingPage()
         {
@@ -85,30 +74,44 @@ namespace TBChestTracker.Pages.ClanmatesValidation
                 var bAlreadyIgnoreList = ignoreList.Select(c => c).Contains(clanmate.Name);
                 if (bAlreadyIgnoreList == false)
                 {
+
                     foreach (var verifedClanmate in verifiedClanmates)
                     {
                         if (clanmate.Name != verifedClanmate.Name)
                         {
                             var similiarity = jacko.Similarity(clanmate.Name, verifedClanmate.Name) * 100.0;
 
-                            if (similiarity >= 92)
+                            if (similiarity >= parentWindow.ClanmateSimilarity)
                             {
                                 //-- we have a winner.
-                                Debug.WriteLine($"{clanmate.Name} and {verifedClanmate.Name} similiarity => {similiarity}%");
-
-                                var bExists = parentWindow.affectedClanmates.Where(c => c.Name.ToLower().Equals(clanmate.Name.ToLower())).FirstOrDefault();
-
-                                if (bExists == null)
+                                try
                                 {
-                                    var af = new AffectedClanmate();
-                                    af.Name = verifedClanmate.Name;
+                                    Debug.WriteLine($"{clanmate.Name} and {verifedClanmate.Name} similiarity => {similiarity}%");
+                                    var bExists = parentWindow.affectedClanmates.Where(c => c.Name.ToLower().Equals(clanmate.Name.ToLower())).FirstOrDefault();
 
-                                    parentWindow.affectedClanmates.Add(af);
+                                    //-- if somehow this exists then there will be a collision.
+                                    
+                                    if (bExists == null)
+                                    {
+                                        var af = new AffectedClanmate();
+                                        af.Name = verifedClanmate.Name;
+
+                                        parentWindow.affectedClanmates.Add(af);
+                                    }
+
+                                    //-- _af throws ArgumentOutOfRangeException.
+                                    var _af = parentWindow.affectedClanmates.Select(c => c).Where(cn => cn.Name.Equals(verifedClanmate.Name)).ToList();
+
+                                    if (_af != null && _af.Count > 0)
+                                    {
+                                        _af[0].AddAlias(clanmate.Name);
+                                        ignoreList.Add(clanmate.Name);
+                                    }
                                 }
-
-                                var _af = parentWindow.affectedClanmates.Select(c => c).Where(cn => cn.Name.Equals(verifedClanmate.Name)).ToList()[0];
-                                _af.AddAlias(clanmate.Name);
-                                ignoreList.Add(clanmate.Name);
+                                catch (Exception e)
+                                {
+                                    throw new Exception(e.Message);
+                                }
                             }
                         }
                     }
@@ -119,106 +122,7 @@ namespace TBChestTracker.Pages.ClanmatesValidation
             var _progressComplete = new ClanmatesValidationProgress($"Validating Completed...", 100);
             progress.Report(_progressComplete);
         }
-
-        private async Task FineTuneResults(IProgress<ClanmatesValidationProgress> progress)
-        {
-            var dailyclanchests = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
-            double total = dailyclanchests.Count;
-            double processed = 0;
-            var parentWindow = Window.GetWindow(this) as ClanmateValidationWindow;
-            foreach (var k in dailyclanchests.Values)
-            {
-                total += k.Count();
-            }
-
-            //-- init finetuning chests
-            foreach(var finetuning in parentWindow.affectedClanmates)
-            {
-                var n = finetuning.Name;
-                ClanmateFineTuningList.Add(n, 0);
-                foreach(var c in finetuning.Aliases)
-                {
-                    ClanmateFineTuningList.Add(c.Name, 0);
-                }
-            }
-
-            var _validationProgress = new ClanmatesValidationProgress("Finetuning Results...", 0);
-            progress.Report(_validationProgress);
-           
-            foreach (var dailyclanchest in dailyclanchests)
-            {
-                var dailychests = dailyclanchests[dailyclanchest.Key];
-                foreach (var dailychest in dailychests)
-                {
-
-                    double percent = Math.Round((processed / total) * 100.0);
-                    var _processed = new ClanmatesValidationProgress("Finetuning Results...", percent);
-                    progress.Report(_processed);
-
-                    foreach (var affectedClanmate in parentWindow.affectedClanmates)
-                    {
-                        if (dailychest.Clanmate.ToLower().Equals(affectedClanmate.Name.ToLower()))
-                        {
-                            var chestCount = dailychest.chests != null ? dailychest.chests.Count : 0;
-                            if (ClanmateFineTuningList.ContainsKey(affectedClanmate.Name))
-                            {
-                                ClanmateFineTuningList[affectedClanmate.Name] += chestCount;
-                            }
-                        }
-                        else
-                        {
-                            var isAffectedSibling = affectedClanmate.Aliases.Where(a => a.Name.ToLower().Equals(dailychest.Clanmate.ToLower())).FirstOrDefault();
-                            if (isAffectedSibling != null)
-                            {
-                                var chestCount = dailychest.chests != null ? dailychest.chests.Count : 0;
-                             
-                                if (ClanmateFineTuningList.ContainsKey(isAffectedSibling.Name))
-                                {
-                                    ClanmateFineTuningList[isAffectedSibling.Name] += chestCount;
-                                }
-                            }
-
-                        }
-                    }
-                    processed++;
-                    await Task.Delay(5);
-                }
-                processed++;
-            }
-        }
-
-        private async Task FinalizeResults(IProgress<ClanmatesValidationProgress> progress)
-        {
-            var _validationProgress = new ClanmatesValidationProgress("Finalizing Results...", 0);
-            progress.Report(_validationProgress);
-            var parentWindow = Window.GetWindow(this) as ClanmateValidationWindow;
-
-            double total = ClanmateFineTuningList.Count;
-            double processed = 0;
-
-            var sortedResults = ClanmateFineTuningList.OrderByDescending(s => s.Value).ToList();
-            foreach (var result in sortedResults)
-            {
-                foreach(var affected in parentWindow.affectedClanmates)
-                {
-                    if (result.Key.Equals(affected.Name) == true)
-                    {
-                        if (result.Value > 0)
-                        {
-
-                        }
-                    }
-                    else
-                    {
-                        var affectedAlias = affected.Aliases.Where(aa => aa.Name.Equals(result.Key)).FirstOrDefault();
-                        if (affectedAlias != null)
-                        {
-
-                        }
-                    }
-                }
-            }
-        }
+     
         private async Task BeginValidatingClanmates()
         {
             _progress = new Progress<ClanmatesValidationProgress>();

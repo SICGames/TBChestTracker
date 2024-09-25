@@ -4,10 +4,11 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:TBChestTracker.Pages.ClanmatesValidation"
+      xmlns:tb="clr-namespace:TBChestTracker"
       xmlns:ui="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="CreateVerifiedClanmatesPage">
+      Title="CreateVerifiedClanmatesPage" Loaded="Page_Loaded" Unloaded="Page_Unloaded">
     <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -22,6 +23,26 @@
             <TextBlock Text="First, make sure you're on the Member's tab inside the game."  Margin="15,0"/>
             <TextBlock Text="Second, after clicking on Start button, you will be able easily create a verified clanmates list."  Margin="15,0"/>
             <TextBlock Text="You can select a clanmate(s) or type them in. A list will be generated. Once done, click on the Done button. Ready?" Margin="15,0"/>
+            <TextBlock Text="Before getting started, let's setup the Similarity Percentage two clanmates must meet to match." Margin="15,25"/>
+            <Grid VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Similarity Percentage" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Margin="20,0"/>
+                <ui:FancyNumericValue
+                    x:Name="SimiliarityPercentageNumericValue" 
+                    Minimal="0" Maximum="100" 
+                    Steps="1.0" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type tb:ClanmateValidationWindow}}, Path=ClanmateSimilarity}" 
+                    ValueChanged="SimiliarityPercentageNumericValue_ValueChanged" 
+                    Grid.Column="1" Grid.Row="0" Height="24" Width="75" 
+                    Margin="10,0"/>
+            </Grid>
+            <TextBlock Text="* The higher the better. So if Bobby is a legit clanmate, but gets mispelled as B0bbe, you'd want to make sure it is over 90% or higher similiarity." Margin="10,15" TextWrapping="Wrap"/>
         </StackPanel>
         
         <DockPanel LastChildFill="False" Grid.Row="3" Height="48" HorizontalAlignment="Right">

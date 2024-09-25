@@ -38,11 +38,6 @@
                         x:Name="SaveAsClanDatabaseCommand" 
                         CanExecute="SaveAsClanDatabaseCommand_CanExecute" 
                         Executed="SaveAsClanDatabaseCommand_Executed"/>
-        <CommandBinding Command="Commands:CustomCommandBindings.ValidateChestData"
-                        x:Name="ValidateChestData"
-                        CanExecute="ValidateChestData_CanExecute"
-                        Executed="ValidateChestData_Executed"/>
-
         <CommandBinding Command="Commands:CustomCommandBindings.ExportClanDatabase" 
                         x:Name="ExportClanDatabase" 
                         CanExecute="ExportClanDatabase_CanExecute" 

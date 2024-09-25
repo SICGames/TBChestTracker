@@ -88,7 +88,7 @@ namespace TBChestTracker.Pages.ClanmatesValidation
                         }
                     }
 
-                    Debug.WriteLine($"Removing {aliasName}");
+                  //  Debug.WriteLine($"Removing {aliasName}");
 
                     ClanManager.Instance.ClanmateManager.Remove(aliasName);
                     ClanManager.Instance.ClanChestManager.RemoveChestData(aliasName);
@@ -111,7 +111,7 @@ namespace TBChestTracker.Pages.ClanmatesValidation
                                 }
                                 if (chests != null)
                                 {
-                                    chestdata.chests.AddRange(chests);
+                                    chestdata.chests.ToList().AddRange(chests);
                                 }
                             }
                         }
@@ -160,7 +160,7 @@ namespace TBChestTracker.Pages.ClanmatesValidation
                 var _progres = new ClanmatesRepairProgress($"Removing Invalid Clanmate {dirtyClanmate}...", percent);
                 progress.Report(_progres);
 
-                Debug.WriteLine($"Removing Invalid Clanmate {dirtyClanmate}");
+               // Debug.WriteLine($"Removing Invalid Clanmate {dirtyClanmate}");
 
                 ClanManager.Instance.ClanmateManager.Remove(dirtyClanmate);
                 ClanManager.Instance.ClanChestManager.RemoveChestData(dirtyClanmate);
@@ -172,7 +172,7 @@ namespace TBChestTracker.Pages.ClanmatesValidation
         private async Task FinishRepairing(Dictionary<string, int> lazyClanmates, IProgress<ClanmatesRepairProgress> progress)
         {
             var j = new F23.StringSimilarity.JaroWinkler();
-
+            
             if (lazyClanmates.Count > 0)
             {
                 foreach (var lazyClanmate in lazyClanmates.ToList())
@@ -181,8 +181,8 @@ namespace TBChestTracker.Pages.ClanmatesValidation
                     foreach (var clanmate in ClanManager.Instance.ClanmateManager.Database.Clanmates)
                     {
                         var similiarity = j.Similarity(lazyboy, clanmate.Name) * 100;
-                        Debug.WriteLine($"{lazyClanmate.Key} and {clanmate.Name} have a {similiarity}% similiarity");
-                        if(similiarity > 95)
+                        //Debug.WriteLine($"{lazyClanmate.Key} and {clanmate.Name} have a {similiarity}% similiarity");
+                        if(similiarity > ValidationWindow.ClanmateSimilarity)
                         {
                             lazyClanmates.Remove(lazyboy);
                             break;
@@ -250,26 +250,41 @@ namespace TBChestTracker.Pages.ClanmatesValidation
 
             processed = 0;
             double total = chesttotal;
-            
-            foreach (var dailyclanchest in ClanManager.Instance.ClanChestManager.ClanChestDailyData.ToList())
-            {
-                var dailyChestData = dailyclanchest.Value.ToList();
-                
-                foreach (var chestdata in dailyChestData)
-                {
-                    var percent = Math.Round((processed / total) * 100.0);
-                    var _processinglazylist = new ClanmatesRepairProgress($"Processing Lazy Clanmates List...", percent);
-                    progress.Report(_processinglazylist);
 
-                    lazyClanmates[chestdata.Clanmate] += chestdata.chests != null ? chestdata.chests.Count() : 0;
-                    
-                    processed++;
+            try
+            {
+                foreach (var dailyclanchest in ClanManager.Instance.ClanChestManager.ClanChestDailyData.ToList())
+                {
+                    var dailyChestData = dailyclanchest.Value.ToList();
+
+                    foreach (var chestdata in dailyChestData)
+                    {
+                        var percent = Math.Round((processed / total) * 100.0);
+                        var _processinglazylist = new ClanmatesRepairProgress($"Processing Lazy Clanmates List...", percent);
+                        progress.Report(_processinglazylist);
+
+                        try
+                        {
+                            lazyClanmates[chestdata.Clanmate] += chestdata.chests != null ? chestdata.chests.Count() : 0;
+                        }
+                        catch (Exception ex)
+                        {
+                            //-- name doesn't exist within the chest database. We'd need to remove non-existant clanmates
+                            Debug.WriteLine($"{chestdata.Clanmate} doesn't exist within clanmates");
+                        }
+                        processed++;
+                    }
+                    await Task.Delay(100);
                 }
-                await Task.Delay(100);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Processing exception been caught => {ex.Message}");
             }
         }
         private async Task<Dictionary<string,int>> CreateLazyList(ObservableCollection<VerifiedClanmate> verifiedClanmates, IProgress<ClanmatesRepairProgress> progress)
         {
+
             var lazyClanmates = new Dictionary<string, int>();
             double processed = 0;
             double total = verifiedClanmates.Count;

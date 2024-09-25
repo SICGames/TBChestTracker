@@ -19,6 +19,8 @@ using TBChestTracker.Engine;
 using TBChestTracker.Effects;
 using System.Linq;
 using TBChestTracker.ViewModels;
+using System.Windows.Threading;
+using System.Threading;
 
 namespace TBChestTracker
 {
@@ -55,6 +57,8 @@ namespace TBChestTracker
 
         public bool bCanDraw = false;
 
+        private DispatcherTimer DispatcherTimer { get; set; }
+
         public ClanmateEditorWindow()
         {
             InitializeComponent();
@@ -81,9 +85,9 @@ namespace TBChestTracker
 
             _clanmatesFloatingWindow.Show();
             Debug.WriteLine($"Window Dimension: {this.ActualWidth}x{this.ActualHeight}");
-            UI_TOOLBAR.Width = (this.ActualWidth / 5);
+            UI_TOOLBAR.Width = (this.ActualWidth * 0.5);
             var windowWidth = this.ActualWidth;
-            var windowCenteredHori = (windowWidth / 2) - (UI_TOOLBAR.ActualWidth /2);
+            var windowCenteredHori = (windowWidth * 0.5) - ((UI_TOOLBAR.ActualWidth * 0.5) * 2);
             Canvas.SetLeft(UI_TOOLBAR, windowCenteredHori);
 
             Snapture = new Snapture();
@@ -98,15 +102,30 @@ namespace TBChestTracker
 
             captainHook = new CaptainHook();
 
-            if(ParentWindow is ClanmateValidationWindow clanmateValidationWindow)
+            if(ParentWindow != null)
             {
-                if(clanmateValidationWindow.VerifiedClanmatesViewModel.VerifiedClanmates == null)
+                var validationWindow = ParentWindow as ClanmateValidationWindow;
+
+                if(validationWindow.VerifiedClanmatesViewModel.VerifiedClanmates == null)
                 {
-                    clanmateValidationWindow.VerifiedClanmatesViewModel.VerifiedClanmates = new System.Collections.ObjectModel.ObservableCollection<VerifiedClanmate>();
+                    validationWindow.VerifiedClanmatesViewModel.VerifiedClanmates = new System.Collections.ObjectModel.ObservableCollection<VerifiedClanmate>();
                 }
             }
+
+            AcceptBtn.IsEnabled = false;
+            CLANMATE_ADD_BUTTON.IsEnabled = false;
+            
+            DispatcherTimer = new DispatcherTimer();
+            DispatcherTimer.Interval = TimeSpan.FromMilliseconds(500);
+            DispatcherTimer.Tick += DispatcherTimer_Tick;
+            DispatcherTimer.Start();
         }
 
+        private void DispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            var bIsEnabled = VerifiedClanmatesViewModel.Instance.VerifiedClanmates.Count > 0 ? true : false;
+            AcceptBtn.IsEnabled = bIsEnabled;
+        }
 
         private void StartRenderingRectangle(int x, int y)
         {
@@ -280,6 +299,9 @@ namespace TBChestTracker
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            DispatcherTimer.Stop();
+            DispatcherTimer = null;
+
             if (captainHook != null)
             {
                 captainHook.Dispose();
@@ -290,28 +312,6 @@ namespace TBChestTracker
             SelectionRect = null;
             Snapture.Dispose();
 
-        }
-
-        private void CloseBtn_Click(object sender, RoutedEventArgs e)
-        {
-
-            bool bHasVerifiedClanmates = false;
-            foreach(var wnd in Application.Current.Windows.OfType<ClanmateValidationWindow>())
-            {
-                var window = wnd as ClanmateValidationWindow;
-                window.WindowState = WindowState.Normal;
-                if (VerifiedClanmatesViewModel.Instance.VerifiedClanmates.Count > 0)
-                {
-                    bHasVerifiedClanmates = true;
-                }
-                if (bHasVerifiedClanmates)
-                {
-                    window.NavigateTo("Pages/ClanmatesValidation/ClanmatesValidationProcessingPage.xaml");
-                    this.DialogResult = true;
-                }
-            }
-
-            this.Close();
         }
 
         private void Border_Click(object sender, RoutedEventArgs e)
@@ -435,6 +435,69 @@ namespace TBChestTracker
                 VerifiedClanmatesViewModel.Instance.Add(text);
                 tb.Text = String.Empty;
             }
+        }
+
+        private void AcceptBtn_Click(object sender, RoutedEventArgs e)
+        {
+            bool bHasVerifiedClanmates = false;
+            foreach (var wnd in Application.Current.Windows.OfType<ClanmateValidationWindow>())
+            {
+                var window = wnd as ClanmateValidationWindow;
+                window.WindowState = WindowState.Normal;
+                if (VerifiedClanmatesViewModel.Instance.VerifiedClanmates.Count > 0)
+                {
+                    bHasVerifiedClanmates = true;
+                }
+                if (bHasVerifiedClanmates)
+                {
+                    window.NavigateTo("Pages/ClanmatesValidation/ClanmatesValidationProcessingPage.xaml");
+                    this.DialogResult = true;
+                }
+            }
+
+            this.Close();
+        }
+
+        private void ExitBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+            foreach (var wnd in Application.Current.Windows.OfType<ClanmateValidationWindow>())
+            {
+                var window = wnd as ClanmateValidationWindow;
+                window.WindowState = WindowState.Normal;
+                if (VerifiedClanmatesViewModel.Instance.VerifiedClanmates.Count > 0)
+                {
+                    if (VerifiedClanmatesViewModel.Instance.VerifiedClanmates.Count > 0)
+                    {
+                        if (MessageBox.Show("You have a list of clanmates you're trying to verify. Are you sure you want to close?", "Are You Sure?", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        {
+                            VerifiedClanmatesViewModel.Instance.VerifiedClanmates.Clear();
+                            this.Close();
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                }
+                this.Close();
+            }
+        }
+
+        private void CLANMATE_ADD_BUTTON_Click(object sender, RoutedEventArgs e)
+        {
+            if (CLANMATE_TEXTBOX.Text.Length > 0)
+            {
+                var clanmate = CLANMATE_TEXTBOX.Text;
+                VerifiedClanmatesViewModel.Instance.Add(clanmate);
+                CLANMATE_TEXTBOX.Text = String.Empty;
+            }
+        }
+
+        private void CLANMATE_TEXTBOX_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            bool bAddButtonEnabled = CLANMATE_TEXTBOX.Text.Length > 0 ? true : false;
+            CLANMATE_ADD_BUTTON.IsEnabled = bAddButtonEnabled;
         }
 
         private void UI_TOOLBAR_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
