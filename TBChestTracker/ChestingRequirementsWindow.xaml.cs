@@ -55,7 +55,10 @@ namespace TBChestTracker
         private void ApplyBtn_Click(object sender, RoutedEventArgs e)
         {
             //-- make changes.
-            var clanchestsettings = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanSettingsFile}";
+            var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
+            var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+
+            var clanchestsettings = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanSettingsFile}";
             ClanManager.Instance.ClanChestSettings.SaveSettings(clanchestsettings);
             this.Close();
         }

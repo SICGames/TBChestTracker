@@ -11,17 +11,18 @@ namespace TBChestTracker
     [Serializable]
     public class ClanDatabase : INotifyPropertyChanged
     {
+        private int? _version;
         public int Version { get; set; }
+
         public string ClanAbbreviations { get; set; }
         public string Clanname { get; set; }
-        public string ClanDatabaseFolder { get; set; }
-        public string DefaultClanFolderPath
+
+        private string? _ClanDatabaseFolder;
+        public string ClanDatabaseFolder
         {
-            get
-            {
-                return $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\TotalBattleChestTracker\\";
-            }
+            get => $"\\db";
         }
+
         public string ClanFolderPath { get; set; }
         
         public string ClanmateDatabaseFile 
@@ -58,7 +59,6 @@ namespace TBChestTracker
             }
         }
         public string ClanChestDatabaseExportFolderPath { get; set; }
-        public string ClanChestReportFolderPath { get; set; }
         public string ClanDatabaseBackupFolderPath { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;

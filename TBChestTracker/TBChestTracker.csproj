@@ -361,9 +361,6 @@
     <Compile Include="ClanManagementWindow.xaml.cs">
       <DependentUpon>ClanManagementWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ClanmateVerificationWindow.xaml.cs">
-      <DependentUpon>ClanmateVerificationWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\BooleanToWidthConverter.cs" />
     <Compile Include="CaptureRegionWindow.xaml.cs">
@@ -481,10 +478,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ClanManagementWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ClanmateVerificationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

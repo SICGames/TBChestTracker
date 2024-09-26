@@ -32,7 +32,10 @@ namespace TBChestTracker
 
         public void Load()
         {
-            var file = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\ChestRewards.db";
+            var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
+            var clanFolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+            var databaseFolder = $"{clanFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}";
+            var file = $@"{databaseFolder}\ChestRewards.db";
             using(StreamReader sr = File.OpenText(file))
             {
                 var serializer = new JsonSerializer();
@@ -44,7 +47,10 @@ namespace TBChestTracker
         }
         public void Save()
         {
-            var file = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\ChestRewards.db";
+            var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
+            var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+
+            var file = $@"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\ChestRewards.db";
             using(StreamWriter sw = File.CreateText(file))
             {
                 var serializer = new JsonSerializer();  

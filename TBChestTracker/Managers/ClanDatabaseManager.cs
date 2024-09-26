@@ -51,17 +51,14 @@ namespace TBChestTracker
 
             var clanrootfolder = $"{mainpath}{clanname}";
 
-            ClanDatabase.ClanFolderPath = clanrootfolder;
-            ClanDatabase.ClanDatabaseFolder = $"\\db";
-            ClanDatabase.ClanChestReportFolderPath = $"\\reports";
+            ClanDatabase.ClanFolderPath = clanname;
             ClanDatabase.ClanChestDatabaseExportFolderPath = $"\\exports";
             ClanDatabase.ClanDatabaseBackupFolderPath = $"\\backups";
 
-            System.IO.Directory.CreateDirectory($"{ClanDatabase.ClanFolderPath}");
-            System.IO.Directory.CreateDirectory($"{ClanDatabase.ClanFolderPath}{ClanDatabase.ClanDatabaseFolder}");
-            System.IO.Directory.CreateDirectory($"{ClanDatabase.ClanFolderPath}{ClanDatabase.ClanChestReportFolderPath}");
-            System.IO.Directory.CreateDirectory($"{ClanDatabase.ClanFolderPath}{ClanDatabase.ClanChestDatabaseExportFolderPath}");
-            System.IO.Directory.CreateDirectory($"{ClanDatabase.ClanFolderPath}{ClanDatabase.ClanDatabaseBackupFolderPath}");
+            System.IO.Directory.CreateDirectory($"{clanrootfolder}");
+            System.IO.Directory.CreateDirectory($"{clanrootfolder}{ClanDatabase.ClanDatabaseFolder}");
+            System.IO.Directory.CreateDirectory($"{clanrootfolder}{ClanDatabase.ClanChestDatabaseExportFolderPath}");
+            System.IO.Directory.CreateDirectory($"{clanrootfolder}{ClanDatabase.ClanDatabaseBackupFolderPath}");
             result( true ); 
         }
         public void Update()
@@ -81,7 +78,8 @@ namespace TBChestTracker
         }
         public void Save()
         {
-            var saveFilePath = $"{ClanDatabase.ClanFolderPath}\\clan.cdb";
+            var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
+            var saveFilePath = $"{root}{ClanDatabase.ClanFolderPath}\\clan.cdb";
             using (System.IO.StreamWriter sw = System.IO.File.CreateText(saveFilePath))
             {
                 JsonSerializer serializer = new JsonSerializer();
@@ -148,6 +146,7 @@ namespace TBChestTracker
             var clanroot = SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder;
             var directories = System.IO.Directory.GetDirectories(clanroot);
             bool needsUpgrade = false;
+
             Dictionary<string, bool> DatabasesRequireUpgrade = new Dictionary<string, bool>();
 
             foreach (var directory in directories)
@@ -164,6 +163,18 @@ namespace TBChestTracker
 
                     if (tmp_Clandatabase != null)
                     {
+                        //--- if tmp_Clandatabase doesn't have new changes applied. 
+                        var version = tmp_Clandatabase.Version;
+
+                        //-- was [documents folder]\TotalBattleChestTracker\AwesomeClan\
+                        //-- now is AwesomeClan\\
+                        var clanNameFolder = tmp_Clandatabase.ClanFolderPath;
+                        var clanName = tmp_Clandatabase.Clanname;
+                        if(clanNameFolder.IndexOf(clanName) > 0)
+                        {
+                            DatabasesRequireUpgrade.Add(clandatabasefile, true);
+                        }
+
                         if(tmp_Clandatabase.Version != 2)
                         {
                             DatabasesRequireUpgrade.Add(clandatabasefile, true);
@@ -185,8 +196,9 @@ namespace TBChestTracker
                 var clandatabasefile = database.Key;
                 if (databases[clandatabasefile] == true)
                 {
+
                     var tmp_Clandatabase = new ClanDatabase();
-                    var clanroot = SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder;
+                    var root = SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder;
 
                     using (StreamReader sr = File.OpenText(clandatabasefile))
                     {
@@ -194,27 +206,24 @@ namespace TBChestTracker
                         serializer.Formatting = Formatting.Indented;
 
                         tmp_Clandatabase = (ClanDatabase)serializer.Deserialize(sr, typeof(ClanDatabase));
-                        clanroot = $"{clanroot}{tmp_Clandatabase.Clanname}";
+
+                        var clanroot = $"{root}{tmp_Clandatabase.Clanname}";
+
                         if (tmp_Clandatabase != null)
                         {
+                            if(tmp_Clandatabase.ClanFolderPath.ToLower().Contains(clanroot.ToLower()))
+                            {
+                                tmp_Clandatabase.ClanFolderPath = tmp_Clandatabase.ClanFolderPath.Replace(clanroot, $"{tmp_Clandatabase.Clanname}");
+                            }
                             if (tmp_Clandatabase.ClanChestDatabaseExportFolderPath.ToLower().Contains(clanroot.ToLower()))
                             {
                                 tmp_Clandatabase.ClanChestDatabaseExportFolderPath = tmp_Clandatabase.ClanChestDatabaseExportFolderPath.Replace(clanroot, "");
-                            }
-                            if (tmp_Clandatabase.ClanChestReportFolderPath.ToLower().Contains(clanroot.ToLower()))
-                            {
-                                tmp_Clandatabase.ClanChestReportFolderPath= tmp_Clandatabase.ClanChestReportFolderPath.Replace(clanroot, "");
                             }
                             if (tmp_Clandatabase.ClanDatabaseBackupFolderPath.ToLower().Contains(clanroot.ToLower()))
                             {
                                 tmp_Clandatabase.ClanDatabaseBackupFolderPath = tmp_Clandatabase.ClanDatabaseBackupFolderPath.Replace(clanroot, "");
                             }
-                            if (tmp_Clandatabase.ClanDatabaseFolder.ToLower().Contains(clanroot.ToLower()))
-                            {
-                                tmp_Clandatabase.ClanDatabaseFolder = tmp_Clandatabase.ClanDatabaseFolder.Replace(clanroot, "");
-                            }
                             tmp_Clandatabase.Version = 2;
-
                         }
                         sr.Close();
                         sr.Dispose();

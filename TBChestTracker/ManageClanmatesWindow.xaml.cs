@@ -51,7 +51,10 @@ namespace TBChestTracker
 
         private void OkayButton_Click(object sender, RoutedEventArgs e)
         {
-            var clanmatefile = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}";
+            var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
+            var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+
+            var clanmatefile = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}";
             ClanManager.Instance.ClanmateManager.Save();
             ClanManager.Instance.ClanChestManager.BuildData();
             this.DialogResult = true;
@@ -200,15 +203,18 @@ namespace TBChestTracker
 
         private void VerifyClanmates_Click(object sender, RoutedEventArgs e)
         {
-            ClanmateVerificationWindow window = new ClanmateVerificationWindow();   
-            window.ShowDialog();
+          
         }
 
         private void MergeClanmate_Click(object sender, RoutedEventArgs e)
         {
 
             //-- should create backup incase shit hits the fan.
-            var backup_file = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\clanchests.old";
+            var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
+            var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+
+
+            var backup_file = $@"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\clanchests.old";
             ClanManager.Instance.ClanChestManager.SaveData(backup_file);
 
             var selected = ListClanMates01.SelectedItems;

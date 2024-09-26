@@ -112,7 +112,9 @@ namespace TBChestTracker
         
         public void Save()
         {
-            var clanmatedb = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}";
+            var root = $@"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
+            var clanFolder = $@"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+            var clanmatedb = $@"{clanFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}";
             using (StreamWriter sw = File.CreateText(clanmatedb))
             {
                 string jsondata = StringHelpers.ConvertToUTF8(JsonConvert.SerializeObject(Database, Formatting.Indented));
@@ -133,7 +135,11 @@ namespace TBChestTracker
         public void CreateBackup()
         {
             DateTimeOffset dateTimeOffset = DateTimeOffset.Now;
-            var clanmateBackupFolder = $"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath}//Clanmates";
+            var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
+            var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+
+
+            var clanmateBackupFolder = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath}//Clanmates";
             var di = new DirectoryInfo(clanmateBackupFolder);   
             if(di.Exists == false)
             {

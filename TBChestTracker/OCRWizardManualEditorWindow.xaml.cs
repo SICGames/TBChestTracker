@@ -124,8 +124,8 @@ namespace TBChestTracker
             
             var bmp = cropped_bitmap.ToBitmap();
 
-            bmp.Save($@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png");
-            SettingsManager.Instance.Settings.OCRSettings.PreviewImage = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png";
+            bmp.Save($@"{AppContext.Instance.LocalApplicationPath}\preview_image.png");
+            SettingsManager.Instance.Settings.OCRSettings.PreviewImage = $@"{AppContext.Instance.LocalApplicationPath}\preview_image.png";
             Image<Gray, byte> image = bmp.ToImage<Gray, byte>();
             var imageBrightened = image.Mul(SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness) + SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness;
             var imageScaled = image.Resize(5, Emgu.CV.CvEnum.Inter.Cubic);

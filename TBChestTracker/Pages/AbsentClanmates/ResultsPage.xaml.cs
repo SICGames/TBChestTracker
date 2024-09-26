@@ -43,7 +43,11 @@ namespace TBChestTracker.Pages.AbsentClanmates
             if (AbsentClanmatesViewModel.Instance.AbsentClanmateList.Count() > 0)
             {
                 ClanManager.Instance.ClanmateManager.CreateBackup();
-                var clanmatedatabaseFile = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}";
+                var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
+                var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+
+
+                var clanmatedatabaseFile = $@"{AppContext.Instance.LocalApplicationPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}";
 
                 foreach (var absentClanmate in AbsentClanmatesViewModel.Instance.AbsentClanmateList)
                 {

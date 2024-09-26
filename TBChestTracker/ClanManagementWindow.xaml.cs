@@ -35,8 +35,8 @@ namespace TBChestTracker
                 clans = new ObservableCollection<Clan>();
 
                 //-- build clans 
-                var clan_default_folder = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath;
-                var clan_directories = System.IO.Directory.GetDirectories(clan_default_folder);
+                var root_folder = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
+                var clan_directories = System.IO.Directory.GetDirectories(root_folder);
                 foreach (var directory in clan_directories)
                 {
                     Clan clan = new Clan();

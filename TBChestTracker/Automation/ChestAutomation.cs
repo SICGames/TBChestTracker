@@ -292,8 +292,8 @@ namespace TBChestTracker.Automation
                 //-- if it is null or empty somehow, we update it.
                 if (String.IsNullOrEmpty(ocrSettings.PreviewImage))
                 {
-                    outputImage.Save($@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png");
-                    ocrSettings.PreviewImage = $@"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}\preview_image.png";
+                    outputImage.Save($@"{AppContext.Instance.LocalApplicationPath}\preview_image.png");
+                    ocrSettings.PreviewImage = $@"{AppContext.Instance.LocalApplicationPath}\preview_image.png";
                 }
 
                 var ocrResult = OCREngine.Read(outputImage);

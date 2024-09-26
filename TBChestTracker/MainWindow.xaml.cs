@@ -152,10 +152,6 @@ namespace TBChestTracker
             return Task.Run(() =>
             {
                 this.ClanManager = new ClanManager();
-                if (String.IsNullOrEmpty(SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder))
-                {
-                    SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath;
-                }
 
                 if (System.IO.Directory.Exists(SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder) == false)
                 {
@@ -813,7 +809,8 @@ namespace TBChestTracker
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Clan Databases | *.cdb";
             openFileDialog.RestoreDirectory = true;
-            openFileDialog.InitialDirectory = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.DefaultClanFolderPath;
+            openFileDialog.InitialDirectory = SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder;
+           
 
             if (ClanManager.Instance.ClanChestSettings.ChestRequirements != null)
                 ClanManager.Instance.ClanChestSettings.Clear();
