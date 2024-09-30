@@ -26,14 +26,14 @@ namespace TBChestTracker
     /// </summary>
     public partial class StartPageWindow : Window
     {
-        public ObservableCollection<RecentClanDatabase> RecentClanDatabases { get; set; }
-
-        //public ObservableCollection<String> RecentFiles;
+        //public ObservableCollection<RecentClanDatabase> RecentClanDatabases { get; set; }
+        
         public MainWindow MainWindow { get; set; }
         public StartPageWindow()
         {
             InitializeComponent();
-            RecentClanDatabases = new ObservableCollection<RecentClanDatabase>();   
+            this.DataContext = RecentlyOpenedListManager.Instance;
+            //RecentClanDatabases = new ObservableCollection<RecentClanDatabase>();   
         }
 
         private void CloseBtn_Click(object sender, RoutedEventArgs e)
@@ -42,6 +42,7 @@ namespace TBChestTracker
             this.Close();
         }
 
+        /*
         private void LoadRecentFilesList()
         {
             if(File.Exists(AppContext.Instance.RecentOpenedClanDatabases))
@@ -58,6 +59,7 @@ namespace TBChestTracker
             }
 
         }
+        */
 
         private void Lvi_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -72,15 +74,31 @@ namespace TBChestTracker
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            LoadRecentFilesList();
+            RecentlyOpenedListManager.Instance.Build();
+
+            recentFilesView.ItemsSource = RecentlyOpenedListManager.Instance.RecentClanDatabases;
+            if (RecentlyOpenedListManager.Instance.RecentClanDatabases.Count > 0)
+            {
+                ClearRecentListBtn.IsEnabled = true;
+            }
+            else
+            {
+                ClearRecentListBtn.IsEnabled = false;
+            }
+            //LoadRecentFilesList();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            recentFilesView.ItemsSource = null;
+            
+            /*
             if (RecentClanDatabases.Count > 0)
                 RecentClanDatabases.Clear();
 
             RecentClanDatabases = null;
+            */
+
             MainWindow = null;
         }
 
@@ -121,6 +139,16 @@ namespace TBChestTracker
                     break;
                 default: break;
             }
+        }
+
+        private void ClearRecentListBtn_Click(object sender, RoutedEventArgs e)
+        {
+            RecentlyOpenedListManager.Instance.Delete();
+            if (MainWindow.RecentlyOpenedParent.Items.Count > 0)
+            {
+                MainWindow.RecentlyOpenedParent.Items.Clear();
+            }
+            ClearRecentListBtn.IsEnabled = false;   
         }
     }
 }

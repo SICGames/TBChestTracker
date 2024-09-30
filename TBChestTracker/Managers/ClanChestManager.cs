@@ -786,8 +786,13 @@ namespace TBChestTracker
 
                     if (chests != null)
                     {
-                        foreach (var chest in chests)
+                        foreach (var chest in chests.ToList())
                         {
+                            if(chest == null)
+                            {
+                                chests.Remove(chest);
+                                continue;
+                            }
                             var name = chest.Name;
                             var source = chest.Source;
                             /*

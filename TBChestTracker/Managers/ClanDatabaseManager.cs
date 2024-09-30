@@ -90,11 +90,12 @@ namespace TBChestTracker
             }
 
             //--- in addition, we add it to recent files. 
-            var recentdb = new RecentDatabase();
-            recentdb.Load();
-            if (recentdb.RecentClanDatabases.Count > 0)
+            var recentdb = RecentlyOpenedListManager.Instance.RecentClanDatabases;
+            
+            //recentdb.Load();
+            if (recentdb.Count > 0)
             {
-                var recent_files = recentdb.RecentClanDatabases.Where(f => f.FullClanRootFolder.Equals(saveFilePath)).ToList();
+                var recent_files = recentdb.Where(f => f.FullClanRootFolder.Equals(saveFilePath)).ToList();
                 if(recent_files.Count>0)
                 {
                     recent_files[0].LastOpened = DateTime.Now.ToFileTimeUtc().ToString();
@@ -111,8 +112,9 @@ namespace TBChestTracker
                     recentClanDatabase.ShortClanRootFolder = truncated;
                     recentClanDatabase.FullClanRootFolder = saveFilePath;
                     recentClanDatabase.LastOpened = DateTime.Now.ToFileTimeUtc().ToString();
-                    recentdb.RecentClanDatabases.Add(recentClanDatabase);
-                    recentdb.Save();
+                    recentdb.Add(recentClanDatabase);
+                    RecentlyOpenedListManager.Instance.Save();
+                    //recentdb.Save();
                 }
             }
         }
@@ -170,6 +172,7 @@ namespace TBChestTracker
                         //-- now is AwesomeClan\\
                         var clanNameFolder = tmp_Clandatabase.ClanFolderPath;
                         var clanName = tmp_Clandatabase.Clanname;
+
                         if(clanNameFolder.IndexOf(clanName) > 0)
                         {
                             DatabasesRequireUpgrade.Add(clandatabasefile, true);
@@ -211,10 +214,11 @@ namespace TBChestTracker
 
                         if (tmp_Clandatabase != null)
                         {
-                            if(tmp_Clandatabase.ClanFolderPath.ToLower().Contains(clanroot.ToLower()))
-                            {
-                                tmp_Clandatabase.ClanFolderPath = tmp_Clandatabase.ClanFolderPath.Replace(clanroot, $"{tmp_Clandatabase.Clanname}");
+                            var clanname = tmp_Clandatabase.Clanname;
+                            if(tmp_Clandatabase.ClanFolderPath.IndexOf(clanname) > 0) {
+                              tmp_Clandatabase.ClanFolderPath =  tmp_Clandatabase.ClanFolderPath.Substring(tmp_Clandatabase.ClanFolderPath.LastIndexOf("\\") + 1);
                             }
+
                             if (tmp_Clandatabase.ClanChestDatabaseExportFolderPath.ToLower().Contains(clanroot.ToLower()))
                             {
                                 tmp_Clandatabase.ClanChestDatabaseExportFolderPath = tmp_Clandatabase.ClanChestDatabaseExportFolderPath.Replace(clanroot, "");

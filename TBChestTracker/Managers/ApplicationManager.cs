@@ -73,6 +73,7 @@ namespace TBChestTracker
             }
             var localeFolder = $@"{AppContext.Instance.LocalApplicationPath}locale";
             var di = new DirectoryInfo(localeFolder);
+
             if(di.Exists == false)
             {
                 di.Create();

@@ -217,6 +217,7 @@
     <Compile Include="Helpers\WindowHelper.cs" />
     <Compile Include="ImageEffects\ImageEffects.cs" />
     <Compile Include="Managers\ChestRewardsManager.cs" />
+    <Compile Include="Managers\RecentlyOpenedListManager.cs" />
     <Compile Include="Pages\ClanmatesValidation\CompletedPage.xaml.cs">
       <DependentUpon>CompletedPage.xaml</DependentUpon>
     </Compile>
@@ -322,7 +323,6 @@
       <DependentUpon>PreviewScreenshotWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="RecentData\RecentClanDatabase.cs" />
-    <Compile Include="RecentData\RecentDatabase.cs" />
     <Compile Include="Resources\Strings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

@@ -115,10 +115,14 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="48"/>
                         <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Text="Recent Opened Clan Databases" Foreground="White" FontWeight="Bold" FontSize="20" Grid.Column="0" Margin="15,10"/>
-                    <ListView ItemTemplate="{DynamicResource RecentOpenedDatabaseTemplate}" 
-                              x:Name="recentFilesView" Grid.Row="1" 
+                        <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                    <TextBlock Text="Recent Opened Clan Databases" Foreground="White" FontWeight="Bold" FontSize="20" Grid.Row="0" Grid.Column="0" Margin="15,10"/>
+                <ListView ItemTemplate="{DynamicResource RecentOpenedDatabaseTemplate}" ItemsSource="{Binding RecentClanDatabases}"
+                              x:Name="recentFilesView" Grid.Row="1" Grid.Column="0"
                               Background="#111" BorderBrush="Transparent" BorderThickness="0" Margin="0" Foreground="White" FontWeight="Bold">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
@@ -126,6 +130,9 @@
                         </Style>
                     </ListView.ItemContainerStyle>
                     </ListView>
+                <DockPanel LastChildFill="False" Grid.Row="2" Height="32" Background="#111" Grid.Column="0">
+                    <ui:FancyButton RenderMode="IMAGE_TEXT" ImageSource="pack://application:,,,/Images/trashIcon-white.png" Background="Transparent" Foreground="White" HilightBrush="Transparent" Text="Clear Recent List" Height="20" Width="125" Margin="10,0" x:Name="ClearRecentListBtn" Click="ClearRecentListBtn_Click"/>
+                </DockPanel>
                 </Grid>
                 <!--#region  Recent Files-->
 

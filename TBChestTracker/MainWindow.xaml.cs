@@ -76,9 +76,11 @@ namespace TBChestTracker
         OCRWizardWindow OCRWizardWindow { get; set; }
         StartPageWindow startPageWindow {  get; set; }  
         ClanChestProcessResult clanChestProcessResult { get; set; }
-        RecentDatabase recentlyOpenedDatabases { get; set; }
-        ApplicationManager applicationManager { get; set; }
         
+        //RecentDatabase recentlyOpenedDatabases { get; set; }
+        
+        ApplicationManager applicationManager { get; set; }
+        RecentlyOpenedListManager recentlyOpenedListManager { get; set; }
         Task AutomationTask { get; set; }
 
         ChestAutomation ChestAutomation { get; set; }
@@ -104,7 +106,7 @@ namespace TBChestTracker
 
             this.DataContext = AppContext.Instance;
             this.Closing += MainWindow_Closing;
-            recentlyOpenedDatabases = new RecentDatabase();
+            //recentlyOpenedDatabases = new RecentDatabase();
             consoleWindow = new ConsoleWindow();
         }
         #endregion
@@ -160,10 +162,9 @@ namespace TBChestTracker
 
                 if (File.Exists(AppContext.Instance.RecentOpenedClanDatabases))
                 {
-                    
-                    if(recentlyOpenedDatabases.Load())
+                    if(recentlyOpenedListManager.Build())
                     {
-                        foreach(var recent in recentlyOpenedDatabases.RecentClanDatabases)
+                        foreach(var recent in recentlyOpenedListManager.RecentClanDatabases)
                         {
                             if(string.IsNullOrEmpty(recent.FullClanRootFolder) ) 
                             {
@@ -437,6 +438,8 @@ namespace TBChestTracker
 
             if (window is SplashScreen splashScreen)
             {
+
+
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     splashScreen.UpdateStatus("Checking For Updates...", 0);
@@ -449,6 +452,8 @@ namespace TBChestTracker
                 {
                     splashScreen.UpdateStatus("Initalizing...", 10);
                 }));
+
+                recentlyOpenedListManager = new RecentlyOpenedListManager();
 
                 await Task.Delay(500);
                 SettingsManager = await InitSettings();
@@ -751,9 +756,11 @@ namespace TBChestTracker
             {
                 try
                 {
-                    System.IO.File.Delete($@"{AppContext.Instance.RecentOpenedClanDatabases}");
+                    recentlyOpenedListManager.Delete();
+
+                    //System.IO.File.Delete($@"{AppContext.Instance.RecentOpenedClanDatabases}");
                     RecentlyOpenedParent.Items.Clear();
-                    recentlyOpenedDatabases.RecentClanDatabases.Clear();
+                    //recentlyOpenedDatabases.RecentClanDatabases.Clear();
                 }
                 catch(Exception ex)
                 {
@@ -825,7 +832,7 @@ namespace TBChestTracker
                         AppContext.Instance.UpdateCurrentProject($"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}");
                         AppContext.Instance.UpdateApplicationTitle();
 
-                        var recentlyOpenedFiles = recentlyOpenedDatabases.RecentClanDatabases.Select(f => f.FullClanRootFolder).ToList();
+                        var recentlyOpenedFiles = recentlyOpenedListManager.RecentClanDatabases.Select(f => f.FullClanRootFolder).ToList();
 
                         if(!recentlyOpenedFiles.Contains(file))
                         {
@@ -836,7 +843,8 @@ namespace TBChestTracker
                             recentdb.ShortClanRootFolder = StringHelpers.truncate_file_name(file, position);
                             recentdb.FullClanRootFolder = file;
                             recentdb.LastOpened = DateTime.Now.ToFileTimeUtc().ToString();
-                            recentlyOpenedDatabases.RecentClanDatabases.Add(recentdb);
+
+                            recentlyOpenedListManager.RecentClanDatabases.Add(recentdb);
 
                             MenuItem mu = new MenuItem();
                             mu.Header = StringHelpers.truncate_file_name(file, position);
@@ -844,7 +852,18 @@ namespace TBChestTracker
                             mu.Click += Mu_Click;
                             RecentlyOpenedParent.Items.Add(mu);
 
-                            recentlyOpenedDatabases.Save();
+                            recentlyOpenedListManager.Save();
+                            
+                            if(RecentlyOpenedParent.Items.Count <= 1)
+                            {
+                                Separator separator = new Separator();
+                                RecentlyOpenedParent.Items.Add(separator);
+                                MenuItem mi = new MenuItem();
+                                mi.Tag = "CLEAR_HISTORY";
+                                mi.Header = "Clear Recent Clan Databases";
+                                mi.Click += Mu_Click;
+                                RecentlyOpenedParent.Items.Add(mi);
+                            }
 
                         }
 
