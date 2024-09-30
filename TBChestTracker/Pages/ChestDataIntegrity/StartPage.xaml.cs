@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using TBChestTracker.Managers;
 
 namespace TBChestTracker.Pages.ChestDataIntegrity
 {
@@ -20,6 +21,7 @@ namespace TBChestTracker.Pages.ChestDataIntegrity
     /// </summary>
     public partial class StartPage : Page
     {
+       
         public StartPage()
         {
             InitializeComponent();
@@ -33,6 +35,21 @@ namespace TBChestTracker.Pages.ChestDataIntegrity
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void FancyButton_Click(object sender, RoutedEventArgs e)
+        {
+            var wnd = Window.GetWindow(this) as ValidateClanChestsIntegrityWindow;
+            var result = ClanManager.Instance.ClanChestManager.DoesChestDataNeedsRepairs();
+            if(result == null)
+            {
+                wnd.NavigateTo("Pages/ChestDataIntegrity/NoRepairsNeeded.xaml");
+            }
+            else
+            {
+                wnd.IntegrityResult = result;
+                wnd.NavigateTo("Pages/ChestDataIntegrity/ErrorsFound.xaml");
+            }
         }
     }
 }

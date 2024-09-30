@@ -13,6 +13,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Markup;
 using TBChestTracker.Automation;
 using TBChestTracker.Managers;
@@ -760,7 +761,239 @@ namespace TBChestTracker
 
         }
 
-        //-- RepairChestData returns false if nothing needs to be done. Returns true if it's been repaired.
+        //-- RepairChestData returns false if nothing needs to be done. Returns true if errors exist.
+        public IntegrityResult DoesChestDataNeedsRepairs()
+        {
+            int chestErrors = 0;
+            IntegrityResult result = new IntegrityResult();
+
+            var chestsettings = ClanManager.Instance.ClanChestSettings;
+            var chestdata = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
+
+            var chestpointsvalues = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints;
+            if (chestpointsvalues == null || chestpointsvalues.Count == 0)
+            {
+
+            }
+
+            foreach (var dates in chestdata.Keys.ToList())
+            {
+                var data = chestdata[dates];
+                foreach (var _data in data.ToList())
+                {
+                    var clanmate_points = _data.Points;
+                    var chests = _data.chests;
+
+                    var total_chest_points = 0;
+
+                    if (chests != null)
+                    {
+                        foreach (var chest in chests.ToList())
+                        {
+                            if (chest == null)
+                            {
+                                chests.Remove(chest);
+                                continue;
+                            }
+                            var name = chest.Name;
+                            var source = chest.Source;
+                            /*
+                              Fix Any Chests that start with lvl in it. 
+                            */
+                            if (source.Contains(TBChestTracker.Resources.Strings.lvl))
+                            {
+                                var levelStartPos = -1;
+                                levelStartPos = source.IndexOf(TBChestTracker.Resources.Strings.lvl);
+                                int level = 0;
+                                //-- level in en-US is 0 position.
+                                //-- level in es-ES is 11 position.
+                                //-- crypt in en-US is 9 position 
+                                //-- crypt in es-ES is 0 position.
+
+                                //-- we can check direction of level position.
+                                //-- if more than 1 then we know we should go backwares. If 0 then we know to go forwards.
+                                var levelFullLength = 0;
+                                var ChestType = String.Empty;
+
+                                if (levelStartPos > -1)
+                                {
+                                    var levelStr = source.Substring(levelStartPos).ToLower();
+                                    var levelNumberStr = levelStr.Substring(levelStr.IndexOf(" ") + 1);
+
+                                    //-- using a quantifer to check if there is an additional space after the level number. If user is spanish, no space after level number.
+                                    levelNumberStr = levelNumberStr.IndexOf(" ") > 0 ? levelNumberStr.Substring(0, levelNumberStr.IndexOf(" ")) : levelNumberStr;
+                                    var levelFullStr = String.Empty;
+
+                                    if (source.Contains(TBChestTracker.Resources.Strings.Level))
+                                    {
+                                        levelFullStr = $"{TBChestTracker.Resources.Strings.Level} {levelNumberStr}";
+                                    }
+                                    else if (source.Contains(TBChestTracker.Resources.Strings.lvl))
+                                    {
+                                        levelFullStr = $"{TBChestTracker.Resources.Strings.lvl} {levelNumberStr}";
+                                    }
+
+                                    levelFullLength = levelFullStr.Length; //-- 'level|nivel 10' should equal to 8 characters in length.
+
+                                    var levelArray = levelNumberStr.Split('-');
+
+                                    if (levelArray.Count() == 1)
+                                    {
+                                        if (Int32.TryParse(levelArray[0], out level) == false)
+                                        {
+                                            //-- couldn't extract level.
+                                        }
+                                    }
+                                    else if (levelArray.Count() > 1)
+                                    {
+                                        if (Int32.TryParse(levelArray[0], out level) == false)
+                                        {
+                                            //-- couldn't extract level.
+                                        }
+                                    }
+
+                                    //-- now we make sure levelStartPos == 0 or more than 0.
+                                    var direction = levelStartPos == 0 ? "forwards" : "backwards";
+                                    if (direction == "forwards")
+                                    {
+                                        ChestType = source.Substring(levelFullLength + 1);
+                                    }
+                                    else
+                                    {
+                                        //-- Cripta de nivel 10 = 18 characters long.
+                                        //-- Cripta de = 10 characters long
+                                        //-- nivel 10 =  8 characters long.
+
+                                        ChestType = source.Substring(0, source.Length - levelFullLength);
+                                        ChestType = ChestType.Trim(); //-- remove any whitespaces at the end 
+                                    }
+                                    if (ChestType.StartsWith(TBChestTracker.Resources.Strings.OnlyCrypt))
+                                    {
+                                        ChestType = ChestType.Insert(0, $"{TBChestTracker.Resources.Strings.Common} ");
+                                    }
+
+                                    chest.Type = ChestType;
+                                    if (chest.Level != level)
+                                    {
+                                        result.Add("Incorrect Chest levels", chestErrors);
+                                        //chest.Level = level;
+                                        Debug.WriteLine($"Repairing Chest {chest.Source} that contain lvl.");
+                                        chestErrors++;
+                                    }
+
+                                }
+                            }
+
+                            //-- these issues contain no level inside source.
+                            if (chest.Source.Contains(TBChestTracker.Resources.Strings.lvl) == false && chest.Source.Contains(TBChestTracker.Resources.Strings.Level) == false)
+                            {
+                                if (chest.Source.ToLower().Equals(chest.Type.ToLower()) == false)
+                                {
+                                    if (chest.Source.ToLower().EndsWith(chest.Type.ToLower()))
+                                    {
+                                        //-- these errors generally have a level 5 whereas should be 0.
+                                        if (chest.Level == 5)
+                                        {
+                                            chest.Level = 0;
+                                        }
+
+
+                                        //chest.Type = chest.Source;
+                                        result.Add("Incorrect Chest Types", chestErrors);
+
+                                        Debug.WriteLine("Fixing Corrupted Chests.");
+                                        chestErrors++;
+                                    }
+                                }
+                            }
+                            if (chestsettings.GeneralClanSettings.ChestOptions == ChestOptions.UsePoints)
+                            {
+                                foreach (var chestpointvalue in chestpointsvalues)
+                                {
+                                    var chestname = chest.Name;
+                                    var chesttype = chest.Type;
+
+                                    if (chesttype.ToLower().Contains(chestpointvalue.ChestType.ToLower()))
+                                    {
+                                        if (chestpointvalue.ChestName.Equals("(Any)"))
+                                        {
+                                            if (!chestpointvalue.Level.Equals("(Any)"))
+                                            {
+                                                var chestlevel = Int32.Parse(chestpointvalue.Level);
+                                                if (chest.Level == chestlevel)
+                                                {
+                                                    total_chest_points += chestpointvalue.PointValue;
+                                                    break;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                total_chest_points += chestpointvalue.PointValue;
+                                                break;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (chestname.ToLower().Contains(chestpointvalue.ChestName.ToLower()))
+                                            {
+                                                if (!chestpointvalue.Level.Equals("(Any)"))
+                                                {
+                                                    var chestlevel = Int32.Parse(chestpointvalue.Level);
+                                                    if (chest.Level == chestlevel)
+                                                    {
+                                                        total_chest_points += chestpointvalue.PointValue;
+                                                        break;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    total_chest_points += chestpointvalue.PointValue;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (clanmate_points != total_chest_points)
+                        {
+                            //_data.Points = total_chest_points;
+                            //Debug.WriteLine("Chest Points don't add up.");
+                            result.Add("Incorrect Chest Points", chestErrors);
+
+                            chestErrors++;
+                        }
+                    }
+
+                    // Search for clanmates no longer within clanmates db
+                    var clanmate = _data.Clanmate;
+                    var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates;
+                    bool bExists = clanmates.Select(c => c.Name).Contains(clanmate);
+                    if (bExists == false)
+                    {
+                        //Debug.WriteLine($"{clanmate} doesn't exist anymore within clanmates database. Removing.");
+                        //RemoveChestData(clanmate);
+                        result.Add("Non-Existing Clanmates", chestErrors);
+
+                        chestErrors++;
+                    }
+                }
+            }
+
+            if (chestErrors > 0)
+            {
+                //com.HellStormGames.Logging.Console.Write("Chest Data Automatically Repaired", "Chest Integrity", LogType.INFO);
+                //SaveData();
+                //CreateBackup();
+                return result;
+            }
+
+            //com.HellStormGames.Logging.Console.Write("Chest Data looks good. No repairs needed.", "Chest Integrity", LogType.INFO);
+            return null;
+        }
+
         public bool RepairChestData()
         {
             int chestErrors = 0;
@@ -1003,6 +1236,24 @@ namespace TBChestTracker
                 ClanChestDailyData = (Dictionary<string, IList<ClanChestData>>)serializer.Deserialize(sw, typeof(Dictionary<string, List<ClanChestData>>));
             }
         }
+
+
+        private async Task<bool> LoadClanChestData(string file)
+        {
+            try
+            {
+                using (var sw = File.OpenText(file))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    ClanChestDailyData = (Dictionary<string, IList<ClanChestData>>)serializer.Deserialize(sw, typeof(Dictionary<string, IList<ClanChestData>>));
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
         public async void LoadData()
         {
             var rootFolder = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
@@ -1037,10 +1288,15 @@ namespace TBChestTracker
             }
             else
             {
-                using (var sw = File.OpenText(clanchestfile))
+                bool result = await LoadClanChestData(clanchestfile); 
+                if(result == false) 
                 {
-                    JsonSerializer serializer = new JsonSerializer();
-                    ClanChestDailyData = (Dictionary<string, IList<ClanChestData>>)serializer.Deserialize(sw, typeof(Dictionary<string, IList<ClanChestData>>));
+                    //-- we need to let them know there's a possible corrupt clanchestdatabase file
+                    //-- we caught the exception. User needs to restore. Need a way to force them. 
+                    if(MessageBox.Show("Oh no! There is an error loading your clan chest database file. It is possibly corrupted. Be sure to restore a previously known good clan chest data file inside Tools -> Restore Clan Chest Data", "Clan Chest Data Loading Error", MessageBoxButton.OK, MessageBoxImage.Stop)  == MessageBoxResult.OK)
+                    {
+                        AppContext.Instance.IsClanChestDataCorrupted = true;
+                    }
                 }
             }
             //-- load clan chest settings

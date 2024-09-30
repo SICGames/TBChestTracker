@@ -27,7 +27,8 @@ namespace TBChestTracker.Pages.ChestDataIntegrity
 
         private void RepairButton_Click(object sender, RoutedEventArgs e)
         {
-
+            var wnd = Window.GetWindow(this) as ValidateClanChestsIntegrityWindow;
+            wnd.NavigateTo("Pages/ChestDataIntegrity/RepairingClanChestData.xaml");
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -35,9 +36,51 @@ namespace TBChestTracker.Pages.ChestDataIntegrity
 
         }
 
+        private async Task BuildErrorListView(IntegrityResult result)
+        {
+            await this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                var errorParent = ERROR_LIST as Grid;
+                var rowCount = 0;
+                foreach (var error in result.Errors)
+                {
+                    var rowDef = new RowDefinition();
+                    errorParent.RowDefinitions.Add(rowDef);
+
+                    var img = new Image();
+                    img.Source = new BitmapImage(new Uri(@"Images/errorIcon.png", UriKind.Relative));
+                    img.Width = 16;
+                    img.Height = 16;
+                    img.VerticalAlignment = VerticalAlignment.Center;
+                    img.Margin = new Thickness(5, 5, 5, 5);
+
+                    img.SetValue(Grid.RowProperty, rowCount);
+                    img.SetValue(Grid.ColumnProperty, 0);
+
+                    errorParent.Children.Add(img);
+
+                    TextBlock textBlock = new TextBlock();
+                    textBlock.Text = error.Key;
+                    textBlock.FontWeight = FontWeights.Bold;
+                    textBlock.VerticalAlignment = VerticalAlignment.Center;
+                    textBlock.Margin = new Thickness(3, 0, 0, 0);
+                    textBlock.SetValue(Grid.ColumnProperty, 1);
+                    textBlock.SetValue(Grid.RowProperty, rowCount);
+
+                    errorParent.Children.Add(textBlock);
+                    rowCount++;
+                }
+            }));
+        }
+
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            //-- get the Integrity Result and display the user. 
+            var wnd = Window.GetWindow(this) as ValidateClanChestsIntegrityWindow;
+            var result = wnd.IntegrityResult;
 
+            Task.Run(() => BuildErrorListView(result));
+            
         }
     }
 }

@@ -19,9 +19,15 @@ namespace TBChestTracker
     /// </summary>
     public partial class ValidateClanChestsIntegrityWindow : Window
     {
+        public IntegrityResult IntegrityResult { get; set; }
         public ValidateClanChestsIntegrityWindow()
         {
             InitializeComponent();
+        }
+
+        public void NavigateTo(string page)
+        {
+            ValidateClanChestIntegrityFrame.Navigate(new Uri(Uri.UnescapeDataString(page.ToString()), UriKind.RelativeOrAbsolute));
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -31,7 +37,10 @@ namespace TBChestTracker
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-
+            if (IntegrityResult != null)
+            {
+                IntegrityResult.Dispose();
+            }
         }
     }
 }

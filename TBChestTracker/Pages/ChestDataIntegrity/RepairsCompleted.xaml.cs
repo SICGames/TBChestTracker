@@ -27,7 +27,8 @@ namespace TBChestTracker.Pages.ChestDataIntegrity
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
-
+            var wnd = Window.GetWindow(this) as ValidateClanChestsIntegrityWindow;
+            wnd.Close();
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)

@@ -387,7 +387,7 @@ namespace TBChestTracker
                 ClanManager.Instance.ClanChestManager.CreateBackup();
                 
                 //-- automatically repairs chest data if necessary
-                ClanManager.Instance.ClanChestManager.RepairChestData();
+                //ClanManager.Instance.ClanChestManager.RepairChestData();
 
                 AppContext.Instance.IsAutomationPlayButtonEnabled = true;
                 AppContext.Instance.IsAutomationStopButtonEnabled = false;
@@ -784,7 +784,7 @@ namespace TBChestTracker
                     
                     AppContext.Instance.IsCurrentClandatabase = true;
                     AppContext.Instance.IsAutomationPlayButtonEnabled = true;
-                    ClanManager.Instance.ClanChestManager.RepairChestData();
+                    //ClanManager.Instance.ClanChestManager.RepairChestData();
                     response(true);
                 }
                 else
@@ -872,7 +872,7 @@ namespace TBChestTracker
 
                         AppContext.Instance.IsCurrentClandatabase = true;
                         AppContext.Instance.IsAutomationPlayButtonEnabled = true;
-                        ClanManager.Instance.ClanChestManager.RepairChestData();
+                        //ClanManager.Instance.ClanChestManager.RepairChestData();
                         response(true);
                     }
                     else
@@ -979,7 +979,7 @@ namespace TBChestTracker
         private void StartAutomationCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             if (AppContext.Instance.NewClandatabaseBeenCreated
-                && AppContext.Instance.ClanmatesBeenAdded && AppContext.Instance.OCRCompleted)
+                && AppContext.Instance.ClanmatesBeenAdded && AppContext.Instance.OCRCompleted && AppContext.Instance.IsClanChestDataCorrupted == false)
             {
                 e.CanExecute = true;
             }
@@ -1234,7 +1234,8 @@ namespace TBChestTracker
 
         private void ValidateClanChestIntegrityMenuItem_Click(object sender, RoutedEventArgs e)
         {
-
+            ValidateClanChestsIntegrityWindow validateChestDataIntegrity = new ValidateClanChestsIntegrityWindow();
+            validateChestDataIntegrity.Show();
         }
     }
 }

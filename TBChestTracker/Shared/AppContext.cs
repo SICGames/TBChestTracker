@@ -28,6 +28,8 @@ namespace TBChestTracker
         private bool newClanDatabaseCreated;
         private bool clanmatesBeenAdded;
 
+        private bool? corruptedClanChestData;
+
         private string pAppName = "Total Battle Chest Tracker";
         private string pCurrentProject = "Untitled";
         private string pAppTitle = $"";
@@ -43,6 +45,18 @@ namespace TBChestTracker
             set
             {
                 _bDeleteTessData = value;
+            }
+        }
+
+        public bool IsClanChestDataCorrupted
+        {
+            get
+            {
+                return corruptedClanChestData.GetValueOrDefault(false);
+            }
+            set
+            {
+                corruptedClanChestData = value;
             }
         }
 

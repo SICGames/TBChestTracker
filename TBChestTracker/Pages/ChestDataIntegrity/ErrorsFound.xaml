@@ -13,6 +13,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
@@ -20,7 +21,15 @@
         <TextBlock Grid.Row="0" Text="Validate Clan Chest Data Integrity" FontSize="20" FontWeight="Bold" Margin="15,5"/>
         <TextBlock Grid.Row="1" Text="Clan Chest Data Has Errors" FontSize="16" Margin="20,0"/>
         <TextBlock Grid.Row="2" Text="Oh no, your clan chest data has few or more errors. Let's fix them!" TextWrapping="Wrap" Margin="20,10"/>
-        <DockPanel LastChildFill="False" Grid.Row="3" Height="48" HorizontalAlignment="Right">
+
+        <Grid x:Name="ERROR_LIST" Grid.Row="3" HorizontalAlignment="Center" Width="300" Margin="0,25">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+        </Grid>
+        <DockPanel LastChildFill="False" Grid.Row="4" Height="48" HorizontalAlignment="Right">
             <ui:FancyButton RenderMode="TEXT" x:Name="RepairButton" Width="100" Height="24" Text="Repair" Background="#0055FF" HilightBrush="#0077FF" Foreground="White" Margin="15,0" Click="RepairButton_Click"/>
         </DockPanel>
     </Grid>

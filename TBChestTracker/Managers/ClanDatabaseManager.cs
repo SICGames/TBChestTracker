@@ -125,21 +125,28 @@ namespace TBChestTracker
 
             using (StreamReader sr = File.OpenText(file))
             {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Formatting = Formatting.Indented;
-                ClanDatabase = (ClanDatabase)serializer.Deserialize(sr, typeof(ClanDatabase));
-                if (ClanDatabase != null)
+                try
                 {
-                    //-- parse prefixes if used 
-                    //--- %MY_DOCUMENTS% - User Documents
-                    
-                    m_ClanChestManager.BuildData();
-                    AppContext.Instance.NewClandatabaseBeenCreated = true;
-                    CommandManager.InvalidateRequerySuggested();
-                    result(true);
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.Formatting = Formatting.Indented;
+                    ClanDatabase = (ClanDatabase)serializer.Deserialize(sr, typeof(ClanDatabase));
+                    if (ClanDatabase != null)
+                    {
+                        //-- parse prefixes if used 
+                        //--- %MY_DOCUMENTS% - User Documents
+
+                        m_ClanChestManager.BuildData();
+                        AppContext.Instance.NewClandatabaseBeenCreated = true;
+                        CommandManager.InvalidateRequerySuggested();
+                        result(true);
+                    }
+                    else
+                        result(false);
                 }
-                else
+                catch (Exception ex)
+                {
                     result(false);
+                }
             }
         }
 

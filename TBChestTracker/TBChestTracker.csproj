@@ -165,6 +165,7 @@
     <Compile Include="Chest\ChestPointsSettings.cs" />
     <Compile Include="Chest\GameChest.cs" />
     <Compile Include="Chest\RefEnum.cs" />
+    <Compile Include="ClanChestIntegrity\IntegrityResult.cs" />
     <Compile Include="ClanData\ClanChestComparer.cs" />
     <Compile Include="ClanData\ClanChestExporter.cs" />
     <Compile Include="ClanData\DateRangeEnum.cs" />

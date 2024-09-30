@@ -112,6 +112,7 @@ namespace TBChestTracker
 
                 ClanManager.Instance.ClanChestManager.LoadBackup(SelectedBackupItem.File);
                 ClanManager.Instance.ClanChestManager.SaveData();
+                AppContext.Instance.IsClanChestDataCorrupted = false;
                 this.Close();   
             }
         }

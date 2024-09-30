@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using TBChestTracker.Managers;
 
 namespace TBChestTracker.Pages.ChestDataIntegrity
 {
@@ -30,9 +31,16 @@ namespace TBChestTracker.Pages.ChestDataIntegrity
 
         }
 
+        private async Task PerformClanChestDataRepair()
+        {
+            ClanManager.Instance.ClanChestManager.RepairChestData();
+            await Task.Delay(3000);
+            var wnd = Window.GetWindow(this) as ValidateClanChestsIntegrityWindow;
+            wnd.NavigateTo("Pages/ChestDataIntegrity/RepairsCompleted.xaml");
+        }
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-
+            Task.Run(() => PerformClanChestDataRepair());   
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)

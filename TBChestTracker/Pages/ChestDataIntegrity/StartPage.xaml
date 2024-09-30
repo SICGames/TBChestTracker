@@ -21,7 +21,7 @@
         <TextBlock Grid.Row="1" Text="Let's Get Started" FontSize="16" Margin="20,0"/>
         <TextBlock Grid.Row="2" Text="This will guide you through whether or not your clan chest data is intact. If there are no errors, there won't be anything done to your clan chest data. If errors do exist, everything will be handled for you." TextWrapping="Wrap" Margin="20,10"/>
         <DockPanel LastChildFill="False" Grid.Row="3" Height="48" HorizontalAlignment="Right">
-            <ui:FancyButton RenderMode="TEXT" Width="100" Height="24" Text="Start" Background="#0055FF" HilightBrush="#0077FF" Foreground="White" Margin="15,0"/>
+            <ui:FancyButton RenderMode="TEXT" Width="100" Height="24" Text="Start" Background="#0055FF" HilightBrush="#0077FF" Foreground="White" Margin="15,0" Click="FancyButton_Click"/>
         </DockPanel>
     </Grid>
 </Page>
