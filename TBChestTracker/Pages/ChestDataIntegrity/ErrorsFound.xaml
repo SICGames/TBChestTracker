@@ -22,7 +22,7 @@
         <TextBlock Grid.Row="1" Text="Clan Chest Data Has Errors" FontSize="16" Margin="20,0"/>
         <TextBlock Grid.Row="2" Text="Oh no, your clan chest data has few or more errors. Let's fix them!" TextWrapping="Wrap" Margin="20,10"/>
 
-        <Grid x:Name="ERROR_LIST" Grid.Row="3" HorizontalAlignment="Center" Width="300" Margin="0,25">
+        <Grid x:Name="ERROR_LIST" Grid.Row="3" HorizontalAlignment="Center" Width="300" Margin="0,5" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>

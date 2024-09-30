@@ -35,8 +35,11 @@ namespace TBChestTracker.Pages.ChestDataIntegrity
         {
             ClanManager.Instance.ClanChestManager.RepairChestData();
             await Task.Delay(3000);
-            var wnd = Window.GetWindow(this) as ValidateClanChestsIntegrityWindow;
-            wnd.NavigateTo("Pages/ChestDataIntegrity/RepairsCompleted.xaml");
+            await this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                var wnd = Window.GetWindow(this) as ValidateClanChestsIntegrityWindow;
+                wnd.NavigateTo("Pages/ChestDataIntegrity/RepairsCompleted.xaml");
+            }));
         }
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
