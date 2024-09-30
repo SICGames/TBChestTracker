@@ -148,6 +148,7 @@
     <Compile Include="Automation\ChestAutomation.cs" />
     <Compile Include="Automation\Events\AutomationChestProcessedEventArguments.cs" />
     <Compile Include="Automation\Events\AutomationChestProcessingFailedEventArguments.cs" />
+    <Compile Include="Automation\Events\AutomationChestSaveEventArguments.cs" />
     <Compile Include="Automation\Events\AutomationClicksEventArguments.cs" />
     <Compile Include="Automation\Events\AutomationErrorEventArguments.cs" />
     <Compile Include="Automation\Events\AutomationEventArguments.cs" />
@@ -218,6 +219,21 @@
     <Compile Include="ImageEffects\ImageEffects.cs" />
     <Compile Include="Managers\ChestRewardsManager.cs" />
     <Compile Include="Managers\RecentlyOpenedListManager.cs" />
+    <Compile Include="Pages\ChestDataIntegrity\ErrorsFound.xaml.cs">
+      <DependentUpon>ErrorsFound.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ChestDataIntegrity\NoRepairsNeeded.xaml.cs">
+      <DependentUpon>NoRepairsNeeded.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ChestDataIntegrity\RepairingClanChestData.xaml.cs">
+      <DependentUpon>RepairingClanChestData.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ChestDataIntegrity\RepairsCompleted.xaml.cs">
+      <DependentUpon>RepairsCompleted.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ChestDataIntegrity\StartPage.xaml.cs">
+      <DependentUpon>StartPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\ClanmatesValidation\CompletedPage.xaml.cs">
       <DependentUpon>CompletedPage.xaml</DependentUpon>
     </Compile>
@@ -420,6 +436,9 @@
     <Compile Include="UpdateWindow.xaml.cs">
       <DependentUpon>UpdateWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ValidateClanChestsIntegrityWindow.xaml.cs">
+      <DependentUpon>ValidateClanChestsIntegrityWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\ClanDatabaseBackupItem.cs" />
     <Compile Include="ViewModels\ClanmatesReparProgress.cs" />
     <Compile Include="ViewModels\ClanmatesValidationProgress.cs" />
@@ -565,6 +584,26 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\ChestDataIntegrity\ErrorsFound.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\ChestDataIntegrity\NoRepairsNeeded.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\ChestDataIntegrity\RepairingClanChestData.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\ChestDataIntegrity\RepairsCompleted.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\ChestDataIntegrity\StartPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\ClanmatesValidation\ClanmatesValidationCompleted.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -670,6 +709,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UpdateWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ValidateClanChestsIntegrityWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1231,5 +1231,10 @@ namespace TBChestTracker
 
             }
         }
+
+        private void ValidateClanChestIntegrityMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

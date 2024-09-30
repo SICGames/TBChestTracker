@@ -1109,17 +1109,17 @@ namespace TBChestTracker
             return;
         }
         
-        public void SaveData(string filepath = "")
+        public void SaveData(string chestdatafile = "")
         {
             //-- write to file.
             string file = String.Empty;
             var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
             var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
-
-            if (String.IsNullOrEmpty(filepath))
+            var databaseFolder = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\\";
+            if (String.IsNullOrEmpty(chestdatafile))
                 file = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile}";
             else
-                file = filepath;
+                file = $"{databaseFolder}{chestdatafile}";
 
             try
             {

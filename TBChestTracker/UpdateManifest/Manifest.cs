@@ -13,7 +13,7 @@ namespace TBChestTracker
     {
         public static string Name = "Total Battle Chest Tracker";
         public static string Version = $@"v{Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
-        public static string Build = "['Preview 5.9']";
-        public static string Tag = "v2.0-preview-5.9";
+        public static string Build = "['Preview 5.10']";
+        public static string Tag = "v2.0-preview-5.10";
     }
 }

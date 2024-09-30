@@ -53,6 +53,27 @@ namespace TBChestTracker.Automation
 
         private event EventHandler<AutomationChestProcessingFailedEventArguments> ChestProcessingFailed = null;
 
+        //-- make temp save events
+        private event EventHandler<AutomationChestSaveEventArguments> ChestDataSaving = null;
+        private event EventHandler<AutomationChestSaveEventArguments> ChestDataSaved = null;
+
+        protected virtual void onChestDataSaving(AutomationChestSaveEventArguments args)
+        {
+            EventHandler<AutomationChestSaveEventArguments> handler = ChestDataSaving;
+            if (handler != null)
+            {
+                handler(this, args);
+            }
+        }
+        protected virtual void onChestDataSaved(AutomationChestSaveEventArguments args)
+        {
+            EventHandler<AutomationChestSaveEventArguments> eventHandler = ChestDataSaved;
+            if(eventHandler != null)
+            {
+                eventHandler(this, args);
+            }
+        }
+
         protected virtual void onAutomationStarted(AutomationEventArguments args)
         {
             EventHandler<AutomationEventArguments> handler = AutomationStarted;
@@ -66,6 +87,7 @@ namespace TBChestTracker.Automation
             EventHandler<AutomationEventArguments> handler = AutomationStopped;
             if(handler != null)
             {
+                clicksTotal = 0;
                 handler(this, args);
             }
         }
@@ -75,6 +97,7 @@ namespace TBChestTracker.Automation
             EventHandler<AutomationErrorEventArguments> handler = AutomationError;
             if(handler != null)
             {
+                clicksTotal = 0;
                 handler (this, args);   
             }
         }
@@ -171,17 +194,35 @@ namespace TBChestTracker.Automation
             ChestProcessingFailed += ChestAutomation_ChestProcessingFailed;
             ProcessingClicks += ChestAutomation_ProcessingClicks;
             ProcessedClicks += ChestAutomation_ProcessedClicks;
-                
+            ChestDataSaving += ChestAutomation_ChestDataSaving;
+            ChestDataSaved += ChestAutomation_ChestDataSaved;
             return true;
         }
 
-        
+        private void ChestAutomation_ChestDataSaved(object sender, AutomationChestSaveEventArguments e)
+        {
+            if(e.isSaved)
+            {
+                this.canCaptureAgain = true;
+            }
+        }
+
+        private void ChestAutomation_ChestDataSaving(object sender, AutomationChestSaveEventArguments e)
+        {
+            if(e.isSaved == false)
+            {
+                ClanManager.Instance.ClanChestManager.SaveData("clanchests_temp.db");
+                onChestDataSaved(new AutomationChestSaveEventArguments(false, true));
+            }
+        }
 
         private void ChestAutomation_ProcessedClicks(object sender, AutomationClicksEventArguments e)
         {
             if(e.ProcessedClicks == true)
             {
-                this.canCaptureAgain = true;
+                onChestDataSaving(new AutomationChestSaveEventArguments(true, false));
+
+                //this.canCaptureAgain = true;
             }
         }
 
@@ -227,7 +268,7 @@ namespace TBChestTracker.Automation
 
         }
 
-        private async void ChestAutomation_TextProcessed(object sender, AutomationTextProcessedEventArguments e)
+        private void ChestAutomation_TextProcessed(object sender, AutomationTextProcessedEventArguments e)
         {
             var ocrResult = e.TessResult;
             if(ocrResult != null)
@@ -348,6 +389,7 @@ namespace TBChestTracker.Automation
             try
             {
                 token.ThrowIfCancellationRequested();
+                clicksTotal = 0;
 
                 while (isRunning)
                 {

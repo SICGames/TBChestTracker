@@ -283,6 +283,7 @@
                     <MenuItem Header="Absent Clanmates Cleaner" x:Name="AbsentClanmateCleanerMenuItem" Click="AbsentClanmateCleanerMenuItem_Click"/>
                     <Separator/>
                     <MenuItem Header="Restore Clan Chest Data" x:Name="RestoreClanChestDataMenuItem" Click="RestoreClanChestDataMenuItem_Click"/>
+                    <MenuItem Header="Validate Clan Chest Integrity" x:Name="ValidateClanChestIntegrityMenuItem" Click="ValidateClanChestIntegrityMenuItem_Click"/>
                     <!--
                     <MenuItem Header="{x:Static ResourceStrings:Strings.VerifyChestDataIntegrity}" Command="Commands:CustomCommandBindings.ValidateChestData"/>
                     -->

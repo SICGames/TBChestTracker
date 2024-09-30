@@ -1,0 +1,27 @@
+﻿<Page x:Class="TBChestTracker.Pages.ChestDataIntegrity.NoRepairsNeeded"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:TBChestTracker.Pages.ChestDataIntegrity"
+      xmlns:ui="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="NoRepairsNeeded" Unloaded="Page_Unloaded" Loaded="Page_Loaded">
+
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Validate Clan Chest Data Integrity" FontSize="20" FontWeight="Bold" Margin="15,5"/>
+        <TextBlock Grid.Row="1" Text="No Repairs Needed" FontSize="16" Margin="20,0"/>
+        <TextBlock Grid.Row="2" Text="Good news! Your clan chest data is intact and no repairs are needed. Awesome! You can close this window now." TextWrapping="Wrap" Margin="20,10"/>
+        <DockPanel LastChildFill="False" Grid.Row="3" Height="48" HorizontalAlignment="Right">
+            <ui:FancyButton RenderMode="TEXT" x:Name="ExitButton" Width="100" Height="24" Text="Close" Background="#0055FF" HilightBrush="#0077FF" Foreground="White" Margin="15,0" Click="ExitButton_Click"/>
+        </DockPanel>
+    </Grid>
+</Page>
