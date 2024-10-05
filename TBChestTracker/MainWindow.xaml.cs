@@ -387,11 +387,25 @@ namespace TBChestTracker
                 ClanManager.Instance.ClanChestManager.CreateBackup();
                 
                 //-- automatically repairs chest data if necessary
-                //ClanManager.Instance.ClanChestManager.RepairChestData();
-
+                
+                
                 AppContext.Instance.IsAutomationPlayButtonEnabled = true;
                 AppContext.Instance.IsAutomationStopButtonEnabled = false;
                 com.HellStormGames.Logging.Console.Write("Automation stopped.", com.HellStormGames.Logging.LogType.INFO);
+
+                if (SettingsManager.Instance.Settings.AutomationSettings.AutoRepairAfterStoppingAutomation)
+                {
+                    if (ClanManager.Instance.ClanChestManager.DoesChestDataNeedsRepairs() != null)
+                    {
+                        ClanManager.Instance.ClanChestManager.RepairChestData();
+                        com.HellStormGames.Logging.Console.Write("Clan Chest Data automatically repaired.", com.HellStormGames.Logging.LogType.INFO);
+                    }
+                    else
+                    {
+                        com.HellStormGames.Logging.Console.Write("Clan Chest Data is looking good. No need for repairs.", com.HellStormGames.Logging.LogType.INFO);
+                    }
+                }
+
             }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         }
 
@@ -685,7 +699,11 @@ namespace TBChestTracker
                 {
                     if(keyStr.Equals(SettingsManager.Instance.Settings.HotKeySettings.StartAutomationKeys))
                     {
-                        ChestAutomation.StartAutomation();
+                        if (AppContext.Instance.IsAutomationPlayButtonEnabled == true)
+                        {
+                            ChestAutomation.StartAutomation();
+                        }
+
                         AppContext.Instance.hasHotkeyBeenPressed = true;
                         keyStr = String.Empty;
                         previousKey = Key.None;
@@ -693,8 +711,10 @@ namespace TBChestTracker
                     }
                     if(keyStr.Equals(SettingsManager.Instance.Settings.HotKeySettings.StopAutomationKeys))
                     {
-                        ChestAutomation.StopAutomation();
-                        
+                        if (AppContext.Instance.IsAutomationStopButtonEnabled)
+                        {
+                            ChestAutomation.StopAutomation();
+                        }
                         AppContext.Instance.hasHotkeyBeenPressed = true;
                         keyStr = String.Empty;
                         previousKey = Key.None;
@@ -735,10 +755,11 @@ namespace TBChestTracker
         }
         private void LoadClanDatabaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-          ShowLoadClanWindow(result =>
-          {
+            ShowLoadClanWindow(result =>
+            {
 
-          });
+            });
+           
         }
         #endregion
 
@@ -783,7 +804,22 @@ namespace TBChestTracker
                     AppContext.Instance.UpdateApplicationTitle();
                     
                     AppContext.Instance.IsCurrentClandatabase = true;
-                    AppContext.Instance.IsAutomationPlayButtonEnabled = true;
+                    if (AppContext.Instance.IsClanChestDataCorrupted)
+                    {
+                        AppContext.Instance.IsAutomationPlayButtonEnabled = false;
+
+                        if (MessageBox.Show("Oh no! There is an error loading your clan chest database file. It is possibly corrupted. Be sure to restore a previously known good clan chest data file inside Tools -> Restore Clan Chest Data", "Clan Chest Data Loading Error", MessageBoxButton.OK, MessageBoxImage.Stop) == MessageBoxResult.OK)
+                        {
+                            RestoreClanChestDataWindow restoreClanChestDataWindow = new RestoreClanChestDataWindow();
+                            restoreClanChestDataWindow.Show();
+                        }
+
+                    }
+                    else
+                    {
+                        AppContext.Instance.IsAutomationPlayButtonEnabled = true;
+                    }
+
                     //ClanManager.Instance.ClanChestManager.RepairChestData();
                     response(true);
                 }
@@ -871,7 +907,20 @@ namespace TBChestTracker
                             com.HellStormGames.Logging.LogType.INFO);
 
                         AppContext.Instance.IsCurrentClandatabase = true;
-                        AppContext.Instance.IsAutomationPlayButtonEnabled = true;
+                        if (AppContext.Instance.IsClanChestDataCorrupted == true)
+                        {
+                            AppContext.Instance.IsAutomationPlayButtonEnabled = false;
+
+                            if (MessageBox.Show("Oh no! There is an error loading your clan chest database file. It is possibly corrupted. Be sure to restore a previously known good clan chest data file inside Tools -> Restore Clan Chest Data", "Clan Chest Data Loading Error", MessageBoxButton.OK, MessageBoxImage.Stop) == MessageBoxResult.OK)
+                            {
+                                RestoreClanChestDataWindow restoreClanChestDataWindow = new RestoreClanChestDataWindow();
+                                restoreClanChestDataWindow.Show();
+                            }
+                        }
+                        else
+                        {
+                            AppContext.Instance.IsAutomationPlayButtonEnabled = true;
+                        }
                         //ClanManager.Instance.ClanChestManager.RepairChestData();
                         response(true);
                     }
@@ -955,7 +1004,8 @@ namespace TBChestTracker
             if (addClanmatesWindow.ShowDialog() == true)
             {
                 AppContext.Instance.ClanmatesBeenAdded = true;
-                AppContext.Instance.IsAutomationPlayButtonEnabled = true;
+
+                AppContext.Instance.IsAutomationPlayButtonEnabled = !AppContext.Instance.IsClanChestDataCorrupted;
             }
         }
         #endregion

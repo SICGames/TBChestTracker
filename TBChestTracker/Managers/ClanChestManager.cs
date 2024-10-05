@@ -1233,7 +1233,7 @@ namespace TBChestTracker
             using (var sw = File.OpenText(file))
             {
                 JsonSerializer serializer = new JsonSerializer();
-                ClanChestDailyData = (Dictionary<string, IList<ClanChestData>>)serializer.Deserialize(sw, typeof(Dictionary<string, List<ClanChestData>>));
+                ClanChestDailyData = (Dictionary<string, IList<ClanChestData>>)serializer.Deserialize(sw, typeof(Dictionary<string, IList<ClanChestData>>));
             }
         }
 
@@ -1254,7 +1254,7 @@ namespace TBChestTracker
                 return false;
             }
         }
-        public async void LoadData()
+        public async Task<bool> LoadData()
         {
             var rootFolder = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
             var clanFolder = $"{rootFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
@@ -1265,13 +1265,16 @@ namespace TBChestTracker
 
             var chestrewardsFile = $@"{databaseFolder}\ChestRewards.db";
 
+            bool clanchestcorrupted = false;
+
+
             if (ClanManager.Instance.ClanmateManager.Database.Clanmates != null)
                 ClanManager.Instance.ClanmateManager.Database.Clanmates.Clear();
 
             if (!System.IO.File.Exists(clanmatefile))
             {
                 AppContext.Instance.ClanmatesBeenAdded = false;
-                return;
+                return false;
             }
             else
             {
@@ -1293,10 +1296,9 @@ namespace TBChestTracker
                 {
                     //-- we need to let them know there's a possible corrupt clanchestdatabase file
                     //-- we caught the exception. User needs to restore. Need a way to force them. 
-                    if(MessageBox.Show("Oh no! There is an error loading your clan chest database file. It is possibly corrupted. Be sure to restore a previously known good clan chest data file inside Tools -> Restore Clan Chest Data", "Clan Chest Data Loading Error", MessageBoxButton.OK, MessageBoxImage.Stop)  == MessageBoxResult.OK)
-                    {
-                        AppContext.Instance.IsClanChestDataCorrupted = true;
-                    }
+                    AppContext.Instance.IsClanChestDataCorrupted = true;
+                    clanchestcorrupted = true;
+
                 }
             }
             //-- load clan chest settings
@@ -1322,11 +1324,16 @@ namespace TBChestTracker
                 ChestRewards.Load();
             }
 
-            return;
+            if(clanchestcorrupted)
+            {
+                return false;
+            }
+
+            return true;
         }
         public void BuildData()
         {
-            LoadData(); 
+            var result = LoadData(); 
             
             //--- build blank clanchestdata 
             foreach (var clanmate in ClanManager.Instance.ClanmateManager.Database.Clanmates)
@@ -1359,8 +1366,10 @@ namespace TBChestTracker
                     ClanChestDailyData.Add(DateTime.Now.ToString("d", new CultureInfo(CultureInfo.CurrentCulture.Name)), clanChestData);
                 }
 
-                AppContext.Instance.ClanmatesBeenAdded = true;
+                
             }
+
+            AppContext.Instance.ClanmatesBeenAdded = true;
 
             return;
         }

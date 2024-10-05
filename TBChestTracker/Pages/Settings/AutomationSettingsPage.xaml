@@ -89,5 +89,8 @@
                      LostKeyboardFocus="TextBox_LostKeyboardFocus" 
                      TextChanged="TextBox_TextChanged"/>
         </Grid>
+
+        <TextBlock Grid.Row="7" Grid.Column="0" Text="Automatically repair clan chest data after stopping automation" TextWrapping="Wrap" Width="250" Margin="10,5"/>
+        <CheckBox Grid.Row="7" Grid.Column="1" IsChecked="{Binding AutoRepairAfterStoppingAutomation}" Margin="10,0" VerticalAlignment="Center"/>
     </Grid>
 </Page>

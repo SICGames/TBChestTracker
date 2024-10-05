@@ -57,6 +57,7 @@ namespace TBChestTracker
             set
             {
                 corruptedClanChestData = value;
+                OnPropertyChanged(nameof(IsClanChestDataCorrupted));    
             }
         }
 

@@ -112,7 +112,13 @@ namespace TBChestTracker
 
                 ClanManager.Instance.ClanChestManager.LoadBackup(SelectedBackupItem.File);
                 ClanManager.Instance.ClanChestManager.SaveData();
-                AppContext.Instance.IsClanChestDataCorrupted = false;
+                if (AppContext.Instance.IsClanChestDataCorrupted)
+                {
+                    AppContext.Instance.IsClanChestDataCorrupted = false;
+                    AppContext.Instance.IsAutomationPlayButtonEnabled = true;
+                    AppContext.Instance.IsAutomationStopButtonEnabled = false;
+                }
+                CommandManager.InvalidateRequerySuggested();
                 this.Close();   
             }
         }
