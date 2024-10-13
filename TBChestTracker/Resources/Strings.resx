@@ -237,4 +237,31 @@
   <data name="lvl" xml:space="preserve">
     <value>Lvl</value>
   </data>
+  <data name="ClanmateValidation" xml:space="preserve">
+    <value>Clanmate Validation</value>
+  </data>
+  <data name="AbsentClanmatesCleaner" xml:space="preserve">
+    <value>Absent Clanmates Cleaner</value>
+  </data>
+  <data name="RestoreClanChestData" xml:space="preserve">
+    <value>Restore Clan Chest Data</value>
+  </data>
+  <data name="ValidateClanChestIntegrity" xml:space="preserve">
+    <value>Validate Clan Chest Integrity</value>
+  </data>
+  <data name="RecentOpenedDatabases" xml:space="preserve">
+    <value>Recent Opened Databases</value>
+  </data>
+  <data name="VisitGithubProjectPage" xml:space="preserve">
+    <value>Visit Github Project Page</value>
+  </data>
+  <data name="ReportAnIssue" xml:space="preserve">
+    <value>Report A Issue</value>
+  </data>
+  <data name="Tutorial" xml:space="preserve">
+    <value>Tutorial</value>
+  </data>
+  <data name="TotalBattleGuideYoutube" xml:space="preserve">
+    <value>TotalBattleGuide on Youtube</value>
+  </data>
 </root>

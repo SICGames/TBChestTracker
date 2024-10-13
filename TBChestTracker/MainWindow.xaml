@@ -260,7 +260,7 @@
                     <Separator/>
                     <MenuItem Header="{x:Static ResourceStrings:Strings.ExportChestData}" Command="Commands:CustomCommandBindings.ExportClanDatabase"/>
                     <Separator/>
-                    <MenuItem x:Name="RecentlyOpenedParent" Header="Recently Opened Databases">
+                    <MenuItem x:Name="RecentlyOpenedParent" Header="{x:Static ResourceStrings:Strings.RecentOpenedDatabases}">
                     </MenuItem>
                     <MenuItem Header="{x:Static ResourceStrings:Strings.ExitApplication}" Command="Commands:CustomCommandBindings.QuitApplication"/>
                 </MenuItem>
@@ -277,13 +277,12 @@
                 </MenuItem>
                 <MenuItem Header="{x:Static ResourceStrings:Strings.Tools}">
                     <MenuItem Header="{x:Static ResourceStrings:Strings.ChestBuilder}" x:Name="ChestBuilderMenuItem" Click="ChestBuilderMenuItem_Click"/>
-                    <MenuItem Header="Clan Wealth Builder" x:Name="ClanWealthBuilderMenuItem" Click="ClanWealthBuilderMenuItem_Click" IsEnabled="False"/>
                     <Separator/>
-                    <MenuItem Header="Clanmates Validation" x:Name="ClanmateValidationMenuItem" Click="ClanmateValidationMenuItem_Click"/>
-                    <MenuItem Header="Absent Clanmates Cleaner" x:Name="AbsentClanmateCleanerMenuItem" Click="AbsentClanmateCleanerMenuItem_Click"/>
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.ClanmateValidation}" x:Name="ClanmateValidationMenuItem" Click="ClanmateValidationMenuItem_Click"/>
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.AbsentClanmatesCleaner}" x:Name="AbsentClanmateCleanerMenuItem" Click="AbsentClanmateCleanerMenuItem_Click"/>
                     <Separator/>
-                    <MenuItem Header="Restore Clan Chest Data" x:Name="RestoreClanChestDataMenuItem" Click="RestoreClanChestDataMenuItem_Click"/>
-                    <MenuItem Header="Validate Clan Chest Integrity" x:Name="ValidateClanChestIntegrityMenuItem" Click="ValidateClanChestIntegrityMenuItem_Click"/>
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.RestoreClanChestData}" x:Name="RestoreClanChestDataMenuItem" Click="RestoreClanChestDataMenuItem_Click"/>
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.ValidateClanChestIntegrity}" x:Name="ValidateClanChestIntegrityMenuItem" Click="ValidateClanChestIntegrityMenuItem_Click"/>
                     <!--
                     <MenuItem Header="{x:Static ResourceStrings:Strings.VerifyChestDataIntegrity}" Command="Commands:CustomCommandBindings.ValidateChestData"/>
                     -->
@@ -291,14 +290,14 @@
                 </MenuItem>
                 <MenuItem Header="{x:Static ResourceStrings:Strings.Help}" x:Name="HelpMenu" Click="HelpMenu_Click">
                     <MenuItem Header="Github">
-                        <MenuItem Header="Visit Project Page" Tag="VisitGithub"/>
-                        <MenuItem Header="Report An Issue" Tag="ReportIssue"/>
+                        <MenuItem Header="{x:Static ResourceStrings:Strings.VisitGithubProjectPage}" Tag="VisitGithub"/>
+                        <MenuItem Header="{x:Static ResourceStrings:Strings.ReportAnIssue}" Tag="ReportIssue"/>
                     </MenuItem>
-                    <MenuItem Header="TotalBattleGuide on Youtube" Tag="Youtube"/>
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.TotalBattleGuideYoutube}" Tag="Youtube"/>
                     <Separator/>
                     <MenuItem Header="{x:Static ResourceStrings:Strings.Patreon}" Tag="Patron"/>
                     <Separator/>
-                    <MenuItem Header="Tutorial" Tag="Tutorial"/>
+                    <MenuItem Header="{x:Static ResourceStrings:Strings.Tutorial}" Tag="Tutorial"/>
                     <Separator/>
                     <MenuItem Header="{x:Static ResourceStrings:Strings.About}" Tag="AboutApp"/>
                 </MenuItem>

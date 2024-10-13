@@ -236,7 +236,13 @@ namespace TBChestTracker
                     InconsistentDates++;
                     var msg = $"{date} doesn't exist inside Clan Chest Data. Skipping.";
                     com.HellStormGames.Logging.Console.Write(msg, "Invalid Dates", com.HellStormGames.Logging.LogType.WARNING);
-                    break;
+                    continue; //-- skip not break. Break exits for loop. 
+                }
+
+                if(dailyChestData == null)
+                {
+                    //-- we have something critical and this should not be null. 
+                    throw new Exception("DailyChestData shouldn't be null. There's a huge problem if it's getting to this point.");
                 }
 
                 BuildChestExportData(dailyChestData, true);

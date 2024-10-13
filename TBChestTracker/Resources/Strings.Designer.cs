@@ -70,6 +70,15 @@ namespace TBChestTracker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Absent Clanmates Cleaner.
+        /// </summary>
+        public static string AbsentClanmatesCleaner {
+            get {
+                return ResourceManager.GetString("AbsentClanmatesCleaner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Chest.
         /// </summary>
         public static string Chest {
@@ -129,6 +138,15 @@ namespace TBChestTracker.Resources {
         public static string ClanmateManager {
             get {
                 return ResourceManager.GetString("ClanmateManager", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clanmate Validation.
+        /// </summary>
+        public static string ClanmateValidation {
+            get {
+                return ResourceManager.GetString("ClanmateValidation", resourceCulture);
             }
         }
         
@@ -313,6 +331,33 @@ namespace TBChestTracker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Recent Opened Databases.
+        /// </summary>
+        public static string RecentOpenedDatabases {
+            get {
+                return ResourceManager.GetString("RecentOpenedDatabases", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report A Issue.
+        /// </summary>
+        public static string ReportAnIssue {
+            get {
+                return ResourceManager.GetString("ReportAnIssue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restore Clan Chest Data.
+        /// </summary>
+        public static string RestoreClanChestData {
+            get {
+                return ResourceManager.GetString("RestoreClanChestData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save Clan Database.
         /// </summary>
         public static string SaveClanDatabase {
@@ -376,6 +421,24 @@ namespace TBChestTracker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to TotalBattleGuide on Youtube.
+        /// </summary>
+        public static string TotalBattleGuideYoutube {
+            get {
+                return ResourceManager.GetString("TotalBattleGuideYoutube", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tutorial.
+        /// </summary>
+        public static string Tutorial {
+            get {
+                return ResourceManager.GetString("Tutorial", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to New Update Available.
         /// </summary>
         public static string UpdateAvailable {
@@ -403,11 +466,29 @@ namespace TBChestTracker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Validate Clan Chest Integrity.
+        /// </summary>
+        public static string ValidateClanChestIntegrity {
+            get {
+                return ResourceManager.GetString("ValidateClanChestIntegrity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Verify Chest Data Integrity.
         /// </summary>
         public static string VerifyChestDataIntegrity {
             get {
                 return ResourceManager.GetString("VerifyChestDataIntegrity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visit Github Project Page.
+        /// </summary>
+        public static string VisitGithubProjectPage {
+            get {
+                return ResourceManager.GetString("VisitGithubProjectPage", resourceCulture);
             }
         }
         
