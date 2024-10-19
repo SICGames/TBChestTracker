@@ -91,14 +91,7 @@ namespace TBChestTracker
             
             var file = FilePicker01.File;
             var sortOption = (SortType)SortOptions.SelectedIndex;
-            var chest_points_value = ChestPointsValue.Text;
-            int chest_points = 0;
-
-            if(!Int32.TryParse(chest_points_value, out  chest_points))
-            {
-                MessageBox.Show("Chest Points Correction Value must be only numbers.");
-                return;
-            }
+            
             var saveExportSettings = (bool)SaveExportSettingsCheckBox.IsChecked;
             if(saveExportSettings)
             {

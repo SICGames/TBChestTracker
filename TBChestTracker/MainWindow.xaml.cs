@@ -43,6 +43,7 @@ using TBChestTracker.Resources;
 
 using TBChestTracker.Effects;
 using TBChestTracker.Automation;
+using com.HellStormGames.Logging;
 
 namespace TBChestTracker
 {
@@ -397,8 +398,11 @@ namespace TBChestTracker
                 {
                     if (ClanManager.Instance.ClanChestManager.DoesChestDataNeedsRepairs() != null)
                     {
-                        ClanManager.Instance.ClanChestManager.RepairChestData();
-                        com.HellStormGames.Logging.Console.Write("Clan Chest Data automatically repaired.", com.HellStormGames.Logging.LogType.INFO);
+                        var result = ClanManager.Instance.ClanChestManager.RepairChestData();
+                        if (result)
+                        {
+                            com.HellStormGames.Logging.Console.Write("Chest Data Automatically Repaired", "Chest Integrity", LogType.INFO);
+                        }
                     }
                     else
                     {
@@ -861,7 +865,7 @@ namespace TBChestTracker
             if (openFileDialog.ShowDialog() == true)
             {
                 var file = openFileDialog.FileName;
-                ClanManager.Instance.ClanDatabaseManager.Load(file, ClanManager.ClanChestManager, result =>
+                ClanManager.Instance.ClanDatabaseManager.Load(file, ClanManager.Instance.ClanChestManager, result =>
                 {
                     if (result)
                     {

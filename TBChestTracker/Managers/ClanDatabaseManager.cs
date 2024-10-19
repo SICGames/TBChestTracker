@@ -123,10 +123,38 @@ namespace TBChestTracker
         {
             m_ClanChestManager.ClearData();
 
+            if (File.Exists(file) == false)
+            {
+                MessageBox.Show($@"'{file}' does not exist.", "Clan Database Not Found");
+                result(false);
+            }
+
+            var _clandatabase = new ClanDatabase();
+            if(JsonHelper.TryLoad<ClanDatabase>(file, out _clandatabase))
+            {
+                ClanDatabase = _clandatabase;
+                if(ClanDatabase != null)
+                {
+                    m_ClanChestManager.BuildData();
+                    AppContext.Instance.NewClandatabaseBeenCreated = true;
+                    CommandManager.InvalidateRequerySuggested();
+                    result(true);
+                }
+                else
+                {
+                    result(false);
+                }
+            }
+            else
+            {
+                result(false);
+            }
+            /*
             using (StreamReader sr = File.OpenText(file))
             {
                 try
                 {
+
                     JsonSerializer serializer = new JsonSerializer();
                     serializer.Formatting = Formatting.Indented;
                     ClanDatabase = (ClanDatabase)serializer.Deserialize(sr, typeof(ClanDatabase));
@@ -148,6 +176,8 @@ namespace TBChestTracker
                     result(false);
                 }
             }
+            */
+
         }
 
         public Dictionary<string, bool> ClanDatabasesToUpgrade()
@@ -160,7 +190,15 @@ namespace TBChestTracker
 
             foreach (var directory in directories)
             {
-                var clandatabasefile = $@"{directory}\clan.cdb";
+                var files = Directory.GetFiles(directory, "clan.cdb");
+                if(files.Length < 1)
+                {
+                    //-- we can not load this file because it doesn't exist.
+                    continue;
+                }
+
+                var clandatabasefile = files[0];
+                
                 var tmp_Clandatabase = new ClanDatabase();
 
                 using (StreamReader sr = File.OpenText(clandatabasefile))
@@ -180,14 +218,20 @@ namespace TBChestTracker
                         var clanNameFolder = tmp_Clandatabase.ClanFolderPath;
                         var clanName = tmp_Clandatabase.Clanname;
 
-                        if(clanNameFolder.IndexOf(clanName) > 0)
+                        if (DatabasesRequireUpgrade.ContainsKey(clandatabasefile) == false)
                         {
-                            DatabasesRequireUpgrade.Add(clandatabasefile, true);
+                            if (clanNameFolder.IndexOf(clanName) > 0)
+                            {
+                                DatabasesRequireUpgrade.Add(clandatabasefile, true);
+                            }
                         }
 
-                        if(tmp_Clandatabase.Version != 2)
+                        if (DatabasesRequireUpgrade.ContainsKey(clandatabasefile) == false)
                         {
-                            DatabasesRequireUpgrade.Add(clandatabasefile, true);
+                            if (tmp_Clandatabase.Version != 2)
+                            {
+                                DatabasesRequireUpgrade.Add(clandatabasefile, true);
+                            }
                         }
                     }
                     sr.Close();

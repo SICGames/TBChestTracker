@@ -30,12 +30,23 @@ namespace TBChestTracker
             ChestRewardsList.Add(new ChestReward(chesttype, level, reward));
         }
 
-        public void Load()
+        public bool Load()
         {
             var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
             var clanFolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
             var databaseFolder = $"{clanFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}";
             var file = $@"{databaseFolder}\ChestRewards.db";
+            var _chestrewardslist =  new List<ChestReward>();
+            if(JsonHelper.TryLoad(file, out _chestrewardslist))
+            {
+                ChestRewardsList = _chestrewardslist;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+            /*
             using(StreamReader sr = File.OpenText(file))
             {
                 var serializer = new JsonSerializer();
@@ -44,6 +55,7 @@ namespace TBChestTracker
                 sr.Close();
                 serializer = null;
             }
+            */
         }
         public void Save()
         {

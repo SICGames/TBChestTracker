@@ -76,21 +76,22 @@ namespace TBChestTracker
         }
         public bool LoadSettings(string file)
         {
-            using (StreamReader sr = File.OpenText(file))
+            var clanChestSettings = new ClanChestSettings();
+            if(JsonHelper.TryLoad(file, out clanChestSettings))
             {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Formatting = Formatting.Indented;
-                var clanChestSettings = new ClanChestSettings();
-                clanChestSettings = (ClanChestSettings)serializer.Deserialize(sr, typeof(ClanChestSettings));
-                
+
                 this.pChestRequirements = clanChestSettings.ChestRequirements;
                 this.pChestPointsSettings = clanChestSettings.ChestPointsSettings;
                 this.generalClanSettings = clanChestSettings.GeneralClanSettings;
 
-                if (pChestRequirements != null || generalClanSettings != null ||  pChestPointsSettings != null)
+                if (pChestRequirements != null || generalClanSettings != null || pChestPointsSettings != null)
                     return true;
                 else
                     return false;
+            }
+            else
+            {
+                return false;
             }
         }
         public void SaveSettings(string file)

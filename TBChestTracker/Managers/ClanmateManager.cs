@@ -17,7 +17,7 @@ namespace TBChestTracker
 {
     public class ClanmateManager 
     {
-        public ClanmatesDatabase Database { get; private set; }
+        public ClanmatesDatabase Database { get; set; }
 
         public void UpdateCount()
         {
@@ -91,22 +91,27 @@ namespace TBChestTracker
                 UpdateCount();
             }
         }
-        public void Load(string path)
+
+
+   
+        public bool Load(string path)
         {
             bool requiresUpdate = false;
             string backuptext = String.Empty;
 
             Database.Clanmates.Clear();
             Database.NumClanmates = Database.Clanmates.Count;
+            ClanmatesDatabase clanmatesDatabase = new ClanmatesDatabase();
 
-            using (StreamReader sr = File.OpenText(path))
+            bool loaded = JsonHelper.TryLoad<ClanmatesDatabase>(path,out clanmatesDatabase);
+            if(loaded)
             {
-                var data = StringHelpers.ConvertToUTF8(sr.ReadToEnd());
-                if (JsonHelper.isJson(data))
-                {
-                    Database = JsonConvert.DeserializeObject<ClanmatesDatabase>(data);
-                    sr.Close();
-                }
+                Database = clanmatesDatabase;
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
         

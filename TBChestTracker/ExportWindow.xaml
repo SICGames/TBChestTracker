@@ -15,7 +15,7 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0">
             <local:FilePicker x:Name="FilePicker01" Title="Export Clan Chest Data" Height="35" VerticalAlignment="Top" 
-                              Extensions="CSV|*.csv" HoverColor="LightBlue" 
+                              Extensions="CSV|*.csv|JSON|*.json" HoverColor="LightBlue" 
                               DefaultColor="Gray" FileAccepted="FilePicker_FileAccepted" Margin="5"/>
         </DockPanel>
         <DockPanel Grid.Row="1">
@@ -45,21 +45,7 @@
                             <DatePicker x:Name="DateRangeFromPicker" Grid.Row="1" Grid.Column="0" SelectedDate="{Binding DateRangeFrom}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,0"/>
                             <DatePicker x:Name="DateRangeToPicker" Grid.Row="1" Grid.Column="2" SelectedDate="{Binding DateRangeTo}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,0"/>
                         </Grid>
-                        
-                        <GroupBox Header="Points Correction">
-                            <StackPanel Orientation="Vertical" Margin="5">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Chest Points +/-" Margin="5"/>
-                                    <TextBox Text="0" VerticalContentAlignment="Center" x:Name="ChestPointsValue" Margin="5" Width="75" Height="18"/>
-                                </StackPanel>
-                                <TextBlock 
-                                        Text="Mistakes happen. In case, accidently claiming all instead of starting automation, correct by entering a number to give everyone added chest points." 
-                                        TextWrapping="Wrap" 
-                                        Margin="5" 
-                                        FontWeight="Bold" 
-                                        FontSize="10"/>
-                            </StackPanel>
-                        </GroupBox>
+                        <TextBlock Text="When exporting to JSON file, it will export everything inside clanchest.db file in the selected range. In addition, it will ignore extra headers. If you have a website and would like to manually parse the json data using Javascript or JQuery, this option is for you." TextWrapping="Wrap" Margin="5"/>
                     </StackPanel>
                 </TabItem>
                 <TabItem Header="Extra Headers">

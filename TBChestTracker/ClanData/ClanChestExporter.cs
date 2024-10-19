@@ -1,4 +1,5 @@
 ﻿using CsvHelper;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,12 +32,15 @@ namespace TBChestTracker
         ~ClanChestExporter() {
 
             ExportFilename = String.Empty;
-            ChestExportDataCollection.Clear();
-            ChestExportDataCollection = null;
+            if (ChestExportDataCollection != null)
+            {
+                ChestExportDataCollection.Clear();
+                ChestExportDataCollection = null;
+            }
+            ExportSettings = null;
+
         }
         #endregion
-
-    
 
         private void InitChestExportData(bool bUsePoints = false)
         {
@@ -54,7 +58,9 @@ namespace TBChestTracker
                         chestExportData.ExtraHeaders.Add(header, 0);
                     }
                 }
+
                 chestExportData.Total = 0;
+
                 if(bUsePoints)
                 {
                     chestExportData.PointsHeader.Add("Points", 0);
@@ -96,7 +102,7 @@ namespace TBChestTracker
                 }
                 else
                 {
-                    for(var da = 0; da  < datesToSubtract; da++)
+                    for(var da = 0; da <= datesToSubtract; da++)
                     {
                         var d = toDate;
                         d = toDate.AddDays(-da);
@@ -104,8 +110,8 @@ namespace TBChestTracker
                         Dates.Add(shortD);
                     }
                 }
-                
             }
+
             if (isCustom == false)
             {
                 var Today = DateTime.Now;
@@ -343,6 +349,7 @@ namespace TBChestTracker
                 writer.Close();
             }
         }
+
         public bool Export()
         {
             var sortOptions = ExportSettings.SortOption;
@@ -350,9 +357,43 @@ namespace TBChestTracker
             var dateFrom = ExportSettings.DateRangeFrom;
             var dateRange = ExportSettings.DateRange;
             var extraHeaders = ExportSettings.ExtraHeaders;
-            var extraChestPoints = ExportSettings.PointsAmount;
 
             var clanSettings = ClanManager.Instance.ClanChestSettings;
+
+            var ext = Path.GetExtension(ExportFilename);
+            if(ext.ToLower().Contains("json"))
+            {
+                //--- need to export raw json
+                var ClanChestDailyData = new Dictionary<string, IList<ClanChestData>>(); 
+                var Dates = BuildDates();
+                var _clanchestdailydata = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
+                foreach (var date in Dates)
+                {
+
+                    IList<ClanChestData> dailyChestData = null;
+                    try
+                    {
+                        dailyChestData = _clanchestdailydata[date];
+                        ClanChestDailyData.Add(date, dailyChestData);
+                    }
+                    catch (Exception ex)
+                    {
+                        InconsistentDates++;
+                        var msg = $"{date} doesn't exist inside Clan Chest Data. Skipping.";
+                        com.HellStormGames.Logging.Console.Write(msg, "Invalid Dates", com.HellStormGames.Logging.LogType.WARNING);
+                        continue;
+                    }
+                }
+
+                using (StreamWriter sw = File.CreateText(ExportFilename))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.Formatting = Formatting.Indented;
+                    serializer.Serialize(sw, ClanChestDailyData);
+                    sw.Close();
+                }
+                return true;
+            }
 
             ChestExportDataCollection = new List<ChestExportData>();
 
@@ -365,7 +406,6 @@ namespace TBChestTracker
             {
                 //-- we build according to clan specified conditions.
                 BuildChestsByConditions();
-            
             }
             else if(clanSettings.GeneralClanSettings.ChestOptions == ChestOptions.UsePoints)
             {

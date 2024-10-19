@@ -4,27 +4,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#nullable enable
+
 namespace TBChestTracker.Arrays
 {
     public class ClanmateCollection : IDisposable
     {
-        private List<Clanmate> _collection;
+        private List<Clanmate>? _collection;
         public ClanmateCollection()
         {
             _collection = new List<Clanmate>();
         }
         public void Add(Clanmate clanmate)
         {
-            _collection.Add(clanmate);
+            _collection?.Add(clanmate);
         }
         public void AddRange(List<Clanmate> list)
         {
-            _collection.AddRange(list);
+            _collection?.AddRange(list);
         }
 
         public void Remove(Clanmate clanmate)
         {
-            _collection.Remove(clanmate);
+            _collection?.Remove(clanmate);
         }
         public void Clear()
         {
@@ -32,28 +34,35 @@ namespace TBChestTracker.Arrays
         }
         public void RemoveAt(int index)
         {
-            _collection.RemoveAt(index);
+            _collection?.RemoveAt(index);
         }
 
         public void Dispose()
         {
-            _collection.Clear();
+            _collection?.Clear();
             _collection = null;
         }
 
-        public Clanmate this[int index]
+        public Clanmate? this[int index]
         {
             get
             {
-                return _collection[index];
+                if (_collection != null)
+                {
+                    return _collection[index];
+                }
+                return null;
             }
             set
             {
-                _collection[index] = value;
+                if (_collection != null && value != null)
+                {
+                    _collection[index] = value;
+                }
             }
         }
 
-        public Clanmate this[string name]
+        public Clanmate? this[string name]
         {
             get
             {
@@ -61,8 +70,11 @@ namespace TBChestTracker.Arrays
             }
             set
             {
-                var _clanmate = _collection.Select(c=>c).Where(cn => cn.Name.Equals(name.ToLower())).FirstOrDefault();  
-                _collection[_collection.IndexOf(_clanmate)] = value; 
+                var _clanmate = _collection.Select(c=>c).Where(cn => cn.Name.Equals(name.ToLower())).FirstOrDefault();
+                if (_collection != null && value != null)
+                {
+                    _collection[_collection.IndexOf(_clanmate)] = value;
+                }
             }
         }
     }
