@@ -178,6 +178,14 @@ namespace TBChestTracker
 
         private void AddHeaderItemBtn_Click(object sender, RoutedEventArgs e)
         {
+            if(exportSettings.ExtraHeaders.Contains(HeadersComboBox.SelectedValue.ToString()))
+            {
+                if(MessageBox.Show($"Unable to add same extra header. Must be unique. Can't have two or more '{HeadersComboBox.SelectedValue.ToString()}'") == MessageBoxResult.OK)
+                {
+                    return;
+                }
+            }
+
             exportSettings.ExtraHeaders.Add(HeadersComboBox.SelectedValue.ToString());
         }
 

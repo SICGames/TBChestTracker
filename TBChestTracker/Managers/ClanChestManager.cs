@@ -1379,7 +1379,7 @@ namespace TBChestTracker
             if (ClanChestDailyData != null && ClanChestDailyData.Keys != null && ClanChestDailyData.Keys.Count > 0)
             {
                 var lastDate = ClanChestDailyData.Keys.Last();
-                var dateStr = DateTime.Now.ToString("d");
+                var dateStr = DateTime.Now.ToString("d", new CultureInfo(CultureInfo.CurrentCulture.Name));
                 if (lastDate.Equals(dateStr))
                 {
                     clanChestData = ClanChestDailyData[lastDate];

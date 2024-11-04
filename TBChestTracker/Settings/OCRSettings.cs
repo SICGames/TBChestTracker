@@ -32,7 +32,12 @@ namespace TBChestTracker
         {
             get
             {
-                return String.IsNullOrEmpty(_TessDataFolder) == true ? $@"{AppContext.Instance.TesseractData}" : _TessDataFolder;
+                if(String.IsNullOrEmpty(_TessDataFolder))
+                {
+                    _TessDataFolder = $@"{AppContext.Instance.TesseractData}";
+                }
+
+                return _TessDataFolder;
             }
             set
             {
@@ -47,7 +52,11 @@ namespace TBChestTracker
         {
             get
             {
-                return String.IsNullOrEmpty(_languages) == true ? "eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus+pol+por+pus+ukr+deu" : _languages;
+                if(String.IsNullOrEmpty(_languages))
+                {
+                    _languages = "eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus+pol+por+pus+ukr+deu";
+                }
+                return  _languages;
             }
             set
             {

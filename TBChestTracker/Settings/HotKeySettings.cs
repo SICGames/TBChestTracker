@@ -16,6 +16,7 @@ namespace TBChestTracker
         public string StartAutomationKeys {
             get
             {
+
                return String.IsNullOrEmpty(_StartAutomationKeys) == true ? "F9" : _StartAutomationKeys;
             }
             set
