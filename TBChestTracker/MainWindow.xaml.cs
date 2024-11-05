@@ -864,10 +864,11 @@ namespace TBChestTracker
         
         public void ImportClanDatabase(Action<bool> response)
         {
+            var clanroot = SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder;
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Clan Archives | *.zip";
             openFileDialog.RestoreDirectory = true;
-            openFileDialog.InitialDirectory = SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder;
+            openFileDialog.InitialDirectory = clanroot;
 
             if (openFileDialog.ShowDialog() == true)
             {
@@ -875,11 +876,23 @@ namespace TBChestTracker
 
                 ImportDatabaseWindow importDatabaseWindow = new ImportDatabaseWindow();
                 importDatabaseWindow.SourceFile = file;
-                importDatabaseWindow.DestFolderPath = SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder;
+                var clanname = file.Substring(file.LastIndexOf("\\") + 1);
+                clanname = clanname.Substring(0, clanname.LastIndexOf("."));
+
+                var tdi = new DirectoryInfo($@"{clanroot}{clanname}");
+                if(tdi.Exists == false)
+                {
+                    tdi.Create();
+                }
+                var dest = $@"{clanroot}{clanname}\";
+
+                importDatabaseWindow.DestFolderPath = dest;
+
                 if(importDatabaseWindow.ShowDialog() == true)
                 {
-
-                    response(true);
+                    var clandbFile = $@"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}{clanname}\clan.cdb";
+                    var bloaded = LoadClanDatabase(clandbFile);
+                    response(bloaded);
                 }
                 else
                 {

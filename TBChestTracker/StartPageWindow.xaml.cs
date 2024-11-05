@@ -83,7 +83,11 @@ namespace TBChestTracker
 
         private void ImportClanDatabase()
         {
-
+            MainWindow.ImportClanDatabase(result =>
+            {
+                MainWindow.ShowWindow();
+                this.Close();
+            });
         }
         private void StackPanel_Click(object sender, RoutedEventArgs e)
         {
@@ -116,7 +120,7 @@ namespace TBChestTracker
                     this.Close();
                     break;
                 case "IMPORT":
-
+                    ImportClanDatabase();
                     break;
                 default: break;
             }

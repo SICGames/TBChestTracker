@@ -87,19 +87,17 @@ namespace TBChestTracker
         private async void ImportClanDatabase(string src, string dest)
         {
             await Task.Run(() => ImportClanDatabaseAsync(src, dest));
-            this.DialogResult = true;
             this.Close();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             ImportClanDatabase(SourceFile, DestFolderPath);
-
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-
+            this.DialogResult = true;
         }
     }
 }

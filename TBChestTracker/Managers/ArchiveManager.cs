@@ -115,6 +115,7 @@ namespace TBChestTracker
                     if (file.FullName.StartsWith(destinationDirectoryFullPath, StringComparison.OrdinalIgnoreCase))
                     {
                         entryFile = file.FullName.Substring(destFolderPos);
+                        entryFile = entryFile.Replace("\\", "/");
                     }
 
                     var zipProgress = new ZipProgress(files.Count(), count, entryFile);
