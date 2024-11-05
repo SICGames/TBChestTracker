@@ -107,7 +107,10 @@
                         <ui:FancyButton ImageSource="/Images/folderIcon.png" Text="Load Clan Database..." Tag="LOAD"
                                     Foreground="White" 
                                     FontWeight="Bold" FontSize="14" HilightBrush="#222" Height="50"/>
-                        <!--#endregion-->
+                        <ui:FancyButton ImageSource="/Images/import-icon.png" Text="Import Clan Database..." Tag="IMPORT"
+                                    Foreground="White" 
+                                    FontWeight="Bold" FontSize="14" HilightBrush="#222" Height="50"/>
+                    <!--#endregion-->
                     </StackPanel>
                 </Grid>
                 <!--#endregion-->

@@ -44,6 +44,8 @@ using TBChestTracker.Resources;
 using TBChestTracker.Effects;
 using TBChestTracker.Automation;
 using com.HellStormGames.Logging;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using TBChestTracker.UI;
 
 namespace TBChestTracker
 {
@@ -761,7 +763,10 @@ namespace TBChestTracker
         {
             ShowLoadClanWindow(result =>
             {
-
+                if(result)
+                {
+                    ExportClan.IsEnabled = true;
+                }
             });
            
         }
@@ -797,6 +802,10 @@ namespace TBChestTracker
         #region LoadRecentFile
         public void LoadReentFile(string file, Action<bool> response)
         {
+            bool bLoaded = LoadClanDatabase(file);
+            response(bLoaded);
+
+            /*
             ClanManager.Instance.ClanDatabaseManager.Load(file, ClanManager.Instance.ClanChestManager, result =>
             {
                 if (result)
@@ -823,8 +832,8 @@ namespace TBChestTracker
                     {
                         AppContext.Instance.IsAutomationPlayButtonEnabled = true;
                     }
-
-                    //ClanManager.Instance.ClanChestManager.RepairChestData();
+                    ExportClan.IsEnabled = true;
+                    
                     response(true);
                 }
                 else
@@ -832,6 +841,9 @@ namespace TBChestTracker
                     MessageBox.Show("Something went horribly wrong. Database is not suppost to be blank.");
                 }
             });
+
+            */
+
         }
 
         
@@ -850,90 +862,127 @@ namespace TBChestTracker
                 response(false);
         }
         
+        public void ImportClanDatabase(Action<bool> response)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Clan Archives | *.zip";
+            openFileDialog.RestoreDirectory = true;
+            openFileDialog.InitialDirectory = SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder;
 
+            if (openFileDialog.ShowDialog() == true)
+            {
+                var file = openFileDialog.FileName;
+
+                ImportDatabaseWindow importDatabaseWindow = new ImportDatabaseWindow();
+                importDatabaseWindow.SourceFile = file;
+                importDatabaseWindow.DestFolderPath = SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder;
+                if(importDatabaseWindow.ShowDialog() == true)
+                {
+
+                    response(true);
+                }
+                else
+                {
+                    response(false);
+                }
+            }
+            else
+                response(false);
+        }
+
+        private bool LoadClanDatabase(string file)
+        {
+            bool bIsLoaded = false;
+
+            if (ClanManager.Instance.ClanChestSettings.ChestRequirements != null)
+                ClanManager.Instance.ClanChestSettings.Clear();
+
+            ClanManager.Instance.ClanDatabaseManager.Load(file, ClanManager.Instance.ClanChestManager, result =>
+            {
+                if (result)
+                {
+                    AppContext.Instance.UpdateCurrentProject($"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}");
+                    AppContext.Instance.UpdateApplicationTitle();
+
+                    var recentlyOpenedFiles = recentlyOpenedListManager.RecentClanDatabases.Select(f => f.FullClanRootFolder).ToList();
+
+                    if (!recentlyOpenedFiles.Contains(file))
+                    {
+                        RecentClanDatabase recentdb = new RecentClanDatabase();
+                        recentdb.ClanAbbreviations = ClanManager.ClanDatabaseManager.ClanDatabase.ClanAbbreviations;
+                        recentdb.ClanName = ClanManager.ClanDatabaseManager.ClanDatabase.Clanname;
+                        var position = StringHelpers.findNthOccurance(file, Convert.ToChar(@"\"), 3);
+                        recentdb.ShortClanRootFolder = StringHelpers.truncate_file_name(file, position);
+                        recentdb.FullClanRootFolder = file;
+                        recentdb.LastOpened = DateTime.Now.ToFileTimeUtc().ToString();
+
+                        recentlyOpenedListManager.RecentClanDatabases.Add(recentdb);
+
+                        MenuItem mu = new MenuItem();
+                        mu.Header = StringHelpers.truncate_file_name(file, position);
+                        mu.Tag = file;
+                        mu.Click += Mu_Click;
+                        RecentlyOpenedParent.Items.Add(mu);
+
+                        recentlyOpenedListManager.Save();
+
+                        if (RecentlyOpenedParent.Items.Count <= 1)
+                        {
+                            Separator separator = new Separator();
+                            RecentlyOpenedParent.Items.Add(separator);
+                            MenuItem mi = new MenuItem();
+                            mi.Tag = "CLEAR_HISTORY";
+                            mi.Header = "Clear Recent Clan Databases";
+                            mi.Click += Mu_Click;
+                            RecentlyOpenedParent.Items.Add(mi);
+                        }
+
+                    }
+
+                    com.HellStormGames.Logging.Console.Write($"Loaded Clan ({ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}) Database Successfully.",
+                        com.HellStormGames.Logging.LogType.INFO);
+
+                    AppContext.Instance.IsCurrentClandatabase = true;
+                    if (AppContext.Instance.IsClanChestDataCorrupted == true)
+                    {
+                        AppContext.Instance.IsAutomationPlayButtonEnabled = false;
+
+                        if (MessageBox.Show("Oh no! There is an error loading your clan chest database file. It is possibly corrupted. Be sure to restore a previously known good clan chest data file inside Tools -> Restore Clan Chest Data", "Clan Chest Data Loading Error", MessageBoxButton.OK, MessageBoxImage.Stop) == MessageBoxResult.OK)
+                        {
+                            RestoreClanChestDataWindow restoreClanChestDataWindow = new RestoreClanChestDataWindow();
+                            restoreClanChestDataWindow.Show();
+                        }
+                    }
+                    else
+                    {
+                        AppContext.Instance.IsAutomationPlayButtonEnabled = true;
+                    }
+
+                    ExportClan.IsEnabled = true;
+                    //ClanManager.Instance.ClanChestManager.RepairChestData();
+                    bIsLoaded = true;
+                }
+                else
+                {
+                    MessageBox.Show("Something went horribly wrong. Database is not suppost to be blank.");
+                    bIsLoaded = false;
+                }
+            });
+
+            return bIsLoaded;
+        }
         public void ShowLoadClanWindow(Action<bool> response)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Clan Databases | *.cdb";
             openFileDialog.RestoreDirectory = true;
             openFileDialog.InitialDirectory = SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder;
-           
-
-            if (ClanManager.Instance.ClanChestSettings.ChestRequirements != null)
-                ClanManager.Instance.ClanChestSettings.Clear();
 
             if (openFileDialog.ShowDialog() == true)
             {
                 var file = openFileDialog.FileName;
-                ClanManager.Instance.ClanDatabaseManager.Load(file, ClanManager.Instance.ClanChestManager, result =>
-                {
-                    if (result)
-                    {
-                        AppContext.Instance.UpdateCurrentProject($"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}");
-                        AppContext.Instance.UpdateApplicationTitle();
-
-                        var recentlyOpenedFiles = recentlyOpenedListManager.RecentClanDatabases.Select(f => f.FullClanRootFolder).ToList();
-
-                        if(!recentlyOpenedFiles.Contains(file))
-                        {
-                            RecentClanDatabase recentdb = new RecentClanDatabase();
-                            recentdb.ClanAbbreviations = ClanManager.ClanDatabaseManager.ClanDatabase.ClanAbbreviations;
-                            recentdb.ClanName = ClanManager.ClanDatabaseManager.ClanDatabase.Clanname;
-                            var position = StringHelpers.findNthOccurance(file, Convert.ToChar(@"\"), 3);
-                            recentdb.ShortClanRootFolder = StringHelpers.truncate_file_name(file, position);
-                            recentdb.FullClanRootFolder = file;
-                            recentdb.LastOpened = DateTime.Now.ToFileTimeUtc().ToString();
-
-                            recentlyOpenedListManager.RecentClanDatabases.Add(recentdb);
-
-                            MenuItem mu = new MenuItem();
-                            mu.Header = StringHelpers.truncate_file_name(file, position);
-                            mu.Tag = file;
-                            mu.Click += Mu_Click;
-                            RecentlyOpenedParent.Items.Add(mu);
-
-                            recentlyOpenedListManager.Save();
-                            
-                            if(RecentlyOpenedParent.Items.Count <= 1)
-                            {
-                                Separator separator = new Separator();
-                                RecentlyOpenedParent.Items.Add(separator);
-                                MenuItem mi = new MenuItem();
-                                mi.Tag = "CLEAR_HISTORY";
-                                mi.Header = "Clear Recent Clan Databases";
-                                mi.Click += Mu_Click;
-                                RecentlyOpenedParent.Items.Add(mi);
-                            }
-
-                        }
-
-                        com.HellStormGames.Logging.Console.Write($"Loaded Clan ({ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}) Database Successfully.",
-                            com.HellStormGames.Logging.LogType.INFO);
-
-                        AppContext.Instance.IsCurrentClandatabase = true;
-                        if (AppContext.Instance.IsClanChestDataCorrupted == true)
-                        {
-                            AppContext.Instance.IsAutomationPlayButtonEnabled = false;
-
-                            if (MessageBox.Show("Oh no! There is an error loading your clan chest database file. It is possibly corrupted. Be sure to restore a previously known good clan chest data file inside Tools -> Restore Clan Chest Data", "Clan Chest Data Loading Error", MessageBoxButton.OK, MessageBoxImage.Stop) == MessageBoxResult.OK)
-                            {
-                                RestoreClanChestDataWindow restoreClanChestDataWindow = new RestoreClanChestDataWindow();
-                                restoreClanChestDataWindow.Show();
-                            }
-                        }
-                        else
-                        {
-                            AppContext.Instance.IsAutomationPlayButtonEnabled = true;
-                        }
-                        //ClanManager.Instance.ClanChestManager.RepairChestData();
-                        response(true);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Something went horribly wrong. Database is not suppost to be blank.");
-                        response(false);
-                    }
-                });
+                bool bLoaded = LoadClanDatabase(file);
+                response(bLoaded);
             }
             else
                 response(false);
@@ -1290,6 +1339,22 @@ namespace TBChestTracker
         {
             ValidateClanChestsIntegrityWindow validateChestDataIntegrity = new ValidateClanChestsIntegrityWindow();
             validateChestDataIntegrity.Show();
+        }
+
+        private void ExportClan_Click(object sender, RoutedEventArgs e)
+        {
+
+            var clanpath = $@"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+            var archivename = $@"{ClanManager.ClanDatabaseManager.ClanDatabase.Clanname}.zip";
+            var dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = true;
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                ExportDatabaseWindow exportDatabaseWindow = new ExportDatabaseWindow();
+                exportDatabaseWindow.DestinationFilePath = $@"{dialog.FileName}\{archivename}";
+                exportDatabaseWindow.SourceFolderPath = clanpath;
+                exportDatabaseWindow.Show();
+            }
         }
     }
 }

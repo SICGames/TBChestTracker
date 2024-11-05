@@ -214,10 +214,16 @@
     </Compile>
     <Compile Include="Engine\OCREngine.cs" />
     <Compile Include="ErrorHandlers\ChestProcessingError.cs" />
+    <Compile Include="ExportDatabaseWindow.xaml.cs">
+      <DependentUpon>ExportDatabaseWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Extensions\DateExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Helpers\WindowHelper.cs" />
     <Compile Include="ImageEffects\ImageEffects.cs" />
+    <Compile Include="ImportDatabaseWindow.xaml.cs">
+      <DependentUpon>ImportDatabaseWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Managers\ChestRewardsManager.cs" />
     <Compile Include="Managers\RecentlyOpenedListManager.cs" />
     <Compile Include="Pages\ChestDataIntegrity\ErrorsFound.xaml.cs">
@@ -482,6 +488,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CrashBox\CrashBoxWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ExportDatabaseWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ImportDatabaseWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -850,6 +864,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\EditIcon-White.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\export-icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\import-icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\NewFileIcon.png">

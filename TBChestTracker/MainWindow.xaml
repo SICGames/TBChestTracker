@@ -258,6 +258,8 @@
                     <MenuItem Header="{x:Static ResourceStrings:Strings.SaveClanDatabase}" x:Name="SaveClanDB" Command="Commands:CustomCommandBindings.SaveClanDatabase"/>
                     <MenuItem Header="{x:Static ResourceStrings:Strings.SaveClanDatabaseAs}" x:Name="SaveClanDBAs" Command="Commands:CustomCommandBindings.SaveAsClanDatabase"/>
                     <Separator/>
+                    <MenuItem Header="Export Clan Database" x:Name="ExportClan" Click="ExportClan_Click" IsEnabled="False"/>
+                    <Separator/>
                     <MenuItem Header="{x:Static ResourceStrings:Strings.ExportChestData}" Command="Commands:CustomCommandBindings.ExportClanDatabase"/>
                     <Separator/>
                     <MenuItem x:Name="RecentlyOpenedParent" Header="{x:Static ResourceStrings:Strings.RecentOpenedDatabases}">

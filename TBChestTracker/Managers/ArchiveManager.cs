@@ -5,12 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO.Compression;
+using System.Runtime.CompilerServices;
 
 namespace TBChestTracker
 {
 
     public static class MyZipFileExtensions
     {
+      
         public static void ExtractToDirectory(this ZipArchive source, string destinationDirectoryName, IProgress<ZipProgress> progress)
         {
             ExtractToDirectory(source, destinationDirectoryName, progress, overwrite: false);
@@ -73,6 +75,59 @@ namespace TBChestTracker
 
     public class ArchiveManager
     {
+        public static void CreateFromDirectory(string sourceDirectory, string destinationArchiveFilename, IProgress<ZipProgress> progress)
+        {
+            CreateFromDirectory(sourceDirectory, destinationArchiveFilename, progress, overwrite: false);
+        }
+        public static void CreateFromDirectory(string sourceDirectory, string destinationArchiveFilename, IProgress<ZipProgress> progress, bool overwrite)
+        {
+            if (sourceDirectory == null)
+                throw new ArgumentNullException(nameof(sourceDirectory));
+
+            if (destinationArchiveFilename == null)
+                throw new ArgumentNullException(nameof(destinationArchiveFilename));
+
+            DirectoryInfo di = new DirectoryInfo(sourceDirectory);
+            if (di.Exists == false)
+            {
+                throw new IOException($@"{nameof(sourceDirectory)} does not exist.");
+            }
+
+            var files = di.GetFiles("*.*", SearchOption.AllDirectories);
+
+            if(File.Exists(destinationArchiveFilename))
+            {
+               File.Delete(destinationArchiveFilename); 
+            }
+
+            using (var archive = ZipFile.Open(destinationArchiveFilename, ZipArchiveMode.Create))
+            {
+                string destinationDirectoryFullPath = di.FullName;
+                var destFolderPos = destinationDirectoryFullPath.LastIndexOf("\\") + 1;
+
+                int count = 0;
+                foreach (var file in files)
+                {
+                    count++;
+                    var entryFullname = file.FullName;
+                    string entryFile = string.Empty;
+                    
+                    if (file.FullName.StartsWith(destinationDirectoryFullPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        entryFile = file.FullName.Substring(destFolderPos);
+                    }
+
+                    var zipProgress = new ZipProgress(files.Count(), count, entryFile);
+                    progress.Report(zipProgress);
+
+                    archive.CreateEntryFromFile(file.FullName, entryFile);
+
+                }
+
+                archive.Dispose();
+            }
+        }
+
         private static Task ExtractAsync(string archiveFile, string destinationFolder, IProgress<ZipProgress> progress, bool bOverwrite)
         {
             return Task.Run(() =>
@@ -87,6 +142,17 @@ namespace TBChestTracker
         public static async Task Extract(string archiveFile, string destinationFolder, IProgress<ZipProgress> progress, bool bOverwrite = true)
         {
             await ExtractAsync(archiveFile, destinationFolder, progress, bOverwrite).ConfigureAwait(false);
+        }
+        private static Task CreateAsync(string sourceDirectory, string archiveFilename, IProgress<ZipProgress> progress, bool bOverwrite)
+        {
+            return Task.Run(() =>
+            {
+               CreateFromDirectory(sourceDirectory, archiveFilename, progress, bOverwrite);
+            });
+        }
+        public static async Task Create(string sourceDirectory, string archiveFilename, IProgress<ZipProgress> progress, bool bOverwrite = true)
+        {
+            await CreateAsync(sourceDirectory, archiveFilename,progress,bOverwrite).ConfigureAwait(false);
         }
     }
 }

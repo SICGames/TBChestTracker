@@ -42,25 +42,6 @@ namespace TBChestTracker
             this.Close();
         }
 
-        /*
-        private void LoadRecentFilesList()
-        {
-            if(File.Exists(AppContext.Instance.RecentOpenedClanDatabases))
-            {
-                var recentDatabase = new RecentDatabase();
-                recentDatabase.Load();
-                
-                foreach(var recent in recentDatabase.RecentClanDatabases)
-                {
-                    RecentClanDatabases.Add(recent);
-                }
-
-                recentFilesView.ItemsSource = RecentClanDatabases;
-            }
-
-        }
-        */
-
         private void Lvi_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             var item = ((ListViewItem)sender).Content as RecentClanDatabase;
@@ -91,14 +72,6 @@ namespace TBChestTracker
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             recentFilesView.ItemsSource = null;
-            
-            /*
-            if (RecentClanDatabases.Count > 0)
-                RecentClanDatabases.Clear();
-
-            RecentClanDatabases = null;
-            */
-
             MainWindow = null;
         }
 
@@ -106,6 +79,11 @@ namespace TBChestTracker
         {
             ClanWizardWindow clanWizardWindow = new ClanWizardWindow();
             clanWizardWindow.Show();
+        }
+
+        private void ImportClanDatabase()
+        {
+
         }
         private void StackPanel_Click(object sender, RoutedEventArgs e)
         {
@@ -136,6 +114,9 @@ namespace TBChestTracker
                 case "NEW_WIZARD":
                     NewClanWizard();
                     this.Close();
+                    break;
+                case "IMPORT":
+
                     break;
                 default: break;
             }
