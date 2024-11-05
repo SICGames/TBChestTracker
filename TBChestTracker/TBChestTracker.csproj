@@ -869,6 +869,12 @@
     <Content Include="Images\export-icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\heart-icon-white.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\import-icon-white.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\import-icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

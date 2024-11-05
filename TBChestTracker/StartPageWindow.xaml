@@ -85,35 +85,46 @@
                       Background="Red" BorderBrush="Red" 
                       HoverBrush="#ff55" Icon="/Images/close-button.png" BorderThickness="1" x:Name="CloseBtn" Click="CloseBtn_Click"/>
             -->
-
-
             </Grid>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="200"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
                 <!--#region  Menu -->
-                <Grid Grid.Column="0" VerticalAlignment="Top">
-                    <StackPanel Orientation="Vertical" Margin="5,10" ButtonBase.Click="StackPanel_Click">
+                <Grid Grid.Column="0" Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Vertical" Margin="5,10" ButtonBase.Click="StackPanel_Click">
                         <!--#region  Mockup Menu Buttons -->
                         <ui:FancyButton RenderMode="IMAGE_TEXT" ImageSource="/Images/NewIcon.png" Text="New Clan Database..." Corners="0" ShowSeperator="False" Tag="NEW"
-                Foreground="White" 
-                FontWeight="Bold" FontSize="14" HilightBrush="#222" Height="50" IsEnabled="True"/>
+                                        Foreground="White" 
+                                        FontWeight="Bold" FontSize="14" HilightBrush="#222" Height="50" IsEnabled="True"/>
                         <ui:FancyButton ImageSource="/Images/NewWizardIcon.png" Text="Clan Setup Wizard..." RenderMode="IMAGE_TEXT" Tag="NEW_WIZARD"
-                Foreground="White" 
-                FontWeight="Bold" FontSize="14" HilightBrush="#222" Height="50" Visibility="Collapsed"/>
+                                         Foreground="White" 
+                                        FontWeight="Bold" FontSize="14" HilightBrush="#222" Height="50" Visibility="Collapsed"/>
                         <ui:FancyButton ImageSource="/Images/folderIcon.png" Text="Load Clan Database..." Tag="LOAD"
                                     Foreground="White" 
                                     FontWeight="Bold" FontSize="14" HilightBrush="#222" Height="50"/>
-                        <ui:FancyButton ImageSource="/Images/import-icon.png" Text="Import Clan Database..." Tag="IMPORT"
+                        <ui:FancyButton ImageSource="/Images/import-icon-white.png" Text="Import Clan Database..." Tag="IMPORT"
                                     Foreground="White" 
                                     FontWeight="Bold" FontSize="14" HilightBrush="#222" Height="50"/>
+                    
                     <!--#endregion-->
                     </StackPanel>
-                </Grid>
-                <!--#endregion-->
+                <DockPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="0,10,0,10">
+                    <ui:FancyButton Grid.Row="0" ImageSource="/Images/heart-icon-white.png" Text="Become A Patreon..." Tag="PATREON"
+                                    Foreground="White" 
+                                    FontWeight="Bold" FontSize="14" HilightBrush="#222" Height="50" x:Name="PatreonBtn" Click="PatreonBtn_Click"/>
+                </DockPanel>
+            </Grid>
+            
+            <!--#endregion-->
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="48"/>

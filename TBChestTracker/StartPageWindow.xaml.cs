@@ -18,6 +18,7 @@ using TBChestTracker.UI;
 using System.Runtime.CompilerServices;
 using System.Windows.Shell;
 using com.KonquestUI.Controls;
+using System.Diagnostics;
 
 namespace TBChestTracker
 {
@@ -134,6 +135,11 @@ namespace TBChestTracker
                 MainWindow.RecentlyOpenedParent.Items.Clear();
             }
             ClearRecentListBtn.IsEnabled = false;   
+        }
+
+        private void PatreonBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start("https://www.patreon.com/TotalBattleGuide");
         }
     }
 }
