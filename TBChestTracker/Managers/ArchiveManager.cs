@@ -26,9 +26,7 @@ namespace TBChestTracker
             if (destinationDirectoryName == null)
                 throw new ArgumentNullException(nameof(destinationDirectoryName));
 
-
             // Rely on Directory.CreateDirectory for validation of destinationDirectoryName.
-
             // Note that this will give us a good DirectoryInfo even if destinationDirectoryName exists:
             DirectoryInfo di = Directory.CreateDirectory(destinationDirectoryName);
             string destinationDirectoryFullPath = di.FullName;
@@ -70,6 +68,8 @@ namespace TBChestTracker
                     }
                 }
             }
+
+            source.Dispose();
         }
     }
 
@@ -124,7 +124,6 @@ namespace TBChestTracker
                     archive.CreateEntryFromFile(file.FullName, entryFile);
 
                 }
-
                 archive.Dispose();
             }
         }

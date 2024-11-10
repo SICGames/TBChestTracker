@@ -108,6 +108,8 @@ namespace TBChestTracker
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            bool failedToParseDates = false;
+
             var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
             var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
 
@@ -134,7 +136,6 @@ namespace TBChestTracker
             if (System.IO.File.Exists(ExportSettingsFile))
             {
                 LoadExportSettings();
-
             }
 
             var dailyclanchestdata = ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions != ChestOptions.UseConditions ? ClanManager.Instance.ClanChestManager.ClanChestDailyData : ClanManager.Instance.ClanChestManager.FilterClanChestByConditions();
@@ -143,30 +144,33 @@ namespace TBChestTracker
 
             var FirstDateTimeObject = new DateTime();
             var LastDateTimeObject = new DateTime();
+
             if (DateTime.TryParse(firstDate, out FirstDateTimeObject) == false)
             {
-
+                failedToParseDates = true;
             }
             if (DateTime.TryParse(lastDate, out LastDateTimeObject) == false)
             {
-
+                failedToParseDates = true;
             }
-            var pastDateTimeObject = FirstDateTimeObject.AddDays(-1);
-            var futureDateTimeObject = LastDateTimeObject.AddDays(1);
 
-            var beginningOfTime = pastDateTimeObject.AddYears(-1000);
-            var endingOfTime = futureDateTimeObject.AddYears(1000);
+            if (failedToParseDates == false)
+            {
+                var pastDateTimeObject = FirstDateTimeObject.AddDays(-1);
+                var futureDateTimeObject = LastDateTimeObject.AddDays(1);
 
-            DateRangeToPicker.BlackoutDates.Add(new CalendarDateRange(beginningOfTime, pastDateTimeObject));
-            DateRangeToPicker.BlackoutDates.Add(new CalendarDateRange(futureDateTimeObject, endingOfTime));
+                var beginningOfTime = pastDateTimeObject.AddYears(-1000);
+                var endingOfTime = futureDateTimeObject.AddYears(1000);
 
-            DateRangeFromPicker.BlackoutDates.Add(new CalendarDateRange(beginningOfTime, pastDateTimeObject));
-            DateRangeFromPicker.BlackoutDates.Add(new CalendarDateRange(futureDateTimeObject, endingOfTime));
+                DateRangeToPicker.BlackoutDates.Add(new CalendarDateRange(beginningOfTime, pastDateTimeObject));
+                DateRangeToPicker.BlackoutDates.Add(new CalendarDateRange(futureDateTimeObject, endingOfTime));
 
+                DateRangeFromPicker.BlackoutDates.Add(new CalendarDateRange(beginningOfTime, pastDateTimeObject));
+                DateRangeFromPicker.BlackoutDates.Add(new CalendarDateRange(futureDateTimeObject, endingOfTime));
 
-            exportSettings.DateRangeTo = LastDateTimeObject;
-
-            exportSettings.DateRangeFrom = FirstDateTimeObject;
+                exportSettings.DateRangeTo = LastDateTimeObject;
+                exportSettings.DateRangeFrom = FirstDateTimeObject;
+            }
 
             this.DataContext = exportSettings;
         }

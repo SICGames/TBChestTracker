@@ -87,7 +87,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Image x:Name="ImagePreview"  Height="500" Width="500" HorizontalAlignment="Left" Stretch="UniformToFill" Grid.Column="0"/>
-            <ListView x:Name="ocrResultsListView" Grid.Column="1" Visibility="Hidden">
+            <ListView x:Name="ocrResultsListView" Grid.Column="1">
             </ListView>
         </Grid>
         

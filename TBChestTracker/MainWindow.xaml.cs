@@ -349,6 +349,7 @@ namespace TBChestTracker
                         splashScreen.UpdateStatus($"Extracting Trained Tesseract Models.... ({Math.Round(processed)}/{Math.Round(total)})", percentage);
                     });
 
+                    //-- archive file was never closed or disposed. Fixed 11/10/24.
                     await ArchiveManager.Extract(archiveFile, destinationFolder, progress);
 
                     //-- now we should clean up.
@@ -421,15 +422,22 @@ namespace TBChestTracker
         }
         public async Task DeleteTessData()
         {
-            var di = new DirectoryInfo(SettingsManager.Instance.Settings.OCRSettings.TessDataFolder);
-            if (di.Exists)
+            try
             {
-                di.Delete(true);
+                var di = new DirectoryInfo(SettingsManager.Instance.Settings.OCRSettings.TessDataFolder);
+                if (di.Exists)
+                {
+                    di.Delete(true);
+                }
+                var tessdatatemp = new DirectoryInfo($"{AppContext.Instance.LocalApplicationPath}\\Temp");
+                if (tessdatatemp.Exists)
+                {
+                    tessdatatemp.Delete(true);
+                }
             }
-            var tessdatatemp = new DirectoryInfo($"{AppContext.Instance.LocalApplicationPath}\\Temp");
-            if (tessdatatemp.Exists)
+            catch (Exception ex)
             {
-                tessdatatemp.Delete(true);
+                //-- this shouldn't reach this point because everything should've been handled correctly. 
             }
         }
 
@@ -451,10 +459,7 @@ namespace TBChestTracker
 
         public async void Init(Window window)
         {
-
-
             bool bTessDataDownloadComplete = false;
-
 
             if (window is SplashScreen splashScreen)
             {
