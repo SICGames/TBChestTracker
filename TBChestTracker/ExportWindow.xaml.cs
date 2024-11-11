@@ -142,14 +142,11 @@ namespace TBChestTracker
             var firstDate = dailyclanchestdata.First().Key;
             var lastDate = dailyclanchestdata.Last().Key;
 
-            var FirstDateTimeObject = new DateTime();
-            var LastDateTimeObject = new DateTime();
-
-            if (DateTime.TryParse(firstDate, out FirstDateTimeObject) == false)
-            {
-                failedToParseDates = true;
-            }
-            if (DateTime.TryParse(lastDate, out LastDateTimeObject) == false)
+            DateTime FirstDateTimeObject, LastDateTimeObject = new DateTime();
+            
+            bool bFirstDateExtracted = DateTime.TryParse(firstDate, CultureInfo.CurrentCulture, DateTimeStyles.AssumeLocal, out FirstDateTimeObject);
+            bool bLastDateExtracted = DateTime.TryParse(lastDate, CultureInfo.CurrentCulture, DateTimeStyles.AssumeLocal, out LastDateTimeObject);
+            if (bFirstDateExtracted == false || bLastDateExtracted == false)
             {
                 failedToParseDates = true;
             }

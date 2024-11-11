@@ -21,8 +21,7 @@ namespace TBChestTracker
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            //-- Force to English
-            LocalizationManager.Set("en-US");
+            
 
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 
@@ -58,6 +57,11 @@ namespace TBChestTracker
                 else if(argumentsDictionary.ContainsKey("--delete_tessdata"))
                 {
                     appContext.bDeleteTessData = true;
+                }
+                else if(argumentsDictionary.ContainsKey("--force-us-locale"))
+                {
+                    //-- Force to English
+                    LocalizationManager.Set("en-US");
                 }
             }
 
