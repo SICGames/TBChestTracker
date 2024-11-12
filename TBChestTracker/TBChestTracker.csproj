@@ -218,6 +218,7 @@
       <DependentUpon>ExportDatabaseWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Extensions\DateExtensions.cs" />
+    <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Helpers\WindowHelper.cs" />
     <Compile Include="ImageEffects\ImageEffects.cs" />

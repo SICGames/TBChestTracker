@@ -135,10 +135,18 @@ namespace TBChestTracker
                 ClanDatabase = _clandatabase;
                 if(ClanDatabase != null)
                 {
-                    m_ClanChestManager.BuildData();
-                    AppContext.Instance.NewClandatabaseBeenCreated = true;
-                    CommandManager.InvalidateRequerySuggested();
-                    result(true);
+                    var r = m_ClanChestManager.BuildData();
+                    if (r == ClanChestManager.ChestDataBuildResult.DATA_CORRUPT)
+                    {
+                        MessageBox.Show("Clan Chest Data is corrupted. Please run Validate Chest Data Integrity to fix this issue. Very important.", "Chest Data Corrupted");
+                        result(true);
+                    }
+                    else if (r == ClanChestManager.ChestDataBuildResult.OK)
+                    {
+                        AppContext.Instance.NewClandatabaseBeenCreated = true;
+                        CommandManager.InvalidateRequerySuggested();
+                        result(true);
+                    }
                 }
                 else
                 {

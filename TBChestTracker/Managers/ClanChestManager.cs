@@ -2,6 +2,7 @@
 using com.HellStormGames.Logging;
 using Emgu.CV.CvEnum;
 using Microsoft.Win32;
+using MS.WindowsAPICodePack.Internal;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Markup;
 using TBChestTracker.Automation;
 using TBChestTracker.Managers;
@@ -778,6 +780,29 @@ namespace TBChestTracker
 
             foreach (var dates in chestdata.Keys.ToList())
             {
+                //-- need to check integrity of date format.
+                var date = new DateTime();
+                var canParse = DateTime.TryParse(dates, CultureInfo.CurrentCulture, DateTimeStyles.None, out date);
+                var bDateInvalid = false;
+
+                if (canParse)
+                {
+                    if(date.ToShortDateString().Equals(dates, StringComparison.OrdinalIgnoreCase) == false)
+                    {
+                        bDateInvalid = true;
+                    }
+                }
+                else if(canParse == false)
+                {
+                    bDateInvalid = true;
+                }
+
+                if(bDateInvalid)
+                {
+                    result.Add("Date Format Is Invalid", chestErrors);
+                    chestErrors++;
+                }
+
                 var data = chestdata[dates];
                 foreach (var _data in data.ToList())
                 {
@@ -997,13 +1022,9 @@ namespace TBChestTracker
 
             if (chestErrors > 0)
             {
-                //com.HellStormGames.Logging.Console.Write("Chest Data Automatically Repaired", "Chest Integrity", LogType.INFO);
-                //SaveData();
-                //CreateBackup();
                 return result;
             }
 
-            //com.HellStormGames.Logging.Console.Write("Chest Data looks good. No repairs needed.", "Chest Integrity", LogType.INFO);
             return null;
         }
 
@@ -1019,10 +1040,120 @@ namespace TBChestTracker
             {
 
             }
-
+           
             foreach (var dates in chestdata.Keys.ToList())
             {
-                var data = chestdata[dates];
+                //-- repair invalid date format.
+                var date = new DateTime();
+                var canParse = DateTime.TryParse(dates, CultureInfo.CurrentCulture, DateTimeStyles.None, out date);
+                var newDate = String.Empty;
+                var bDateInvalid = false;
+
+                if (canParse)
+                {
+                    if (date.ToShortDateString().Equals(dates, StringComparison.OrdinalIgnoreCase) == false)
+                    {
+                        bDateInvalid = true;
+                    }
+                }
+                else if (canParse == false)
+                {
+                    bDateInvalid = true;
+                }
+                
+                if (bDateInvalid)
+                {
+                    var formats = new[]
+                    {
+                        "M/d/yyyy",
+                        "d/M/yyyy",
+                        "yyyy-d-M",
+                        "dd.MM.yyyy",
+                        "dd/MM/yyyy",
+                        "MM/dd/yyyy",
+                        "yyyy-dd-MM",
+                        "dd-MM-yyyy",
+                        "d-M-yyyy",
+                        "d.M.yyyy"
+                    };
+                    var locales = new[]
+                    {
+                         "en-US",
+                         "en-GB",
+                         "fr-FR",
+                         "it-IT",
+                         "jp-JP",
+                         "de-DE",
+                         "en-AU",
+                         "es-SP",
+                         "es-MX",
+                         "ru-RU"
+                    };
+
+                    foreach (var locale in locales)
+                    {
+                        var cultureInfo = CultureInfo.CreateSpecificCulture(locale);
+                        var parsable = DateTime.TryParseExact(dates, formats, cultureInfo, DateTimeStyles.None, out date);
+                        if (parsable == true)
+                        {
+                            var timestamp = date.ConvertToUnixTimeStamp();
+                            var newDateTime = timestamp.ConvertToDateTime();
+                            try
+                            {
+                                chestdata.UpdateKey<string, IList<ClanChestData>>(dates, newDateTime.ToShortDateString());
+                                newDate = newDateTime.ToShortDateString();
+                                chestErrors++;
+                                break;
+                            }
+                            catch (Exception ex)
+                            {
+                                //--- we have a duplcated key. We need to merge data to previous data.
+                                var badData = chestdata[dates];
+                                var goodDate = chestdata[newDateTime.ToShortDateString()];
+
+                                foreach (var goodData in goodDate)
+                                {
+                                    foreach (var bad in badData.ToList())
+                                    {
+                                        var clanmate = goodData.Clanmate;
+                                        if (clanmate.ToLower().Equals(bad.Clanmate.ToLower(), StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            if (bad.chests != null)
+                                            {
+                                                foreach (var chest in bad.chests)
+                                                {
+                                                    if (goodData.chests == null)
+                                                    {
+                                                        goodData.chests = new List<Chest>();
+                                                    }
+
+                                                    goodData.chests.Add(chest);
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+                                //-- make sure we update newDate to the one we merged. Double checking.
+                                newDate = newDateTime.ToShortDateString();
+                                //-- remove the bad chest date.
+                                chestdata.Remove(dates);
+                                chestErrors++;
+
+                                AppContext.Instance.NewClandatabaseBeenCreated = true;
+                                AppContext.Instance.IsClanChestDataCorrupted = false;
+                                CommandManager.InvalidateRequerySuggested();
+                                break;
+                            }
+                        }
+                    }
+                }
+                if(newDate == String.Empty)
+                {
+                    newDate = dates;
+                }
+
+                var data = chestdata[newDate];
                 foreach (var _data in data.ToList())
                 {
                     var clanmate_points = _data.Points;
@@ -1356,14 +1487,22 @@ namespace TBChestTracker
 
             return true;
         }
-        public void BuildData()
+
+        public enum ChestDataBuildResult
+        {
+            OK = 0,
+            LOAD_FAIL = 1,
+            DATA_CORRUPT = 2
+        }
+
+        public ChestDataBuildResult BuildData()
         {
             var result = LoadData().Result; 
             
             if(result == false)
             {
                 MessageBox.Show("Unable to build clan data. Something went horribly wrong.", "Building Clan Data Failed");
-                return;
+                return ChestDataBuildResult.LOAD_FAIL;
             }
 
             //--- build blank clanchestdata 
@@ -1378,6 +1517,87 @@ namespace TBChestTracker
             //--- midnight bug may occur here.
             if (ClanChestDailyData != null && ClanChestDailyData.Keys != null && ClanChestDailyData.Keys.Count > 0)
             {
+                //-- check for duplicate keys.
+                bool bDuplcateDatesDetected = false;
+
+                foreach (var dates in ClanChestDailyData.Keys.ToList())
+                {
+
+                    var date = new DateTime();
+                    var canParse = DateTime.TryParse(dates, CultureInfo.CurrentCulture, DateTimeStyles.None, out date);
+                    var newDate = String.Empty;
+                    var bDateInvalid = false;
+
+                    if (canParse)
+                    {
+                        if (date.ToShortDateString().Equals(dates, StringComparison.OrdinalIgnoreCase) == false)
+                        {
+                            bDateInvalid = true;
+                        }
+                    }
+                    else if (canParse == false)
+                    {
+                        bDateInvalid = true;
+                    }
+
+                    if (bDateInvalid)
+                    {
+                        var formats = new[]
+                        {
+                        "M/d/yyyy",
+                        "d/M/yyyy",
+                        "yyyy-d-M",
+                        "dd.MM.yyyy",
+                        "dd/MM/yyyy",
+                        "MM/dd/yyyy",
+                        "yyyy-dd-MM",
+                        "dd-MM-yyyy",
+                        "d-M-yyyy",
+                        "d.M.yyyy"
+                    };
+                        var locales = new[]
+                        {
+                         "en-US",
+                         "en-GB",
+                         "fr-FR",
+                         "it-IT",
+                         "jp-JP",
+                         "de-DE",
+                         "en-AU",
+                         "es-SP",
+                         "es-MX",
+                         "ru-RU"
+                    };
+
+                        foreach (var locale in locales)
+                        {
+                            var cultureInfo = CultureInfo.CreateSpecificCulture(locale);
+                            var parsable = DateTime.TryParseExact(dates, formats, cultureInfo, DateTimeStyles.None, out date);
+
+                            if (parsable == true)
+                            {
+                                var timestamp = date.ConvertToUnixTimeStamp();
+                                var newDateTime = timestamp.ConvertToDateTime();
+                                if (ClanChestDailyData.ContainsKey(newDateTime.ToShortDateString()))
+                                {
+                                    //-- there's a duplicate.
+                                    bDuplcateDatesDetected = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (bDuplcateDatesDetected == true)
+                        {
+                            break;
+                        }
+                    }
+                }
+                //-- end check for duplicates
+                if (bDuplcateDatesDetected == true)
+                {
+                    return ChestDataBuildResult.DATA_CORRUPT;
+                }
+
                 var lastDate = ClanChestDailyData.Keys.Last();
                 var dateStr = DateTime.Now.ToString("d", new CultureInfo(CultureInfo.CurrentCulture.Name));
                 if (lastDate.Equals(dateStr))
@@ -1394,13 +1614,20 @@ namespace TBChestTracker
                 }
                 else
                 {
-                    ClanChestDailyData.Add(DateTime.Now.ToString("d", new CultureInfo(CultureInfo.CurrentCulture.Name)), clanChestData);
+                    try
+                    {
+                        ClanChestDailyData.Add(DateTime.Now.ToString("d", new CultureInfo(CultureInfo.CurrentCulture.Name)), clanChestData);
+                    }
+                    catch (Exception ex)
+                    {
+                        return ChestDataBuildResult.DATA_CORRUPT;
+                    }
                 }
             }
 
             AppContext.Instance.ClanmatesBeenAdded = true;
 
-            return;
+            return ChestDataBuildResult.OK;
         }
         
         public void SaveData(string chestdatafile = "")

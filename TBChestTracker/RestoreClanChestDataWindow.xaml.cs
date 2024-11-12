@@ -50,7 +50,7 @@ namespace TBChestTracker
                     var timestampstr = file.Substring(file.LastIndexOf("_") + 1);
                     timestampstr = timestampstr.Substring(0, timestampstr.LastIndexOf("."));
                     var timestamp = Double.Parse(timestampstr);
-                    var d = timestamp.UnixTimeStampToDateTime();
+                    var d = timestamp.ConvertToDateTime();
 
                     var date = d.ToShortDateString();
                     var time = d.ToShortTimeString();
