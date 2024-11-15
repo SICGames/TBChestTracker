@@ -26,14 +26,17 @@
 
         <TextBlock  Grid.Row="0" Grid.Column="0" Text="Clan Root Path" Margin="5,5" VerticalAlignment="Center"/>
         <TextBlock Grid.Row="2" Grid.Column="0" Text="UI Language" Margin="5,5" VerticalAlignment="Center"/>
-        
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Date Format" Margin="5,5" VerticalAlignment="Center"/>
         <ui:FancyPicker Grid.Column="1" Grid.Row="0" Margin="0,5,0,5" ToolTip="Root directory where all newly created clans will be stored."
                         Height="18" BorderBrush="#aaa" Source="{Binding ClanRootFolder}"
                         Corners="10" 
                         BorderThickness="1" Padding="1" Background="#fff" Foreground="#000" Tag="ClanRoot" Click="ClanRootFolderPicker_Click" x:Name="ClanRootFolderPicker"/>
         
-        <ComboBox x:Name="UILanguageComboBox" Grid.Row="2" Grid.Column="1" Width="200" SelectionChanged="UILanguageComboBox_SelectionChanged" HorizontalAlignment="Left" Margin="0,0" SelectedIndex="0" Text="{Binding UILanguage}">
+        <ComboBox x:Name="UILanguageComboBox" Grid.Row="2" Grid.Column="1" Width="200" SelectionChanged="UILanguageComboBox_SelectionChanged" HorizontalAlignment="Left" Margin="0,5" SelectedIndex="0" Text="{Binding UILanguage}">
             <ComboBoxItem Content="English"/>
         </ComboBox>
+        <ComboBox x:Name="DateFormatComboBox" Grid.Row="3" Grid.Column="1" Width="200" SelectionChanged="DateFormatComboBox_SelectionChanged"  HorizontalAlignment="Left" Margin="0,5" SelectedIndex="0" Text="{Binding DateFormat}">
+        </ComboBox>
+
     </Grid>
 </Page>

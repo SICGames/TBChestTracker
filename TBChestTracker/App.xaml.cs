@@ -21,10 +21,7 @@ namespace TBChestTracker
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            
-
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
-
             AppContext appContext = new AppContext();
             MainWindow mainwnd = new MainWindow();
             StartPageWindow startPageWindow = new StartPageWindow();

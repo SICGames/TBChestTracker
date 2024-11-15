@@ -47,6 +47,7 @@ using com.HellStormGames.Logging;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using TBChestTracker.UI;
 using System.Globalization;
+using TBChestTracker.Localization;
 
 namespace TBChestTracker
 {
@@ -642,7 +643,15 @@ namespace TBChestTracker
 
                 await Task.Delay(1000);
                 await LaunchTask(splashScreen);
-                
+
+                var language = SettingsManager.Instance.Settings.GeneralSettings.UILanguage;
+                switch(language.ToLower())
+                {
+                    case "english":
+                        LocalizationManager.Set("en-US");
+                        break;
+                }
+
                 com.HellStormGames.Logging.Console.Write($"Using Culture Info ('{CultureInfo.CurrentCulture.Name}')", com.HellStormGames.Logging.LogType.INFO);
             }
         }

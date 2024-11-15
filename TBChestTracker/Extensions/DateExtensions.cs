@@ -14,11 +14,11 @@ namespace TBChestTracker
         {
             "en-US",
             "en-GB",
+            "en-AU",
             "fr-FR",
             "it-IT",
             "jp-JP",
             "de-DE",
-            "en-AU",
             "es-SP",
             "es-MX",
             "ru-RU"
@@ -32,10 +32,37 @@ namespace TBChestTracker
             dateTime = dateTime.AddSeconds(unixTimeStamp).ToLocalTime();
             return dateTime;
         }
+
         public static double ConvertToUnixTimeStamp(this DateTime dateTime)
         {
             TimeSpan elapsedTime = dateTime - Epoch;
             return elapsedTime.TotalSeconds;
+        }
+
+        public static DateTime ParseCulture(this string date)
+        {
+            DateTime result = new DateTime();
+            var successful = false;
+            foreach (var culture in locales)
+            {
+                var cultureInfo = CultureInfo.CreateSpecificCulture(culture);
+                var dateformats = cultureInfo.DateTimeFormat.GetAllDateTimePatterns('d');
+                foreach (var dateformat in dateformats)
+                {
+                    if (DateTime.TryParseExact(date, dateformat, new CultureInfo(culture), DateTimeStyles.None, out result))
+                    {
+                        successful = true; 
+                        break;
+                    }
+                }
+
+                if (successful)
+                {
+                    break;
+                }
+            }
+
+            return result;
         }
 
         public static CultureInfo DetectDateTimeLocale(this DateTime dateTime)
