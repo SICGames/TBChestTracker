@@ -209,6 +209,8 @@
     <Compile Include="CrashBox\Events\CrashBoxEvents.cs" />
     <Compile Include="CrashBox\Events\CrashBoxExceptionArgs.cs" />
     <Compile Include="CustomControls\DpiAwareImage.cs" />
+    <Compile Include="DateParser\DateKeys.cs" />
+    <Compile Include="DateParser\DateParser.cs" />
     <Compile Include="EditChestPointValueWindow.xaml.cs">
       <DependentUpon>EditChestPointValueWindow.xaml</DependentUpon>
     </Compile>

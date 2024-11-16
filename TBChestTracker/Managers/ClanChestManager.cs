@@ -784,15 +784,20 @@ namespace TBChestTracker
             var currentCulture = CultureInfo.CurrentCulture; //-- en-GB
             var uiCulture = CultureInfo.CurrentUICulture; //-- en-US
 
+            bool invalidateDates = DoesDatesNeedRepair();
+            if (invalidateDates)
+            {
+                result.Add("Invalid Locale Date Format Detected", chestErrors);
+                chestErrors++;
+            }
+
             foreach (var dates in chestdata.Keys.ToList())
             {
-               
                 var data = chestdata[dates];
                 foreach (var _data in data.ToList())
                 {
                     var clanmate_points = _data.Points;
                     var chests = _data.chests;
-
                     var total_chest_points = 0;
 
                     try
@@ -1379,13 +1384,144 @@ namespace TBChestTracker
             return false;
         }
 
+        public bool DoesDatesNeedRepair()
+        {
+            var currentCulture = CultureInfo.CurrentCulture; //-- en-GB
+                                                             //-- attempting to repair date.
+            var dates = new List<string>();
+            foreach (var date_key in ClanChestDailyData.Keys.ToList())
+            {
+                dates.Add(date_key);
+
+                //ClanChestDailyData.UpdateKey<string, IList<ClanChestData>>(date_key, dateformat);
+            }
+
+            var culture_seperator = currentCulture.DateTimeFormat.DateSeparator;
+            var culture_shortDateFormat = currentCulture.DateTimeFormat.ShortDatePattern;
+            var possible_locale = String.Empty;
+
+            var first_part = String.Empty;
+            var second_part = String.Empty;
+            var last_part = String.Empty;
+            var detected_month = String.Empty;
+            var detected_year = String.Empty;
+            var detected_day = String.Empty;
+
+            int day_key = -1, month_key = -1, year_key = -1;
+
+            DateTime? date_Created = null;
+
+            int y = 0, d = 0, m = 0;
+            var max_samples = 3;
+            var result = false;
+
+            foreach (var date in dates)
+            {
+                var date_seperator = String.Empty;
+
+                for (var sample = 0; sample < max_samples; sample++)
+                {
+                    var _date = dates[sample];
+
+                    if (_date.Contains("/"))
+                    {
+                        date_seperator = "/";
+                    }
+                    else if (_date.Contains("-"))
+                    {
+                        date_seperator = "-";
+                    }
+                    else if (_date.Contains("."))
+                    {
+                        date_seperator = ".";
+                    }
+
+                    var date_parts = _date.Split(date_seperator[0]); //-- should be 3 arrays. 
+                    var current_first_part = date_parts[0];
+                    var current_second_part = date_parts[1];
+                    var current_last_part = date_parts[2];
+
+                    if (first_part != current_first_part)
+                    {
+                        first_part = current_first_part;
+                        detected_day = current_first_part;
+                        day_key = 0;
+                    }
+                    else
+                    {
+                        //-- we can possibly say that we've detected the month or year.
+                        if (current_first_part.Length > 2)
+                        {
+                            detected_year = current_first_part;
+                            year_key = 0;
+                        }
+                        else
+                        {
+                            detected_month = current_first_part;
+                            month_key = 0;
+                        }
+                    }
+
+                    if (second_part != current_second_part)
+                    {
+                        second_part = current_second_part;
+                        detected_day = current_second_part;
+                        day_key = 1;
+                    }
+                    else
+                    {
+                        //-- month detected. 
+                        detected_month = current_second_part;
+                        month_key = 1;
+                    }
+
+                    if (last_part != current_last_part)
+                    {
+                        last_part = current_last_part;
+                    }
+                    else
+                    {
+                        //-- probably year or date or month. 
+                        if (current_last_part.Length > 2)
+                        {
+                            //-- year 
+                            detected_year = current_last_part;
+                            year_key = 2;
+                        }
+                        else
+                        {
+                            //-- possibly day.
+
+                        }
+                    }
+                }
+                var dateParts = date.Split(date_seperator[0]);
+
+                Int32.TryParse(dateParts[month_key], out m);
+                Int32.TryParse(dateParts[day_key], out d);
+                Int32.TryParse(dateParts[year_key], out y);
+
+                try
+                {
+                    date_Created = new DateTime(y, m, d);
+                    var newLocaleDate = date_Created?.ToString("d", currentCulture);
+                    result = date.Equals(newLocaleDate);
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+
+            return !result; //-- returning the opposite. If it matches then we return false. If it does not match, we return true.
+        }
+
         public ChestDataBuildResult BuildData()
         {
             var result = LoadData().Result;
             var dateformat = SettingsManager.Instance.Settings.GeneralSettings.DateFormat;
             var currentCulture = CultureInfo.CurrentCulture; //-- en-GB
-            var uiCulture = CultureInfo.CurrentUICulture; //-- en-US
-            var invalidDates = new List<string>();
+            bool invalidDateFormat = false;
 
             if(result == false)
             {
@@ -1401,14 +1537,14 @@ namespace TBChestTracker
                     clanChestData.Add(new ClanChestData(clanmate.Name, null));
                 }
             }
-
-            var bDateInvalid = false;
             //--- midnight bug may occur here.
             if (ClanChestDailyData != null && ClanChestDailyData.Keys != null && ClanChestDailyData.Keys.Count > 0)
             {
-              
+
                 var lastDate = ClanChestDailyData.Keys.Last();
                 var dateStr = DateTime.Now.ToString(dateformat, new CultureInfo(CultureInfo.CurrentCulture.Name));
+
+                invalidDateFormat = DoesDatesNeedRepair();
 
                 if (lastDate.Equals(dateStr))
                 {
@@ -1435,11 +1571,10 @@ namespace TBChestTracker
                 }
             }
 
-            if(invalidDates.Count > 0)
+            if(invalidDateFormat)
             {
                 return ChestDataBuildResult.DATA_CORRUPT;
             }
-
 
             AppContext.Instance.ClanmatesBeenAdded = true;
 
