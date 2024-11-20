@@ -52,6 +52,9 @@ Clanmate Management
  
 </details>
 
+## Known Issues
+- RC 2.4 has a date issue and does not play nicely with Clan Insights depending if you're in German or another country. Will be patched soon. 
+
 ## Are you stuck on something?
 Watch the Youtube videos under Total Battle Chest Tracker Troubleshooting. 
 [TotalBattleGuide - Youtube Channel](https://www.youtube.com/@TotalBattleGuide)
@@ -70,9 +73,5 @@ Head over to [Contributions section](https://github.com/SICGames/TBChestTracker/
 - When you're ready to begin the automation process, press F9 to start automation procecss and F10 to stop automation process.
 - Everything is saved when creating new clan and when new clanmate is added, in addition when automation is stopped.
 - When chest period is done, click on File then click on Export and click on the File textbox. Save it as CSV file. CSV file is used to upload to Google Sheets. 
-
-## Known Issues
-- Currently is not cultural friendly. Primary developed for only english speaking users.
-
 
 
