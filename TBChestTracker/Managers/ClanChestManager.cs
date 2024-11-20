@@ -35,12 +35,18 @@ namespace TBChestTracker
      ClanChestManager.Give("Hellraiser",new ClanChest("Epic","Harpy Chest", 35));
      Ideally, this will remove the need to create unnecessary crap in memory and hold up processing time.
     */
+
     [System.Serializable]
     public class ClanChestManager : IDisposable
     {
         #region Declarations
+        
         public IList<ClanChestData> clanChestData { get; set; }
-        public Dictionary<string, IList<ClanChestData>> ClanChestDailyData;
+
+        public ClanChestDatabase Database { get; set; } //-- new updated version.
+        
+        public Dictionary<string, IList<ClanChestData>> ClanChestDailyData; //--- old will phase out after 2.0 is stable.
+
         private ChestProcessingState pChestProcessingState = ChestProcessingState.IDLE;
         bool filteringErrorOccurred = false;
         string lastFilterString = String.Empty;
@@ -59,6 +65,8 @@ namespace TBChestTracker
         #region Constructor
         public ClanChestManager()
         {
+            Database = new ClanChestDatabase();
+
             clanChestData = new List<ClanChestData>();
             ClanChestDailyData = new Dictionary<string, IList<ClanChestData>>();
             ChestProcessingState = ChestProcessingState.IDLE;
@@ -110,6 +118,7 @@ namespace TBChestTracker
         #region ClearData
         public void ClearData()
         {
+            Database.RemoveAllEntries();
             ClanChestDailyData.Clear();
             clanChestData.Clear();
             ClanManager.Instance.ClanmateManager.Database.Clanmates.Clear();
@@ -1392,8 +1401,6 @@ namespace TBChestTracker
             foreach (var date_key in ClanChestDailyData.Keys.ToList())
             {
                 dates.Add(date_key);
-
-                //ClanChestDailyData.UpdateKey<string, IList<ClanChestData>>(date_key, dateformat);
             }
 
             var culture_seperator = currentCulture.DateTimeFormat.DateSeparator;
