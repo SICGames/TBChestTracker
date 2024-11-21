@@ -158,13 +158,15 @@
     <Compile Include="ChestBuilderWindow.xaml.cs">
       <DependentUpon>ChestBuilderWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ChestProcessor\ChestProcessor.cs" />
+    <Compile Include="ChestProcessor\Events\ChestProcessingEventArguments.cs" />
+    <Compile Include="ChestProcessor\Events\ChestProcessingStateChangedEventArguments.cs" />
     <Compile Include="ChestRewards\ChestReward.cs" />
-    <Compile Include="Chest\ChestBox.cs" />
-    <Compile Include="Chest\ChestOptions.cs" />
-    <Compile Include="Chest\ChestPointsData.cs" />
-    <Compile Include="Chest\ChestPointsSettings.cs" />
-    <Compile Include="Chest\GameChest.cs" />
-    <Compile Include="Chest\RefEnum.cs" />
+    <Compile Include="ChestProcessor\ChestBox.cs" />
+    <Compile Include="ClanChestSettings\ChestOptions.cs" />
+    <Compile Include="ClanChestSettings\ChestPointsData.cs" />
+    <Compile Include="ClanChestSettings\ChestPointsSettings.cs" />
+    <Compile Include="ChestBuilder\GameChest.cs" />
     <Compile Include="ClanChestDatabase\ClanChestDatabase.cs" />
     <Compile Include="ClanChestIntegrity\IntegrityResult.cs" />
     <Compile Include="ClanData\ClanChestComparer.cs" />
@@ -229,6 +231,7 @@
       <DependentUpon>ImportDatabaseWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Managers\ChestRewardsManager.cs" />
+    <Compile Include="Managers\OldClanChestManager.cs" />
     <Compile Include="Managers\RecentlyOpenedListManager.cs" />
     <Compile Include="Pages\ChestDataIntegrity\ErrorsFound.xaml.cs">
       <DependentUpon>ErrorsFound.xaml</DependentUpon>
@@ -394,14 +397,13 @@
       <DependentUpon>CaptureRegionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Chest\Chest.cs" />
-    <Compile Include="Chest\ChestConditions.cs" />
-    <Compile Include="Chest\ChestExportData.cs" />
-    <Compile Include="Chest\ChestDailyData.cs" />
-    <Compile Include="Chest\ChestData.cs" />
+    <Compile Include="ClanChestSettings\ChestConditions.cs" />
+    <Compile Include="Export\ChestExportData.cs" />
+    <Compile Include="ChestProcessor\ChestData.cs" />
     <Compile Include="ChestingRequirementsWindow.xaml.cs">
       <DependentUpon>ChestingRequirementsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Chest\ChestRequirements.cs" />
+    <Compile Include="ClanChestSettings\ChestRequirements.cs" />
     <Compile Include="ClanData\ClanChestData.cs" />
     <Compile Include="Managers\ClanChestManager.cs" />
     <Compile Include="ClanData\ClanChestReport.cs" />
@@ -433,7 +435,7 @@
     <Compile Include="SelectRegionWindow.xaml.cs">
       <DependentUpon>SelectRegionWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Chest\SortType.cs" />
+    <Compile Include="Export\SortType.cs" />
     <Compile Include="Helpers\StringHelpers.cs" />
     <Compile Include="UI\FancyPicker.cs" />
     <Compile Include="UI\Milestone.xaml.cs">
