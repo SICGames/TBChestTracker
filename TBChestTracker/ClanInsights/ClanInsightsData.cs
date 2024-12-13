@@ -15,7 +15,10 @@ namespace TBChestTracker
         public List<String> GameChests { get; set; }
         public Dictionary<string, IList<ClanChestData>> ChestData { get; set; }
         public bool UsePoints { get; set; }
-        public ClanInsightsData(string clan, int size, List<string> members, List<String> gameChests, Dictionary<string, IList<ClanChestData>> chestData, bool usepoints)
+        public string DateFormat { get; set; }
+        public string Locale { get; set; }
+
+        public ClanInsightsData(string clan, int size, List<string> members, List<String> gameChests, Dictionary<string, IList<ClanChestData>> chestData, bool usepoints, string dateformat, string locale )
         {
             Clan = clan;
             Size = size;
@@ -23,6 +26,8 @@ namespace TBChestTracker
             GameChests = gameChests;
             ChestData = chestData;
             UsePoints = usepoints;
+            DateFormat = dateformat;
+            Locale = locale;
         }   
     }
 }

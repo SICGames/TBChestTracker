@@ -97,7 +97,7 @@ namespace TBChestTracker
 
                 if(datesToSubtract == 0)
                 {
-                    var dateStr = fromDate.ToShortDateString();
+                    var dateStr = fromDate.ToString(AppContext.Instance.ForcedDateFormat);
                     Dates.Add(dateStr);
                 }
                 else
@@ -106,7 +106,7 @@ namespace TBChestTracker
                     {
                         var d = toDate;
                         d = toDate.AddDays(-da);
-                        var shortD = d.ToShortDateString();
+                        var shortD = d.ToString(AppContext.Instance.ForcedDateFormat);
                         Dates.Add(shortD);
                     }
                 }
@@ -114,12 +114,12 @@ namespace TBChestTracker
 
             if (isCustom == false)
             {
-                var Today = DateTime.Now;
+                var Today = DateTime.UtcNow;
                 for (var d = 0; d < datesToSubtract; d++)
                 {
                     var previousDate = Today;
                     previousDate = Today.AddDays(-d);
-                    var shortDateString = previousDate.ToShortDateString();
+                    var shortDateString = previousDate.ToString(AppContext.Instance.ForcedDateFormat);
                     Dates.Add(shortDateString);
                 }
             }
@@ -175,7 +175,7 @@ namespace TBChestTracker
         }
         private void BuildAllChests()
         {
-            var ClanChestDailyData = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
+            var ClanChestDailyData = ClanManager.Instance.ClanChestManager.Database.ClanChestData; // ClanChestDailyData;
             var Dates = BuildDates();
 
             foreach (var date in Dates)
@@ -227,7 +227,7 @@ namespace TBChestTracker
        
         private void BuildChestsByChestPoints()
         {
-            var ClanChestDailyData = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
+            var ClanChestDailyData = ClanManager.Instance.ClanChestManager.Database.ClanChestData; // ClanChestDailyData;
             var Dates = BuildDates();
 
             foreach (var date in Dates)
@@ -366,7 +366,7 @@ namespace TBChestTracker
                 //--- need to export raw json
                 var ClanChestDailyData = new Dictionary<string, IList<ClanChestData>>(); 
                 var Dates = BuildDates();
-                var _clanchestdailydata = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
+                var _clanchestdailydata = ClanManager.Instance.ClanChestManager.Database.ClanChestData;
                 foreach (var date in Dates)
                 {
 

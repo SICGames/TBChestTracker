@@ -97,7 +97,7 @@ namespace TBChestTracker
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     serializer.Formatting = Formatting.Indented;    
-                    serializer.Serialize(sw, ClanManager.Instance.ClanChestManager.ClanChestDailyData);
+                    serializer.Serialize(sw, ClanManager.Instance.ClanChestManager.Database.ClanChestData);
                     sw.Close();
                 }
 
@@ -116,7 +116,7 @@ namespace TBChestTracker
                     return;
                 }
 
-                ClanManager.Instance.ClanChestManager.SaveData();
+                ClanManager.Instance.ClanChestManager.Save(); //SaveData();
                 if (AppContext.Instance.IsClanChestDataCorrupted)
                 {
                     AppContext.Instance.IsClanChestDataCorrupted = false;

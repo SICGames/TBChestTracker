@@ -211,7 +211,8 @@ namespace TBChestTracker.Automation
         {
             if(e.isSaved == false)
             {
-                ClanManager.Instance.ClanChestManager.SaveData("clanchests_temp.db");
+                ClanManager.Instance.ClanChestManager.Save("clanchests_temp.db");
+                //ClanManager.Instance.ClanChestManager.SaveData("clanchests_temp.db");
                 onChestDataSaved(new AutomationChestSaveEventArguments(false, true));
             }
         }
@@ -274,7 +275,8 @@ namespace TBChestTracker.Automation
             if(ocrResult != null)
             {
                 //clanChestProcessResult = await ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words, onError =>
-                ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words, this);
+                ClanManager.Instance.ClanChestManager.ProcessChests(ocrResult.Words, this);
+                //ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words, this);
             }
         }
 

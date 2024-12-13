@@ -35,7 +35,7 @@ namespace TBChestTracker.Dialogs
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
             //-- make sure we save everything
-            ClanManager.Instance.ClanChestManager.SaveData();
+            ClanManager.Instance.ClanChestManager.Save();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

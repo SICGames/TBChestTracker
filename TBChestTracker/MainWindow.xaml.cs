@@ -389,7 +389,7 @@ namespace TBChestTracker
                 AppContext.Instance.AutomationRunning = false;
                 AppContext.Instance.isBusyProcessingClanchests = false;
                
-                ClanManager.Instance.ClanChestManager.SaveDataTask();
+                ClanManager.Instance.ClanChestManager.Save();
                 ClanManager.Instance.ClanChestManager.CreateBackup();
                 
                 //-- automatically repairs chest data if necessary
@@ -401,9 +401,9 @@ namespace TBChestTracker
 
                 if (SettingsManager.Instance.Settings.AutomationSettings.AutoRepairAfterStoppingAutomation)
                 {
-                    if (ClanManager.Instance.ClanChestManager.DoesChestDataNeedsRepairs() != null)
+                    if (ClanManager.Instance.ClanChestManager.CheckIntegrity() != null)
                     {
-                        var result = ClanManager.Instance.ClanChestManager.RepairChestData();
+                        var result = ClanManager.Instance.ClanChestManager.Repair();
                         if (result)
                         {
                             com.HellStormGames.Logging.Console.Write("Chest Data Automatically Repaired", "Chest Integrity", LogType.INFO);
@@ -1165,9 +1165,11 @@ namespace TBChestTracker
             var responseData = String.Empty;
 
             //-- build ClanInsightsData
-            var chestdata = ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions != ChestOptions.UseConditions  ? ClanManager.Instance.ClanChestManager.ClanChestDailyData : ClanManager.Instance.ClanChestManager.FilterClanChestByConditions();
+            var chestdata = ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions != ChestOptions.UseConditions 
+                ? ClanManager.Instance.ClanChestManager.Database.ClanChestData : ClanManager.Instance.ClanChestManager.FilterClanChestByConditions();
             var gameChests = new List<string>();
             var previousChest = String.Empty;
+            var dateformat = AppContext.Instance.ForcedDateFormat;
             foreach(var chest in ApplicationManager.Instance.Chests)
             {
                 if (chest.ChestType != previousChest)
@@ -1182,8 +1184,9 @@ namespace TBChestTracker
             var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates;
             var clanmateNames = clanmates.Select(n => n.Name).ToList();
             var usePoints = ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions == ChestOptions.UsePoints;
+            var locale = CultureInfo.CurrentCulture.Name;
 
-            ClanInsightsData insightsData = new ClanInsightsData(clan,size,clanmateNames,gameChests, chestdata, usePoints);
+            ClanInsightsData insightsData = new ClanInsightsData(clan,size,clanmateNames,gameChests, chestdata, usePoints, dateformat, locale);
 
             var JsonStr = JsonConvert.SerializeObject(insightsData, Formatting.Indented);
 

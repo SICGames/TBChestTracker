@@ -138,7 +138,7 @@ namespace TBChestTracker
                 LoadExportSettings();
             }
 
-            var dailyclanchestdata = ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions != ChestOptions.UseConditions ? ClanManager.Instance.ClanChestManager.ClanChestDailyData : ClanManager.Instance.ClanChestManager.FilterClanChestByConditions();
+            var dailyclanchestdata = ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions != ChestOptions.UseConditions ? ClanManager.Instance.ClanChestManager.Database.ClanChestData : ClanManager.Instance.ClanChestManager.FilterClanChestByConditions();
             var firstDate = dailyclanchestdata.First().Key;
             var lastDate = dailyclanchestdata.Last().Key;
 

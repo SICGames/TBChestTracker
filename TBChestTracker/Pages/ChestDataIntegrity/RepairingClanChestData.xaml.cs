@@ -33,7 +33,7 @@ namespace TBChestTracker.Pages.ChestDataIntegrity
 
         private async Task PerformClanChestDataRepair()
         {
-            ClanManager.Instance.ClanChestManager.RepairChestData();
+            ClanManager.Instance.ClanChestManager.Repair();
             await Task.Delay(3000);
             await this.Dispatcher.BeginInvoke(new Action(() =>
             {

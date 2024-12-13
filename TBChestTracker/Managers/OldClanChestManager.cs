@@ -22,7 +22,7 @@ using TBChestTracker.Automation;
 using TBChestTracker.Managers;
 using static Emgu.CV.Features2D.ORB;
 
-namespace TBChestTracker
+namespace TBChestTracker.Obsolete
 {
 
     /*
@@ -570,7 +570,6 @@ namespace TBChestTracker
 
                 chestAutomation.InvokeChestProcessed(new Automation.AutomationChestProcessedEventArguments(new ClanChestProcessResult("No Gifts", 404, ClanChestProcessEnum.NO_GIFTS)));
                 return;
-
             }
 
             ChestProcessingState = ChestProcessingState.PROCESSING;
@@ -769,7 +768,7 @@ namespace TBChestTracker
             IntegrityResult result = new IntegrityResult();
 
             var chestsettings = ClanManager.Instance.ClanChestSettings;
-            var chestdata = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
+            var chestdata = ClanManager.Instance.ClanChestManager.Database.ClanChestData; // ClanChestDailyData;
             var df = SettingsManager.Instance.Settings.GeneralSettings.DateFormat;
 
             var chestpointsvalues = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints;
@@ -1020,7 +1019,7 @@ namespace TBChestTracker
             int chestErrors = 0;
 
             var chestsettings = ClanManager.Instance.ClanChestSettings;
-            var chestdata = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
+            var chestdata = ClanManager.Instance.ClanChestManager.Database.ClanChestData; // ClanChestDailyData;
             var cultureUI = CultureInfo.CurrentUICulture;
             var currentCulture = CultureInfo.CurrentCulture;
 
@@ -1273,10 +1272,10 @@ namespace TBChestTracker
             var rootFolder = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
             var clanFolder = $"{rootFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
             var databaseFolder = $"{clanFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}";
+
             var clanmatefile = $"{clanFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}";
             var clanchestfile = $"{clanFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile}";
             var chestsettingsfile = $"{clanFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanSettingsFile}";
-
             var chestrewardsFile = $@"{databaseFolder}\ChestRewards.db";
 
             bool clanchestcorrupted = false;
@@ -1357,12 +1356,7 @@ namespace TBChestTracker
             return true;
         }
 
-        public enum ChestDataBuildResult
-        {
-            OK = 0,
-            LOAD_FAIL = 1,
-            DATA_CORRUPT = 2
-        }
+       
 
         private bool hasDuplicatedDate(DateTime date, string dateformat)
         {
@@ -1584,6 +1578,7 @@ namespace TBChestTracker
             var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
             var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
             var databaseFolder = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\\";
+
             if (String.IsNullOrEmpty(chestdatafile))
                 file = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile}";
             else
@@ -1621,14 +1616,12 @@ namespace TBChestTracker
             var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
             var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
 
-
             var clanchestsBackupFolder = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath}//Clanchests";
             var di = new DirectoryInfo(clanchestsBackupFolder);
             if (di.Exists == false)
             {
                 di.Create();
             }
-
 
             string file = $"{clanchestsBackupFolder}//clanchest_backup_{dateTimeOffset.ToUnixTimeSeconds()}.db";
             try

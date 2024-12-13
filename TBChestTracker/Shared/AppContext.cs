@@ -20,6 +20,7 @@ namespace TBChestTracker
     {
 
         #region Declarations
+        public string ForcedDateFormat =>"yyyy-MM-dd";
 
         private bool isAutomationPlayButtonEnabled;
         private bool isAutomationPauseButtonEnabled;
@@ -307,6 +308,12 @@ namespace TBChestTracker
             }
         }
 
+        private bool _isClanChestDatabaseUpgradeRequired = false;
+        public bool IsClanChestDatabaseUpgradeRequired
+        {
+            get => _isClanChestDatabaseUpgradeRequired;
+            set => _isClanChestDatabaseUpgradeRequired = value;
+        }
         #endregion
 
         #region OnPropertyChanged 

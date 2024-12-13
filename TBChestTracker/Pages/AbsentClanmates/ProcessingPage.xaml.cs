@@ -42,7 +42,7 @@ namespace TBChestTracker.Pages.AbsentClanmates
         {
             ObservableCollection<string> absentClanmates = new ObservableCollection<string>();
 
-            var dailyChestData = ClanManager.Instance.ClanChestManager.ClanChestDailyData;
+            var dailyChestData = ClanManager.Instance.ClanChestManager.Database.ClanChestData;
             var absentCount = 0;
             var daysToSubtract = 0;
 

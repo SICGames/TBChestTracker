@@ -30,7 +30,7 @@ namespace TBChestTracker.Pages.ClanmatesValidation
         {
             //--- save clanmates and clanchest data.
             ClanManager.Instance.ClanmateManager.Save();
-            ClanManager.Instance.ClanChestManager.SaveData();
+            ClanManager.Instance.ClanChestManager.Save(); //SaveData();
             var wnd = Window.GetWindow(this) as ClanmateValidationWindow;
             wnd.Close();
         }

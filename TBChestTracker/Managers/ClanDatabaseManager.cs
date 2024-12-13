@@ -121,7 +121,8 @@ namespace TBChestTracker
 
         public void Load(string file, ClanChestManager m_ClanChestManager, Action<bool> result)
         {
-            m_ClanChestManager.ClearData();
+            //m_ClanChestManager.ClearData();
+            m_ClanChestManager.Clear();
 
             if (File.Exists(file) == false)
             {
@@ -136,15 +137,28 @@ namespace TBChestTracker
                 if(ClanDatabase != null)
                 {
                     var r = m_ClanChestManager.BuildData();
-                    if (r == ClanChestManager.ChestDataBuildResult.DATA_CORRUPT)
+
+                    if (r == ChestDataBuildResult.DATA_CORRUPT)
                     {
                         MessageBox.Show("Clan Chest Data is corrupted. Please run Validate Chest Data Integrity to fix this issue. Very important.", "Chest Data Corrupted");
                         result(true);
                     }
-                    else if (r == ClanChestManager.ChestDataBuildResult.OK)
+                    else if (r == ChestDataBuildResult.OK)
                     {
                         AppContext.Instance.NewClandatabaseBeenCreated = true;
                         CommandManager.InvalidateRequerySuggested();
+                        if(AppContext.Instance.IsClanChestDatabaseUpgradeRequired)
+                        {
+                            if(MessageBox.Show("Clan Chest Database requires an update. To continue with updating the database, click on 'Ok'.") == MessageBoxResult.OK)
+                            {
+                                ClanChestDatabaseUpdaterWindow clanChestDatabaseUpdaterWindow = new ClanChestDatabaseUpdaterWindow();
+                                clanChestDatabaseUpdaterWindow.Show();
+                            }
+                            else
+                            {
+
+                            }
+                        }
                         result(true);
                     }
                 }

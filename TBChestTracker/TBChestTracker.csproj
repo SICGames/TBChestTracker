@@ -163,6 +163,9 @@
     <Compile Include="ChestProcessor\Events\ChestProcessingStateChangedEventArguments.cs" />
     <Compile Include="ChestRewards\ChestReward.cs" />
     <Compile Include="ChestProcessor\ChestBox.cs" />
+    <Compile Include="ClanChestDatabaseUpdaterWindow.xaml.cs">
+      <DependentUpon>ClanChestDatabaseUpdaterWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ClanChestSettings\ChestOptions.cs" />
     <Compile Include="ClanChestSettings\ChestPointsData.cs" />
     <Compile Include="ClanChestSettings\ChestPointsSettings.cs" />
@@ -218,6 +221,7 @@
       <DependentUpon>EditChestPointValueWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Engine\OCREngine.cs" />
+    <Compile Include="Enums\ChestBuildDataResult.cs" />
     <Compile Include="ErrorHandlers\ChestProcessingError.cs" />
     <Compile Include="ExportDatabaseWindow.xaml.cs">
       <DependentUpon>ExportDatabaseWindow.xaml</DependentUpon>
@@ -261,6 +265,7 @@
       <DependentUpon>RestoreClanChestDataWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings\TessDataConfig.cs" />
+    <Compile Include="Shared\UpgradeProgressStatus.cs" />
     <Compile Include="UI\FancyTreeView.cs" />
     <Compile Include="Helpers\DateTimeHelper.cs" />
     <Compile Include="Helpers\EnumBindingSourceExtension.cs" />
@@ -470,6 +475,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ChestBuilderWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ClanChestDatabaseUpdaterWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

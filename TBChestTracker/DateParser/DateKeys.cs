@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,18 @@ namespace TBChestTracker
         public void SetIndice(string datepart, int value)
         {
             _DateIndices[datepart] = value;
+        }
+
+        public string DateSeperator { get; private set; }
+
+        public void SetDateSeperator(string seperator = "")
+        {
+            if(String.IsNullOrEmpty(seperator))
+            {
+                seperator = CultureInfo.CurrentCulture.DateTimeFormat.DateSeparator;
+            }
+
+            DateSeperator = seperator;
         }
 
         public void Dispose()

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace TBChestTracker
 {
@@ -47,6 +48,12 @@ namespace TBChestTracker
         }
         #endregion
 
+        public String Date { get; private set; }
+
+        public int Year { get; private set; }
+        public int Month { get; private set; }
+        public int Day { get; private set; }    
+
         #region Constructor
         public DateParser() 
         {
@@ -59,17 +66,41 @@ namespace TBChestTracker
 
         #endregion
 
+        private int isValidYear(string year)
+        {
+            int y = -1;
+            Int32.TryParse(year, out y);
+
+            bool bIsValidYear = false;
+            //-- increment until we fail.
+            while (true)
+            {
+                try
+                {
+                    DateTime test = new DateTime(y,1, 1);
+                    bIsValidYear = true;
+                    y++;
+                }
+                catch
+                {
+                    //-- exception occured, we failed.
+                    break;
+                }
+            }
+
+            if (bIsValidYear)
+            {
+                return 0;
+            }
+
+            return -1;
+        }
         //--- returns -1 for false and 0 for true.
         private int isValidMonth(string month)
         {
             int m = -1;
             Int32.TryParse(month, out m);
-
-            if (m > 12)
-            {
-                return -1;
-            }
-
+            
             bool bIsValidMonth = false;
             //-- increment until we fail.
             while (true)
@@ -77,12 +108,19 @@ namespace TBChestTracker
                 try
                 {
                     DateTime test = new DateTime(1970, m, 1);
-                    bIsValidMonth = true;
                     m++;
                 }
                 catch
                 {
                     //-- exception occured, we failed.
+                    if(m <= 12)
+                    {
+                        bIsValidMonth = true;
+                    }
+                    else
+                    {
+                        bIsValidMonth= false;
+                    }
                     break;
                 }
             }
@@ -99,12 +137,6 @@ namespace TBChestTracker
         {
             int d = -1;
             Int32.TryParse(day, out d);
-
-            if (d > 31)
-            {
-                return -1;
-            }
-
             bool bIsValidDay = false;
             //-- increment until we fail.
             while (true)
@@ -112,12 +144,15 @@ namespace TBChestTracker
                 try
                 {
                     DateTime test = new DateTime(1970, 1, d);
-                    bIsValidDay = true;
                     d++;
                 }
                 catch
                 {
                     //-- exception occured, we failed.
+                    if(d <= 31)
+                    {
+                        bIsValidDay = true;
+                    }
                     break;
                 }
             }
@@ -137,6 +172,11 @@ namespace TBChestTracker
                 throw new ArgumentNullException(nameof(datestring));    
             }
 
+            var current_part_index = 0;
+            var month_index = -1;
+            var year_index = -1;
+            var day_index = -1;
+
             var date_seperator = Culture.DateTimeFormat.DateSeparator;
             var date_format = Culture.DateTimeFormat.ShortDatePattern;
 
@@ -154,6 +194,7 @@ namespace TBChestTracker
               test each date key by incrementing by 1. 
               Month can not go past 12. Day can not go past 31. 
             */
+
             var seperator = String.Empty;
             if (datestring.Contains("/"))
             {
@@ -172,11 +213,67 @@ namespace TBChestTracker
                 return false;
             }
 
+            Date = datestring;
             var parts = datestring.Split(seperator[0]);
-            var current_part_index = 0;
-            var month_index = -1;
-            var year_index = -1;
-            var day_index = -1;
+           
+            
+            //-- is correct date format?
+            if (seperator == Culture.DateTimeFormat.DateSeparator)
+            {
+                DateTime date_result;
+                var canBeParsed = DateTime.TryParse(datestring, Culture, DateTimeStyles.None, out date_result);
+                if (canBeParsed)
+                {
+                    //-- if we arrive here, very good stuff.
+                    //-- it means the date format is correct. 
+                    //-- de-DE => dd.M.yyyy
+                    var date_format_parts = date_format.Split(seperator[0]);
+
+                    var day_pos = datestring.IndexOf(date_result.Day.ToString());
+                    var month_pos = datestring.IndexOf(date_result.Month.ToString());   
+                    var year_pos = datestring.IndexOf(date_result.Year.ToString()); 
+                    var date_length = datestring.Length;
+                    int day_indice, month_indice, year_indice;
+                    day_indice = month_indice = year_indice = -1;
+
+                    //-- really need to not assume and take guesses. year can come first.
+                    //-- maybe needs better coding. 
+                    //-- Sweden Format - 2024-12-1 - 2/0/1 (Date Indices)
+                    //-- German Format - 1-12-2024 - 1/0/2
+                    //-- America Format - 12/1/2024 - 0/1/2
+                    
+                    for(int indice =0; indice < date_format_parts.Length; indice++)
+                    {
+                    
+                        if (date_format_parts[indice].ToLower().Equals("yyyy"))
+                        {
+                            year_indice = indice;
+                            continue;
+                        }
+                        else if (date_format_parts[indice].ToLower().Equals("m") || date_format_parts[indice].ToLower().Equals("mm"))
+                        {
+                            month_indice = indice;
+                            continue;
+                        }
+                        else if (date_format_parts[indice].ToLower().Equals("dd") || date_format_parts[indice].ToLower().Equals("d"))
+                        {
+                            day_indice = indice;
+                            continue;
+                        }
+                    }
+                    
+                    SetDateKeys(new DateKeys(month_indice, day_indice, year_indice));
+                    int y, m, d;
+                    Int32.TryParse(parts[year_indice], out y);
+                    Int32.TryParse(parts[month_indice], out m);
+                    Int32.TryParse(parts[day_indice], out d);
+                    Year = y;
+                    Month = m;
+                    Day = d;
+
+                    return true;
+                }
+            }
 
             foreach (var part in parts)
             {
@@ -185,6 +282,7 @@ namespace TBChestTracker
                     if (isValidMonth(part) == 0)
                     {
                         month_index = current_part_index;
+                        current_part_index++;
                         continue;
                     }
                 }
@@ -193,13 +291,40 @@ namespace TBChestTracker
                     if(isValidDay(part) == 0)
                     {
                         day_index = current_part_index;
+                        current_part_index++;
+                        continue;
+                    }
+                }
+                if (year_index < 0)
+                {
+                    if (isValidYear(part) == 0)
+                    {
+                        year_index = current_part_index;
+                        current_part_index++;
                         continue;
                     }
                 }
 
-                current_part_index++;
             }
-            return false;
+            int yearStr, monthStr, dayStr;
+            Int32.TryParse(parts[year_index], out yearStr);
+            Int32.TryParse(parts[month_index], out monthStr);
+            Int32.TryParse(parts[day_index], out dayStr);
+            Year = yearStr;
+            Month = monthStr;
+            Day = dayStr;
+
+            try
+            {
+                DateTime date = new DateTime(yearStr, monthStr, dayStr);
+                SetDateKeys(new DateKeys(month_index, day_index, year_index));
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

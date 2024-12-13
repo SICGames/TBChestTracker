@@ -40,7 +40,7 @@ namespace TBChestTracker.Pages.ChestDataIntegrity
         private void FancyButton_Click(object sender, RoutedEventArgs e)
         {
             var wnd = Window.GetWindow(this) as ValidateClanChestsIntegrityWindow;
-            var result = ClanManager.Instance.ClanChestManager.DoesChestDataNeedsRepairs();
+            var result = ClanManager.Instance.ClanChestManager.CheckIntegrity(); // DoesChestDataNeedsRepairs();
             if(result == null)
             {
                 wnd.NavigateTo("Pages/ChestDataIntegrity/NoRepairsNeeded.xaml");

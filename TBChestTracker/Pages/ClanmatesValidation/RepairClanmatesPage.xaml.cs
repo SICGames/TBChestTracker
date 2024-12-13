@@ -76,7 +76,7 @@ namespace TBChestTracker.Pages.ClanmatesValidation
                 {
                     var aliasName = alias.Name;
                     
-                    foreach(var dailychestdata in ClanManager.Instance.ClanChestManager.ClanChestDailyData.ToList())
+                    foreach(var dailychestdata in ClanManager.Instance.ClanChestManager.Database.ClanChestData.ToList())
                     {
                         var alias_clanchestdata = dailychestdata.Value.Where(chestdata => chestdata.Clanmate.Equals(aliasName, StringComparison.CurrentCultureIgnoreCase)).ToList();
                         var temp_clanchest = new List<ClanChestData>();
@@ -95,7 +95,7 @@ namespace TBChestTracker.Pages.ClanmatesValidation
                 }
 
                 //-- something's happening with the proper clanmates not getting chests.
-                foreach (var dailychestdata in ClanManager.Instance.ClanChestManager.ClanChestDailyData.ToList())
+                foreach (var dailychestdata in ClanManager.Instance.ClanChestManager.Database.ClanChestData.ToList())
                 {
                     var chestsdata = dailychestdata.Value.Where(name => name.Clanmate.Equals(affectedClanmate.Name, StringComparison.CurrentCultureIgnoreCase)).ToList();
                     foreach (var chestdata in chestsdata)
@@ -149,7 +149,7 @@ namespace TBChestTracker.Pages.ClanmatesValidation
                 }
             }
 
-            var dailyclanchests = ClanManager.Instance.ClanChestManager.ClanChestDailyData.ToList();
+            var dailyclanchests = ClanManager.Instance.ClanChestManager.Database.ClanChestData.ToList();
 
             double processed = 0;
             double total = dirtyClanmates.Count;
@@ -235,7 +235,7 @@ namespace TBChestTracker.Pages.ClanmatesValidation
             progress.Report(_totalChestCount);
             await Task.Delay(500);
 
-            foreach (var dailyclanchest in ClanManager.Instance.ClanChestManager.ClanChestDailyData.ToList())
+            foreach (var dailyclanchest in ClanManager.Instance.ClanChestManager.Database.ClanChestData.ToList())
             {
                 var dailyChestData = dailyclanchest.Value.ToList();
                 foreach (var chestdata in dailyChestData)
@@ -253,7 +253,7 @@ namespace TBChestTracker.Pages.ClanmatesValidation
 
             try
             {
-                foreach (var dailyclanchest in ClanManager.Instance.ClanChestManager.ClanChestDailyData.ToList())
+                foreach (var dailyclanchest in ClanManager.Instance.ClanChestManager.Database.ClanChestData.ToList())
                 {
                     var dailyChestData = dailyclanchest.Value.ToList();
 
