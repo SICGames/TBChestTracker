@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO.Compression;
 using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Diagnostics;
 
 namespace TBChestTracker
 {
@@ -132,10 +134,31 @@ namespace TBChestTracker
         {
             return Task.Run(() =>
             {
-                using (var archive = ZipFile.OpenRead(archiveFile))
+                try
                 {
-                    archive.ExtractToDirectory(destinationFolder, progress, bOverwrite);
-                    archive.Dispose();
+                    using (var archive = ZipFile.OpenRead(archiveFile))
+                    {
+                        archive.ExtractToDirectory(destinationFolder, progress, bOverwrite);
+                        archive.Dispose();
+                    }
+                }
+                catch(Exception ex)
+                {
+                    //-- Happens when zip archive is corrupted.
+                    if(MessageBox.Show($"The Zip Archive File: {archiveFile} is corrupted. Click on 'Ok' button to restart application to clean tesseract data.") == MessageBoxResult.OK)
+                    {
+                        var selfApplication = System.Reflection.Assembly.GetEntryAssembly().Location; 
+                        ProcessStartInfo startinfo = new ProcessStartInfo();
+                        startinfo.UseShellExecute = false;
+                        startinfo.RedirectStandardOutput = false;
+                        startinfo.RedirectStandardError = false;
+                        startinfo.RedirectStandardInput = false;
+                        startinfo.CreateNoWindow = true;
+                        startinfo.FileName = selfApplication;
+                        startinfo.Arguments = "--delete_tessdata";
+                        Process.Start(startinfo);   
+                        Application.Current.Shutdown();
+                    }
                 }
             });
         }

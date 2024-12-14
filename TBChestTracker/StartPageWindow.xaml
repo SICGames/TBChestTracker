@@ -31,7 +31,7 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     
-                    <Image Grid.Row="0" Grid.Column="0" Source="Images/icons_main_menu_clan_1.png" Stretch="UniformToFill" Width="32" Margin="5"/>
+                    <Image Grid.Row="0" Grid.Column="0" Source="pack://application:,,,/Images/ui/icons_main_menu_clan_1.png" Stretch="UniformToFill" Width="32" Margin="5"/>
 
                     <Grid Grid.Column="1" Grid.Row="0" Margin="10,0">
                         <Grid.RowDefinitions>
@@ -78,12 +78,12 @@
                             BorderBrush="#ff33" 
                             HilightBrush="#ff33"
                             BorderThickness="0"
-                            ImageSource="/Images/close-button.png" RenderMode="IMAGE" x:Name="CloseBtn" Click="CloseBtn_Click" WindowChrome.IsHitTestVisibleInChrome="True"/>
+                            ImageSource="pack://application:,,,/Images/ui/close-button.png" RenderMode="IMAGE" x:Name="CloseBtn" Click="CloseBtn_Click" WindowChrome.IsHitTestVisibleInChrome="True"/>
 
                 <!-- 
             <controls:ImageButton Grid.Column="1" 
                       Background="Red" BorderBrush="Red" 
-                      HoverBrush="#ff55" Icon="/Images/close-button.png" BorderThickness="1" x:Name="CloseBtn" Click="CloseBtn_Click"/>
+                      HoverBrush="#ff55" Icon="pack://application:,,,/Images/ui/close-button.png" BorderThickness="1" x:Name="CloseBtn" Click="CloseBtn_Click"/>
             -->
             </Grid>
             <Grid Grid.Row="1">
@@ -102,23 +102,23 @@
                     </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0" Orientation="Vertical" Margin="5,10" ButtonBase.Click="StackPanel_Click">
                         <!--#region  Mockup Menu Buttons -->
-                        <ui:FancyButton RenderMode="IMAGE_TEXT" ImageSource="/Images/NewIcon.png" Text="New Clan Database..." Corners="0" ShowSeperator="False" Tag="NEW"
+                        <ui:FancyButton RenderMode="IMAGE_TEXT" ImageSource="pack://application:,,,/Images/ui/NewIcon.png" Text="New Clan Database..." Corners="0" ShowSeperator="False" Tag="NEW"
                                         Foreground="White" 
                                         FontWeight="Bold" FontSize="14" HilightBrush="#222" Height="50" IsEnabled="True"/>
-                        <ui:FancyButton ImageSource="/Images/NewWizardIcon.png" Text="Clan Setup Wizard..." RenderMode="IMAGE_TEXT" Tag="NEW_WIZARD"
+                        <ui:FancyButton ImageSource="pack://application:,,,/Images/ui/NewWizardIcon.png" Text="Clan Setup Wizard..." RenderMode="IMAGE_TEXT" Tag="NEW_WIZARD"
                                          Foreground="White" 
                                         FontWeight="Bold" FontSize="14" HilightBrush="#222" Height="50" Visibility="Collapsed"/>
-                        <ui:FancyButton ImageSource="/Images/folderIcon.png" Text="Load Clan Database..." Tag="LOAD"
+                        <ui:FancyButton ImageSource="pack://application:,,,/Images/ui/folderIcon.png" Text="Load Clan Database..." Tag="LOAD"
                                     Foreground="White" 
                                     FontWeight="Bold" FontSize="14" HilightBrush="#222" Height="50"/>
-                        <ui:FancyButton ImageSource="/Images/import-icon-white.png" Text="Import Clan Database..." Tag="IMPORT"
+                        <ui:FancyButton ImageSource="pack://application:,,,/Images/ui/import-icon-white.png" Text="Import Clan Database..." Tag="IMPORT"
                                     Foreground="White" 
                                     FontWeight="Bold" FontSize="14" HilightBrush="#222" Height="50"/>
                     
                     <!--#endregion-->
                     </StackPanel>
                 <DockPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="0,10,0,10">
-                    <ui:FancyButton Grid.Row="0" ImageSource="/Images/heart-icon-white.png" Text="Become A Patreon..." Tag="PATREON"
+                    <ui:FancyButton Grid.Row="0" ImageSource="pack://application:,,,/Images/ui/heart-icon-white.png" Text="Become A Patreon..." Tag="PATREON"
                                     Foreground="White" 
                                     FontWeight="Bold" FontSize="14" HilightBrush="#222" Height="50" x:Name="PatreonBtn" Click="PatreonBtn_Click"/>
                 </DockPanel>
@@ -145,7 +145,7 @@
                     </ListView.ItemContainerStyle>
                     </ListView>
                 <DockPanel LastChildFill="False" Grid.Row="2" Height="32" Background="#111" Grid.Column="0">
-                    <ui:FancyButton RenderMode="IMAGE_TEXT" ImageSource="pack://application:,,,/Images/trashIcon-white.png" Background="Transparent" Foreground="White" HilightBrush="Transparent" Text="Clear Recent List" Height="20" Width="125" Margin="10,0" x:Name="ClearRecentListBtn" Click="ClearRecentListBtn_Click"/>
+                    <ui:FancyButton RenderMode="IMAGE_TEXT" ImageSource="pack://application:,,,/Images/ui/trashIcon-white.png" Background="Transparent" Foreground="White" HilightBrush="Transparent" Text="Clear Recent List" Height="20" Width="125" Margin="10,0" x:Name="ClearRecentListBtn" Click="ClearRecentListBtn_Click"/>
                 </DockPanel>
                 </Grid>
                 <!--#region  Recent Files-->

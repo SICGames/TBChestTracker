@@ -23,7 +23,7 @@
             <ListView x:Name="AbsentClanmatesListView" Grid.Row="0" Margin="5,10" ItemsSource="{Binding AbsentClanmateList}"/>
             <ui:FancyImageButton x:Name="RemoveClanmateButton" Grid.Row="1" 
                                  HorizontalAlignment="Left" Margin="15,0" 
-                                 ImageSource="pack://application:,,,/Images/trashIcon.png" 
+                                 ImageSource="pack://application:,,,/Images/ui/trashIcon.png" 
                                  Height="24" Width="24" Click="RemoveClanmateButton_Click"/>
         </Grid>
         

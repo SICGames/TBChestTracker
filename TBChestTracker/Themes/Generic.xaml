@@ -40,7 +40,7 @@
                                 </TextBox.Style>
                             </TextBox>
                             <Viewbox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}">
-                                <Image x:Name="FOLDER_ICON" Source="pack://application:,,,/Images/folder-icon.png" Stretch="UniformToFill" Margin="0,0,10,0"/>
+                                <Image x:Name="FOLDER_ICON" Source="pack://application:,,,/Images/ui/folder-icon.png" Stretch="UniformToFill" Margin="0,0,10,0"/>
                             </Viewbox>
                         </Grid>
                     </Border>

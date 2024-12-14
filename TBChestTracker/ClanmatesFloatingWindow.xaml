@@ -39,14 +39,14 @@
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Orientation="Horizontal">
                 <ui:FancyImageButton x:Name="EditClanmate" Background="Transparent" HighlightBrush="#0077ff" 
-                         ImageSource="pack://application:,,,/Images/editIcon-White.png" Height="24" Width="24" ToolTip="Edit Verified Clanmate" HighlightStrokeBrush="#0099FF" HighlightOpacity="0.5" Click="EditClanmate_Click" Margin="5,0"/>
+                         ImageSource="pack://application:,,,/Images/ui/editIcon-White.png" Height="24" Width="24" ToolTip="Edit Verified Clanmate" HighlightStrokeBrush="#0099FF" HighlightOpacity="0.5" Click="EditClanmate_Click" Margin="5,0"/>
                 <ui:FancyImageButton x:Name="RemoveClanmate" Background="Transparent" HighlightBrush="#0077ff" Margin="5,0" 
-                         ImageSource="pack://application:,,,/Images/trashIcon-White.png" ToolTip="Remove Verified Clanmate From list" Height="24" Width="24" HighlightStrokeBrush="#0099FF" HighlightOpacity="0.5" Click="RemoveClanmate_Click"/>
+                         ImageSource="pack://application:,,,/Images/ui/trashIcon-White.png" ToolTip="Remove Verified Clanmate From list" Height="24" Width="24" HighlightStrokeBrush="#0099FF" HighlightOpacity="0.5" Click="RemoveClanmate_Click"/>
 
                 <ui:FancyImageButton x:Name="LoadFromFile" Background="Transparent" HighlightBrush="#0077ff" Margin="10,0" 
-                         ImageSource="pack://application:,,,/Images/folderIcon.png" ToolTip="Import From Text File" Height="24" Width="24" HighlightStrokeBrush="#0099FF" HighlightOpacity="0.5" Click="LoadFromFile_Click"/>
+                         ImageSource="pack://application:,,,/Images/ui/folderIcon.png" ToolTip="Import From Text File" Height="24" Width="24" HighlightStrokeBrush="#0099FF" HighlightOpacity="0.5" Click="LoadFromFile_Click"/>
                 <ui:FancyImageButton x:Name="SaveToFile" Background="Transparent" HighlightBrush="#0077ff" Margin="5,0" 
-                         ImageSource="pack://application:,,,/Images/saveIcon.png" ToolTip="Save Verified Clanmates To File" Height="24" Width="24" HighlightStrokeBrush="#0099FF" HighlightOpacity="0.5" Click="SaveToFile_Click"/>
+                         ImageSource="pack://application:,,,/Images/ui/saveIcon.png" ToolTip="Save Verified Clanmates To File" Height="24" Width="24" HighlightStrokeBrush="#0099FF" HighlightOpacity="0.5" Click="SaveToFile_Click"/>
             </StackPanel>
             <TextBlock Grid.Column="1" Text="Clanmates Total" Foreground="White" Margin="2,0"/>
             <TextBlock DataContext="{Binding Source={x:Static viewmodel:VerifiedClanmatesViewModel.Instance}}" Grid.Column="2" Text="{Binding Total}" 

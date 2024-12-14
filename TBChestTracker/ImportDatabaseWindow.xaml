@@ -15,7 +15,7 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <Image Source="pack://application:,,,/Images/import-icon.png" Width="128" Height="128" Margin="0,15,0,0"/>
+            <Image Source="pack://application:,,,/Images/ui/import-icon.png" Width="128" Height="128" Margin="0,15,0,0"/>
         </Grid>
         <TextBlock Grid.Row="1" Text="Importing Clan Database" TextAlignment="Center" FontSize="18" Margin="0,5,0,5"/>
         <ProgressBar Grid.Row="2" Minimum="0" Maximum="100" Value="{Binding Percentage}" Height="8" Margin="30,10" Foreground="#0099ff"/>

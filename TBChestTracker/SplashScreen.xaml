@@ -28,7 +28,7 @@
                        TextAlignment="Center" HorizontalAlignment="Right" VerticalAlignment="Top"/>
             <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding BuildMode}" Foreground="White" FontSize="10"  HorizontalAlignment="Right" Margin="15,2"/>
         </Grid>
-        <Image Grid.Row="1" Grid.Column="0" Source="Images/Chest_Lg.png" Margin="50" Height="250"/>
+        <Image Grid.Row="1" Grid.Column="0" Source="pack://application:,,,/Images/Splash/Chest_Lg.png" Margin="50" Height="250"/>
         <Grid Grid.Column="0" Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>

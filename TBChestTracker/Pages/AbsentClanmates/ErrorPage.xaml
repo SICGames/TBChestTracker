@@ -13,7 +13,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <Image Grid.Column="0" Source="pack://application:,,,/Images/errorIcon.png" Height="128" Width="128" Margin="25"/>
+        <Image Grid.Column="0" Source="pack://application:,,,/Images/ui/errorIcon.png" Height="128" Width="128" Margin="25"/>
         <TextBlock Grid.Row="1" Text="You don't have enough dates inside Clan Chest Database to perform this operation." Margin="10,5" TextWrapping="Wrap"/>
         <Grid Grid.Row="2" Background="#efefef" Height="36" VerticalAlignment="Bottom">
             <Button x:Name="CloseBtn" Click="CloseBtn_Click" Content="Close" HorizontalAlignment="Right" VerticalAlignment="Center" Width="100" Height="24" Margin="15,0"/>
