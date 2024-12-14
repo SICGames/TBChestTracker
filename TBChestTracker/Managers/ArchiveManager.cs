@@ -147,17 +147,7 @@ namespace TBChestTracker
                     //-- Happens when zip archive is corrupted.
                     if(MessageBox.Show($"The Zip Archive File: {archiveFile} is corrupted. Click on 'Ok' button to restart application to clean tesseract data.") == MessageBoxResult.OK)
                     {
-                        var selfApplication = System.Reflection.Assembly.GetEntryAssembly().Location; 
-                        ProcessStartInfo startinfo = new ProcessStartInfo();
-                        startinfo.UseShellExecute = false;
-                        startinfo.RedirectStandardOutput = false;
-                        startinfo.RedirectStandardError = false;
-                        startinfo.RedirectStandardInput = false;
-                        startinfo.CreateNoWindow = true;
-                        startinfo.FileName = selfApplication;
-                        startinfo.Arguments = "--delete_tessdata";
-                        Process.Start(startinfo);   
-                        Application.Current.Shutdown();
+                        AppContext.RestartApplication("--delete_tessdata");
                     }
                 }
             });

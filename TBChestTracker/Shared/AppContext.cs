@@ -8,11 +8,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace TBChestTracker
 {
@@ -326,6 +328,21 @@ namespace TBChestTracker
         #endregion
 
 
+        public static void RestartApplication(string commandlineargs)
+        {
+            var selfApplication = System.Reflection.Assembly.GetEntryAssembly().Location;
+            ProcessStartInfo startinfo = new ProcessStartInfo();
+            startinfo.UseShellExecute = false;
+            startinfo.RedirectStandardOutput = false;
+            startinfo.RedirectStandardError = false;
+            startinfo.RedirectStandardInput = false;
+            startinfo.CreateNoWindow = true;
+            startinfo.FileName = selfApplication;
+            startinfo.Arguments = commandlineargs;
+            startinfo.WorkingDirectory = AppContext.Instance.AppFolder;
+            Process.Start(startinfo);
+            Application.Current.Shutdown();
+        }
         #region AppContext() & Instance
         public static AppContext Instance { get; private set; }
 

@@ -1388,5 +1388,10 @@ namespace TBChestTracker
                 exportDatabaseWindow.Show();
             }
         }
+
+        private void RebuildTessData_Click(object sender, RoutedEventArgs e)
+        {
+            AppContext.RestartApplication("--delete_tessdata");
+        }
     }
 }

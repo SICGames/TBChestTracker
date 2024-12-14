@@ -230,25 +230,49 @@ namespace TBChestTracker
             }
             return true;
         }
+        public bool SaveBackup(string filename)
+        {
+            if (String.IsNullOrEmpty(filename))
+            {
+                throw new ArgumentNullException(nameof(filename));
+            }
+            try
+            {
+                using (StreamWriter sw = File.CreateText(filename))
+                {
+                    JsonSerializer jsonSerializer = new JsonSerializer();
+                    jsonSerializer.Formatting = Formatting.Indented;
+                    jsonSerializer.Serialize(sw, Database);
+                    sw.Close();
+                }
+            }
+            catch (Exception ex) 
+            { 
+                return false; 
+            }
 
+            return true;
+        }
         public bool CreateBackup(string filename = "")
         {
             try
             {
-                DateTime dateTimeOffset = DateTime.UtcNow;
+                
 
                 var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
                 var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
 
-                var clanchestsBackupFolder = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath}//Clanchests";
+                var clanchestsBackupFolder = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath}\\Clanchests";
                 var di = new DirectoryInfo(clanchestsBackupFolder);
                 if (di.Exists == false)
                 {
                     di.Create();
                 }
 
-                string file = $"{clanchestsBackupFolder}//clanchest_backup_{dateTimeOffset.ConvertToUnixTimeStamp()}.db";
-                if (Save(file))
+                DateTime dateTimeOffset = DateTime.Now;
+                string file = $"{clanchestsBackupFolder}\\clanchest_backup_{dateTimeOffset.ConvertToUnixTimeStamp()}.db";
+
+                if (SaveBackup(file))
                 {
                     return true;
                 }
