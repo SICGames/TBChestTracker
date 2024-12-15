@@ -388,30 +388,32 @@ namespace TBChestTracker
             {
                 AppContext.Instance.AutomationRunning = false;
                 AppContext.Instance.isBusyProcessingClanchests = false;
-               
-                ClanManager.Instance.ClanChestManager.Save();
-                ClanManager.Instance.ClanChestManager.CreateBackup();
-                
+
                 //-- automatically repairs chest data if necessary
-                
-                
                 AppContext.Instance.IsAutomationPlayButtonEnabled = true;
                 AppContext.Instance.IsAutomationStopButtonEnabled = false;
                 com.HellStormGames.Logging.Console.Write("Automation stopped.", com.HellStormGames.Logging.LogType.INFO);
 
-                if (SettingsManager.Instance.Settings.AutomationSettings.AutoRepairAfterStoppingAutomation)
+                BuildingChestsWindow buildingChestsWindow = new BuildingChestsWindow();
+                if (buildingChestsWindow.ShowDialog() == true)
                 {
-                    if (ClanManager.Instance.ClanChestManager.CheckIntegrity() != null)
+                    ClanManager.Instance.ClanChestManager.Save();
+                    ClanManager.Instance.ClanChestManager.CreateBackup();
+
+                    if (SettingsManager.Instance.Settings.AutomationSettings.AutoRepairAfterStoppingAutomation)
                     {
-                        var result = ClanManager.Instance.ClanChestManager.Repair();
-                        if (result)
+                        if (ClanManager.Instance.ClanChestManager.CheckIntegrity() != null)
                         {
-                            com.HellStormGames.Logging.Console.Write("Chest Data Automatically Repaired", "Chest Integrity", LogType.INFO);
+                            var result = ClanManager.Instance.ClanChestManager.Repair();
+                            if (result)
+                            {
+                                com.HellStormGames.Logging.Console.Write("Chest Data Automatically Repaired", "Chest Integrity", LogType.INFO);
+                            }
                         }
-                    }
-                    else
-                    {
-                        com.HellStormGames.Logging.Console.Write("Clan Chest Data is looking good. No need for repairs.", com.HellStormGames.Logging.LogType.INFO);
+                        else
+                        {
+                            com.HellStormGames.Logging.Console.Write("Clan Chest Data is looking good. No need for repairs.", com.HellStormGames.Logging.LogType.INFO);
+                        }
                     }
                 }
 

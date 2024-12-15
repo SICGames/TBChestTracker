@@ -30,5 +30,14 @@ namespace TBChestTracker
             Clear();
             Content = null;
         }
+        public override String ToString()
+        {
+            string result = string.Empty;
+            foreach (var item in Content)
+            {
+                result += $"{item}\n";
+            }
+            return result;
+        }
     }
 }

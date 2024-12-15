@@ -66,13 +66,38 @@ namespace TBChestTracker
         {
             get
             {
-                if (ChestProcessor == null)
+                if(ChestProcessor == null)
                 {
-                    throw new ArgumentNullException(nameof(ChestProcessor));
+                    return ChestProcessingState.NO_PROCESSOR_ATTACHED;
                 }
+
                 return ChestProcessor.ChestProcessingState;
             }
         }
+
+        public async Task WriteChests(string filename, List<string> result, ChestAutomation chestAutomation)
+        {
+            if(String.IsNullOrEmpty(filename))
+            {
+                throw new ArgumentNullException(nameof(filename));
+            }
+
+            if (chestAutomation == null)
+            {
+                throw new ArgumentNullException(nameof(chestAutomation));
+            }
+
+            bool r = await ChestProcessor.WriteAsync(filename, result.ToArray());
+        }
+        public async Task BuildChests(string[] files, IProgress<BuildingChestsProgress> progress)
+        {
+            if (files == null || files.Length == 0) 
+            { 
+                throw new ArgumentNullException(nameof(files)); 
+            }
+            await ChestProcessor.Build(files, progress, Database);
+        }
+
         public async Task ProcessChests(List<string> result, ChestAutomation chestAutomation)
         {
             if (chestAutomation == null)
@@ -81,6 +106,14 @@ namespace TBChestTracker
             }
             
            await ChestProcessor.Process(result, chestAutomation, Database);
+        }
+        public async Task ProcessChestsAsRaw(List<string> result, ChestAutomation chestautomation)
+        {
+            if (chestautomation == null)
+            {
+                throw new ArgumentNullException(nameof(chestautomation));
+            }
+            await ChestProcessor.ProcessToCache(result, chestautomation);
         }
         public bool Load(string filename = "")
         {
@@ -125,7 +158,7 @@ namespace TBChestTracker
 
                 if (!System.IO.File.Exists(filename))
                 {
-                    Database.NewEntry(DateTime.UtcNow.ToString(AppContext.Instance.ForcedDateFormat));
+                    Database.NewEntry(DateTime.Now.ToString(AppContext.Instance.ForcedDateFormat));
                     //ClanChestDailyData.Add(DateTime.Now.ToString(AppContext.Instance.ForcedDateFormat, new CultureInfo(CultureInfo.CurrentCulture.Name)), clanChestData);
                     Save();
                     //await SaveDataTask();
@@ -358,18 +391,19 @@ namespace TBChestTracker
                                                 if (condition.level.Equals("(Any)") == false)
                                                 {
                                                     var level = int.Parse(condition.level);
-                                                    if (level >= chest.Level)
+                                                    if (chest.Level >= level)
                                                     {
                                                         var c = new Chest(chest.Name, chest.Type, chest.Source, chest.Level);
                                                         newChests.Add(c);
                                                         break;
                                                     }
-                                                    else
-                                                    {
-                                                        var c = new Chest(chest.Name, chest.Type, chest.Source, chest.Level);
-                                                        newChests.Add(c);
-                                                        break;
-                                                    }
+                                                   
+                                                }
+                                                else
+                                                {
+                                                    var c = new Chest(chest.Name, chest.Type, chest.Source, chest.Level);
+                                                    newChests.Add(c);
+                                                    break;
                                                 }
                                             }
                                         }

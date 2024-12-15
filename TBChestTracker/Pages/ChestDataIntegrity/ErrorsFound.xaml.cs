@@ -48,7 +48,7 @@ namespace TBChestTracker.Pages.ChestDataIntegrity
                     errorParent.RowDefinitions.Add(rowDef);
 
                     var img = new Image();
-                    img.Source = new BitmapImage(new Uri(@"../../Images/errorIcon.png", UriKind.RelativeOrAbsolute));
+                    img.Source = new BitmapImage(new Uri(@"../../Images/ui/errorIcon.png", UriKind.RelativeOrAbsolute));
                     img.Width = 16;
                     img.Height = 16;
                     img.VerticalAlignment = VerticalAlignment.Center;

@@ -1,0 +1,41 @@
+﻿<Window x:Class="TBChestTracker.BuildingChestsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TBChestTracker"
+        mc:Ignorable="d"
+           Title="Building Clan Chests" Height="200" Width="600" Loaded="Window_Loaded" Closing="Window_Closing" Topmost="True" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="Building Clan Chests" Grid.Row="0" FontWeight="Bold" Margin="12,5"/>
+        <TextBlock Text="This is can take a while depending on your computer. Please wait while Clan Chests are being built into the Clan Chest Database." Grid.Row="1" Margin="15,5" FontSize="10"/>
+
+        <Grid Grid.Row="2" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="{Binding Status}" Grid.Row="0" Margin="0,5"/>
+            <ProgressBar Grid.Row="1" Height="16" Foreground="#0077ff" Minimum="0" Maximum="100" Value="{Binding Progress}"/>
+            <Grid Grid.Row="2" Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Estimated Time To Complete:" Margin="5"  Grid.Column="0" VerticalAlignment="Center"/>
+                <TextBlock Text="00:00:00" Grid.Column="1" Margin="10,0" VerticalAlignment="Center"/>
+            </Grid>
+        </Grid>
+        <DockPanel Grid.Row="3" Height="32" HorizontalAlignment="Right" Margin="10,0" Visibility="{Binding PanelVisible}" x:Name="ClosePanel">
+          
+        </DockPanel>
+    </Grid>
+</Window>

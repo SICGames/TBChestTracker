@@ -114,7 +114,7 @@ namespace TBChestTracker
 
             if (isCustom == false)
             {
-                var Today = DateTime.UtcNow;
+                var Today = DateTime.Now;
                 for (var d = 0; d < datesToSubtract; d++)
                 {
                     var previousDate = Today;

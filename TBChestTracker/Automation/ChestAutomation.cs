@@ -274,9 +274,8 @@ namespace TBChestTracker.Automation
             var ocrResult = e.TessResult;
             if(ocrResult != null)
             {
-                //clanChestProcessResult = await ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words, onError =>
-                ClanManager.Instance.ClanChestManager.ProcessChests(ocrResult.Words, this);
-                //ClanManager.Instance.ClanChestManager.ProcessChestData(ocrResult.Words, this);
+                //ClanManager.Instance.ClanChestManager.ProcessChests(ocrResult.Words, this);
+                ClanManager.Instance.ClanChestManager.ProcessChestsAsRaw(ocrResult.Words, this);
             }
         }
 
@@ -408,15 +407,6 @@ namespace TBChestTracker.Automation
                     
                     if (this.canCaptureAgain)
                     {
-                        /*
-                        Benchmarker.onElapsed += (s, e) =>
-                        {
-                            var msg = $"Processed Chest Data in {e.Message}";
-                            com.HellStormGames.Logging.Console.Write(msg,"Benchmark Result", LogType.INFO);
-                        };
-                        Benchmarker.Start();
-                        */
-
                         await Task.Delay(SettingsManager.Instance.Settings.AutomationSettings.AutomationScreenshotsAfterClicks);
                         CaptureRegion();
 

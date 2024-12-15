@@ -24,10 +24,10 @@
         </ListView>
         <StackPanel Orientation="Vertical" Grid.Column="1">
             <Button Height="24" Width="24" Margin="0,5" ToolTip="New Clan" x:Name="NewClanBtn" Click="NewClanBtn_Click">
-                <Image Source="Images/plusIcon.png" Height="16" Width="16"/>
+                <Image Source="Images/ui/plusIcon.png" Height="16" Width="16"/>
             </Button>
             <Button Height="24" Width="24" Margin="0,5" ToolTip="Delete Clan" x:Name="DeleteClanBtn" Click="DeleteClanBtn_Click">
-                <Image Source="Images/trashIcon.png" Height="16" Width="16"/>
+                <Image Source="Images/ui/trashIcon.png" Height="16" Width="16"/>
             </Button>
         </StackPanel>
     </Grid>

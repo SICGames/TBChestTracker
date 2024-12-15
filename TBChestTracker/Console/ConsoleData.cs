@@ -19,13 +19,13 @@ namespace com.HellStormGames.Logging
                 switch (_logType)
                 {
                     case LogType.INFO:
-                        logTypeIcon = "Images/infoIcon.png";
+                        logTypeIcon = "Images/ui/infoIcon.png";
                         break;
                     case LogType.WARNING:
-                        logTypeIcon = "Images/warningIcon.png";
+                        logTypeIcon = "Images/ui/warningIcon.png";
                         break;
                     case LogType.ERROR:
-                        logTypeIcon = "Images/errorIcon.png";
+                        logTypeIcon = "Images/ui/errorIcon.png";
                         break;
                 }
                 _logType = value;
