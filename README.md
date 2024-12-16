@@ -3,9 +3,6 @@
 ![GitHub contributors](https://img.shields.io/github/contributors/SICGames/TBChestTracker)
 [![Github All Releases](https://img.shields.io/github/downloads/SICGames/TBChestTracker/total.svg)]()
 
-## Important Note
-Release Canidiate 2.4 has a issue with locale date which causes a lot of the miscounting. Download Release Canidiate 2.1 which is more stable. In addition, Release Canidiate 3 is being developed and will require time. The part responsible for counting chests is being replaced with newer code. You should see a performance increase in Release Candiate 3. 
-
 ## Become a Patreon 
 If you want to support this project, become a Patreon and get access to the Discord server. 
 [Click Here](https://www.patreon.com/TotalBattleGuide) to become a Patreon and support this project.
