@@ -34,7 +34,7 @@ namespace TBChestTracker.Obsolete
      ClanChestManager.Give("Hellraiser",new ClanChest("Epic","Harpy Chest", 35));
      Ideally, this will remove the need to create unnecessary crap in memory and hold up processing time.
      This needs to be entirely reworked from ground up. 
-    */
+    
 
     public class ClanChestManager : IDisposable
     {
@@ -553,13 +553,6 @@ namespace TBChestTracker.Obsolete
         public async Task ProcessChestData(List<string> result, ChestAutomation chestAutomation)
         {
 
-            /*
-             * TmpChests gather processed chests.
-             * Stuffs into temporary clanchestdata
-             * Need to make sure we don't need to start new entry in ClanChestDaily.
-             * ClanChestData should be obsolete.
-            */
-
             AppContext.Instance.isBusyProcessingClanchests = true;
             var resulttext = result;
 
@@ -638,7 +631,7 @@ namespace TBChestTracker.Obsolete
                     }
 
                     //-- attempt to check to see if the unfound clanmate is under an alias.
-                    /*
+                    
                     foreach (var mate in clanmates)
                     {
                         if (mate.Aliases.Count > 0)
@@ -653,7 +646,6 @@ namespace TBChestTracker.Obsolete
                             }
                         }
                     }
-                    */
                 }
             });
 
@@ -812,9 +804,9 @@ namespace TBChestTracker.Obsolete
                                     }
                                     var name = chest.Name;
                                     var source = chest.Source;
-                                    /*
-                                      Fix Any Chests that start with lvl in it. 
-                                    */
+                                    
+                                    // Fix Any Chests that start with lvl in it. 
+                                    
                                     if (source.Contains(TBChestTracker.Resources.Strings.lvl))
                                     {
                                         var levelStartPos = -1;
@@ -1052,9 +1044,9 @@ namespace TBChestTracker.Obsolete
                             }
                             var name = chest.Name;
                             var source = chest.Source;
-                            /*
-                              Fix Any Chests that start with lvl in it. 
-                            */
+                            
+                              // Fix Any Chests that start with lvl in it. 
+                            
                             if (source.Contains(TBChestTracker.Resources.Strings.lvl))
                             {
                                 var levelStartPos = -1;
@@ -1741,4 +1733,5 @@ namespace TBChestTracker.Obsolete
             return x.CompareTo(y);
         }
     }
+    */
 }

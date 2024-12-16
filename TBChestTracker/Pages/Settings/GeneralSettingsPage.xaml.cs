@@ -41,14 +41,6 @@ namespace TBChestTracker.Pages
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             this.DataContext = SettingsManager.Instance.Settings.GeneralSettings;
-            var dtfi = CultureInfo.CreateSpecificCulture(CultureInfo.CurrentCulture.Name).DateTimeFormat;
-            var availableDateFormats = dtfi.GetAllDateTimePatterns('d');
-
-            DateFormatComboBox.Items.Clear();
-            foreach (var availableDateFormat in availableDateFormats)
-            {
-                DateFormatComboBox.Items.Add(availableDateFormat);
-            }
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -95,11 +87,6 @@ namespace TBChestTracker.Pages
                     }
                 }
             }
-        }
-
-        private void DateFormatComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
         }
     }
 }

@@ -23,7 +23,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Image Source="Images/Splash/Chest_Lg.png" Height="100" Margin="5" VerticalAlignment="Top"/>
+            <Image Source="Images/Splash/Chest_Lg.png" Height="100" Margin="5" VerticalAlignment="Top" PreviewMouseLeftButtonDown="Image_PreviewMouseLeftButtonDown"/>
             <Grid Grid.Column="1" Grid.Row="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>

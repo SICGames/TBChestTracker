@@ -493,8 +493,9 @@ namespace TBChestTracker
             if (String.IsNullOrEmpty(filename))
             {
                 var clandb = ClanManager.Instance.ClanDatabaseManager.ClanDatabase;
-                var dbFolder = $"{ClanManager.Instance.CurrentProjectDirectory}{clandb.ClanDatabaseFolder}";
-                var cacheFolder = $"{dbFolder}\\cache";
+                var clanfolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
+                //var dbFolder = $"{ClanManager.Instance.CurrentProjectDirectory}{clandb.ClanDatabaseFolder}";
+                var cacheFolder = $"{clanfolder}\\cache";
                 DirectoryInfo di = new DirectoryInfo(cacheFolder);
                 if (di.Exists == false)
                 {
@@ -881,15 +882,9 @@ namespace TBChestTracker
             int currentCheckBox = 0;
             var result = r.ToList();
 
-            int maxChestBoxes = result.Count;
-
             for (var b = 0; b < result.Count; b++)
             {
                 ChestBox cb = new ChestBox();
-
-                var p = new BuildingChestsProgress($"Creating ChestBoxes ({currentCheckBox})...", maxChestBoxes, currentCheckBox, false);
-                progress.Report(p);
-
                 //-- 4 clicks 
                 //-- 3 lines each box
                 //-- expired chest gives 4 lines.
@@ -900,6 +895,11 @@ namespace TBChestTracker
 
                 var bContainsIndex = tmpResult.FindIndex(r => r.StartsWith("Contains:"));
                 var _inc = bContainsIndex > -1 ? 4 : 3;
+                
+                int maxChestBoxes = result.Count / _inc;
+                var p = new BuildingChestsProgress($"Creating ChestBoxes ({currentCheckBox}/{maxChestBoxes})...", maxChestBoxes, currentCheckBox, false);
+                progress.Report(p);
+
                 for (var c = 0; c < _inc; c++)
                 {
                     var w = tmpResult[c];

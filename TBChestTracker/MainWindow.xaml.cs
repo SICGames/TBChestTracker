@@ -415,6 +415,8 @@ namespace TBChestTracker
                             com.HellStormGames.Logging.Console.Write("Clan Chest Data is looking good. No need for repairs.", com.HellStormGames.Logging.LogType.INFO);
                         }
                     }
+
+                    ClanManager.Instance.ClanChestManager.ClearCache();
                 }
 
             }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);

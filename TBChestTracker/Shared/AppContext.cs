@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,7 +24,39 @@ namespace TBChestTracker
 
         #region Declarations
         public string ForcedDateFormat =>"yyyy-MM-dd";
+        private bool? _showDebugMenu;
 
+        private Visibility _DebugMenuVisibility = Visibility.Hidden;
+        public Visibility DebugMenuVisibility
+        {
+            get => _DebugMenuVisibility;
+            set
+            {
+                _DebugMenuVisibility= value;
+                OnPropertyChanged(nameof(DebugMenuVisibility));
+            }
+        }
+        public bool bShowDebugMenu
+        {
+            get
+            {
+                return _showDebugMenu.GetValueOrDefault(false);
+            }
+            private set
+            {
+                _showDebugMenu = value;
+                if (value == false)
+                {
+                    DebugMenuVisibility = Visibility.Hidden;
+                }
+                else
+                {
+                    DebugMenuVisibility = Visibility.Visible;
+                }
+
+                OnPropertyChanged(nameof(bShowDebugMenu));
+            }
+        }
         private bool isAutomationPlayButtonEnabled;
         private bool isAutomationPauseButtonEnabled;
         private bool isAutomationStopButtonEnabled;
@@ -63,7 +96,7 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(IsClanChestDataCorrupted));    
             }
         }
-
+       
         public bool upgradeAvailable
         {
             get => _upgradeAvailable;
@@ -327,7 +360,13 @@ namespace TBChestTracker
         }
         #endregion
 
+        public static void ShowDebugMenu(bool state)
+        {
+            if(Instance == null)
+                return;
 
+            Instance.bShowDebugMenu = state;
+        }
         public static void RestartApplication(string commandlineargs)
         {
             var selfApplication = System.Reflection.Assembly.GetEntryAssembly().Location;
@@ -350,6 +389,7 @@ namespace TBChestTracker
         {
             if (Instance == null)
                 Instance = this;
+
         }
         #endregion
 

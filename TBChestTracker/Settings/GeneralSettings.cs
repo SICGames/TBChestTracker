@@ -42,30 +42,6 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(UILanguage));
             }
         }
-
-        private string? _dateformat;
-        public string DateFormat
-        {
-            get
-            {
-                if(String.IsNullOrEmpty(_dateformat) == true)
-                {
-                    var dtfi = CultureInfo.CreateSpecificCulture(CultureInfo.CurrentUICulture.Name).DateTimeFormat;
-                    _dateformat = dtfi.ShortDatePattern;
-                    return _dateformat;
-                }
-                else
-                {
-                    return _dateformat;
-                }
-            }
-            set
-            {
-                _dateformat = value;
-                OnPropertyChanged(nameof(DateFormat));
-            }
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged(string propertyName)

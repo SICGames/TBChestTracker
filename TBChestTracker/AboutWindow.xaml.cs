@@ -20,6 +20,8 @@ namespace TBChestTracker
     /// </summary>
     public partial class AboutWindow : Window
     {
+        private int knocks = 0;
+
         public AboutWindow()
         {
             InitializeComponent();
@@ -29,6 +31,22 @@ namespace TBChestTracker
         {
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;   
+        }
+
+        private void Reveal_Secret()
+        {
+            AppContext.ShowDebugMenu(true);
+        }
+
+        private void Image_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            knocks++;
+            Debug.WriteLine($"OUCHIES!!!!");
+            if (knocks == 7)
+            {
+                knocks = 0;
+                Reveal_Secret();
+            }
         }
     }
 }

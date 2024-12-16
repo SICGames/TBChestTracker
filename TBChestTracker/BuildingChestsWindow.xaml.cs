@@ -87,7 +87,7 @@ namespace TBChestTracker
             return Task.Run(async() =>
             {
                 var clanfolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
-                var cacheFolder = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\\cache";
+                var cacheFolder = $"{clanfolder}\\cache";
                 DirectoryInfo di = new DirectoryInfo(cacheFolder);
 
                 if (di.Exists)

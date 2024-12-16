@@ -96,7 +96,7 @@ namespace TBChestTracker
 
             var clanfolder = ClanManager.Instance.CurrentProjectDirectory;
             var archiveFolder = $"{clanfolder}\\archives";
-            var cacheFolder = $"{clanfolder}{db.ClanDatabaseFolder}\\cache";
+            var cacheFolder = $"{clanfolder}\\cache";
             DirectoryInfo di = new DirectoryInfo(cacheFolder);
             if (di.Exists)
             {
@@ -460,18 +460,14 @@ namespace TBChestTracker
 
             var chestsettings = ClanManager.Instance.ClanChestSettings;
             var chestdata = ClanManager.Instance.ClanChestManager.Database.ClanChestData; //ClanChestDailyData;
-            var df = SettingsManager.Instance.Settings.GeneralSettings.DateFormat;
 
             var chestpointsvalues = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints;
             if (chestpointsvalues == null || chestpointsvalues.Count == 0)
             {
 
             }
-
-            var dateformat = SettingsManager.Instance.Settings.GeneralSettings.DateFormat;
             var currentCulture = CultureInfo.CurrentCulture; //-- en-GB
             var uiCulture = CultureInfo.CurrentUICulture; //-- en-US
-
             /*
             bool invalidateDates = DoesDatesNeedRepair();
             if (invalidateDates)
@@ -723,8 +719,6 @@ namespace TBChestTracker
             {
 
             }
-
-            var df = SettingsManager.Instance.Settings.GeneralSettings.DateFormat;
 
             foreach (var dates in chestdata.Keys.ToList())
             {

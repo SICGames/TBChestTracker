@@ -60,6 +60,10 @@ namespace TBChestTracker
                     //-- Force to English
                     LocalizationManager.Set("en-US");
                 }
+                else if(argumentsDictionary.ContainsKey("--debug"))
+                {
+                    AppContext.ShowDebugMenu(true);
+                }
             }
 
             //-- configure crashbox

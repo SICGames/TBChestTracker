@@ -303,7 +303,7 @@
                     <Separator/>
                     <MenuItem Header="{x:Static ResourceStrings:Strings.About}" Tag="AboutApp"/>
                 </MenuItem>
-                <MenuItem Header="Debug">
+                <MenuItem Header="Debug" Visibility="{Binding DebugMenuVisibility}">
                     <MenuItem x:Name="RebuildTessData" Header="Rebuild Tess Data" Click="RebuildTessData_Click"/>
                     <MenuItem x:Name="BuildChests" Header="Build Clan Chests To Database" Click="BuildChests_Click"/>
                 </MenuItem>
