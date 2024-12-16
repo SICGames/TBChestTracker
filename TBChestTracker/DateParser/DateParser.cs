@@ -273,6 +273,10 @@ namespace TBChestTracker
                 }
             }
 
+            return false;
+            /*
+              Will have to work on a better approach in future. 
+
             foreach (var part in parts)
             {
                 if (month_index < 0)
@@ -323,6 +327,8 @@ namespace TBChestTracker
             }
 
             return true;
+            */
+
         }
     }
 }

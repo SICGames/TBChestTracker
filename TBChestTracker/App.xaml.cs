@@ -66,6 +66,10 @@ namespace TBChestTracker
                 }
             }
 
+#if DEBUG
+            AppContext.ShowDebugMenu(true);
+#endif
+
             //-- configure crashbox
             CrashBox crashBox = new CrashBox();
 

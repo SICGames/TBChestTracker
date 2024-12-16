@@ -87,7 +87,7 @@ namespace TBChestTracker
                 throw new ArgumentNullException(nameof(chestAutomation));
             }
 
-            bool r = await ChestProcessor.WriteAsync(filename, result.ToArray());
+            bool r = ChestProcessor.Write(filename, result.ToArray());
         }
 
         public async Task ClearCache()
