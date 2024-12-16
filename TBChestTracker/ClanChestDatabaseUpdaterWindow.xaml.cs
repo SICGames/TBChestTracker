@@ -161,21 +161,29 @@ namespace TBChestTracker
         private async void BeginUpgrade(IProgress<UpgradeProgressStatus> progress)
         {
             var db = ClanManager.Instance.ClanDatabaseManager.ClanDatabase;
-            var dbfolder = $@"{ClanManager.Instance.CurrentProjectDirectory}{db.ClanFolderPath}";
+            var dbfolder = $@"{ClanManager.Instance.CurrentProjectDirectory}";
             var dbFile = $@"{dbfolder}{db.ClanChestDatabaseFile}";
 
             var result = await LoadDatabase(dbFile, progress);
-            if(result)
+            if (result == false)
             {
-                await DetectDateFormatAndConvert(progress);
-                var r = await UpgradeDatabase(progress);
-                if(r)
-                {
-                    var tprogress = new UpgradeProgressStatus($"Clan Chest Database been upgraded to newer version...", 100, true);
-                    progress.Report(tprogress);
-                    await Task.Delay(100);
-                }
+                var tprogress0 = new UpgradeProgressStatus($"Failed to load {dbFile}...", 0, false);
+                progress.Report(tprogress0);
+                await Task.Delay(100);
+                return;
             }
+            await DetectDateFormatAndConvert(progress);
+            var r = await UpgradeDatabase(progress);
+            if (r == false)
+            {
+                var tprogress1 = new UpgradeProgressStatus($"Failed to upgrade clan chest database to version 3. Make sure your system date format matches date format inside clanchest.db file.", 0, false);
+                progress.Report(tprogress1);
+                await Task.Delay(100);
+                return;
+            }
+            var tprogress = new UpgradeProgressStatus($"Clan Chest Database been upgraded to newer version...", 100, true);
+            progress.Report(tprogress);
+            await Task.Delay(100);
 
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -189,9 +197,12 @@ namespace TBChestTracker
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            tmp_clanchestdata.Clear();
-            tmp_clanchestdata = null;
-            
+            //-- patched object not referenced 
+            if (tmp_clanchestdata != null)
+            {
+                tmp_clanchestdata.Clear();
+                tmp_clanchestdata = null;
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

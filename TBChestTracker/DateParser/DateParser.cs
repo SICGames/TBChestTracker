@@ -215,7 +215,6 @@ namespace TBChestTracker
 
             Date = datestring;
             var parts = datestring.Split(seperator[0]);
-           
             
             //-- is correct date format?
             if (seperator == Culture.DateTimeFormat.DateSeparator)
@@ -244,7 +243,6 @@ namespace TBChestTracker
                     
                     for(int indice =0; indice < date_format_parts.Length; indice++)
                     {
-                    
                         if (date_format_parts[indice].ToLower().Equals("yyyy"))
                         {
                             year_indice = indice;
