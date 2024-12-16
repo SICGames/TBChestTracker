@@ -44,7 +44,7 @@ namespace TBChestTracker.Pages.AbsentClanmates
             {
                 ClanManager.Instance.ClanmateManager.CreateBackup();
                 var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
-                var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+                var clanfolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
 
 
                 var clanmatedatabaseFile = $@"{AppContext.Instance.LocalApplicationPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}";

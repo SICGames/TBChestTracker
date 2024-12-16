@@ -89,6 +89,35 @@ namespace TBChestTracker
 
             bool r = await ChestProcessor.WriteAsync(filename, result.ToArray());
         }
+
+        public async Task ClearCache()
+        {
+            var db = ClanManager.Instance.ClanDatabaseManager.ClanDatabase;
+
+            var clanfolder = ClanManager.Instance.CurrentProjectDirectory;
+            var archiveFolder = $"{clanfolder}\\archives";
+            var cacheFolder = $"{clanfolder}{db.ClanDatabaseFolder}\\cache";
+            DirectoryInfo di = new DirectoryInfo(cacheFolder);
+            if (di.Exists)
+            {
+                var files = di.GetFiles("*.txt");
+
+                DirectoryInfo archiveDI = new DirectoryInfo(archiveFolder);
+                if(archiveDI.Exists == false)
+                {
+                    archiveDI.Create();
+                }
+
+                //-- archive them then delete 
+                foreach (var file in files)
+                {
+                    var destFilename = $"{archiveFolder}\\{file.Name}";
+                    File.Copy(file.FullName, destFilename, true);
+                    file.Delete();
+                }
+            }
+        }
+
         public async Task BuildChests(string[] files, IProgress<BuildingChestsProgress> progress)
         {
             if (files == null || files.Length == 0) 
@@ -119,8 +148,8 @@ namespace TBChestTracker
         {
             try
             {
-                var rootFolder = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
-                var clanFolder = $"{rootFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+                //var rootFolder = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
+                var clanFolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
                 var databaseFolder = $"{clanFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}";
 
                 var clanchestfile = $"{clanFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile}";
@@ -234,7 +263,7 @@ namespace TBChestTracker
                 //-- write to file.
                 string file = String.Empty;
                 var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
-                var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+                var clanfolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
                 var databaseFolder = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\\";
 
                 if (String.IsNullOrEmpty(filename))
@@ -290,10 +319,8 @@ namespace TBChestTracker
         {
             try
             {
-                
-
-                var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
-                var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+                //var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
+                var clanfolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
 
                 var clanchestsBackupFolder = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath}\\Clanchests";
                 var di = new DirectoryInfo(clanchestsBackupFolder);

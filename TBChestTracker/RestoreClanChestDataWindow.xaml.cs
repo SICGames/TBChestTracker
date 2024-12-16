@@ -37,7 +37,7 @@ namespace TBChestTracker
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
-            var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+            var clanfolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
             
             var backupFolder = $@"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseBackupFolderPath}\Clanchests";
             var di = new DirectoryInfo(backupFolder);
@@ -88,7 +88,7 @@ namespace TBChestTracker
             if (SelectedBackupItem != null)
             {
                 var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
-                var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+                var clanfolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
 
                 var clanchestdbfile = $@"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile}";
                 var oldClanChestDBFile = clanchestdbfile.Substring(0,clanchestdbfile.LastIndexOf("."));

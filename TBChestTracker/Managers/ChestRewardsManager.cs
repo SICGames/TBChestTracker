@@ -32,8 +32,8 @@ namespace TBChestTracker
 
         public bool Load()
         {
-            var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
-            var clanFolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+            //var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
+            var clanFolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
             var databaseFolder = $"{clanFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}";
             var file = $@"{databaseFolder}\ChestRewards.db";
             var _chestrewardslist =  new List<ChestReward>();
@@ -60,7 +60,7 @@ namespace TBChestTracker
         public void Save()
         {
             var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
-            var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+            var clanfolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
 
             var file = $@"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\ChestRewards.db";
             using(StreamWriter sw = File.CreateText(file))

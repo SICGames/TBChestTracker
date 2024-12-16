@@ -51,8 +51,8 @@ namespace TBChestTracker
 
         private void OkayButton_Click(object sender, RoutedEventArgs e)
         {
-            var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
-            var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+            //var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
+            var clanfolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
 
             var clanmatefile = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}";
             ClanManager.Instance.ClanmateManager.Save();
@@ -216,8 +216,8 @@ namespace TBChestTracker
         {
 
             //-- should create backup incase shit hits the fan.
-            var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
-            var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+            //var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
+            var clanfolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
 
 
             var backup_file = $@"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\clanchests.old";

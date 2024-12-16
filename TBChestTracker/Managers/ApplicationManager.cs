@@ -42,6 +42,7 @@ namespace TBChestTracker
 
         private Manifest UpdateManifest = null;
 
+       
         public ApplicationManager() 
         { 
             if (Instance == null)

@@ -1378,7 +1378,7 @@ namespace TBChestTracker
         private void ExportClan_Click(object sender, RoutedEventArgs e)
         {
 
-            var clanpath = $@"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+            var clanpath = $@"{ClanManager.Instance.CurrentProjectDirectory}";
             var archivename = $@"{ClanManager.ClanDatabaseManager.ClanDatabase.Clanname}.zip";
             var dialog = new CommonOpenFileDialog();
             dialog.IsFolderPicker = true;
@@ -1419,6 +1419,7 @@ namespace TBChestTracker
                         com.HellStormGames.Logging.Console.Write("Clan Chest Data is looking good. No need for repairs.", com.HellStormGames.Logging.LogType.INFO);
                     }
                 }
+                ClanManager.Instance.ClanChestManager.ClearCache();
             }
         }
     }

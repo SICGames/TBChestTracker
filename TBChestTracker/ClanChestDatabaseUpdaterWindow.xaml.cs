@@ -146,7 +146,7 @@ namespace TBChestTracker
         private async Task<bool> UpgradeDatabase(IProgress<UpgradeProgressStatus> progress)
         {
             var db = ClanManager.Instance.ClanDatabaseManager.ClanDatabase;
-            var dbfolder = $@"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}{db.ClanFolderPath}";
+            var dbfolder = $@"{ClanManager.Instance.CurrentProjectDirectory}{db.ClanFolderPath}";
             var dbFile = $@"{dbfolder}{db.ClanChestDatabaseFile}";
             var tprogress = new UpgradeProgressStatus($"Saving upgraded clanchest.db file...", 95, false);
             progress.Report(tprogress);
@@ -161,7 +161,7 @@ namespace TBChestTracker
         private async void BeginUpgrade(IProgress<UpgradeProgressStatus> progress)
         {
             var db = ClanManager.Instance.ClanDatabaseManager.ClanDatabase;
-            var dbfolder = $@"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}{db.ClanFolderPath}";
+            var dbfolder = $@"{ClanManager.Instance.CurrentProjectDirectory}{db.ClanFolderPath}";
             var dbFile = $@"{dbfolder}{db.ClanChestDatabaseFile}";
 
             var result = await LoadDatabase(dbFile, progress);

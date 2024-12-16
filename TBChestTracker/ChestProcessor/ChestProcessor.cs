@@ -492,9 +492,8 @@ namespace TBChestTracker
             string file = String.Empty;
             if (String.IsNullOrEmpty(filename))
             {
-                var rootFolder = SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder;
                 var clandb = ClanManager.Instance.ClanDatabaseManager.ClanDatabase;
-                var dbFolder = $"{rootFolder}{clandb.ClanFolderPath}{clandb.ClanDatabaseFolder}";
+                var dbFolder = $"{ClanManager.Instance.CurrentProjectDirectory}{clandb.ClanDatabaseFolder}";
                 var cacheFolder = $"{dbFolder}\\cache";
                 DirectoryInfo di = new DirectoryInfo(cacheFolder);
                 if (di.Exists == false)

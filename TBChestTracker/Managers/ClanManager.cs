@@ -22,6 +22,18 @@ namespace TBChestTracker.Managers
         private ClanChestSettings _clansettings = null;
         public ClanChestSettings ClanChestSettings => _clansettings;
 
+        private string currentProjectDirectory = String.Empty;
+        public string CurrentProjectDirectory
+        {
+            get => currentProjectDirectory;
+            private set => currentProjectDirectory = value;
+        }
+        public void SetProjectDirectory(string path)
+        {
+            CurrentProjectDirectory = path;
+        }
+
+
         public ClanManager()
         {
             if(Instance == null)

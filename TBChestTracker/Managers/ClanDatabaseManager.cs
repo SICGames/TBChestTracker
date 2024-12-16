@@ -59,6 +59,9 @@ namespace TBChestTracker
             System.IO.Directory.CreateDirectory($"{clanrootfolder}{ClanDatabase.ClanDatabaseFolder}");
             System.IO.Directory.CreateDirectory($"{clanrootfolder}{ClanDatabase.ClanChestDatabaseExportFolderPath}");
             System.IO.Directory.CreateDirectory($"{clanrootfolder}{ClanDatabase.ClanDatabaseBackupFolderPath}");
+
+            ClanManager.Instance.SetProjectDirectory( clanrootfolder );
+
             result( true ); 
         }
         public void Update()
@@ -136,6 +139,9 @@ namespace TBChestTracker
                 ClanDatabase = _clandatabase;
                 if(ClanDatabase != null)
                 {
+                    var clanFolderPath = Path.GetDirectoryName(file);
+                    ClanManager.Instance.SetProjectDirectory($"{clanFolderPath}");
+
                     var r = m_ClanChestManager.BuildData();
 
                     if (r == ChestDataBuildResult.DATA_CORRUPT)
@@ -159,6 +165,8 @@ namespace TBChestTracker
 
                             }
                         }
+
+                      
                         result(true);
                     }
                 }

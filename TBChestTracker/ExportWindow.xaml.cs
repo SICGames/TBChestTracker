@@ -111,7 +111,7 @@ namespace TBChestTracker
             bool failedToParseDates = false;
 
             var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
-            var clanfolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+            var clanfolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
 
             FilePicker01.DefaultFolder = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseExportFolderPath}";
 
