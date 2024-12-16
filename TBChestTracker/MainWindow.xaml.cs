@@ -1395,5 +1395,31 @@ namespace TBChestTracker
         {
             AppContext.RestartApplication("--delete_tessdata");
         }
+
+        private void BuildChests_Click(object sender, RoutedEventArgs e)
+        {
+            BuildingChestsWindow buildingChestsWindow = new BuildingChestsWindow();
+            if (buildingChestsWindow.ShowDialog() == true)
+            {
+                ClanManager.Instance.ClanChestManager.Save();
+                ClanManager.Instance.ClanChestManager.CreateBackup();
+
+                if (SettingsManager.Instance.Settings.AutomationSettings.AutoRepairAfterStoppingAutomation)
+                {
+                    if (ClanManager.Instance.ClanChestManager.CheckIntegrity() != null)
+                    {
+                        var result = ClanManager.Instance.ClanChestManager.Repair();
+                        if (result)
+                        {
+                            com.HellStormGames.Logging.Console.Write("Chest Data Automatically Repaired", "Chest Integrity", LogType.INFO);
+                        }
+                    }
+                    else
+                    {
+                        com.HellStormGames.Logging.Console.Write("Clan Chest Data is looking good. No need for repairs.", com.HellStormGames.Logging.LogType.INFO);
+                    }
+                }
+            }
+        }
     }
 }

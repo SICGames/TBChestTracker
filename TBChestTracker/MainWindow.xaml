@@ -305,6 +305,7 @@
                 </MenuItem>
                 <MenuItem Header="Debug">
                     <MenuItem x:Name="RebuildTessData" Header="Rebuild Tess Data" Click="RebuildTessData_Click"/>
+                    <MenuItem x:Name="BuildChests" Header="Build Clan Chests To Database" Click="BuildChests_Click"/>
                 </MenuItem>
             </Menu>
         </DockPanel>

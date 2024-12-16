@@ -12,16 +12,15 @@ namespace TBChestTracker
         public double Total {  get; set; }
         public double Current { get; set; }
         public double Progress { get; set; }
-        public TimeSpan TimeRemaining { get; set; }
-        public string CurrentFile { get; set; }
-        public BuildingChestsProgress(string status, double total, double current, TimeSpan timeRemaining, string currentFile)
+        public bool isFinished { get; set; }
+
+        public BuildingChestsProgress(string status, double total, double current, bool isFinished)
         {
             Status = status;
             Total = total;
             Current = current;
-            TimeRemaining = timeRemaining;
-            CurrentFile = currentFile;
-            Progress = total / current * 100.0;
+            Progress = current / total * 100.0;
+            this.isFinished = isFinished;
         }
     }
 }

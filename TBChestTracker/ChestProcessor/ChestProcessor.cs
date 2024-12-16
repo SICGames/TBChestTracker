@@ -193,9 +193,14 @@ namespace TBChestTracker
         #endregion
 
         #region Read
-        public async Task<string[]> ReadCache(string file)
+        public async Task<string[]> ReadCache(string file, IProgress<BuildingChestsProgress> progress)
         {
+            int currentLineRead = 0;
+            int maxLines = 0;
             
+            var datestring = file.Substring(file.LastIndexOf("_") + 1);
+            datestring = datestring.Substring(0, datestring.LastIndexOf("."));
+
             List<string> final_result = new List<string>();
             if(String.IsNullOrEmpty(file))
             {
@@ -213,12 +218,19 @@ namespace TBChestTracker
                     {
                         data = data.Replace("\r\n", "\n");
                         var result = data.Split('\n');
+                        maxLines = result.Length;
+
                         foreach(var r in result)
                         {
                             if(String.IsNullOrEmpty(r) == false)
                             {
+
                                 final_result.Add(r);
                             }
+                            var p = new BuildingChestsProgress($"Processing Clan Chests Cache for {datestring} ({currentLineRead}/{maxLines})...", maxLines, currentLineRead, false);
+                            progress.Report(p);
+                            await Task.Delay(10);
+                            currentLineRead++;
                         }
                     }
                 }
@@ -233,11 +245,11 @@ namespace TBChestTracker
         #endregion
 
         #region Build
-        public async Task<ProcessingTextResult> BuildFromCacheFile(string file)
+        public async Task<ProcessingTextResult> BuildFromCacheFile(string file, IProgress<BuildingChestsProgress> progress)
         {
-            var result = await ReadCache(file);
-            var checkboxes = BuildChestBoxes(result.ToList());
-            return ProcessChestBoxes(ref checkboxes);
+            var result = await ReadCache(file,progress);
+            var checkboxes = await BuildChestBoxes(result, progress);
+            return await ProcessChestBoxes(checkboxes, progress);
         }
 
         public async Task Build(string[] files, IProgress<BuildingChestsProgress> progress, ClanChestDatabase database)
@@ -255,38 +267,36 @@ namespace TBChestTracker
                     snapshots.Dequeue();
                 }
                 snapshots.Enqueue(Interlocked.Exchange(ref currentFile, 0));
-
             };
 
             foreach (var file in files)
             {
-               
-
-                ProcessingTextResult result = await BuildFromCacheFile(file);
+                ProcessingTextResult result = await BuildFromCacheFile(file, progress);
                 if (result != null)
                 {
                     if(result.Status != ProcessingStatus.OK)
                     {
                         //-- possibly cancel and present error
-                        var p = new BuildingChestsProgress($"{result.Message}", filesMax, currentFile, elapsed, file);
+                        var p = new BuildingChestsProgress($"{result.Message}", filesMax, currentFile, false);
                         progress.Report(p);
                         currentFile++;
                         continue;
                     }
 
-                    int currentChestDataCount = 0;
+
 
                     List<ChestData> tmpchests = result.ChestData;
                     IList<ClanChestData> tmpchestdata = CreateClanChestData(tmpchests);
                     var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates.ToList();
-
-                    int currentTempChestDataCount = 0;
-                    int maxTempChestDataCount = tmpchestdata.Count;
-
+                    
                     var datestring = file.Substring(file.LastIndexOf("_") + 1);
                     datestring = datestring.Substring(0, datestring.LastIndexOf("."));
 
                     var dates = database.ClanChestData.Where(x => x.Key.Equals(datestring));
+
+                    int currentChestDataCount = 0;
+                    int currentTempChestDataCount = 0;
+                    int maxTempChestDataCount = tmpchestdata.Count;
 
                     if (dates.Count() == 0)
                     {
@@ -303,6 +313,11 @@ namespace TBChestTracker
                     var mate_index = 0;
                     Parallel.ForEach(tmpchestdata.ToList(), async tmpchest =>  //foreach (var tmpchest in tmpchestdata.ToList())
                     {
+                        var pp = new BuildingChestsProgress($"Building Temporary Chest Boxes ({currentTempChestDataCount}/{tmpchestdata.Count}) for ${datestring}", tmpchestdata.Count, currentChestDataCount, false);
+                        progress.Report(pp);
+                        
+                        await Task.Delay(100);
+
                         bool exists = clanmates.Select(mate_name => mate_name.Name).Contains(tmpchest.Clanmate, StringComparer.CurrentCultureIgnoreCase);
                         if (exists)
                         {
@@ -335,23 +350,24 @@ namespace TBChestTracker
                             }
                         }
 
-                        var pp = new BuildingChestsProgress($"Building Temporary Chest Boxes ({currentTempChestDataCount}/{maxTempChestDataCount}) for ${datestring}", maxTempChestDataCount, currentChestDataCount, elapsed, "");
-                        progress.Report(pp);
                         currentTempChestDataCount++;
-                        await Task.Delay(100);
+                        await Task.Delay(250);
                     });
 
-
                     //-- update clanchestdata
+                    int maxChestDataCount = tmp_ClanChestData.Count;
                     Parallel.ForEach(tmp_ClanChestData, async chestdata => //foreach (var chestdata in tmp_ClanChestData)
                     {
                         var _chestdata = tmpchestdata.Where(name => name.Clanmate.Equals(chestdata.Clanmate,
                             StringComparison.CurrentCultureIgnoreCase)).Select(chests => chests).ToList();
 
+                        var ppp = new BuildingChestsProgress($"Building Chest Data ({currentChestDataCount}/{tmp_ClanChestData.Count} for {datestring}", tmp_ClanChestData.Count, currentChestDataCount, false);
+                        progress.Report(ppp);
+
                         if (_chestdata.Count > 0)
                         {
                             var m_chestdata = _chestdata[0];
-
+                            
                             //--- chest data returning null after correcting parent clan name.
                             if (chestdata.Clanmate.Equals(m_chestdata.Clanmate, StringComparison.CurrentCultureIgnoreCase))
                             {
@@ -427,18 +443,13 @@ namespace TBChestTracker
                                             }
                                         }
                                     }
+
                                     chestdata.chests.Add(m_chest);
                                 }
                             }
-                            
-                            int maxChestDataCount = tmp_ClanChestData.Count;
-
-                            var ppp = new BuildingChestsProgress($"Building Chest Data ({currentChestDataCount}/{maxChestDataCount} for {datestring}", maxChestDataCount, currentChestDataCount, elapsed, "");
-                            progress.Report(ppp);
-                            await Task.Delay(150);
-                            currentChestDataCount++;
                         }
-
+                        currentChestDataCount++;
+                        await Task.Delay(250);
                     });
 
                     //var datestr = DateTime.Now.ToString(AppContext.Instance.ForcedDateFormat, CultureInfo.InvariantCulture);
@@ -451,7 +462,7 @@ namespace TBChestTracker
                 await Task.Delay(250);
             }
 
-            var p2 = new BuildingChestsProgress($"Finished Building Clan Chests...", filesMax, currentFile, elapsed, "");
+            var p2 = new BuildingChestsProgress($"Finished Building Clan Chests...", filesMax, currentFile, true);
             progress.Report(p2);
         }
         #endregion
@@ -862,16 +873,23 @@ namespace TBChestTracker
         #endregion
 
         #region BuildChestBoxes
-        private List<ChestBox> BuildChestBoxes(List<string> result)
+        private async Task<List<ChestBox>> BuildChestBoxes(string[] r, IProgress<BuildingChestsProgress> progress = null)
         {
             var chestboxes = new List<ChestBox>();
             var clicks = SettingsManager.Instance.Settings.AutomationSettings.AutomationClicks;
-
             var tmpResult = new List<string>();
+
+            int currentCheckBox = 0;
+            var result = r.ToList();
+
+            int maxChestBoxes = result.Count;
 
             for (var b = 0; b < result.Count; b++)
             {
                 ChestBox cb = new ChestBox();
+
+                var p = new BuildingChestsProgress($"Creating ChestBoxes ({currentCheckBox})...", maxChestBoxes, currentCheckBox, false);
+                progress.Report(p);
 
                 //-- 4 clicks 
                 //-- 3 lines each box
@@ -894,25 +912,37 @@ namespace TBChestTracker
                 b += cb.Content.Count - 1;
 
                 chestboxes.Add(cb);
+
+                currentCheckBox++;
+
+                await Task.Delay(10);
             }
 
             tmpResult.Clear();
             tmpResult = null;
+
             return chestboxes;
         }
         #endregion
 
         #region ProcessChestBoxes
-        private ProcessingTextResult ProcessChestBoxes(ref List<ChestBox> chestboxes)
+        private async Task<ProcessingTextResult> ProcessChestBoxes(List<ChestBox> chestboxes, IProgress<BuildingChestsProgress> progress = null)
         {
             ProcessingTextResult ProcessingTextResult = new ProcessingTextResult();
             bool bError = false;
             List<ChestData> tmpchests = new List<ChestData>();
 
+            var currentChestbox = 0;
+            var maxChestBox = chestboxes.Count;
+
             foreach (var chestbox in chestboxes)
             {
+                var pra = new BuildingChestsProgress($"Processing Chest Boxes ({currentChestbox}/{maxChestBox})...", maxChestBox, currentChestbox, false);
+                progress.Report(pra);
+
                 for (var x = 0; x < chestbox.Content.Count; x += chestbox.Content.Count)
                 {
+                   
                     var word = chestbox.Content[x];
 
                     var bHasContains = !String.IsNullOrEmpty(chestbox.Content.Where(s => s.StartsWith("Contains:")).FirstOrDefault());
@@ -1126,6 +1156,9 @@ namespace TBChestTracker
                         com.HellStormGames.Logging.Console.Write(dbg_msg, "OCR Result", com.HellStormGames.Logging.LogType.INFO);
                     }
                 }
+
+                currentChestbox++;
+                await Task.Delay(10);
             }
 
             chestboxes.Clear();
@@ -1154,19 +1187,17 @@ namespace TBChestTracker
             if (FilteringTextResult != null)
             {
                 var filtered_result = FilteringTextResult.RawData;
-                if(outputAsRaw == true)
-                {
-                    ProcessingTextResult.Status = ProcessingStatus.OK;
-                    ProcessingTextResult.Message = "Success";
-                    ProcessingTextResult.ChestData = null;
-                    ProcessingTextResult.RawData = filtered_result;
-                    return ProcessingTextResult;
-                }
 
-                var chestboxes = BuildChestBoxes(filtered_result);
-                ProcessingTextResult = ProcessChestBoxes(ref chestboxes);
+                ProcessingTextResult.Status = ProcessingStatus.OK;
+                ProcessingTextResult.Message = "Success";
+                ProcessingTextResult.ChestData = null;
+                ProcessingTextResult.RawData = filtered_result;
+                return ProcessingTextResult;
+                //var chestboxes = BuildChestBoxes(filtered_result);
+                //ProcessingTextResult = ProcessChestBoxes(ref chestboxes);
             }
-            return ProcessingTextResult;
+
+            return null;
         }
         #endregion
         

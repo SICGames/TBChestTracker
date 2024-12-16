@@ -59,28 +59,73 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(Progress));
             }
         }
+        private Visibility pVisibility = Visibility.Hidden;
+        public Visibility PanelVisible
+        {
+            get
+            {
+                return pVisibility;
+            }
+            set
+            {
+                pVisibility = value;
+                OnPropertyChanged(nameof(PanelVisible));
+            }
+        }
+        private void UpdateUI(string status, double progress)
+        {
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                Status = status;
+                Progress = progress;
+                
+            }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        }
 
+        private Task BeginBuildingChestsTask(IProgress<BuildingChestsProgress> progress)
+        {
+            return Task.Run(async() =>
+            {
+                var clanfolder = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+                var cacheFolder = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\\cache";
+                DirectoryInfo di = new DirectoryInfo(cacheFolder);
+
+                if (di.Exists)
+                {
+                    var files = di.GetFiles("*.txt");
+                    var filepaths = files.Select(f => f.FullName).ToArray();
+
+                    var p = new BuildingChestsProgress("Preparing to build clan chests data...", 0, 0, false);
+                    progress.Report(p);
+
+                    await ClanManager.Instance.ClanChestManager.BuildChests(filepaths, progress);
+                    
+                }
+            });
+        }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-    
             Progress<BuildingChestsProgress> progress = new Progress<BuildingChestsProgress>();
-            progress.ProgressChanged += (s,o) => 
+            progress.ProgressChanged += (s, o) =>
             {
-                Status = o.Status;
-                Progress = o.Progress;
+                UpdateUI(o.Status, o.Progress);
+                if(o.isFinished)
+                {
+                    PanelVisible = Visibility.Visible;
+                }
+                else
+                {
+                    PanelVisible = Visibility.Hidden;
+                }
             };
-            var clanfolder = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
-            var cacheFolder = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\\cache";
-            DirectoryInfo di = new DirectoryInfo(cacheFolder);
-            if (di.Exists)
-            {
-                var files = di.GetFiles("*.txt");
-                var filepaths = files.Select(f => f.FullName).ToArray();
-                ClanManager.Instance.ClanChestManager.BuildChests(filepaths, progress);
-            }
+            BeginBuildingChestsTask(progress);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+        }
+
+        private void CloseBtn_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = true;
         }
