@@ -6,7 +6,7 @@
 - NodeJS
 
 ## Dependancies 
-- [KonquestUI](https://github.com/SICGame/KonquestUI/)
+- [KonquestUI](https://github.com/SICGames/KonquestUI/)
 - [Snapture](https://github.com/SICGames/Snapture)
 - [CaptainHook](https://github.com/SICGames/CaptainHook)
 
