@@ -4,7 +4,7 @@
 [![Github All Releases](https://img.shields.io/github/downloads/SICGames/TBChestTracker/total.svg)]()
 
 ## Important Note
-Release Canidiate 2.4 has a issue with locale date which causes a lot of the miscounting. Download Release Canidiate 2.1 which is more stable. In addition, Release Canidiate 3 is being developed and will require time. The part responsible for counting chests is being replaced with newer code. You should see a performance increase in Release Candiate 3. 
+Release Canidiate 2.5.1 is underway but Github is preventing me from uploading the hotpatch for RC2.5. Hang in tight. I recommend not installing 2.5 due Clan Chest Database not working as intended. It points to a directory that doesn't exist and that causes the hang. In 2.5.1 this is patched but unable to upload the installation file.
 
 ## Become a Patreon 
 If you want to support this project, become a Patreon and get access to the Discord server. 
