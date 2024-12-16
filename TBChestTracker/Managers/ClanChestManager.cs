@@ -66,12 +66,14 @@ namespace TBChestTracker
         {
             get
             {
-                if(ChestProcessor == null)
+                try
+                {
+                    return ChestProcessor.ChestProcessingState;
+                }
+                catch (Exception e)
                 {
                     return ChestProcessingState.NO_PROCESSOR_ATTACHED;
                 }
-
-                return ChestProcessor.ChestProcessingState;
             }
         }
 

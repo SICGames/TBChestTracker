@@ -182,7 +182,7 @@ namespace TBChestTracker
                     foreach (var r in result)
                     {
                         var b = Encoding.UTF8.GetBytes(r);
-                        sw.Write(b)
+                        sw.Write(b);
                     }
                 }
             }
