@@ -92,5 +92,8 @@
 
         <TextBlock Grid.Row="7" Grid.Column="0" Text="Automatically repair clan chest data after stopping automation" TextWrapping="Wrap" Width="250" Margin="10,5"/>
         <CheckBox Grid.Row="7" Grid.Column="1" IsChecked="{Binding AutoRepairAfterStoppingAutomation}" Margin="10,0" VerticalAlignment="Center"/>
+        
+        <TextBlock Grid.Row="8" Grid.Column="0" Text="Automatically close Chest Building Dialog after finished counting chests" TextWrapping="Wrap" Width="250" Margin="10,5"/>
+        <CheckBox Grid.Row="8" Grid.Column="1" IsChecked="{Binding AutomaticallyCloseChestBuildingDialogAfterFinished}" Margin="10,0" VerticalAlignment="Center"/>
     </Grid>
 </Page>

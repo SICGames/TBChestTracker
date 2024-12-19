@@ -29,6 +29,16 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(AutomationClicks));    
             }
         }
+        private bool? _automaticallyCloseChestBuildingDialogAfterFinished;
+        public bool AutomaticallyCloseChestBuildingDialogAfterFinished
+        {
+            get => _automaticallyCloseChestBuildingDialogAfterFinished.GetValueOrDefault(false);
+            set
+            {
+                _automaticallyCloseChestBuildingDialogAfterFinished = value;
+                OnPropertyChanged(nameof(AutomaticallyCloseChestBuildingDialogAfterFinished));
+            }
+        }
         private int? _automationDelayBetweenClicks;
         public int AutomationDelayBetweenClicks
         {

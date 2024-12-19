@@ -25,7 +25,7 @@
             <ui:FancyImageButton Background="Red" 
                                  HighlightStrokeBrush="#ff5555" 
                                  HighlightStrokeThickness="1" 
-                                 ImageSource="Images/close-button.png" 
+                                 ImageSource="Images/ui/close-button.png" 
                                  Grid.Column="1" Width="32" 
                                  HighlightBrush="#ff3333" 
                                  BorderBrush="Transparent" 

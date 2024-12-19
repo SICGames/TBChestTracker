@@ -59,14 +59,5 @@ namespace TBChestTracker.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Window.
-        /// </summary>
-        internal static string Window {
-            get {
-                return ResourceManager.GetString("Window", resourceCulture);
-            }
-        }
     }
 }

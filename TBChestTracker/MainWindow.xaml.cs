@@ -786,6 +786,7 @@ namespace TBChestTracker
                 if(result)
                 {
                     ExportClan.IsEnabled = true;
+                    //CloseDatabase.IsEnabled = true;
                 }
             });
            
@@ -824,46 +825,6 @@ namespace TBChestTracker
         {
             bool bLoaded = LoadClanDatabase(file);
             response(bLoaded);
-
-            /*
-            ClanManager.Instance.ClanDatabaseManager.Load(file, ClanManager.Instance.ClanChestManager, result =>
-            {
-                if (result)
-                {
-                    com.HellStormGames.Logging.Console.Write($"Loaded Clan ({ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}) Database Successfully.",
-                        com.HellStormGames.Logging.LogType.INFO);
-
-                    AppContext.Instance.UpdateCurrentProject($"{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}");
-                    AppContext.Instance.UpdateApplicationTitle();
-                    
-                    AppContext.Instance.IsCurrentClandatabase = true;
-                    if (AppContext.Instance.IsClanChestDataCorrupted)
-                    {
-                        AppContext.Instance.IsAutomationPlayButtonEnabled = false;
-
-                        if (MessageBox.Show("Oh no! There is an error loading your clan chest database file. It is possibly corrupted. Be sure to restore a previously known good clan chest data file inside Tools -> Restore Clan Chest Data", "Clan Chest Data Loading Error", MessageBoxButton.OK, MessageBoxImage.Stop) == MessageBoxResult.OK)
-                        {
-                            RestoreClanChestDataWindow restoreClanChestDataWindow = new RestoreClanChestDataWindow();
-                            restoreClanChestDataWindow.Show();
-                        }
-
-                    }
-                    else
-                    {
-                        AppContext.Instance.IsAutomationPlayButtonEnabled = true;
-                    }
-                    ExportClan.IsEnabled = true;
-                    
-                    response(true);
-                }
-                else
-                {
-                    MessageBox.Show("Something went horribly wrong. Database is not suppost to be blank.");
-                }
-            });
-
-            */
-
         }
 
         
@@ -992,7 +953,8 @@ namespace TBChestTracker
                     }
 
                     ExportClan.IsEnabled = true;
-                    //ClanManager.Instance.ClanChestManager.RepairChestData();
+                    //CloseDatabase.IsEnabled = true;
+                    
                     bIsLoaded = true;
                 }
                 else
@@ -1423,6 +1385,28 @@ namespace TBChestTracker
                 }
                 ClanManager.Instance.ClanChestManager.ClearCache();
             }
+        }
+
+        private void RollbackDatabase_Click(object sender, RoutedEventArgs e)
+        {
+            ClanManager.Instance.ClanChestManager.RollBack();
+        }
+
+        private void CloseClanProject()
+        {
+            ClanManager.Instance.Destroy();
+            com.HellStormGames.Logging.Console.Destroy();
+        }
+        private void CloseDatabase_Click(object sender, RoutedEventArgs e)
+        {
+            CloseClanProject();
+            if(startPageWindow == null)
+            {
+                startPageWindow = new StartPageWindow();
+            }
+            startPageWindow.MainWindow = this;
+            startPageWindow.Show();
+
         }
     }
 }

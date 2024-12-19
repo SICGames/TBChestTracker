@@ -258,6 +258,8 @@
                     <MenuItem Header="{x:Static ResourceStrings:Strings.SaveClanDatabase}" x:Name="SaveClanDB" Command="Commands:CustomCommandBindings.SaveClanDatabase"/>
                     <MenuItem Header="{x:Static ResourceStrings:Strings.SaveClanDatabaseAs}" x:Name="SaveClanDBAs" Command="Commands:CustomCommandBindings.SaveAsClanDatabase"/>
                     <Separator/>
+                    <MenuItem Header="Close Database" x:Name="CloseDatabase" Click="CloseDatabase_Click" IsEnabled="False"/>
+                    <Separator/>
                     <MenuItem Header="Export Clan Database" x:Name="ExportClan" Click="ExportClan_Click" IsEnabled="False"/>
                     <Separator/>
                     <MenuItem Header="{x:Static ResourceStrings:Strings.ExportChestData}" Command="Commands:CustomCommandBindings.ExportClanDatabase"/>
@@ -306,6 +308,8 @@
                 <MenuItem Header="Debug" Visibility="{Binding DebugMenuVisibility}">
                     <MenuItem x:Name="RebuildTessData" Header="Rebuild Tess Data" Click="RebuildTessData_Click"/>
                     <MenuItem x:Name="BuildChests" Header="Build Clan Chests To Database" Click="BuildChests_Click"/>
+                    <Separator/>
+                    <MenuItem x:Name="RollbackDatabase" Header="Rollback Clan Chest Database" Click="RollbackDatabase_Click"/>
                 </MenuItem>
             </Menu>
         </DockPanel>

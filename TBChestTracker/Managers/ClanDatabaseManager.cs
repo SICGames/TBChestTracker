@@ -158,7 +158,10 @@ namespace TBChestTracker
                             if(MessageBox.Show("Clan Chest Database requires an update. To continue with updating the database, click on 'Ok'.") == MessageBoxResult.OK)
                             {
                                 ClanChestDatabaseUpdaterWindow clanChestDatabaseUpdaterWindow = new ClanChestDatabaseUpdaterWindow();
-                                clanChestDatabaseUpdaterWindow.Show();
+                                if(clanChestDatabaseUpdaterWindow.ShowDialog() == true)
+                                {
+                                    m_ClanChestManager.BuildData();
+                                }
                             }
                             else
                             {

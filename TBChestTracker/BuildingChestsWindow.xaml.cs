@@ -111,6 +111,12 @@ namespace TBChestTracker
                 UpdateUI(o.Status, o.Progress);
                 if(o.isFinished)
                 {
+                    if(SettingsManager.Instance.Settings.AutomationSettings.AutomaticallyCloseChestBuildingDialogAfterFinished)
+                    {
+                        this.DialogResult = true;
+                        this.Close();
+                    }
+                    
                     PanelVisible = Visibility.Visible;
                 }
                 else

@@ -193,9 +193,7 @@ namespace TBChestTracker
         {
             //-- load chestypes from chesttypes.csv file
             GameChests = ApplicationManager.Instance.Chests;
-            
             BuildChestTypes(ChestTypeBox);
-            //BuildLevels(ChestPointLevel);
         }
 
         private void ChestNameBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

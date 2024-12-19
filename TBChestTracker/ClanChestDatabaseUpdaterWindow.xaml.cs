@@ -154,8 +154,6 @@ namespace TBChestTracker
             ClanManager.Instance.ClanChestManager.Database.Version = 3;
             ClanManager.Instance.ClanChestManager.Database.ClanChestData = tmp_clanchestdata;
             ClanManager.Instance.ClanChestManager.Save();
-
-
             return true;
         }
         private async void BeginUpgrade(IProgress<UpgradeProgressStatus> progress)
@@ -212,6 +210,7 @@ namespace TBChestTracker
 
         private void CloseBtn_Click(object sender, RoutedEventArgs e)
         {
+            this.DialogResult = true;
             this.Close();
         }
     }

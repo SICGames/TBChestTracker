@@ -62,20 +62,8 @@ namespace TBChestTracker
                 return ChestProcessor.GetClanChestData();
             }
         }
-        public ChestProcessingState ChestProcessingState
-        {
-            get
-            {
-                try
-                {
-                    return ChestProcessor.ChestProcessingState;
-                }
-                catch (Exception e)
-                {
-                    return ChestProcessingState.NO_PROCESSOR_ATTACHED;
-                }
-            }
-        }
+        
+        public ChestProcessor GetChestProcessor() { return ChestProcessor; }
 
         public async Task WriteChests(string filename, List<string> result, ChestAutomation chestAutomation)
         {
@@ -92,6 +80,30 @@ namespace TBChestTracker
             bool r = ChestProcessor.Write(filename, result.ToArray());
         }
 
+        public async Task RollBack()
+        {
+            var db = Database.ClanChestData;
+            //-- back up clanchests.db 
+            var clanchestFile = $"{ClanManager.Instance.CurrentProjectDirectory}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseFile}";
+            var newfile = clanchestFile.Replace(".db", ".ancient");
+            try
+            {
+                File.Copy(clanchestFile, newfile, true);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            using (StreamWriter sw = new StreamWriter(clanchestFile, false))
+            {
+                var serialize = new JsonSerializer();
+                serialize.Formatting = Formatting.Indented;
+                serialize.Serialize(sw, db);
+                sw.Close();
+            }
+
+        }
         public async Task ClearCache()
         {
             var db = ClanManager.Instance.ClanDatabaseManager.ClanDatabase;
@@ -1186,10 +1198,10 @@ namespace TBChestTracker
         {
             if (Database != null)
             {
+                ChestProcessor.Dispose();
+                ChestProcessor = null;
                 Database.Dispose();
                 Database = null;
-                ChestProcessor.Dispose();
-                ChestProcessor=null;
             }
         }
     }

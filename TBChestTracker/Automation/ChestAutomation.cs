@@ -404,14 +404,19 @@ namespace TBChestTracker.Automation
                     }
 
                     token.ThrowIfCancellationRequested();
-                    
+
                     if (this.canCaptureAgain)
                     {
                         await Task.Delay(SettingsManager.Instance.Settings.AutomationSettings.AutomationScreenshotsAfterClicks);
                         CaptureRegion();
 
-                        while (ClanManager.Instance.ClanChestManager.ChestProcessingState != ChestProcessingState.COMPLETED)
+                        //--- ChestProcessingState causes an null object reference exception. 
+                        var cp = ClanManager.Instance.ClanChestManager.GetChestProcessor();
+                        if (cp != null)
                         {
+                            while (cp.ChestProcessingState != ChestProcessingState.COMPLETED)
+                            {
+                            }
                         }
                     }
                 }
