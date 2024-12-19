@@ -21,6 +21,7 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <TextBlock  Grid.Row="0" Grid.Column="0" Text="Automation Clicks" Margin="5,5" VerticalAlignment="Center"/>
         <TextBlock Grid.Row="1" Grid.Column="1" Text="* If you have a 1024 or lower resolution monitor, choose 3 instead of 4 clicks." FontWeight="Bold"/>

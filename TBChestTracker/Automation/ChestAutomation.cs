@@ -274,7 +274,6 @@ namespace TBChestTracker.Automation
             var ocrResult = e.TessResult;
             if(ocrResult != null)
             {
-                //ClanManager.Instance.ClanChestManager.ProcessChests(ocrResult.Words, this);
                 ClanManager.Instance.ClanChestManager.ProcessChestsAsRaw(ocrResult.Words, this);
             }
         }
@@ -434,6 +433,18 @@ namespace TBChestTracker.Automation
         }
         public void StartAutomation()
         {
+            if(CancellationToken != null)
+            {
+                //-- we've ran a chest count.
+                if(CancellationToken.Token.IsCancellationRequested == false)
+                {
+                    //-- we can assume we have successfully cancelled it. 
+                    CancellationToken.Dispose();
+                    isRunning = false;
+                    AppContext.Instance.AutomationRunning = false;
+                }
+            }
+
             CancellationToken = new CancellationTokenSource();
             onAutomationStarted(new AutomationEventArguments(true, false));
             StartAutomationTask(CancellationToken.Token);
@@ -450,6 +461,7 @@ namespace TBChestTracker.Automation
                 {
                     CancellationToken.Cancel();
                     isRunning = false;
+                    AppContext.Instance.AutomationRunning = false;
                     isCancelled = true;
                     isFaulted = false;
 
