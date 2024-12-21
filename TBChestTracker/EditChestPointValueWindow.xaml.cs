@@ -166,15 +166,28 @@ namespace TBChestTracker
             this.Close();
         }
 
-        public void LoadChestPoints(ChestPoints c, int index)
+        public bool LoadChestPoints(ChestPoints c, int index)
         {
-            
-            ChestPointsItemIndex = index;
-            ChestPoints.ChestType = c.ChestType;
-            ChestPoints.ChestName = c.ChestName;
-            ChestPoints.Level = c.Level;
-            ChestPoints.PointValue = c.PointValue;
-            
+            if(c == null)
+            {
+                if (MessageBox.Show($"Unable to load Chest Point Item. Make sure it is selected from the listview in Clan Chest Management.") == MessageBoxResult.OK)
+                return false;
+            }
+
+            try
+            {
+                ChestPointsItemIndex = index;
+                ChestPoints.ChestType = c.ChestType;
+                ChestPoints.ChestName = c.ChestName;
+                ChestPoints.Level = c.Level;
+                ChestPoints.PointValue = c.PointValue;
+            }
+            catch (Exception ex)
+            {
+             
+            }
+
+            return true;
         }
 
         private void UpdateChestTypeSelection()

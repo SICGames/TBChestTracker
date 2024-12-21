@@ -162,7 +162,7 @@ namespace TBChestTracker
             }
             await ChestProcessor.Build(files, progress, Database);
         }
-
+        /*
         public async Task ProcessChests(List<string> result, ChestAutomation chestAutomation)
         {
             if (chestAutomation == null)
@@ -172,6 +172,7 @@ namespace TBChestTracker
             
            await ChestProcessor.Process(result, chestAutomation, Database);
         }
+        */
         public async Task ProcessChestsAsRaw(List<string> result, ChestAutomation chestautomation)
         {
             if (chestautomation == null)
