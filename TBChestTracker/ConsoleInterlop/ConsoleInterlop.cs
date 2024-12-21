@@ -46,6 +46,7 @@ namespace TBChestTracker
                 pProcess.StartInfo.RedirectStandardError = true;
                 pProcess.StartInfo.CreateNoWindow = true;
                 pProcess.EnableRaisingEvents = true;
+                pProcess.StartInfo.Verb = "runas";
                 pProcess.Start();
                 pProcess.OutputDataReceived += PProcess_OutputDataReceived;
 

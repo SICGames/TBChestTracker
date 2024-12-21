@@ -340,15 +340,18 @@ namespace TBChestTracker.Automation
 
                     try
                     {
-                        var ocrResult = OCREngine.Read(outputImage);
+                        if (outputImage != null)
+                        {
+                            var ocrResult = OCREngine.Read(outputImage);
 
-                        AutomationTextProcessedEventArguments arg = new AutomationTextProcessedEventArguments(ocrResult);
-                        onTextProcessed(arg);
+                            AutomationTextProcessedEventArguments arg = new AutomationTextProcessedEventArguments(ocrResult);
+                            onTextProcessed(arg);
 
-                        outputImage.Dispose();
-                        original_image.Dispose();
-                        bitmap.Dispose();
-                        e.ScreenCapturedBitmap.Dispose();
+                            outputImage.Dispose();
+                            original_image.Dispose();
+                            bitmap.Dispose();
+                            e.ScreenCapturedBitmap.Dispose();
+                        }
                     }
                     catch (Exception ex)
                     {
