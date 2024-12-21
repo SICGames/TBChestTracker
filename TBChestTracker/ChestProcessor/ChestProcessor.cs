@@ -9,12 +9,14 @@ using System.IO;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using TBChestTracker.Automation;
 using TBChestTracker.Helpers;
 using TBChestTracker.Managers;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TBChestTracker
 {
@@ -266,7 +268,7 @@ namespace TBChestTracker
                             {
                                 final_result.Add(r);
                             }
-                            var p = new BuildingChestsProgress($"Processing Clan Chests Cache for {datestring} ({currentLineRead}/{maxLines})...", maxLines, currentLineRead, false);
+                            var p = new BuildingChestsProgress($"Processing Clan Chests Cache for {datestring} ({currentLineRead}/{maxLines})...",-1, maxLines, currentLineRead, false);
                             progress.Report(p);
                             await Task.Delay(10);
                             currentLineRead++;
@@ -307,7 +309,7 @@ namespace TBChestTracker
                 var _inc = bContainsIndex > -1 ? 4 : 3;
 
                 int maxChestBoxes = result.Count / _inc;
-                var p = new BuildingChestsProgress($"Creating ChestBoxes ({currentCheckBox}/{maxChestBoxes})...", maxChestBoxes, currentCheckBox, false);
+                var p = new BuildingChestsProgress($"Creating ChestBoxes ({currentCheckBox}/{maxChestBoxes})...", -1, maxChestBoxes, currentCheckBox, false);
                 progress.Report(p);
 
                 //-- tmpResult somehow returns 2 whereas it should be 3 or 4.
@@ -355,7 +357,7 @@ namespace TBChestTracker
 
             foreach (var chestbox in chestboxes)
             {
-                var pra = new BuildingChestsProgress($"Processing Chest Boxes ({currentChestbox}/{maxChestBox})...", maxChestBox, currentChestbox, false);
+                var pra = new BuildingChestsProgress($"Processing Chest Boxes ({currentChestbox}/{maxChestBox})...",-1, maxChestBox, currentChestbox, false);
                 progress.Report(pra);
 
                 for (var x = 0; x < chestbox.Content.Count; x += chestbox.Content.Count)
@@ -599,27 +601,94 @@ namespace TBChestTracker
         #region Build
         public async Task<ProcessingTextResult> BuildFromCacheFile(string file, IProgress<BuildingChestsProgress> progress)
         {
-            var result = await ReadCache(file,progress);
-            var checkboxes = await BuildChestBoxes(result, progress);
-            return await ProcessChestBoxes(checkboxes, progress);
-        }
+            var checkboxes = await PrepareChestBoxesFromCache(file, progress);
+            //var result = await ReadCache(file,progress);
+            //var checkboxes = await BuildChestBoxes(result, progress);
+            if (checkboxes == null)
+            {
+                var errorProcess = new ProcessingTextResult(ProcessingStatus.UNKNOWN_ERROR, "ChestBoxBuilder.exe not found.", null, null);
+                return errorProcess;
+            }
 
+            var processedChestBoxes = await ProcessChestBoxes(checkboxes, progress);
+            return processedChestBoxes;
+        }
+        public async Task<List<ChestBox>> PrepareChestBoxesFromCache(string filename, IProgress<BuildingChestsProgress> progress)
+        {
+            var outputFile = filename;
+            outputFile = outputFile.Replace(Path.GetExtension(outputFile), ".old");
+
+            if(File.Exists("ChestBoxBuilder.exe") == false)
+            {
+                var e = new BuildingChestsProgress("ChestBoxBuilder.exe can not be located. Ensure it is inside program's directory.", 0);
+                progress.Report(e);
+                return null;
+            }
+
+            List<ChestBox> boxes = new List<ChestBox>();
+            ConsoleInterop consoleInterop = new ConsoleInterop("ChestBoxBuilder.exe", $"-i {filename} -o {outputFile} -L en_US");
+            consoleInterop.DataReceived += (s, e) =>
+            {
+                var data = e.Data;
+                if(String.IsNullOrEmpty((data)) == false)
+                {
+                    var dataArray = data.Split('\t');
+                    Regex regex = new Regex(@"\d+");
+                    var match = regex.Match(dataArray[1]);
+                    var percentageString = String.Empty;
+                    double percentage = 0;
+                    if (match.Success)
+                    {
+                        percentageString = match.Value;
+                    }
+
+                    if (!String.IsNullOrEmpty(percentageString))
+                    {
+                        percentage = Convert.ToDouble(percentageString);
+                    }
+                    var p = new BuildingChestsProgress(dataArray[0], percentage);
+                    progress.Report(p);
+                }
+                if(e.isCompleted == true)
+                {
+                    using (StreamReader sr = new StreamReader(outputFile))
+                    {
+                        var sr_data = sr.ReadToEnd();
+                        var checkboxes = sr_data.Split('#');
+                        checkboxes = checkboxes.Select(x => x.Replace("\r\n", "\n")).ToArray();
+
+                        foreach (var checkbox in checkboxes)
+                        {
+                            if (String.IsNullOrEmpty(checkbox))
+                            {
+                                continue;
+                            }
+                            var chestboxitem = new ChestBox();
+                            var checkbox_lines = checkbox.Split('\n');
+                            foreach (var checkbox_line in checkbox_lines)
+                            {
+                                if (!String.IsNullOrEmpty(checkbox_line))
+                                {
+                                    chestboxitem.Content.Add(checkbox_line);
+                                }
+                            }
+
+                            boxes.Add(chestboxitem);
+                        }
+                    }
+                }
+            };
+            CancellationTokenSource cts = new CancellationTokenSource();
+            
+            await consoleInterop.Run(cts.Token);
+
+            return boxes;
+        }
         public async Task Build(string[] files, IProgress<BuildingChestsProgress> progress, ClanChestDatabase database)
         {
             var filesMax = files.Length;
             var currentFile = 0;
-            TimeSpan elapsed = TimeSpan.Zero;
-            var snapshots = new Queue<long>(30);
-            var timer = new System.Timers.Timer(1000D);
-
-            timer.Elapsed += (s, o) =>
-            {
-                if(snapshots.Count == 30)
-                {
-                    snapshots.Dequeue();
-                }
-                snapshots.Enqueue(Interlocked.Exchange(ref currentFile, 0));
-            };
+            var errorOccured = false;
 
             foreach (var file in files)
             {
@@ -629,13 +698,12 @@ namespace TBChestTracker
                     if(result.Status != ProcessingStatus.OK)
                     {
                         //-- possibly cancel and present error
-                        var p = new BuildingChestsProgress($"{result.Message}", filesMax, currentFile, false);
+                        var p = new BuildingChestsProgress($"{result.Message}", -1,filesMax, currentFile, false);
                         progress.Report(p);
+                        errorOccured = true;
                         currentFile++;
                         continue;
                     }
-
-
 
                     List<ChestData> tmpchests = result.ChestData;
                     IList<ClanChestData> tmpchestdata = CreateClanChestData(tmpchests);
@@ -665,7 +733,7 @@ namespace TBChestTracker
                     var mate_index = 0;
                     Parallel.ForEach(tmpchestdata.ToList(), async tmpchest =>  //foreach (var tmpchest in tmpchestdata.ToList())
                     {
-                        var pp = new BuildingChestsProgress($"Building Temporary Chest Boxes ({currentTempChestDataCount}/{tmpchestdata.Count}) for ${datestring}", tmpchestdata.Count, currentChestDataCount, false);
+                        var pp = new BuildingChestsProgress($"Building Temporary Chest Boxes ({currentTempChestDataCount}/{tmpchestdata.Count}) for ${datestring}",-1, tmpchestdata.Count, currentChestDataCount, false);
                         progress.Report(pp);
                         
                         await Task.Delay(100);
@@ -713,7 +781,7 @@ namespace TBChestTracker
                         var _chestdata = tmpchestdata.Where(name => name.Clanmate.Equals(chestdata.Clanmate,
                             StringComparison.CurrentCultureIgnoreCase)).Select(chests => chests).ToList();
 
-                        var ppp = new BuildingChestsProgress($"Building Chest Data ({currentChestDataCount}/{tmp_ClanChestData.Count} for {datestring}", tmp_ClanChestData.Count, currentChestDataCount, false);
+                        var ppp = new BuildingChestsProgress($"Building Chest Data ({currentChestDataCount}/{tmp_ClanChestData.Count} for {datestring}", -1, tmp_ClanChestData.Count, currentChestDataCount, false);
                         progress.Report(ppp);
 
                         if (_chestdata.Count > 0)
@@ -814,8 +882,12 @@ namespace TBChestTracker
                 await Task.Delay(250);
             }
 
-            var p2 = new BuildingChestsProgress($"Finished Building Clan Chests...", filesMax, currentFile, true);
-            progress.Report(p2);
+
+            if (errorOccured == false)
+            {
+                var p2 = new BuildingChestsProgress($"Finished Building Clan Chests...", -1, filesMax, currentFile, true);
+                progress.Report(p2);
+            }
         }
         #endregion
 

@@ -112,6 +112,8 @@ namespace TBChestTracker
             var archiveFolder = $"{clanfolder}\\archives";
             var cacheFolder = $"{clanfolder}\\cache";
             DirectoryInfo di = new DirectoryInfo(cacheFolder);
+            bool saved = false;
+
             if (di.Exists)
             {
                 var files = di.GetFiles("*.txt");
@@ -126,8 +128,28 @@ namespace TBChestTracker
                 foreach (var file in files)
                 {
                     var destFilename = $"{archiveFolder}\\{file.Name}";
+                    var extPos = destFilename.LastIndexOf(Path.GetExtension(destFilename));
+                    var timestamp = DateTime.Now.ToString("HH-mm-ss-ffff");
+                    destFilename = destFilename.Insert(extPos, $"_{timestamp}");
+
                     File.Copy(file.FullName, destFilename, true);
                     file.Delete();
+                    saved = true;
+                }
+                if(saved)
+                {
+                    //-- remove all files inside cache.
+                    var f = di.GetFiles();
+                    try
+                    {
+                        foreach (var _f in f)
+                        {
+                            _f.Delete();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                    }
                 }
             }
         }

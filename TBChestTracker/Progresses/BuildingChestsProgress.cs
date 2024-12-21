@@ -14,12 +14,12 @@ namespace TBChestTracker
         public double Progress { get; set; }
         public bool isFinished { get; set; }
 
-        public BuildingChestsProgress(string status, double total, double current, bool isFinished)
+        public BuildingChestsProgress(string status, double progress, double total = 0, double current = 0, bool isFinished = false)
         {
             Status = status;
             Total = total;
             Current = current;
-            Progress = current / total * 100.0;
+            Progress = progress == -1 ? current / total * 100.0 : progress;
             this.isFinished = isFinished;
         }
     }

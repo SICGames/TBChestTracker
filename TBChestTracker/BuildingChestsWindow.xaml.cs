@@ -95,7 +95,7 @@ namespace TBChestTracker
                     var files = di.GetFiles("*.txt");
                     var filepaths = files.Select(f => f.FullName).ToArray();
 
-                    var p = new BuildingChestsProgress("Preparing to build clan chests data...", 0, 0, false);
+                    var p = new BuildingChestsProgress("Preparing to build clan chests data...",0, 0, 0, false);
                     progress.Report(p);
 
                     await ClanManager.Instance.ClanChestManager.BuildChests(filepaths, progress);
@@ -111,13 +111,15 @@ namespace TBChestTracker
                 UpdateUI(o.Status, o.Progress);
                 if(o.isFinished)
                 {
-                    if(SettingsManager.Instance.Settings.AutomationSettings.AutomaticallyCloseChestBuildingDialogAfterFinished)
+                    if (SettingsManager.Instance.Settings.AutomationSettings.AutomaticallyCloseChestBuildingDialogAfterFinished)
                     {
                         this.DialogResult = true;
                         this.Close();
                     }
-                    
-                    PanelVisible = Visibility.Visible;
+                    else
+                    {
+                        PanelVisible = Visibility.Visible;
+                    }
                 }
                 else
                 {

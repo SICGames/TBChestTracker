@@ -399,7 +399,7 @@ namespace TBChestTracker
                 {
                     ClanManager.Instance.ClanChestManager.Save();
                     ClanManager.Instance.ClanChestManager.CreateBackup();
-
+                    
                     if (SettingsManager.Instance.Settings.AutomationSettings.AutoRepairAfterStoppingAutomation)
                     {
                         if (ClanManager.Instance.ClanChestManager.CheckIntegrity() != null)

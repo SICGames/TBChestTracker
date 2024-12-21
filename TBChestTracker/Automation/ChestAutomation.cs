@@ -194,8 +194,8 @@ namespace TBChestTracker.Automation
             ChestProcessingFailed += ChestAutomation_ChestProcessingFailed;
             ProcessingClicks += ChestAutomation_ProcessingClicks;
             ProcessedClicks += ChestAutomation_ProcessedClicks;
-            ChestDataSaving += ChestAutomation_ChestDataSaving;
-            ChestDataSaved += ChestAutomation_ChestDataSaved;
+            //ChestDataSaving += ChestAutomation_ChestDataSaving;
+            //ChestDataSaved += ChestAutomation_ChestDataSaved;
             return true;
         }
 
@@ -221,9 +221,8 @@ namespace TBChestTracker.Automation
         {
             if(e.ProcessedClicks == true)
             {
-                onChestDataSaving(new AutomationChestSaveEventArguments(true, false));
-
-                //this.canCaptureAgain = true;
+                //onChestDataSaving(new AutomationChestSaveEventArguments(true, false));
+                this.canCaptureAgain = true;
             }
         }
 
@@ -297,61 +296,74 @@ namespace TBChestTracker.Automation
         {
             try
             {
-                CancellationToken.Token.ThrowIfCancellationRequested();
-                
-                var bitmap = e.ScreenCapturedBitmap;
-                var ocrSettings = SettingsManager.Instance.Settings.OCRSettings;
-                var brightness = ocrSettings.GlobalBrightness;
-                var threshold = new Gray(ocrSettings.Threshold); //-- 85
-                var maxThreshold = new Gray(ocrSettings.MaxThreshold); //--- 255
-
-                bool bSave = false;
-                string outputPath = String.Empty;
-
-                Mat outputImage = new Mat();
-                Mat original_image = bitmap.ToImage<Bgr, Byte>().Mat;
-
-                if (AppContext.Instance.SaveOCRImages)
+                if (isRunning)
                 {
-                    bSave = true;
-                    outputPath = $@"{AppContext.Instance.AppFolder}\Output";
-                    System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(outputPath);
-                    if (di.Exists == false)
+                    CancellationToken.Token.ThrowIfCancellationRequested();
+                    Debug.WriteLine($"Automation is running.");
+                    var bitmap = e.ScreenCapturedBitmap;
+                    var ocrSettings = SettingsManager.Instance.Settings.OCRSettings;
+                    var brightness = ocrSettings.GlobalBrightness;
+                    var threshold = new Gray(ocrSettings.Threshold); //-- 85
+                    var maxThreshold = new Gray(ocrSettings.MaxThreshold); //--- 255
+
+                    bool bSave = false;
+                    string outputPath = String.Empty;
+
+                    Mat outputImage = new Mat();
+                    Mat original_image = bitmap.ToImage<Bgr, Byte>().Mat;
+
+                    if (AppContext.Instance.SaveOCRImages)
                     {
-                        di.Create();
+                        bSave = true;
+                        outputPath = $@"{AppContext.Instance.AppFolder}\Output";
+                        System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(outputPath);
+                        if (di.Exists == false)
+                        {
+                            di.Create();
+                        }
+                        original_image.Save($@"{outputPath}\OCR_ImageOriginal.png");
                     }
-                    original_image.Save($@"{outputPath}\OCR_ImageOriginal.png");
+
+                    outputImage = ImageEffects.ConvertToGrayscale(original_image, bSave, outputPath);
+                    outputImage = ImageEffects.Brighten(outputImage, brightness, bSave, outputPath);
+
+                    //-- OCR Incorrect Text Bug - e.g. Slash Jr III is read Slash )r III
+                    //-- Fix: Upscaling input image large enough to read properly.
+                    outputImage = ImageEffects.Resize(outputImage, 3, Emgu.CV.CvEnum.Inter.Cubic, bSave, outputPath);
+                    outputImage = ImageEffects.ThresholdBinaryInv(outputImage, threshold, maxThreshold, bSave, outputPath);
+                    //-- if it is null or empty somehow, we update it.
+                    if (String.IsNullOrEmpty(ocrSettings.PreviewImage))
+                    {
+                        outputImage.Save($@"{AppContext.Instance.LocalApplicationPath}\preview_image.png");
+                        ocrSettings.PreviewImage = $@"{AppContext.Instance.LocalApplicationPath}\preview_image.png";
+                    }
+
+                    try
+                    {
+                        var ocrResult = OCREngine.Read(outputImage);
+
+                        AutomationTextProcessedEventArguments arg = new AutomationTextProcessedEventArguments(ocrResult);
+                        onTextProcessed(arg);
+
+                        outputImage.Dispose();
+                        original_image.Dispose();
+                        bitmap.Dispose();
+                        e.ScreenCapturedBitmap.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        {
+                            if (ex is AccessViolationException)
+                            {
+                                Debug.WriteLine(ex.Message);
+                            }
+                        }
+                    }
                 }
-
-                outputImage = ImageEffects.ConvertToGrayscale(original_image, bSave, outputPath);
-                outputImage = ImageEffects.Brighten(outputImage, brightness, bSave, outputPath);
-
-                //-- OCR Incorrect Text Bug - e.g. Slash Jr III is read Slash )r III
-                //-- Fix: Upscaling input image large enough to read properly.
-                outputImage = ImageEffects.Resize(outputImage, 3, Emgu.CV.CvEnum.Inter.Cubic, bSave, outputPath);
-                outputImage = ImageEffects.ThresholdBinaryInv(outputImage, threshold, maxThreshold, bSave, outputPath);
-                //-- if it is null or empty somehow, we update it.
-                if (String.IsNullOrEmpty(ocrSettings.PreviewImage))
-                {
-                    outputImage.Save($@"{AppContext.Instance.LocalApplicationPath}\preview_image.png");
-                    ocrSettings.PreviewImage = $@"{AppContext.Instance.LocalApplicationPath}\preview_image.png";
-                }
-
-                var ocrResult = OCREngine.Read(outputImage);
-                
-                AutomationTextProcessedEventArguments arg = new AutomationTextProcessedEventArguments(ocrResult);
-                onTextProcessed(arg);
-
-                outputImage.Dispose();
-                original_image.Dispose();
-                bitmap.Dispose();
-
-                e.ScreenCapturedBitmap.Dispose();
-
             }
             catch (OperationCanceledException ex) when (ex.CancellationToken == CancellationToken.Token)
             {
-
+                Debug.WriteLine("Aborting Automation");
             }
             catch(Exception ex)
             {
@@ -360,8 +372,6 @@ namespace TBChestTracker.Automation
 
         }
         #endregion
-
-
         private void CaptureRegion()
         {
             var capture_region = SettingsManager.Instance.Settings.OCRSettings.SuggestedAreaOfInterest;
@@ -388,63 +398,63 @@ namespace TBChestTracker.Automation
             this.canCaptureAgain = true;
             try
             {
-                token.ThrowIfCancellationRequested();
+               // token.ThrowIfCancellationRequested();
                 clicksTotal = 0;
+
+                Debug.WriteLine("Automation is beginning to run...");
 
                 while (isRunning)
                 {
-                    var automationSettings = SettingsManager.Instance.Settings.AutomationSettings;
-                    if(automationSettings.StopAutomationAfterClicks > 0)
+                    try
                     {
-                        if(clicksTotal >= automationSettings.StopAutomationAfterClicks)
+
+                        var automationSettings = SettingsManager.Instance.Settings.AutomationSettings;
+                        if (automationSettings.StopAutomationAfterClicks > 0)
                         {
-                            break;
-                        }
-                    }
-
-                    token.ThrowIfCancellationRequested();
-
-                    if (this.canCaptureAgain)
-                    {
-                        await Task.Delay(SettingsManager.Instance.Settings.AutomationSettings.AutomationScreenshotsAfterClicks);
-                        CaptureRegion();
-
-                        //--- ChestProcessingState causes an null object reference exception. 
-                        var cp = ClanManager.Instance.ClanChestManager.GetChestProcessor();
-                        if (cp != null)
-                        {
-                            while (cp.ChestProcessingState != ChestProcessingState.COMPLETED)
+                            if (clicksTotal >= automationSettings.StopAutomationAfterClicks)
                             {
+                                break;
                             }
                         }
+                        if (this.canCaptureAgain)
+                        {
+                            await Task.Delay(SettingsManager.Instance.Settings.AutomationSettings.AutomationScreenshotsAfterClicks);
+                            CaptureRegion();
+
+                            //--- ChestProcessingState causes an null object reference exception. 
+                            var cp = ClanManager.Instance.ClanChestManager.GetChestProcessor();
+                            if (cp != null)
+                            {
+                                while (cp.ChestProcessingState != ChestProcessingState.COMPLETED)
+                                {
+                                }
+                            }
+                        }
+                    }
+                    catch(OperationCanceledException e)
+                    {
+                        Debug.WriteLine("Automation is being cancelled...");
                     }
                 }
             }
             catch (OperationCanceledException e) when (e.CancellationToken == token)
             {
-
+                Debug.WriteLine("Automation is being cancelled like a celebrity...");
             }
             catch (Exception e)
             {
 
             }
 
-            StopAutomation();
+            //StopAutomation();
         }
         public void StartAutomation()
         {
             if(CancellationToken != null)
             {
-                //-- we've ran a chest count.
-                if(CancellationToken.Token.IsCancellationRequested == false)
-                {
-                    //-- we can assume we have successfully cancelled it. 
-                    CancellationToken.Dispose();
-                    isRunning = false;
-                    AppContext.Instance.AutomationRunning = false;
-                }
+                CancellationToken.Dispose();
             }
-
+            Debug.WriteLine($"Automation is being started.");
             CancellationToken = new CancellationTokenSource();
             onAutomationStarted(new AutomationEventArguments(true, false));
             StartAutomationTask(CancellationToken.Token);
@@ -459,6 +469,7 @@ namespace TBChestTracker.Automation
 
                 if (CancellationToken != null)
                 {
+                    Debug.WriteLine($"Automation is being stopped.");
                     CancellationToken.Cancel();
                     isRunning = false;
                     AppContext.Instance.AutomationRunning = false;
