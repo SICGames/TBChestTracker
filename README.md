@@ -3,9 +3,6 @@
 ![GitHub contributors](https://img.shields.io/github/contributors/SICGames/TBChestTracker)
 [![Github All Releases](https://img.shields.io/github/downloads/SICGames/TBChestTracker/total.svg)]()
 
-## Become a Patreon 
-If you want to support this project, become a Patreon and get access to the Discord server. 
-[Click Here](https://www.patreon.com/TotalBattleGuide) to become a Patreon and support this project.
 ## Description
 TotalBattle Chest Tracker was designed to easily track your clan's chest count. 
 
@@ -52,8 +49,13 @@ Clanmate Management
  
 </details>
 
+## Become a Patreon 
+If you want to support this project, become a Patreon and get access to the Discord server. 
+[Click Here](https://www.patreon.com/TotalBattleGuide) to become a Patreon and support this project.
+
+
 ## Are you stuck on something?
-Watch the Youtube videos under Total Battle Chest Tracker Troubleshooting. 
+Watch the Youtube videos 
 [TotalBattleGuide - Youtube Channel](https://www.youtube.com/@TotalBattleGuide)
 
 ## How to install
