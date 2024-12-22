@@ -94,12 +94,20 @@ namespace TBChestTracker
                 {
                     var files = di.GetFiles("*.txt");
                     var filepaths = files.Select(f => f.FullName).ToArray();
+                    if (filepaths.Length > 0)
+                    {
+                        var p = new BuildingChestsProgress("Preparing...", -1, 0, 0, false);
+                        progress.Report(p);
+                        await Task.Delay(100);
 
-                    var p = new BuildingChestsProgress("Preparing to build clan chests data...",0, 0, 0, false);
-                    progress.Report(p);
-
-                    await ClanManager.Instance.ClanChestManager.BuildChests(filepaths, progress);
-                    
+                        await ClanManager.Instance.ClanChestManager.BuildChests(filepaths, progress);
+                    }
+                    else
+                    {
+                        var p = new BuildingChestsProgress($"No suitable cached files found within {di.FullName}...", -1, 0, 0, false);
+                        progress.Report(p);
+                        await Task.Delay(100);
+                    }
                 }
             });
         }
@@ -126,6 +134,7 @@ namespace TBChestTracker
                     PanelVisible = Visibility.Hidden;
                 }
             };
+
             BeginBuildingChestsTask(progress);
         }
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace TBChestTracker
 {
@@ -33,9 +34,9 @@ namespace TBChestTracker
             this.WorkingDirectoryPath = workingDirectoryPath;
 
         }
-        private Task ExecuteProcessTask(bool waitForExit)
+        private Task<bool> ExecuteProcessTask(bool waitForExit, bool runAsAdmin = false)
         {
-            return Task.Run(() =>
+            try
             {
                 pProcess = new Process();
                 pProcess.StartInfo.FileName = Application;
@@ -46,16 +47,29 @@ namespace TBChestTracker
                 pProcess.StartInfo.RedirectStandardError = true;
                 pProcess.StartInfo.CreateNoWindow = true;
                 pProcess.EnableRaisingEvents = true;
-                pProcess.StartInfo.Verb = "runas";
+                if (runAsAdmin)
+                {
+                    pProcess.StartInfo.Verb = "runas";
+                }
                 pProcess.Start();
                 pProcess.OutputDataReceived += PProcess_OutputDataReceived;
 
                 pProcess.BeginOutputReadLine();
-                if(waitForExit)
+                if (waitForExit)
                 {
                     pProcess.WaitForExit();
                 }
-            });
+            
+            }
+            catch (Exception ex)
+            {
+                if(MessageBox.Show($"Failed to start {Application}. Reason: {ex.Message}") == MessageBoxResult.OK)
+                {
+                    return Task.FromResult(false);
+                }
+            }
+
+            return Task.FromResult(true);
         }
         private Task KillTask()
         {
@@ -87,18 +101,20 @@ namespace TBChestTracker
             onDataReceived(args);
         }
 
-        public async Task Run(CancellationToken? token, bool bWaitForExit = true)
+        public async Task<bool> Run(CancellationToken? token, bool bWaitForExit = true)
         {
             try
             {
-                await ExecuteProcessTask(bWaitForExit);
+                bool result = await ExecuteProcessTask(bWaitForExit);
+                return result;
             }
             catch (OperationCanceledException ex)
             {
                 await Kill();
             }
-            return;
+            return false;
         }
+
         public async Task Kill()
         {
             await KillTask();
