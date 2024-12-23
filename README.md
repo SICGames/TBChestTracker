@@ -3,6 +3,9 @@
 ![GitHub contributors](https://img.shields.io/github/contributors/SICGames/TBChestTracker)
 [![Github All Releases](https://img.shields.io/github/downloads/SICGames/TBChestTracker/total.svg)]()
 
+## Known Issues 
+There's a known issues on some systems that either prevent ChestBoxBuilder.exe from running and crashing to desktop. Look at [Issue #111](https://github.com/SICGames/TBChestTracker/issues/111) for more progress on this issue.
+
 ## Description
 TotalBattle Chest Tracker was designed to easily track your clan's chest count. 
 
