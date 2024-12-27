@@ -4,7 +4,7 @@
 [![Github All Releases](https://img.shields.io/github/downloads/SICGames/TBChestTracker/total.svg)]()
 
 ## Known Issues 
-There's a known issues on some systems that either prevent ChestBoxBuilder.exe from running and crashing to desktop. Look at [Issue #111](https://github.com/SICGames/TBChestTracker/issues/111) for more progress on this issue.
+There's a known issues on some systems that either prevent ChestBoxBuilder.exe from running and crashing to desktop. Look at [Issue #111](https://github.com/SICGames/TBChestTracker/issues/111) for more progress on this issue. So far, this seems to be resolved in RC 2.6.4. Thanks for your patience while dealing with small hiccups. 
 
 RC 2.5.2 works as confirmed by others. use that instead. 
 
