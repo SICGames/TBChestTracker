@@ -20,9 +20,14 @@ namespace TBChestTracker
         {
             //-- catches every exception across application domain
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-
             //--- catches exceptions tossed by any function using async operations. 
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+            Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
+        }
+
+        private void Current_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            CrashBoxDialog.Show(e.Exception);
         }
 
         private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)

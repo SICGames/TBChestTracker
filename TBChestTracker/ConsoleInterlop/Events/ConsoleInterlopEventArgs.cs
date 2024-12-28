@@ -1,6 +1,8 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,12 +10,14 @@ namespace TBChestTracker
 {
     public class ConsoleInterlopEventArgs : EventArgs
     {
+        public int? StatusCode { get; set; }
         public string? Data { get; set; }
-        public bool? isCompleted { get; set; }
-        public ConsoleInterlopEventArgs(string? data, bool? completed)
+        public double? Percent { get; set; }
+        public ConsoleInterlopEventArgs(int? statuscode, string? data, double? percent)
         {
+            this.StatusCode = statuscode;
             this.Data = data;
-            this.isCompleted = completed;
+            this.Percent = percent;
         }
     }
 }

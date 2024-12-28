@@ -117,8 +117,7 @@ namespace TBChestTracker
         
         public void Save()
         {
-            var root = $@"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
-            var clanFolder = $@"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}";
+            var clanFolder = $@"{ClanManager.Instance.CurrentProjectDirectory}";
             var clanmatedb = $@"{clanFolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanmateDatabaseFile}";
             using (StreamWriter sw = File.CreateText(clanmatedb))
             {

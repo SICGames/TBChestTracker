@@ -181,7 +181,7 @@ namespace TBChestTracker
             }
             await ChestProcessor.ProcessToCache(result, chestautomation);
         }
-        public bool Load(string filename = "")
+        public CommonResult Load(string filename = "")
         {
             try
             {
@@ -206,7 +206,7 @@ namespace TBChestTracker
                 if (!System.IO.File.Exists(clanmatefile))
                 {
                     AppContext.Instance.ClanmatesBeenAdded = false;
-                    return false;
+                    return new CommonResult(CommonResultCodes.Fail, "You do not have a clanmates.db file.");
                 }
                 else
                 {
@@ -214,6 +214,7 @@ namespace TBChestTracker
                     {
                         //-- there's a problem loading clanmate file.
                         com.HellStormGames.Logging.Console.Write($@"Failed to load clanmate database file.", "Load Issue", LogType.ERROR);
+
                     }
                 }
 
@@ -225,9 +226,7 @@ namespace TBChestTracker
                 if (!System.IO.File.Exists(filename))
                 {
                     Database.NewEntry(DateTime.Now.ToString(AppContext.Instance.ForcedDateFormat));
-                    //ClanChestDailyData.Add(DateTime.Now.ToString(AppContext.Instance.ForcedDateFormat, new CultureInfo(CultureInfo.CurrentCulture.Name)), clanChestData);
                     Save();
-                    //await SaveDataTask();
                 }
                 else
                 {
@@ -252,7 +251,7 @@ namespace TBChestTracker
 
                 if(clanchestcorrupted)
                 {
-                    return false;
+                    return new CommonResult(CommonResultCodes.Error, "Tried to load ClanChests.db file but failed. It could be possibly corrupted.");
                 }
 
                 //-- load clan chest settings
@@ -286,14 +285,14 @@ namespace TBChestTracker
                     }
                 }
 
-                return true;
+                return new CommonResult(CommonResultCodes.Success, "Everything went peachy.");
             }
             catch (Exception ex)
             {
-                return false;
+                return new CommonResult(CommonResult.Error, $"Oops! Something really bad happened. An exception was caught. Reason for this error: {ex.Message}");
             }
         }
-        public bool Save(string filename = "")
+        public CommonResult Save(string filename = "")
         {
             try
             {
@@ -325,11 +324,11 @@ namespace TBChestTracker
             }
             catch (Exception ex)
             {
-                return false;
+                return new CommonResult(CommonResult.Error, $"Oops! Something really bad happened. An exception was caught. Reason for this error: {ex.Message}");
             }
-            return true;
+            return new CommonResult(CommonResultCodes.Success, "Everything went smooth.");
         }
-        public bool SaveBackup(string filename)
+        public CommonResult SaveBackup(string filename)
         {
             if (String.IsNullOrEmpty(filename))
             {
@@ -346,13 +345,13 @@ namespace TBChestTracker
                 }
             }
             catch (Exception ex) 
-            { 
-                return false; 
+            {
+                return new CommonResult(CommonResult.Error, $"Oops! Something really bad happened. An exception was caught. Reason for this error: {ex.Message}");
             }
 
-            return true;
+            return new CommonResult(CommonResultCodes.Success, "Everything went smooth");
         }
-        public bool CreateBackup(string filename = "")
+        public CommonResult CreateBackup(string filename = "")
         {
             try
             {
@@ -369,35 +368,36 @@ namespace TBChestTracker
                 DateTime dateTimeOffset = DateTime.Now;
                 string file = $"{clanchestsBackupFolder}\\clanchest_backup_{dateTimeOffset.ConvertToUnixTimeStamp()}.db";
 
-                if (SaveBackup(file))
+                if (SaveBackup(file).Code == CommonResultCodes.Success)
                 {
-                    return true;
+                    return new CommonResult(CommonResultCodes.Success, "Everything went smooth");
                 }
-                return false;
+                return new CommonResult(CommonResultCodes.Fail, $"Wasn't able to create a backup for {file}.");
             }
             catch (Exception ex)
             {
-                return false;
+                return new CommonResult(CommonResult.Error, $"Oops! Something really bad happened. An exception was caught. Reason for this error: {ex.Message}");
             }
         }
 
-        public bool LoadBackup(string filename)
+        public CommonResult LoadBackup(string filename)
         {
             try
             {
                 Database.RemoveAllEntries();
-                if (Load(filename))
+                var result = Load(filename);
+                if (result.Code == CommonResultCodes.Success)
                 {
-                    return true;
+                    return new CommonResult(CommonResultCodes.Success, "Everything went smooth");
                 }
                 else
                 {
-                    return false;
+                    return new CommonResult(CommonResult.Fail, result.Message);
                 }
             }
             catch (Exception ex)
             {
-                return false;
+                return new CommonResult(CommonResult.Error, $"Oops! Something really bad happened. An exception was caught. Reason for this error: {ex.Message}");
             }
         }
 
@@ -971,9 +971,9 @@ namespace TBChestTracker
             var dateformat = DateFormat;
             var currentCulture = CultureInfo.CurrentCulture; //-- en-GB
 
-            if (result == false)
+            if (result.Code != CommonResultCodes.Success)
             {
-                MessageBox.Show("Unable to build clan data. Something went horribly wrong.", "Building Clan Data Failed");
+                MessageBox.Show($"{result.Message}", "Building Clan Data Failed");
                 return ChestDataBuildResult.LOAD_FAIL;
             }
             var build_result = ChestProcessor.Init(Database);

@@ -49,7 +49,7 @@ namespace TBChestTracker
                 return;
             }
 
-            var clanrootfolder = $"{mainpath}{clanname}";
+            var clanrootfolder = $"{mainpath}\\{clanname}";
 
             ClanDatabase.ClanFolderPath = clanname;
             ClanDatabase.ClanChestDatabaseExportFolderPath = $"\\exports";
@@ -64,25 +64,11 @@ namespace TBChestTracker
 
             result( true ); 
         }
-        public void Update()
-        {
-
-        }
-
-        
-        public void Move(string oldClanRoot,string newClanRoot)
-        {
-           // CopyDirectory(oldClanRoot, newClanRoot, true);
-        }
-        
-        public void Delete()
-        {
-
-        }
+       
         public void Save()
         {
-            var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
-            var saveFilePath = $"{root}{ClanDatabase.ClanFolderPath}\\clan.cdb";
+            var root = $"{ClanManager.Instance.CurrentProjectDirectory}";
+            var saveFilePath = $"{root}\\clan.cdb";
             using (System.IO.StreamWriter sw = System.IO.File.CreateText(saveFilePath))
             {
                 JsonSerializer serializer = new JsonSerializer();
@@ -168,8 +154,6 @@ namespace TBChestTracker
 
                             }
                         }
-
-                      
                         result(true);
                     }
                 }
@@ -182,35 +166,6 @@ namespace TBChestTracker
             {
                 result(false);
             }
-            /*
-            using (StreamReader sr = File.OpenText(file))
-            {
-                try
-                {
-
-                    JsonSerializer serializer = new JsonSerializer();
-                    serializer.Formatting = Formatting.Indented;
-                    ClanDatabase = (ClanDatabase)serializer.Deserialize(sr, typeof(ClanDatabase));
-                    if (ClanDatabase != null)
-                    {
-                        //-- parse prefixes if used 
-                        //--- %MY_DOCUMENTS% - User Documents
-
-                        m_ClanChestManager.BuildData();
-                        AppContext.Instance.NewClandatabaseBeenCreated = true;
-                        CommandManager.InvalidateRequerySuggested();
-                        result(true);
-                    }
-                    else
-                        result(false);
-                }
-                catch (Exception ex)
-                {
-                    result(false);
-                }
-            }
-            */
-
         }
 
         public Dictionary<string, bool> ClanDatabasesToUpgrade()
@@ -270,7 +225,6 @@ namespace TBChestTracker
                     sr.Close();
                     sr.Dispose();
                 }
-                
             }
             return DatabasesRequireUpgrade;
         }

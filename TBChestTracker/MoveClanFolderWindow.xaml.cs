@@ -25,7 +25,7 @@ namespace TBChestTracker
     public partial class MoveClanFolderWindow : Window, INotifyPropertyChanged
     {
 
-        public string OldClanRootFOlder { get; set; }
+        public string OldClanRootFolder { get; set; }
         public string NewClanRootFolder {  get; set; }
 
         private string _status = "";
@@ -74,10 +74,13 @@ namespace TBChestTracker
 
         private CancellationTokenSource _CancellationTokenSource;
 
-        public MoveClanFolderWindow()
+        public MoveClanFolderWindow(string src, string dest)
         {
             InitializeComponent();
+            OldClanRootFolder = src;
+            NewClanRootFolder = dest;
             this.DataContext = this;
+
         }
 
 
@@ -103,7 +106,7 @@ namespace TBChestTracker
             }
         }
 
-        private async void CopyDirectoryAsync(string sourceDir, string destinationDir, bool recursive, CancellationToken token) 
+        private async Task CopyDirectoryAsync(string sourceDir, string destinationDir, bool recursive, CancellationToken token) 
         {
             Debug.WriteLine("Copying files....");
 
@@ -132,10 +135,11 @@ namespace TBChestTracker
                         Status = $"Copying - {destFile}";
                         Progressbar01.IsIndeterminate = false;
                         Progress = index;
-                        var percentage = (index / Max) * 100 + "%" ;
+                        var percentage = Math.Round((index / Max) * 100) + "%" ;
                         Percent = percentage;
 
                     }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+
                     using (FileStream destinationStream = File.OpenWrite(destFile))
                     {
                         await sourceStream.CopyToAsync(destinationStream);
@@ -164,7 +168,7 @@ namespace TBChestTracker
                     AbortButton.Text = "Close";
                 }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
                 
-                Task.Delay(1000);
+                await Task.Delay(1000);
 
                 this.Close();
             }
@@ -190,33 +194,6 @@ namespace TBChestTracker
             }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         }
 
-        //-- knowing people, they'll fuck shit up and then, "TBChestTracker sucks! It deleted my whole entire hard drive." So, manually let them delete any old clan folder.
-        //-- Trust in humans = 0%
-        /*
-        private async void DeleteFoldersAsync(string oldFolder,  CancellationToken token)
-        {
-            Debug.WriteLine("Removing files....");
-
-            var dir = new DirectoryInfo(oldFolder);
-            if (!dir.Exists)
-                throw new DirectoryNotFoundException($"Source directory not found: {dir.FullName}");
-
-            await this.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                Status = $"Cleaning Up....";
-                Progressbar01.IsIndeterminate = true;
-                Percent = String.Empty; 
-            }));
-        }
-        private Task BeginRemovingFilesTask(string oldFolder, CancellationToken token)
-        {
-            return Task.Run(() =>
-            {
-                DeleteFoldersAsync(oldFolder, token);
-            });
-        }
-        */
-
         private Task BeginCopyingTask(string oldFolder, string newFolder, CancellationToken token)
         {
             return Task.Run(() =>
@@ -235,7 +212,7 @@ namespace TBChestTracker
             _CancellationTokenSource = new CancellationTokenSource();
             //-- we need to ensure user select only drive letter
             
-            BeginMovingClanDatabasesTask(OldClanRootFOlder, NewClanRootFolder, _CancellationTokenSource.Token); 
+            BeginMovingClanDatabasesTask(OldClanRootFolder, NewClanRootFolder, _CancellationTokenSource.Token); 
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)

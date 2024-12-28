@@ -90,6 +90,13 @@ namespace TBChestTracker
                 var cacheFolder = $"{clanfolder}\\cache";
                 DirectoryInfo di = new DirectoryInfo(cacheFolder);
 
+                if(di.Exists == false)
+                {
+                    var p = new BuildingChestsProgress($"Oh no, there doesn't seem to be a cache folder. Have you done some chest counting today? Cache folder should be located in '{cacheFolder}'. So, we can not continue building chests.", -1, 0, 0, false);
+                    progress.Report(p);
+                    await Task.Delay(100);
+                    return;
+                }
                 if (di.Exists)
                 {
                     var files = di.GetFiles("*.txt");

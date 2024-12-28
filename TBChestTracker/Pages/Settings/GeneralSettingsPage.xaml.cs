@@ -69,21 +69,26 @@ namespace TBChestTracker.Pages
                 if (result == MessageBoxResult.Yes)
                 {
                     //-- C:\\
-                    var isHardDriveLetter = folder.LastIndexOf("\\") < 4;
-                    //-- fail safe just incase someone wants to get silly.
-                    if (isHardDriveLetter)
+                    var newFolderLength = folder.Length;
+                    bool bIsHardDriveLetterOnly = false;
+                    if (newFolderLength < 4)
                     {
-                        var forcedDirectory = $"{dialog.FileName}TotalBattleChestTracker";
+                        bIsHardDriveLetterOnly = true;
+                    }
+                    //-- fail safe just incase someone wants to get silly.
+                    if (bIsHardDriveLetterOnly)
+                    {
+                        var forcedDirectory = $"{folder}TotalBattleChestTracker";
                         Directory.CreateDirectory(forcedDirectory);
                         newClanRootFolder = forcedDirectory;
                     }
 
-                    MoveClanFolderWindow moveClanFolderWindow = new MoveClanFolderWindow();
-                    moveClanFolderWindow.OldClanRootFOlder = oldClanRootFolder;
-                    moveClanFolderWindow.NewClanRootFolder = newClanRootFolder;
+                    MoveClanFolderWindow moveClanFolderWindow = new MoveClanFolderWindow(oldClanRootFolder, newClanRootFolder);
                     if (moveClanFolderWindow.ShowDialog() == true)
                     {
                         SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder = newClanRootFolder;
+                        SettingsManager.Instance.Save();
+                        //-- reload clan 
                     }
                 }
             }

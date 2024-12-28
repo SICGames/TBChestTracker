@@ -859,19 +859,19 @@ namespace TBChestTracker
                 importDatabaseWindow.SourceFile = file;
                 var clanname = file.Substring(file.LastIndexOf("\\") + 1);
                 clanname = clanname.Substring(0, clanname.LastIndexOf("."));
-
-                var tdi = new DirectoryInfo($@"{clanroot}{clanname}");
+                var destFolderPath = $"{clanroot}\\{clanname}";
+                var tdi = new DirectoryInfo(destFolderPath);
                 if(tdi.Exists == false)
                 {
                     tdi.Create();
                 }
-                var dest = $@"{clanroot}{clanname}\";
+                var dest = $@"{destFolderPath}\";
 
                 importDatabaseWindow.DestFolderPath = dest;
 
                 if(importDatabaseWindow.ShowDialog() == true)
                 {
-                    var clandbFile = $@"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}{clanname}\clan.cdb";
+                    var clandbFile = $@"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}\{clanname}\clan.cdb";
                     var bloaded = LoadClanDatabase(clandbFile);
                     response(bloaded);
                 }

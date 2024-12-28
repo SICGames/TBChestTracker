@@ -109,10 +109,11 @@ namespace TBChestTracker
                 {
                     Console.WriteLine(ex.ToString());
                 }
-
-                if(ClanManager.Instance.ClanChestManager.LoadBackup(SelectedBackupItem.File) == false)
+                
+                var result = ClanManager.Instance.ClanChestManager.LoadBackup(SelectedBackupItem.File);
+                if (result.Code != CommonResultCodes.Success)
                 {
-                    MessageBox.Show($@"Failed to load '{SelectedBackupItem.File}' due to possible corrupted file.", "Corrupted JSON File.");
+                    MessageBox.Show($@"{result.Message}", "Corrupted JSON File.");
                     return;
                 }
 

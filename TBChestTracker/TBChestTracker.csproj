@@ -204,7 +204,10 @@
     </Compile>
     <Compile Include="ClanWizard\ClanWizardContext.cs" />
     <Compile Include="ConsoleInterlop\ConsoleInterlop.cs" />
+    <Compile Include="ConsoleInterlop\Events\ConsoleInterlopCompletedEventArgs.cs" />
+    <Compile Include="ConsoleInterlop\Events\ConsoleInterlopErrorEventArgs.cs" />
     <Compile Include="ConsoleInterlop\Events\ConsoleInterlopEventArgs.cs" />
+    <Compile Include="Progresses\ClanMovingProgress.cs" />
     <Compile Include="Progresses\ConsoleInterlopProgress.cs" />
     <Compile Include="ConsoleWindow.xaml.cs">
       <DependentUpon>ConsoleWindow.xaml</DependentUpon>
@@ -271,6 +274,7 @@
     <Compile Include="RestoreClanChestDataWindow.xaml.cs">
       <DependentUpon>RestoreClanChestDataWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Results\CommonResult.cs" />
     <Compile Include="Settings\TessDataConfig.cs" />
     <Compile Include="Progresses\UpgradeProgressStatus.cs" />
     <Compile Include="UI\FancyTreeView.cs" />
