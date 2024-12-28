@@ -9,7 +9,7 @@
 - [KonquestUI](https://github.com/SICGames/KonquestUI/)
 - [Snapture](https://github.com/SICGames/Snapture)
 - [CaptainHook](https://github.com/SICGames/CaptainHook)
-
+- [ChestBoxBuilder](https://github.com/SICGames/ChestBoxBuilder)
 ## How To Contribute?
 - click on Fork Icon in the Master repo.
 - CLone your Forked copy of the project.
