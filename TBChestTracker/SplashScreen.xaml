@@ -35,7 +35,7 @@
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="{Binding Path=StatusMessage, Mode=TwoWay}" Foreground="White" FontSize="12" Margin="10,5" TextAlignment="Left" VerticalAlignment="Top"/>
-            <TextBlock Grid.Column="1" Text="&#169; 2023-2024" HorizontalAlignment="Right" Margin="5" Foreground="White" FontSize="10" VerticalAlignment="Top" FontStyle="Italic"/>
+            <TextBlock Grid.Column="1" Text="&#169; 2023-2025" HorizontalAlignment="Right" Margin="5" Foreground="White" FontSize="10" VerticalAlignment="Top" FontStyle="Italic"/>
         </Grid>
         <ProgressBar Grid.Row="3" Grid.ColumnSpan="2" Background="#222" Foreground="#0af" BorderBrush="Transparent" BorderThickness="0" Minimum="0" Maximum="100" 
                      Value="{Binding Path=StatusProgress, Mode=TwoWay}"/>

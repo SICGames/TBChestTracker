@@ -610,27 +610,24 @@ namespace TBChestTracker
         #region Build
         public async Task<ProcessingTextResult> BuildFromCacheFile(string file, IProgress<BuildingChestsProgress> progress)
         {
-            var checkboxes = await PrepareChestBoxesFromCache(file, progress);
-            if (checkboxes == null)
+            var chestboxes = await PrepareChestBoxesFromCache(file, progress);
+            if (chestboxes == null || chestboxes.Count < 1)
             {
                 var errorProcess = new ProcessingTextResult(ProcessingStatus.UNKNOWN_ERROR, "ChestBoxBuilder.exe not found.", null, null);
                 return errorProcess;
             }
 
-            var processedChestBoxes = await ProcessChestBoxes(checkboxes, progress);
+            var processedChestBoxes = await ProcessChestBoxes(chestboxes, progress);
             return processedChestBoxes;
         }
 
         public async Task<List<ChestBox>> PrepareChestBoxesFromCache(string filename, IProgress<BuildingChestsProgress> progress)
         {
             bool errorOccurred = false;
-
-            var outputFile = filename;
-            outputFile = outputFile.Replace(Path.GetExtension(outputFile), ".old");
-
+            
             if(File.Exists($"{AppContext.Instance.AppFolder}ChestBoxBuilder.exe") == false)
             {
-                var ee = new BuildingChestsProgress("ChestBoxBuilder.exe can not be located. Ensure it is inside program's directory.", -1,0,0,false);
+                var ee = new BuildingChestsProgress("ChestBoxBuilder.exe can not be located. Ensure it is inside program's directory.", -1,0,0,false, true);
                 progress.Report(ee);
                 return null;
             }
@@ -638,7 +635,7 @@ namespace TBChestTracker
             List<ChestBox> boxes = new List<ChestBox>();
             if(File.Exists(filename) == false)
             {
-                var ee = new BuildingChestsProgress($"{filename} does not exist as it should. Will not continue.", -1, 0, 0, false);
+                var ee = new BuildingChestsProgress($"{filename} does not exist as it should. Will not continue.", -1, 0, 0, false, true);
                 progress.Report(ee);
                 await Task.Delay(200);
                 return null;
@@ -647,22 +644,17 @@ namespace TBChestTracker
             var e = new BuildingChestsProgress("Starting ChestBoxBuilder....", -1, 0, 0, false);
             progress.Report(e);
             await Task.Delay(250);
+
+            var outputFile = filename;
+            outputFile = outputFile.Replace(Path.GetExtension(outputFile), ".old");
             var chestboxbuilderPath = $"{AppContext.Instance.AppFolder}ChestBoxBuilder.exe";
             string infile = "\"" + filename + "\"";
             string outfile = "\"" + outputFile + "\"";
             string language = "\"en_US\"";
 
-            var chestboxbuilderArgs = $"-i {infile} -o {outfile} -L {language}";
+            var chestboxbuilderArgs = $@"-i {infile} -o {outfile} -L {language}";
             ConsoleInterop consoleInterop = new ConsoleInterop(chestboxbuilderPath, chestboxbuilderArgs , AppContext.Instance.AppFolder);
-            consoleInterop.Error += (s, e) =>
-            {
-                var ef = new BuildingChestsProgress($"Error occured. Reason '{e.ErrorMessage}'", -1, 0, 0, false);
-                progress.Report(ef);
-                Task.Delay(250);
-                errorOccurred = true;
-                return;
-            };
-
+            
             consoleInterop.Completed += (s, e) =>
             {
                 bool outputFileExists = false;
@@ -672,7 +664,7 @@ namespace TBChestTracker
 
                     if(outputFileExists == false)
                     {
-                        var ef = new BuildingChestsProgress($"Error occured. Somehow the output file '{outputFile}' does not exist or can not be accessed.", -1, 0, 0, false);
+                        var ef = new BuildingChestsProgress($"Error occured. Somehow the output file '{outputFile}' does not exist or can not be accessed.", -1, 0, 0, false, true);
                         progress.Report(ef);
                         Task.Delay(250);
                         errorOccurred = true;
@@ -732,8 +724,8 @@ namespace TBChestTracker
                 {
                     //-- have we somehow stopped receiving data from ChestBoxBuilder?
                     var exited = false;
-                  
                 }
+
             };
             
             string error_msg = String.Empty;
@@ -741,8 +733,12 @@ namespace TBChestTracker
             consoleInterop.Error += (s, e) =>
             {
                 error_msg = e.ErrorMessage;
-
                 errorOccurred = true;
+                var ef = new BuildingChestsProgress($"Error occured. Reason '{error_msg}'", -1, 0, 0, false, true);
+                progress.Report(ef);
+                Task.Delay(250);
+                return;
+
             };
 
             CancellationTokenSource cts = new CancellationTokenSource();
@@ -750,14 +746,14 @@ namespace TBChestTracker
             bool result = await consoleInterop.Run(cts.Token);
             if(result == false)
             {
-                var x = new BuildingChestsProgress("Failed Starting ChestBoxBuilder....", -1, 0, 0, false);
+                var x = new BuildingChestsProgress("Failed Starting ChestBoxBuilder....", -1, 0, 0, false, true);
                 progress.Report(x);
                 await Task.Delay(250);
                 return null;
             }
             if(errorOccurred)
             {
-                var ea = new BuildingChestsProgress(error_msg, -1, 0, 0, false);
+                var ea = new BuildingChestsProgress(error_msg, -1, 0, 0, false, true);
                 progress.Report(ea);
                 await Task.Delay(1000);
                 return null;
@@ -999,7 +995,7 @@ namespace TBChestTracker
 
             if (errorOccured == false)
             {
-                var p2 = new BuildingChestsProgress($"Finished Building Clan Chests...", -1, filesMax, currentFile, true);
+                var p2 = new BuildingChestsProgress($"Finished Building Clan Chests...", -1, filesMax, currentFile, true, false);
                 progress.Report(p2);
             }
         }
@@ -1079,217 +1075,6 @@ namespace TBChestTracker
             }
 
         }
-        #endregion
-
-        #region Process
-        [Obsolete]
-        /*
-        public async Task Process(List<string> result,ChestAutomation chestAutomation, ClanChestDatabase database)
-        {
-            if(database == null)
-            {
-                throw new ArgumentNullException(nameof(database));  
-            }
-            var resulttext = result;
-
-            if (resulttext[0].ToLower().Contains("no gifts"))
-            {
-                ChangeProcessingState(ChestProcessingState.IDLE);
-                AppContext.Instance.isAnyGiftsAvailable = false;
-                chestAutomation.InvokeChestProcessed(new Automation.AutomationChestProcessedEventArguments(new ClanChestProcessResult("No Gifts", 404, ClanChestProcessEnum.NO_GIFTS)));
-                return;
-            }
-
-            ChangeProcessingState(ChestProcessingState.PROCESSING);
-            
-            AppContext.Instance.isAnyGiftsAvailable = true;
-            ProcessingTextResult textResult = ProcessScreenText(resulttext);
-
-            if (textResult.Status != ProcessingStatus.OK)
-            {
-                chestAutomation.InvokeChestProcessingFailed(new AutomationChestProcessingFailedEventArguments($"{textResult.Message}", 0));
-                return;
-            }
-
-            List<ChestData> tmpchests = textResult.ChestData;
-            IList<ClanChestData> tmpchestdata = CreateClanChestData(tmpchests);
-            var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates.ToList();
-
-            //-- do we need to insert new entry?
-            //-- causes midnight bug.
-            var currentdate = DateTime.Now.ToString(AppContext.Instance.ForcedDateFormat);
-            var dates = database.ClanChestData.Where(x => x.Key.Equals(currentdate));
-
-            if (dates.Count() == 0)
-            {
-                tmp_ClanChestData.Clear();
-                foreach (var mate in clanmates)
-                {
-                    
-                    tmp_ClanChestData.Add(new ClanChestData(mate.Name, null, 0));
-                }
-
-                database.NewEntry(DateTime.Now.ToString(AppContext.Instance.ForcedDateFormat), tmp_ClanChestData);
-                database.ClanChestData.Add(DateTime.Now.ToString(AppContext.Instance.ForcedDateFormat, CultureInfo.InvariantCulture), tmp_ClanChestData);
-            }
-
-            //-- make sure clanmate exists.
-            var mate_index = 0;
-            Parallel.ForEach(tmpchestdata.ToList(), tmpchest =>  //foreach (var tmpchest in tmpchestdata.ToList())
-            {
-                bool exists = clanmates.Select(mate_name => mate_name.Name).Contains(tmpchest.Clanmate, StringComparer.CurrentCultureIgnoreCase);
-                if (exists)
-                {
-                    mate_index++;
-                    return;
-                }
-
-                if (!exists)
-                {
-                    var tClanmate = tmpchest.Clanmate;
-                    var match_clanmate = Clanmate_Scan(tClanmate, SettingsManager.Instance.Settings.OCRSettings.ClanmateSimilarity);
-                    if (match_clanmate != null)
-                    {
-                        com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} is actually {match_clanmate.Name}.", "Unknown Clanmate Found", LogType.INFO);
-
-                        tmpchestdata[mate_index].Clanmate = match_clanmate.Name; //--- unknown clanmate properly identified and been re-written with correct parent clan name.
-
-                        var parent_data = tmp_ClanChestData.Select(pd => pd).Where(data => data.Clanmate.Equals(match_clanmate.Name, StringComparison.InvariantCultureIgnoreCase)).ToList()[0];
-                        if (parent_data.chests == null)
-                        {
-                            parent_data.chests = new List<Chest>();
-                        }
-                    }
-                    else
-                    {
-                        tmp_ClanChestData.Add(new ClanChestData(tmpchest.Clanmate, tmpchest.chests, tmpchest.Points));
-                        com.HellStormGames.Logging.Console.Write($"Adding {tmpchest.Clanmate} to clanmates database.", "Clanmate Not Found", LogType.WARNING);
-                        ClanManager.Instance.ClanmateManager.Add(tmpchest.Clanmate);
-                        ClanManager.Instance.ClanmateManager.Save();
-                    }
-
-                    //-- attempt to check to see if the unfound clanmate is under an alias.
-                    foreach (var mate in clanmates)
-                    {
-                        if (mate.Aliases.Count > 0)
-                        {
-                            bool isMatch = mate.Aliases.Contains(tmpchest.Clanmate, StringComparer.InvariantCultureIgnoreCase);
-                            if (isMatch)
-                            {
-                                com.HellStormGames.Logging.Console.Write($"\t\t Unknown clanmate ({tmpchest.Clanmate}) belongs to {mate.Name} aliases.", "Unknown Clanmate", LogType.INFO);
-                                var parent_data = tmp_ClanChestData.Select(pd => pd).Where(data => data.Clanmate.Equals(mate.Name, StringComparison.InvariantCultureIgnoreCase)).ToList()[0];
-                                alias_found = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            });
-
-            //-- update clanchestdata
-            Parallel.ForEach(tmp_ClanChestData, chestdata => //foreach (var chestdata in tmp_ClanChestData)
-            {
-                var _chestdata = tmpchestdata.Where(name => name.Clanmate.Equals(chestdata.Clanmate,
-                    StringComparison.CurrentCultureIgnoreCase)).Select(chests => chests).ToList();
-
-                if (_chestdata.Count > 0)
-                {
-                    var m_chestdata = _chestdata[0];
-
-                    //--- chest data returning null after correcting parent clan name.
-                    if (chestdata.Clanmate.Equals(m_chestdata.Clanmate, StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        if (chestdata.chests == null)
-                        {
-                            chestdata.chests = new List<Chest>();
-                            chestdata.Points = 0;
-                        }
-
-                        foreach (var m_chest in m_chestdata.chests.ToList()) //foreach (var m_chest in m_chestdata.chests.ToList())
-                        {
-                            if (ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions == ChestOptions.UsePoints)
-                            {
-                                var pointvalues = ClanManager.Instance.ClanChestSettings.ChestPointsSettings.ChestPoints;
-                                foreach (var pointvalue in pointvalues)
-                                {
-                                    var chest_type = m_chest.Type.ToString();
-                                    var chest_name = m_chest.Name.ToString();
-
-                                    var level = m_chest.Level;
-
-                                    if (chest_type.ToLower().Contains(pointvalue.ChestType.ToLower()))
-                                    {
-                                        if (pointvalue.Level.Equals("(Any)") == false)
-                                        {
-                                            // Debug.WriteLine($"Chest Level in Points -> {Int32.Parse(pointvalue.Level.ToString())} and Chest Level -> {level}");
-
-                                        }
-                                        if (pointvalue.ChestName.Equals("(Any)"))
-                                        {
-
-                                            if (pointvalue.Level.Equals("(Any)"))
-                                            {
-                                                chestdata.Points += pointvalue.PointValue;
-                                                break;
-                                            }
-                                            else
-                                            {
-
-                                                var chestlevel = Int32.Parse(pointvalue.Level.ToString());
-                                                if (level == chestlevel)
-                                                {
-                                                    chestdata.Points += pointvalue.PointValue;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (pointvalue.Level.Equals("(Any)") == false)
-                                            {
-                                                //   Debug.WriteLine($"Chest Level in Points -> {Int32.Parse(pointvalue.Level.ToString())} and Chest Level -> {level}");
-                                            }
-
-                                            if (chest_name.ToLower().Equals(pointvalue.ChestName.ToLower()))
-                                            {
-                                                if (pointvalue.Level.Equals("(Any)"))
-                                                {
-                                                    chestdata.Points += pointvalue.PointValue;
-                                                    break;
-                                                }
-                                                else
-                                                {
-                                                    var chestlevel = Int32.Parse(pointvalue.Level.ToString());
-                                                    if (level == chestlevel)
-                                                    {
-                                                        chestdata.Points += pointvalue.PointValue;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            chestdata.chests.Add(m_chest);
-                        }
-                    }
-                }
-            });
-
-            var datestr = DateTime.Now.ToString(AppContext.Instance.ForcedDateFormat, CultureInfo.InvariantCulture);
-            database.UpdateEntry(datestr, tmp_ClanChestData);
-            
-            ChangeProcessingState(ChestProcessingState.COMPLETED);
-            AppContext.Instance.isBusyProcessingClanchests = false;
-
-            Automation.AutomationChestProcessedEventArguments args = 
-                new AutomationChestProcessedEventArguments(new ClanChestProcessResult("200", 200, ClanChestProcessEnum.SUCCESS));
-
-            chestAutomation.InvokeChestProcessed(args);
-
-        }
-        */
         #endregion
 
         #region FilterChestData & ContainsAny

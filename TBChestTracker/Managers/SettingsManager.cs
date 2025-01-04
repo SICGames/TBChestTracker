@@ -33,31 +33,6 @@ namespace TBChestTracker
             {
                 di.Create();
             }
-            /*
-            //-- configure default settings.
-            DefaultSettings = new Settings();
-            DefaultSettings.GeneralSettings.ClanRootFolder = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\TotalBattleChestTracker\\";
-            DefaultSettings.GeneralSettings.UILanguage = "English";
-            
-            DefaultSettings.OCRSettings.CaptureMethod = "GDI+";
-            DefaultSettings.OCRSettings.GlobalBrightness = 0.65;
-            DefaultSettings.OCRSettings.ClanmateSimilarity = 90;
-            DefaultSettings.OCRSettings.Tags = new ObservableCollection<string>(new List<string> { "Chest", "From", "Source", "Gift", "Contains" });
-            DefaultSettings.OCRSettings.TessDataFolder = $@"{AppContext.Instance.TesseractData}";
-            DefaultSettings.OCRSettings.Languages = "eng+tur+ara+spa+chi_sim+chi_tra+kor+fra+jpn+rus+pol+por+pus+ukr+deu";
-            DefaultSettings.OCRSettings.PreviewImage = String.Empty;
-            DefaultSettings.OCRSettings.Threshold = 85;
-            DefaultSettings.OCRSettings.MaxThreshold = 255;
-
-            DefaultSettings.HotKeySettings.StartAutomationKeys = "F9";
-            DefaultSettings.HotKeySettings.StopAutomationKeys = "F10";
-
-            DefaultSettings.AutomationSettings.AutomationClicks = 4;
-            DefaultSettings.AutomationSettings.AutomationScreenshotsAfterClicks = 1250;
-            DefaultSettings.AutomationSettings.AutomationDelayBetweenClicks = 100;
-            DefaultSettings.AutomationSettings.StopAutomationAfterClicks = 0;
-            */
-
             Settings = new Settings();
 
             try
@@ -69,56 +44,6 @@ namespace TBChestTracker
 
             }
 
-            /*
-
-            if (AppContext.Instance.IsFirstRun)
-            {
-                Settings = new Settings();
-                Settings = DefaultSettings;
-                Save();
-            }
-            else
-            {
-                try
-                {
-                    bool result = Load();
-                    if (result == false)
-                    {
-                        Settings = new Settings();
-                        Settings = DefaultSettings;
-                        Save();
-                    }
-                    else
-                    {
-                        if (Settings.OCRSettings.TessDataFolder == null)
-                        {
-                            //--- definately damaged.
-                            System.IO.File.Delete($"{settingsPathFolder}Settings.json");
-                            if (Settings == null)
-                            {
-                                Settings = new Settings();
-
-                            }
-                            Settings = DefaultSettings;
-                            Save();
-                        }
-
-                        if(Settings.AutomationSettings.AutomationClicks == 0 && Settings.AutomationSettings.AutomationScreenshotsAfterClicks == 0 && Settings.AutomationSettings.AutomationDelayBetweenClicks == 0)
-                        {
-                            Settings.AutomationSettings.AutomationClicks = DefaultSettings.AutomationSettings.AutomationClicks;
-                            Settings.AutomationSettings.AutomationDelayBetweenClicks = DefaultSettings.AutomationSettings.AutomationDelayBetweenClicks;
-                            Settings.AutomationSettings.AutomationScreenshotsAfterClicks = DefaultSettings.AutomationSettings.AutomationScreenshotsAfterClicks;
-                            Save();
-                        }
-
-                     }
-                }
-                catch (Exception ex)
-                {
-                    //-- it's possible it's missing;
-                    throw new Exception("Something happened in SettingsManager");
-                }
-            */
             if(Settings == null)
             {
                 //-- it got corrupted 

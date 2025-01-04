@@ -46,16 +46,6 @@ namespace TBChestTracker
             {
                 return false;
             }
-            /*
-            using(StreamReader sr = File.OpenText(file))
-            {
-                var serializer = new JsonSerializer();
-                serializer.Formatting = Formatting.Indented;
-                ChestRewardsList = (List<ChestReward>)serializer.Deserialize(sr, typeof(List<ChestReward>));
-                sr.Close();
-                serializer = null;
-            }
-            */
         }
         public void Save()
         {
@@ -63,7 +53,7 @@ namespace TBChestTracker
             var clanfolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
 
             var file = $@"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}\ChestRewards.db";
-            using(StreamWriter sw = File.CreateText(file))
+            using(StreamWriter sw = new StreamWriter(file, true))
             {
                 var serializer = new JsonSerializer();  
                 serializer.Formatting = Formatting.Indented;

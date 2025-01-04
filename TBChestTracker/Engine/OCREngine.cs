@@ -61,7 +61,7 @@ namespace TBChestTracker.Engine
                     }
                     catch(Exception ex)
                     {
-                        throw new Exception($"Failed to initialize Tesseract due to AccessViolationException. Main Cause => {ex.Message}");
+                        throw new Exception($"Failed to initialize Tesseract. Reason given: => {ex.Message}");
                     }
                     var psm = OCR.PageSegMode;
 

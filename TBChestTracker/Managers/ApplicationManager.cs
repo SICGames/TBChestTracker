@@ -17,6 +17,7 @@ using Emgu.CV.Ocl;
 using Octokit;
 using Newtonsoft.Json;
 using System.Configuration;
+using System.Security.Principal;
 
 namespace TBChestTracker
 {
@@ -41,7 +42,6 @@ namespace TBChestTracker
         public Release LatestReleaseInfo { get; private set; }
 
         private Manifest UpdateManifest = null;
-
        
         public ApplicationManager() 
         { 
@@ -51,6 +51,11 @@ namespace TBChestTracker
             this.Chests = new List<GameChest>();
             client = new GitHubClient(new ProductHeaderValue("TBChestTracker"));
             UpdateManifest = new Manifest();
+        }
+        public bool IsAdministrator()
+        {
+            var windowsPrincipal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+            return windowsPrincipal.IsInRole(WindowsBuiltInRole.Administrator);
         }
         public void SetChests(List<GameChest> chests)
         {

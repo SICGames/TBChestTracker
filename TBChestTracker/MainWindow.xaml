@@ -15,12 +15,14 @@
         d:Height="96"
         MinWidth="300"
         MaxWidth="800"
-        MinHeight="96"
-        MaxHeight="96"
+        MinHeight="92"
+        MaxHeight="92"
         Width="350"
         Loaded="Window_Loaded" 
         SizeToContent="Height" Topmost="True" 
         WindowStyle="ToolWindow"  ResizeMode="CanResizeWithGrip">
+
+    <!--#region  Command Bindings -->
     <Window.CommandBindings>
         <CommandBinding Command="Commands:CustomCommandBindings.ClanManager" 
                         x:Name="ClanManagerCommand" 
@@ -71,6 +73,8 @@
                         CanExecute="ManageSettingsCommand_CanExecute"
                         Executed="ManageSettingsCommand_Executed"/>
     </Window.CommandBindings>
+    <!--#endregion-->
+
     <!--#region Resources -->
     <Window.Resources>
         <SolidColorBrush x:Key="ToolBarButtonHover" Color="#210080FF"/>
@@ -241,15 +245,18 @@
     <!--#endregion-->
 
     <Grid Background="#F6F6F6">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="99*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
             <RowDefinition Height="36"/>
-            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0" LastChildFill="True">
+        <DockPanel Grid.Row="0" LastChildFill="True" Grid.ColumnSpan="2">
             <Menu DockPanel.Dock="Top" Height="auto" VerticalAlignment="Top">
                 <!-- File menu -->
-                    <!--="{Binding Path=[FileMenu], Source={x:Static locale:LocalizationManager.LocalizedDictionary}}"-->
+                <!--="{Binding Path=[FileMenu], Source={x:Static locale:LocalizationManager.LocalizedDictionary}}"-->
                 <MenuItem Header="{x:Static ResourceStrings:Strings.File}">
                     <MenuItem Header="{x:Static ResourceStrings:Strings.ClanManager}" x:Name="ClanManagerMenuItem" Command="Commands:CustomCommandBindings.ClanManager"/>
                     <Separator/>
@@ -290,7 +297,7 @@
                     <!--
                     <MenuItem Header="{x:Static ResourceStrings:Strings.VerifyChestDataIntegrity}" Command="Commands:CustomCommandBindings.ValidateChestData"/>
                     -->
-                    
+
                 </MenuItem>
                 <MenuItem Header="{x:Static ResourceStrings:Strings.Help}" x:Name="HelpMenu" Click="HelpMenu_Click">
                     <MenuItem Header="Github">
@@ -313,12 +320,16 @@
                 </MenuItem>
             </Menu>
         </DockPanel>
-        <Grid Grid.Row="1" Height="36">
+        <Grid Grid.Row="1" Height="36" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="15*"/>
+                <ColumnDefinition Width="731*"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
-            <DockPanel LastChildFill="False" Grid.Column="0" Height="36" Background="#f6f6f6">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <DockPanel LastChildFill="False" Grid.Column="0" Grid.Row="0" Background="#f6f6f6" Grid.ColumnSpan="2">
                 <UI:FancyImageButton Height="24" Width="24" 
                               HighlightOpacity="0.25" 
                               HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
@@ -327,7 +338,7 @@
                               ToolTip="{x:Static ResourceStrings:Strings.ManageClansTooltip}"
                               Command="Commands:CustomCommandBindings.ClanManager" 
                               IsEnabled="True"/>
-                <Separator Width="2" Background="#777"/>
+                
                 <UI:FancyImageButton Height="24" Width="24" 
                   HighlightOpacity="0.25" 
                   HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
@@ -395,8 +406,6 @@
                      ToolTip="{x:Static ResourceStrings:Strings.ClanInsightsTooltip}"
                      Command="Commands:CustomCommandBindings.ClanStats" 
                      IsEnabled="{Binding IsCurrentClandatabase}"/>
-
-                <Separator Width="2"/>
                 <UI:FancyImageButton Height="24" Width="24" 
                HighlightOpacity="0.25" 
                HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
@@ -406,10 +415,10 @@
                ImageSource="pack://application:,,,/Images/ui/SettingsIcon01.png"
                IsEnabled="True"/>
 
-               
+
             </DockPanel>
             <!-- ui:NotificationButton -->
-            <ui:Notification  Source="pack://application:,,,/Images/ui/notificationBell-Black.png" Grid.Column="1" Margin="15,0" Width="24" Height="24" ShowNotification="{Binding upgradeAvailable}" 
+            <ui:Notification  Source="pack://application:,,,/Images/ui/notificationBell-Black.png" Grid.Column="2" Margin="15,6,15,6" Width="24" Height="24" ShowNotification="{Binding upgradeAvailable}" 
                               AlertColor="#00aaff" ToolTip="{x:Static ResourceStrings:Strings.UpgradeNotification}" x:Name="UpgradeAlertButton" Click="UpgradeAlertButton_Click"/>
             <!--
             <UI:FancyImageButton Height="24" Width="24"  Grid.Column="1" Margin="15,0"
@@ -420,10 +429,6 @@
               ImageSource="pack://application:,,,/Images/notificationBell-Black.png"
               IsEnabled="True" HorizontalAlignment="Right" x:Name="NotificationButton"/>
             -->
-        </Grid>
-       
-        <Grid x:Name="UpdatePanel" Visibility="Visible" Grid.Row="2">
-            
         </Grid>
     </Grid>
 </Window>

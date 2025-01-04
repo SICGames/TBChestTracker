@@ -85,8 +85,6 @@ namespace TBChestTracker
         }
     }
 
-   
-
     public class DownloadManager
     {
         public static async Task UpdateProgress(string message, double progress, Window window)

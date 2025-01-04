@@ -244,7 +244,6 @@
       <DependentUpon>ImportDatabaseWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Managers\ChestRewardsManager.cs" />
-    <Compile Include="Managers\OldClanChestManager.cs" />
     <Compile Include="Managers\RecentlyOpenedListManager.cs" />
     <Compile Include="Pages\ChestDataIntegrity\ErrorsFound.xaml.cs">
       <DependentUpon>ErrorsFound.xaml</DependentUpon>

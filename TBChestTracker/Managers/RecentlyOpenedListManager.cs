@@ -18,7 +18,7 @@ namespace TBChestTracker
             if (File.Exists(filePath) == false)
                 return false;
 
-            using (StreamReader sr = File.OpenText(filePath))
+            using (StreamReader sr = new StreamReader(filePath))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Formatting = Formatting.Indented;
@@ -34,7 +34,8 @@ namespace TBChestTracker
             var savePath = $"{AppContext.Instance.CommonAppFolder}{file}";
             try
             {
-                using (System.IO.StreamWriter sw = System.IO.File.CreateText(savePath))
+                
+                using (System.IO.StreamWriter sw = new StreamWriter(savePath))
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     serializer.Formatting = Formatting.Indented;
@@ -59,14 +60,6 @@ namespace TBChestTracker
             if (File.Exists(AppContext.Instance.RecentOpenedClanDatabases))
             {
                  return LoadRecentList();
-                /*
-                foreach (var recent in _recentDatabase.RecentClanDatabases)
-                {
-                    RecentClanDatabases.Add(recent);
-                }
-                return true;
-                */
-
             }
             return false;
         }
@@ -75,6 +68,7 @@ namespace TBChestTracker
         {
             SaveRecentList();
         }
+
         public void Delete()
         {
             ClearList();
@@ -87,7 +81,7 @@ namespace TBChestTracker
                 }
                 catch(IOException ex)
                 {
-
+                    MessageBox.Show($"Oh boy! Unfortuntately '{file} was not able to be deleted. Does it exist? Do you have admin priveleges?");
                 }
             }
         }

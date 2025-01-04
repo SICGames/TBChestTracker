@@ -25,18 +25,6 @@ using static Emgu.CV.Features2D.ORB;
 
 namespace TBChestTracker
 {
-
-    /*
-     Revising ClanChestManager - 9/4/2024
-     Total Battle Chest Tracker 2.0
-     Goal is to improve speed. 
-     Similar to how a game gives resources, this should act the same.
-     Resource.Give("Bob",ResourceType.Gold, 100);
-     ClanChestManager.Give("Hellraiser",new ClanChest("Epic","Harpy Chest", 35));
-     Ideally, this will remove the need to create unnecessary crap in memory and hold up processing time.
-     This needs to be entirely reworked from ground up. 
-    */
-
     [System.Serializable]
     public class ClanChestManager : IDisposable
     {
@@ -162,17 +150,6 @@ namespace TBChestTracker
             }
             await ChestProcessor.Build(files, progress, Database);
         }
-        /*
-        public async Task ProcessChests(List<string> result, ChestAutomation chestAutomation)
-        {
-            if (chestAutomation == null)
-            {
-                throw new ArgumentNullException(nameof(chestAutomation));
-            }
-            
-           await ChestProcessor.Process(result, chestAutomation, Database);
-        }
-        */
         public async Task ProcessChestsAsRaw(List<string> result, ChestAutomation chestautomation)
         {
             if (chestautomation == null)
@@ -505,15 +482,7 @@ namespace TBChestTracker
             }
             var currentCulture = CultureInfo.CurrentCulture; //-- en-GB
             var uiCulture = CultureInfo.CurrentUICulture; //-- en-US
-            /*
-            bool invalidateDates = DoesDatesNeedRepair();
-            if (invalidateDates)
-            {
-                result.Add("Invalid Locale Date Format Detected", chestErrors);
-                chestErrors++;
-            }
-            */
-
+         
             foreach (var dates in chestdata.Keys.ToList())
             {
                 var data = chestdata[dates];
@@ -983,75 +952,6 @@ namespace TBChestTracker
                 AppContext.Instance.ClanmatesBeenAdded = true;
             }
             return build_result;
-
-            /*
-            //--- build blank clanchestdata 
-            foreach (var clanmate in ClanManager.Instance.ClanmateManager.Database.Clanmates)
-            {
-                if (!String.IsNullOrEmpty(clanmate.Name))
-                {
-                    clanChestData.Add(new ClanChestData(clanmate.Name, null));
-                }
-            }
-            */
-            /*
-            //--- midnight bug may occur here.
-            if (Database != null && Database.ClanChestData != null && Database.ClanChestData.Keys != null && Database.ClanChestData.Keys.Count > 0)
-            {
-                var lastDate = Database.ClanChestData.Keys.Last();
-                var datestring = DateTime.Now.ToString(DateFormat, new CultureInfo(CultureInfo.CurrentCulture.Name));
-                invalidDateFormat = DoesDatesNeedRepair();
-                if(lastDate.Equals(datestring))
-                {
-
-                }
-
-            }
-
-            if (ClanChestDailyData != null && ClanChestDailyData.Keys != null && ClanChestDailyData.Keys.Count > 0)
-            {
-
-                var lastDate = ClanChestDailyData.Keys.Last();
-                var dateStr = DateTime.Now.ToString(DateFormat, new CultureInfo(CultureInfo.CurrentCulture.Name));
-
-                invalidDateFormat = DoesDatesNeedRepair();
-
-                if (lastDate.Equals(dateStr))
-                {
-
-                    clanChestData = ClanChestDailyData[lastDate];
-                    foreach (var member in ClanManager.Instance.ClanmateManager.Database.Clanmates)
-                    {
-                        var clanmate_exists = clanChestData.ToList().Exists(mate => mate.Clanmate.ToLower().Contains(member.Name.ToLower()));
-                        if (!clanmate_exists)
-                        {
-                            clanChestData.Add(new ClanChestData(member.Name, null));
-                        }
-                    }
-                }
-                else
-                {
-                    try
-                    {
-                        ClanChestDailyData.Add(DateTime.Now.ToString(dateformat, new CultureInfo(CultureInfo.CurrentCulture.Name)), clanChestData);
-                    }
-                    catch (Exception ex)
-                    {
-                        return ChestDataBuildResult.DATA_CORRUPT;
-                    }
-                }
-            }
-
-            if (invalidDateFormat)
-            {
-                return ChestDataBuildResult.DATA_CORRUPT;
-            }
-
-            
-
-            return ChestDataBuildResult.OK;
-            */
-
         }
         #endregion
 

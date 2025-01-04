@@ -10,13 +10,11 @@ namespace TBChestTracker.Managers
     public class ClanManager
     {
         public static ClanManager Instance {get; private set;}
-
+        
         private ClanmateManager _clanmatemanager = null;
         public ClanmateManager ClanmateManager => _clanmatemanager;
-        
         private ClanDatabaseManager _databasemanager = null;
         public ClanDatabaseManager ClanDatabaseManager => _databasemanager;
-
         private ClanChestManager _chestmanager = null;
         public ClanChestManager ClanChestManager => _chestmanager;
         private ClanChestSettings _clansettings = null;

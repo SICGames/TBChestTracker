@@ -40,19 +40,28 @@ namespace TBChestTracker.Dialogs
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            if(exception == null)
+            {
+                //-- somehow this is odd. And shouldn't happen. 
+                exception = new Exception("CrashBox exception was null. Odd.");
+            }
             var reasonOfCrash = exception;
-            var crashDate = DateTime.Now.ToString(@"d");
-            var crashTime = DateTime.Now.ToString(@"t");
+            var crashDate = DateTime.Now;
+            var crashTime = DateTime.Now;
+
+            var crashDateStr = DateTime.Now.ToString(@"d");
+            var crashTimeStr = DateTime.Now.ToString(@"t");
+
             if(!Directory.Exists($@"{AppContext.Instance.CommonAppFolder}\Logs"))
             {
                 Directory.CreateDirectory($@"{AppContext.Instance.CommonAppFolder}\Logs");
             }
 
-            var crashLogFile = $@"{AppContext.Instance.CommonAppFolder}\Logs\crash.log";
+            var crashLogFile = $@"{AppContext.Instance.CommonAppFolder}\Logs\crash_{crashDate.ToString(@"yyyy-MM-dd")}_{crashTime.ToString(@"HHHH:mm:ss")}.log";
 
-            using (var sw = File.AppendText(crashLogFile))
+            using (var sw = new StreamWriter(crashLogFile, true))
             {
-                var crashMessage = $"Crash Log {crashDate} - {crashTime}:\n {reasonOfCrash.Message} \n {reasonOfCrash.StackTrace.ToString()}\n";
+                var crashMessage = $"Crash Log {crashDateStr} - {crashTimeStr}:\n {reasonOfCrash.Message} \n {reasonOfCrash.StackTrace.ToString()}\n";
                 sw.WriteLine(crashMessage);
                 sw.Close();
             }
