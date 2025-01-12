@@ -54,11 +54,6 @@ Clanmate Management
  
 </details>
 
-## Become a Patreon 
-If you want to support this project, become a Patreon and get access to the Discord server. 
-[Click Here](https://www.patreon.com/TotalBattleGuide) to become a Patreon and support this project.
-
-
 ## Are you stuck on something?
 Watch the Youtube videos 
 [TotalBattleGuide - Youtube Channel](https://www.youtube.com/@TotalBattleGuide)
