@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace com.HellStormGames.Logging
+namespace com.HellStormGames.Diagnostics.Logging
 {
-    public enum LogType
+    public interface ILoggioConfiguration
     {
-        INFO,
-        WARNING,
-        ERROR
+        
     }
 }

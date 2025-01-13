@@ -21,9 +21,10 @@ using Emgu.CV.Structure;
 using Emgu.CV;
 using TBChestTracker.Helpers;
 using TBChestTracker.Managers;
-using Emgu.CV.OCR;
 using System.Security;
 using com.HellstormGames.Imaging;
+
+using com.HellStormGames.TesseractOCR.Collections;
 using TBChestTracker.Engine;
 
 namespace TBChestTracker
@@ -53,7 +54,7 @@ namespace TBChestTracker
         private Snapture snapture;
         public OCRManualMode OCRManualMode { get; set; }
         private BitmapSource preview {  get; set; }
-        Tesseract.Word[] tessy_characters { get; set; }
+        WordCollection tessy_characters { get; set; }
 
         private WriteableBitmap writeableBitmap { get; set; }
         private Image WriteableImage { get; set; }
@@ -223,7 +224,7 @@ namespace TBChestTracker
                     CroppedBitmap cropped_bitmap = null;
                     BitmapSource bms = null;
 
-                    Tesseract.Word[] tessy_result = null;
+                    WordCollection tessy_result = null;
 
                     try
                     {
@@ -240,13 +241,13 @@ namespace TBChestTracker
                         if (result != null)
                         {
                             Image<Gray, byte> result_image = result.ToImage<Gray, byte>();
-                            
+
                             //Image<Gray, byte> scaled_image = result_image.Resize(3, Emgu.CV.CvEnum.Inter.Cubic);
-                            
+
                             var brightness = SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness;
                             var threshold = new Gray(SettingsManager.Instance.Settings.OCRSettings.Threshold);
                             var maxThreshold = new Gray(SettingsManager.Instance.Settings.OCRSettings.MaxThreshold);
-                            
+
                             Image<Gray, byte> modified_image = result_image.Mul(brightness) + brightness;
                             var thresholdImage = modified_image.ThresholdBinaryInv(threshold, maxThreshold);
                             //var erodedImage = thresholdImage.Erode(1);6
@@ -256,24 +257,33 @@ namespace TBChestTracker
                             //--- after confirmation, save rectangle and move onto Open button editor.
 
                             var tessy = OCREngine.Instance.OCR;
-                            tessy.SetImage(thresholdImage);
-                            if (tessy.Recognize() == 0)
+
+                            var finalResult = thresholdImage.Mat.ToImage<Bgr, byte>();  
+                            var finalBitmap = finalResult.ToBitmap();
+
+                            tessy.SetImage(finalBitmap);
+                            if (tessy.Recongize() == 0)
                             {
                                 tessy_result = tessy.GetWords();
                                 tessy_characters = tessy_result;
-                            }
+                                //-- clean up
+                                tessy = null;
 
-                            //-- clean up
-                            tessy = null;
-                            //erodedImage.Dispose();
-                            thresholdImage.Dispose();
-                            modified_image.Dispose();
-                            modified_image = null;
-                            // scaled_image.Dispose();
-                            // scaled_image = null;
-                            result_image.Dispose();
-                            result_image = null;
-                            result.Dispose();
+                                finalBitmap.Dispose();
+                                finalBitmap = null;
+                                finalResult.Dispose();
+                                finalResult = null;
+                                    
+                                //erodedImage.Dispose();
+                                thresholdImage.Dispose();
+                                modified_image.Dispose();
+                                modified_image = null;
+                                // scaled_image.Dispose();
+                                // scaled_image = null;
+                                result_image.Dispose();
+                                result_image = null;
+                                result.Dispose();
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -290,9 +300,10 @@ namespace TBChestTracker
                     if (tessy_characters != null)
                     {
                         //--- render the letters obtained from Tesseract
-                        foreach (var letter in tessy_characters)
+                        foreach (var letter in tessy_characters.Words)
                         {
-                            var region = letter.Region;
+                            
+                            var region = (System.Drawing.Rectangle)letter.BoundingBox;
                             region.Offset(8, 8);
 
                             var letterX = region.X + SuggestedAreaOfInterest.x;

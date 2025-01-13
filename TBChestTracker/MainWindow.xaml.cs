@@ -48,6 +48,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using TBChestTracker.UI;
 using System.Globalization;
 using TBChestTracker.Localization;
+using com.HellStormGames.Diagnostics;
 
 namespace TBChestTracker
 {
@@ -89,6 +90,13 @@ namespace TBChestTracker
         Task AutomationTask { get; set; }
 
         ChestAutomation ChestAutomation { get; set; }
+        
+        string keyInput = $"";
+        private Key previousKey = Key.None;
+        private Key newKey = Key.None;
+        String keyStr = $"";
+
+
         #endregion
 
         #region PropertyChanged Event
@@ -142,7 +150,7 @@ namespace TBChestTracker
             {
                 SettingsManager = new SettingsManager();
 
-                com.HellStormGames.Logging.Console.Write("Settings Loaded.", com.HellStormGames.Logging.LogType.INFO);
+               // com.HellStormGames.Logging.Console.Write("Settings Loaded.", com.HellStormGames.Logging.LogType.INFO);
 
                 //-- init appContext
                 AppContext.Instance.IsAutomationPlayButtonEnabled = false;
@@ -366,7 +374,7 @@ namespace TBChestTracker
             ChestAutomation.AutomationStarted += ChestAutomation_AutomationStarted;
             ChestAutomation.AutomationStopped += ChestAutomation_AutomationStopped;
             ChestAutomation.AutomationError += ChestAutomation_AutomationError;
-
+            
             bool result = ChestAutomation.Initialize(SettingsManager.Instance.Settings.OCRSettings);
         }
 
@@ -375,7 +383,7 @@ namespace TBChestTracker
         {
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
-                com.HellStormGames.Logging.Console.Write("Automation Started", com.HellStormGames.Logging.LogType.INFO);
+                //com.HellStormGames.Logging.Console.Write("Automation Started", com.HellStormGames.Logging.LogType.INFO);
                 AppContext.Instance.IsAutomationPlayButtonEnabled = false;
                 AppContext.Instance.IsAutomationStopButtonEnabled = true;
 
@@ -392,7 +400,7 @@ namespace TBChestTracker
                 //-- automatically repairs chest data if necessary
                 AppContext.Instance.IsAutomationPlayButtonEnabled = true;
                 AppContext.Instance.IsAutomationStopButtonEnabled = false;
-                com.HellStormGames.Logging.Console.Write("Automation stopped.", com.HellStormGames.Logging.LogType.INFO);
+                //com.HellStormGames.Logging.Console.Write("Automation stopped.", com.HellStormGames.Logging.LogType.INFO);
 
                 BuildingChestsWindow buildingChestsWindow = new BuildingChestsWindow();
                 if (buildingChestsWindow.ShowDialog() == true)
@@ -407,12 +415,12 @@ namespace TBChestTracker
                             var result = ClanManager.Instance.ClanChestManager.Repair();
                             if (result)
                             {
-                                com.HellStormGames.Logging.Console.Write("Chest Data Automatically Repaired", "Chest Integrity", LogType.INFO);
+                                //com.HellStormGames.Logging.Console.Write("Chest Data Automatically Repaired", "Chest Integrity", LogType.INFO);
                             }
                         }
                         else
                         {
-                            com.HellStormGames.Logging.Console.Write("Clan Chest Data is looking good. No need for repairs.", com.HellStormGames.Logging.LogType.INFO);
+                            //com.HellStormGames.Logging.Console.Write("Clan Chest Data is looking good. No need for repairs.", com.HellStormGames.Logging.LogType.INFO);
                         }
                     }
 
@@ -514,7 +522,7 @@ namespace TBChestTracker
                     }));
 
                     await DeleteTessData();
-                    await Task.Delay(500);
+                    await Task.Delay(250);
                 }
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
@@ -532,7 +540,7 @@ namespace TBChestTracker
                 
                 }));
 
-                await Task.Delay(500);
+                await Task.Delay(250);
                 await FinishingUpTask();
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
@@ -548,7 +556,7 @@ namespace TBChestTracker
                     {
                         splashScreen.UpdateStatus("Upgrading Clan databases...", 92);
                     }));
-                    await Task.Delay(500);
+                    await Task.Delay(250);
                     await UpgradeClanDatabases(databasesNeedUpgrade);
                 }
 
@@ -558,7 +566,7 @@ namespace TBChestTracker
                     splashScreen.UpdateStatus("Verifying Tesseract's TessData Installed...", 93);
                 }));
 
-                await Task.Delay(500);
+                await Task.Delay(250);
                 var tessDataExists = await ValidateTessDataExists();    
                 if(tessDataExists == false)
                 {
@@ -612,15 +620,16 @@ namespace TBChestTracker
                         splashScreen.UpdateStatus("Cleaning up Temporary Files...", 97);
                     }));
                     await DeleteDownloadedTempFolder();
-                    await Task.Delay(500);
+                    await Task.Delay(150);
 
                 }
+
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     splashScreen.UpdateStatus("Initializing Chest Automation...", 98);
                 }));
 
-                await Task.Delay(500);
+                await Task.Delay(250);
                 
                 await InitChestAutomation();
 
@@ -628,7 +637,7 @@ namespace TBChestTracker
                 {
                     splashScreen.UpdateStatus("Building Chest Variables...", 99);
                 }));
-                await Task.Delay(250);
+                await Task.Delay(100);
 
                 await BuildChestData();
 
@@ -656,7 +665,7 @@ namespace TBChestTracker
                         break;
                 }
 
-                com.HellStormGames.Logging.Console.Write($"Using Culture Info ('{CultureInfo.CurrentCulture.Name}')", com.HellStormGames.Logging.LogType.INFO);
+                //com.HellStormGames.Logging.Console.Write($"Using Culture Info ('{CultureInfo.CurrentCulture.Name}')", com.HellStormGames.Logging.LogType.INFO);
             }
         }
         #endregion
@@ -664,6 +673,7 @@ namespace TBChestTracker
         #region Window Loaded
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            // throw new Exception("Testing");
         }
         #endregion
 
@@ -684,14 +694,32 @@ namespace TBChestTracker
 
         private void CaptainHook_onInstalled(object sender, EventArgs e)
         {
-            com.HellStormGames.Logging.Console.Write("Installed Keyboard hooks successfully.", com.HellStormGames.Logging.LogType.INFO);
+            //com.HellStormGames.Logging.Console.Write("Installed Keyboard hooks successfully.", com.HellStormGames.Logging.LogType.INFO);
         }
 
-        string keyInput = $"";
 
-        private Key previousKey = Key.None;
-        private Key newKey = Key.None;
-        String keyStr = $"";
+        private async Task StartAutomation()
+        {
+            if (AppContext.Instance.IsAutomationPlayButtonEnabled == true)
+            {
+                if (!AppContext.Instance.AutomationRunning)
+                {
+                    await ChestAutomation.StartAutomation();
+                }
+            }
+        }
+
+        private void StopAutomation()
+        {
+            if (AppContext.Instance.IsAutomationStopButtonEnabled)
+            {
+                if (AppContext.Instance.AutomationRunning)
+                {
+                    ChestAutomation.StopAutomation();
+                }
+            }
+        }
+
         private void CaptainHook_onKeyboardMessage(object sender, KeyboardHookMessageEventArgs e)
         {
             if(!AppContext.Instance.IsConfiguringHotKeys) { 
@@ -725,11 +753,8 @@ namespace TBChestTracker
                 {
                     if(keyStr.Equals(SettingsManager.Instance.Settings.HotKeySettings.StartAutomationKeys))
                     {
-                        if (AppContext.Instance.IsAutomationPlayButtonEnabled == true)
-                        {
-                            ChestAutomation.StartAutomation();
-                        }
-
+                      
+                        StartAutomation();
                         AppContext.Instance.hasHotkeyBeenPressed = true;
                         keyStr = String.Empty;
                         previousKey = Key.None;
@@ -737,10 +762,8 @@ namespace TBChestTracker
                     }
                     if(keyStr.Equals(SettingsManager.Instance.Settings.HotKeySettings.StopAutomationKeys))
                     {
-                        if (AppContext.Instance.IsAutomationStopButtonEnabled)
-                        {
-                            ChestAutomation.StopAutomation();
-                        }
+                        StopAutomation();
+
                         AppContext.Instance.hasHotkeyBeenPressed = true;
                         keyStr = String.Empty;
                         previousKey = Key.None;
@@ -766,7 +789,7 @@ namespace TBChestTracker
             
             ClanManager.Instance.Destroy();
             
-            com.HellStormGames.Logging.Console.Destroy();
+            //com.HellStormGames.Logging.Console.Destroy();
             SettingsManager.Dispose();
             applicationManager.Dispose();
         }
@@ -815,7 +838,7 @@ namespace TBChestTracker
                 }
                 catch(Exception ex)
                 {
-                    com.HellStormGames.Logging.Loggy.Write($"{ex.Message}", com.HellStormGames.Logging.LogType.ERROR);
+                    // com.HellStormGames.Logging.Loggy.Write($"{ex.Message}", com.HellStormGames.Logging.LogType.ERROR);
                 }
             }
         }
@@ -933,8 +956,8 @@ namespace TBChestTracker
 
                     }
 
-                    com.HellStormGames.Logging.Console.Write($"Loaded Clan ({ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}) Database Successfully.",
-                        com.HellStormGames.Logging.LogType.INFO);
+                    // com.HellStormGames.Logging.Console.Write($"Loaded Clan ({ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}) Database Successfully.",
+                        // com.HellStormGames.Logging.LogType.INFO);
 
                     AppContext.Instance.IsCurrentClandatabase = true;
                     if (AppContext.Instance.IsClanChestDataCorrupted == true)
@@ -1088,11 +1111,8 @@ namespace TBChestTracker
         }
         private void StartAutomationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (!AppContext.Instance.AutomationRunning)
-            {
-                ChestAutomation.StartAutomation();
-               
-            }
+            StartAutomation();
+           
         }
         #endregion
 
@@ -1107,10 +1127,7 @@ namespace TBChestTracker
         }
         private void StopAutomationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (AppContext.Instance.AutomationRunning)
-            {
-                ChestAutomation.StopAutomation();
-            }
+            StopAutomation();
         }
         #endregion
 
@@ -1375,12 +1392,12 @@ namespace TBChestTracker
                         var result = ClanManager.Instance.ClanChestManager.Repair();
                         if (result)
                         {
-                            com.HellStormGames.Logging.Console.Write("Chest Data Automatically Repaired", "Chest Integrity", LogType.INFO);
+                            // com.HellStormGames.Logging.Console.Write("Chest Data Automatically Repaired", "Chest Integrity", LogType.INFO);
                         }
                     }
                     else
                     {
-                        com.HellStormGames.Logging.Console.Write("Clan Chest Data is looking good. No need for repairs.", com.HellStormGames.Logging.LogType.INFO);
+                        // com.HellStormGames.Logging.Console.Write("Clan Chest Data is looking good. No need for repairs.", com.HellStormGames.Logging.LogType.INFO);
                     }
                 }
                 ClanManager.Instance.ClanChestManager.ClearCache();
@@ -1395,7 +1412,7 @@ namespace TBChestTracker
         private void CloseClanProject()
         {
             ClanManager.Instance.Destroy();
-            com.HellStormGames.Logging.Console.Destroy();
+            // com.HellStormGames.Logging.Console.Destroy();
         }
         private void CloseDatabase_Click(object sender, RoutedEventArgs e)
         {

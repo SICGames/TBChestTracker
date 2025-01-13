@@ -29,7 +29,7 @@ namespace TBChestTracker
         public ConsoleWindow()
         {
             InitializeComponent();
-            this.DataContext = com.HellStormGames.Logging.Console.Instance;
+            //this.DataContext = com.HellStormGames.Logging.Console.Instance;
             
         }
 

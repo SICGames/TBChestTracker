@@ -9,10 +9,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-
 namespace com.HellStormGames.Logging
 {
-    public class Console : INotifyPropertyChanged
+    public class Consolio : INotifyPropertyChanged
     {
         private ObservableCollection<LogData> _logData = null;
         public ObservableCollection<LogData> LogData
@@ -28,14 +27,14 @@ namespace com.HellStormGames.Logging
             }
         }
         
-        private static Console _instance = null;
-        public static Console Instance
+        private static Consolio _instance = null;
+        public static Consolio Instance
         {
             get
             {
                 if (_instance == null)
                 {
-                    _instance = new Console();
+                    _instance = new Consolio();
                     if(_instance.LogData == null) 
                         _instance.LogData = new ObservableCollection<LogData>();    
                 }
@@ -59,7 +58,18 @@ namespace com.HellStormGames.Logging
         {
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                _instance.LogData.Add(new Logging.LogData(message, Tag, type));
+                try
+                {
+                    if (_instance != null)
+                    {
+                        _instance.LogData.Add(new Logging.LogData(message, Tag, type));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //-- do nothing since we're re-writing a lot of new code.
+                }
+                
             }));
         }
         public static void Clear()

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TBChestTracker.Dialogs;
+using com.HellStormGames.Diagnostics;
 
 namespace TBChestTracker
 {
@@ -11,9 +12,17 @@ namespace TBChestTracker
     {
         public static void Show(Exception e)
         {
-            CrashBoxWindow crashBoxWindow = new CrashBoxWindow();
-            crashBoxWindow.exception = e;
-            crashBoxWindow.ShowDialog();
+            try
+            {
+                CrashBoxWindow crashBoxWindow = new CrashBoxWindow();
+                crashBoxWindow.exception = e;
+                crashBoxWindow.Show();
+            }
+            catch (Exception ex)
+            {
+                //-- don't do anything. 
+                Loggio.Error(ex, "Crash", "A crash occured.");
+            }
         }
     }
 }

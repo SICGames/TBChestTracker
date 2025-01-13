@@ -7,6 +7,14 @@ using System.Threading.Tasks;
 
 namespace com.HellStormGames.Logging
 {
+    public enum LogType
+    {
+        DEBUG,
+        INFO,
+        WARNING,
+        ERROR,
+        FATAL
+    }
     public class LogData
     {
         private LogType _logType = LogType.INFO;

@@ -191,7 +191,7 @@ namespace TBChestTracker
 
                 //ClanManager.Instance.ClanChestManager.SaveData();
                 ClanManager.Instance.ClanChestManager.Save();
-                Loggy.Write($"{previous_Clanmate_Name} changed to {clanmate_newname}", LogType.INFO);
+                // Loggy.Write($"{previous_Clanmate_Name} changed to {clanmate_newname}", LogType.INFO);
                 //Debug.WriteLine($"{previous_Clanmate_Name} changed to {clanmate_newname}");
             }
         }

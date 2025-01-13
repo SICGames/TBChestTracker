@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TBChestTracker.Automation
@@ -16,6 +17,7 @@ namespace TBChestTracker.Automation
             ProcessedClicks = processedClicks;
             CurrentClick = currentClick;
             MaxClicks = maxClicks;
+            
         }
     }
 }

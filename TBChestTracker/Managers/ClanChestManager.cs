@@ -1,4 +1,5 @@
-﻿using com.HellStormGames.Diagnosis;
+﻿using com.HellStormGames.Diagnostics;
+
 using com.HellStormGames.Logging;
 using Emgu.CV.CvEnum;
 using Microsoft.Win32;
@@ -150,13 +151,13 @@ namespace TBChestTracker
             }
             await ChestProcessor.Build(files, progress, Database);
         }
-        public async Task ProcessChestsAsRaw(List<string> result, ChestAutomation chestautomation)
+        public void ProcessChestsAsRaw(List<string> result, ChestAutomation chestautomation)
         {
             if (chestautomation == null)
             {
                 throw new ArgumentNullException(nameof(chestautomation));
             }
-            await ChestProcessor.ProcessToCache(result, chestautomation);
+            ChestProcessor.ProcessToCache(result, chestautomation);
         }
         public CommonResult Load(string filename = "")
         {
@@ -190,7 +191,7 @@ namespace TBChestTracker
                     if (!ClanManager.Instance.ClanmateManager.Load(clanmatefile))
                     {
                         //-- there's a problem loading clanmate file.
-                        com.HellStormGames.Logging.Console.Write($@"Failed to load clanmate database file.", "Load Issue", LogType.ERROR);
+                        Consolio.Write($@"Failed to load clanmate database file.", "Load Issue", LogType.ERROR);
 
                     }
                 }
@@ -221,7 +222,7 @@ namespace TBChestTracker
                         //-- we caught the exception. User needs to restore. Need a way to force them. 
                         AppContext.Instance.IsClanChestDataCorrupted = true;
                         clanchestcorrupted = true;
-                        com.HellStormGames.Logging.Console.Write($@"Clan Chest Database possibly corrupted.", "Clan Chest Database Error", LogType.ERROR);
+                        Consolio.Write($@"Clan Chest Database possibly corrupted.", "Clan Chest Database Error", LogType.ERROR);
                     }
                     database = null;
                 }
@@ -249,7 +250,7 @@ namespace TBChestTracker
                     if (!ClanManager.Instance.ClanChestSettings.LoadSettings(chestsettingsfile))
                     {
                         //-- problem loading clan chest settings.
-                        com.HellStormGames.Logging.Console.Write($@"Failed to load clan settings file.", "Load Issue", LogType.ERROR);
+                        Consolio.Write($@"Failed to load clan settings file.", "Load Issue", LogType.ERROR);
                     }
                 }
 
@@ -258,7 +259,7 @@ namespace TBChestTracker
                     if (ChestProcessor.ChestRewards.Load() == false)
                     {
                         //-- problem loading chest rewards 
-                        com.HellStormGames.Logging.Console.Write($@"Failed to load chest rewards file.", "Load Issue", LogType.ERROR);
+                        Consolio.Write($@"Failed to load chest rewards file.", "Load Issue", LogType.ERROR);
                     }
                 }
 
@@ -678,7 +679,7 @@ namespace TBChestTracker
                     }
                     catch (Exception ex)
                     {
-                        com.HellStormGames.Logging.Console.Write("Exception caught while checking if chest data needs repair.", "Chest Integrity", LogType.INFO);
+                        Consolio.Write("Exception caught while checking if chest data needs repair.", "Chest Integrity", LogType.INFO);
                         if (result != null)
                         {
                             result.Dispose();
@@ -976,7 +977,7 @@ namespace TBChestTracker
                     {
                         var name = data.Clanmate;
                         chestdata.Remove(data);
-                        com.HellStormGames.Logging.Console.Write($"{name} was successfully removed from clanchestdata.", "Clanmate Removal", com.HellStormGames.Logging.LogType.INFO);
+                        Consolio.Write($"{name} was successfully removed from clanchestdata.", "Clanmate Removal", LogType.INFO);
                     }
                 }
             }

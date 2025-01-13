@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using TBChestTracker.Managers;
+using com.HellStormGames.Diagnostics;
+using com.HellStormGames.Logging;
 
 namespace TBChestTracker
 {
@@ -189,7 +191,7 @@ namespace TBChestTracker
                 {
                     InconsistentDates++;
                     var msg = $"{date} doesn't exist inside Clan Chest Data. Skipping.";
-                    com.HellStormGames.Logging.Console.Write(msg, "Invalid Dates", com.HellStormGames.Logging.LogType.WARNING);
+                    Consolio.Write(msg, "Invalid Dates", LogType.WARNING);
                     break;
                 }
 
@@ -217,7 +219,7 @@ namespace TBChestTracker
                 {
                     InconsistentDates++;
                     var msg = $"{date} doesn't exist inside Clan Chest Data. Skipping.";
-                    com.HellStormGames.Logging.Console.Write(msg, "Invalid Dates", com.HellStormGames.Logging.LogType.WARNING);
+                    Consolio.Write(msg, "Invalid Dates", LogType.WARNING);
                     break;
                 }
 
@@ -241,7 +243,7 @@ namespace TBChestTracker
                 {
                     InconsistentDates++;
                     var msg = $"{date} doesn't exist inside Clan Chest Data. Skipping.";
-                    com.HellStormGames.Logging.Console.Write(msg, "Invalid Dates", com.HellStormGames.Logging.LogType.WARNING);
+                    Consolio.Write(msg, "Invalid Dates", LogType.WARNING);
                     continue; //-- skip not break. Break exits for loop. 
                 }
 
@@ -380,7 +382,7 @@ namespace TBChestTracker
                     {
                         InconsistentDates++;
                         var msg = $"{date} doesn't exist inside Clan Chest Data. Skipping.";
-                        com.HellStormGames.Logging.Console.Write(msg, "Invalid Dates", com.HellStormGames.Logging.LogType.WARNING);
+                        Consolio.Write(msg, "Invalid Dates", LogType.WARNING);
                         continue;
                     }
                 }

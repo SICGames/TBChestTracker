@@ -116,7 +116,7 @@ namespace TBChestTracker
                 }
                 catch( Exception ex )
                 {
-                    com.HellStormGames.Logging.Loggy.Write($"{ex.Message}", com.HellStormGames.Logging.LogType.ERROR);
+                    // com.HellStormGames.Logging.Loggy.Write($"{ex.Message}", com.HellStormGames.Logging.LogType.ERROR);
                     //Debug.WriteLine($"--- EXCEPTION CAUGHT: {ex.Message}");
                 }
             }

@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using TBChestTracker.Localization;
 
+using com.HellStormGames.Diagnostics;
+using com.HellStormGames.Diagnostics.Logging;
 
 namespace TBChestTracker
 {
@@ -73,6 +75,9 @@ namespace TBChestTracker
             //-- configure crashbox
             CrashBox crashBox = new CrashBox();
 
+            Loggio.Logger = new LoggioConfiguration().WriteTo.DebugOutput().CreateLogger();
+            Loggio.Info("Total Battle Chest Tracker is starting...");
+            
             splashScreen.Show();
         }
 
@@ -92,7 +97,9 @@ namespace TBChestTracker
 
         private void Application_Exit(object sender, ExitEventArgs e)
         {
-            
+            Loggio.Info("Total Battle Chest Tracker is exiting...");
+
+            Loggio.Shutdown();
             Console.WriteLine("I AM EXITING!!!");
         }
     }

@@ -51,13 +51,13 @@ namespace TBChestTracker.Dialogs
 
             var crashDateStr = DateTime.Now.ToString(@"d");
             var crashTimeStr = DateTime.Now.ToString(@"t");
-
-            if(!Directory.Exists($@"{AppContext.Instance.CommonAppFolder}\Logs"))
+            var logFolder = $@"{AppContext.Instance.CommonAppFolder}Logs";
+            if (!Directory.Exists(logFolder))
             {
-                Directory.CreateDirectory($@"{AppContext.Instance.CommonAppFolder}\Logs");
+                Directory.CreateDirectory(logFolder);
             }
 
-            var crashLogFile = $@"{AppContext.Instance.CommonAppFolder}\Logs\crash_{crashDate.ToString(@"yyyy-MM-dd")}_{crashTime.ToString(@"HHHH:mm:ss")}.log";
+            var crashLogFile = $@"{logFolder}\crash_{crashDate.ToString(@"yyyy-MM-dd")}_{crashTime.ToString(@"HH_mm_ss")}.log";
 
             using (var sw = new StreamWriter(crashLogFile, true))
             {

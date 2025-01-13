@@ -24,7 +24,7 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Image Source="pack://application:,,,/appIcon.ico" Margin="5" Height="32" Grid.Column="0"/>
+            <!--<Image Source="/appIcon.ico" Margin="5" Height="32" Grid.Column="0"/> -->
             <TextBlock Grid.Row="0" Grid.Column="1" Text="Total Battle Chest Tracker Suffered A Crash" Foreground="White" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" Margin="15,0"/>
         </Grid>
         <StackPanel Orientation="Vertical" VerticalAlignment="Top" Grid.Row="1" Grid.Column="0">

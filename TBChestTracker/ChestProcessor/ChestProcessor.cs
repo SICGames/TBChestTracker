@@ -18,6 +18,7 @@ using TBChestTracker.Automation;
 using TBChestTracker.Helpers;
 using TBChestTracker.Managers;
 using static System.Net.Mime.MediaTypeNames;
+using com.HellStormGames.Diagnostics;
 
 namespace TBChestTracker
 {
@@ -128,9 +129,7 @@ namespace TBChestTracker
                 {
                     try
                     {
-                        //database.NewEntry(DateTime.Now.ToString(AppContext.Instance.ForcedDateFormat, CultureInfo.InvariantCulture), tmp_ClanChestData);
                         database.NewEntry(DateTime.Now.ToString(AppContext.Instance.ForcedDateFormat, CultureInfo.InvariantCulture), tmp_ClanChestData);
-                        //ClanChestDailyData.Add(DateTime.Now.ToString(dateformat, new CultureInfo(CultureInfo.CurrentCulture.Name)), clanChestData);
                     }
                     catch (Exception ex)
                     {
@@ -409,7 +408,7 @@ namespace TBChestTracker
                             break;
                         }
 
-                        com.HellStormGames.Logging.Console.Write($"OCR RESULT [{chestName}, {clanmate}, {chestobtained}", "OCR Result", LogType.INFO);
+                        Consolio.Write($"OCR RESULT [{chestName}, {clanmate}, {chestobtained}", "OCR Result", LogType.INFO);
 
                         if (clanmate.ToLower().Contains(TBChestTracker.Resources.Strings.From.ToLower()))
                         {
@@ -430,9 +429,9 @@ namespace TBChestTracker
                                     var fromStartingPos = clanmate.IndexOf(TBChestTracker.Resources.Strings.From);
                                     if (fromStartingPos >= 0)
                                     {
-                                        com.HellStormGames.Logging.Console.Write($"Attempting to correct clanmate name => {clanmate}", "Clanmate Name Issue", LogType.INFO);
+                                        Consolio.Write($"Attempting to correct clanmate name => {clanmate}", "Clanmate Name Issue", LogType.INFO);
                                         clanmate = clanmate.Remove(fromStartingPos, clanmate.IndexOf(' ') + 1);
-                                        com.HellStormGames.Logging.Console.Write($"Clanmate name after correction => {clanmate}", "Clanmate Repair Result", LogType.INFO);
+                                        Consolio.Write($"Clanmate name after correction => {clanmate}", "Clanmate Repair Result", LogType.INFO);
                                     }
 
                                     //throw new Exception("Clanmate name is blank. Increase thread sleep timer to prevent this.");
@@ -444,7 +443,7 @@ namespace TBChestTracker
                                 bError = true;
                                 ProcessingTextResult.Status = ProcessingStatus.CLANMATE_ERROR;
                                 ProcessingTextResult.Message = $"Seems to be an issue while extracting clanmate's name. Exception caught => {e.Message}. ";
-                                com.HellStormGames.Logging.Console.Write($"Couldn't Process Clanmate name correctly. Affected Clanmate => {clanmate}", "Clanmate Extraction Failed", LogType.ERROR);
+                                Consolio.Write($"Couldn't Process Clanmate name correctly. Affected Clanmate => {clanmate}", "Clanmate Extraction Failed", LogType.ERROR);
                                 break;
                             }
                         }
@@ -582,7 +581,7 @@ namespace TBChestTracker
                             dbg_msg = $"--- ADDING {ChestType.ToString()}  '{chestName}' from {clanmate} {reward_msg} ----";
                         }
 
-                        com.HellStormGames.Logging.Console.Write(dbg_msg, "OCR Result", com.HellStormGames.Logging.LogType.INFO);
+                        Consolio.Write(dbg_msg, "OCR Result", LogType.INFO);
                     }
                 }
 
@@ -616,8 +615,10 @@ namespace TBChestTracker
                 var errorProcess = new ProcessingTextResult(ProcessingStatus.UNKNOWN_ERROR, "ChestBoxBuilder.exe not found.", null, null);
                 return errorProcess;
             }
-
             var processedChestBoxes = await ProcessChestBoxes(chestboxes, progress);
+
+            chestboxes?.Clear();
+            chestboxes = null;
             return processedChestBoxes;
         }
 
@@ -830,7 +831,7 @@ namespace TBChestTracker
                     var match_clanmate = Clanmate_Scan(tClanmate, SettingsManager.Instance.Settings.OCRSettings.ClanmateSimilarity);
                     if (match_clanmate != null)
                     {
-                        com.HellStormGames.Logging.Console.Write($"{tmpchest.Clanmate} is actually {match_clanmate.Name}.", "Unknown Clanmate Found", LogType.INFO);
+                        Consolio.Write($"{tmpchest.Clanmate} is actually {match_clanmate.Name}.", "Unknown Clanmate Found", LogType.INFO);
 
                         tmpchestdata[mate_index].Clanmate = match_clanmate.Name; //--- unknown clanmate properly identified and been re-written with correct parent clan name.
 
@@ -843,7 +844,7 @@ namespace TBChestTracker
                     else
                     {
                         tmp_ClanChestData.Add(new ClanChestData(tmpchest.Clanmate, tmpchest.chests, tmpchest.Points));
-                        com.HellStormGames.Logging.Console.Write($"Adding {tmpchest.Clanmate} to clanmates database.", "Clanmate Not Found", LogType.WARNING);
+                        Consolio.Write($"Adding {tmpchest.Clanmate} to clanmates database.", "Clanmate Not Found", LogType.WARNING);
                         ClanManager.Instance.ClanmateManager.Add(tmpchest.Clanmate);
                         ClanManager.Instance.ClanmateManager.Save();
                     }
@@ -966,10 +967,10 @@ namespace TBChestTracker
             var filesMax = files.Length;
             var currentFile = 0;
             var errorOccured = false;
-
+            ProcessingTextResult result = null;
             foreach (var file in files)
             {
-                ProcessingTextResult result = await BuildFromCacheFile(file, progress);
+                result = await BuildFromCacheFile(file, progress);
                 if (result != null)
                 {
                     if(result.Status != ProcessingStatus.OK)
@@ -982,6 +983,11 @@ namespace TBChestTracker
                     
                     await FinalizeBuildToDatabase(file, result, progress, database);
                     AppContext.Instance.isBusyProcessingClanchests = false;
+
+                    result.ChestData.Clear();
+                    result.RawData.Clear();
+                    result = null;
+
                     currentFile++;
                 }
                 
@@ -990,7 +996,9 @@ namespace TBChestTracker
 
             if(errorOccured)
             {
-
+                result.ChestData.Clear();
+                result.RawData.Clear();
+                result = null;
             }
 
             if (errorOccured == false)
@@ -1021,14 +1029,13 @@ namespace TBChestTracker
         #endregion
 
         #region ProcessToCache
-        public async Task ProcessToCache(List<string> result, ChestAutomation chestautomation, string filename = "")
+        public void ProcessToCache(List<string> result, ChestAutomation chestautomation, string filename = "")
         {
             string file = String.Empty;
             if (String.IsNullOrEmpty(filename))
             {
                 var clandb = ClanManager.Instance.ClanDatabaseManager.ClanDatabase;
                 var clanfolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
-                //var dbFolder = $"{ClanManager.Instance.CurrentProjectDirectory}{clandb.ClanDatabaseFolder}";
                 var cacheFolder = $"{clanfolder}\\cache";
                 DirectoryInfo di = new DirectoryInfo(cacheFolder);
                 if (di.Exists == false)
@@ -1073,7 +1080,6 @@ namespace TBChestTracker
 
                 chestautomation.InvokeChestProcessed(args);
             }
-
         }
         #endregion
 
@@ -1133,7 +1139,7 @@ namespace TBChestTracker
             {
                 if (!String.IsNullOrEmpty(errorResult))
                 {
-                    com.HellStormGames.Logging.Console.Write(errorResult, "Invalid OCR", com.HellStormGames.Logging.LogType.INFO);
+                    Consolio.Write(errorResult, "Invalid OCR", LogType.INFO);
                     bFilteringError = true;
                     sFilteringErrorMessage = errorResult;
                 }

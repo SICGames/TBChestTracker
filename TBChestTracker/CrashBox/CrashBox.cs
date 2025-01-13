@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -24,20 +25,27 @@ namespace TBChestTracker
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
             Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
         }
-
+        private void ShowCrashBoxDialog(Exception exception)
+        {
+            Thread thread = new Thread(new ThreadStart(() =>
+            {
+                CrashBoxDialog.Show(exception);
+            }));
+            thread.Start();
+        }
         private void Current_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            CrashBoxDialog.Show(e.Exception);
+            ShowCrashBoxDialog(e.Exception);
         }
 
         private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
-            CrashBoxDialog.Show(e.Exception);
+            ShowCrashBoxDialog(e.Exception);
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            CrashBoxDialog.Show(e.ExceptionObject as Exception);
+            ShowCrashBoxDialog(e.ExceptionObject as Exception);
         }
     }
 }

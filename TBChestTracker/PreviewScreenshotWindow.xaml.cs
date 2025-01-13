@@ -144,7 +144,7 @@ namespace TBChestTracker
             catch(Exception ex)
             {
                 //-- do nothing
-                com.HellStormGames.Logging.Loggy.Write($"{ex.Message}", com.HellStormGames.Logging.LogType.ERROR);
+                // com.HellStormGames.Logging.Loggy.Write($"{ex.Message}", com.HellStormGames.Logging.LogType.ERROR);
             }
         }
 
@@ -259,8 +259,11 @@ namespace TBChestTracker
                         imageScaled.Save($@"{outputPath}\OCR_ImageScaled.png");
                         thresholdImage.Save($@"{outputPath}\OCR_Threshold.png");
                     }
+                    var finalResult = thresholdImage.Mat.ToImage<Bgr, byte>();
+                    var thresholdBitmap = finalResult.ToBitmap();
+                    
+                    var ocrResult = OCREngine.Instance.Read(thresholdBitmap);
 
-                    var ocrResult = OCREngine.Instance.Read(thresholdImage);
                     if (ocrResult != null)
                     {
                         clanmateName = ocrResult.Words.ToArray();

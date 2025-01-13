@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Emgu.CV;
-using Emgu.CV.OCR;
-
 using TBChestTracker.Helpers;
+using com.HellStormGames.TesseractOCR;
+using com.HellStormGames.TesseractOCR.Collections;
+
 using System.Diagnostics;
-using Emgu.CV.Structure;
+using Emgu.CV.Dai;
 
 namespace TBChestTracker.Engine
 {
@@ -16,7 +16,7 @@ namespace TBChestTracker.Engine
     public class OCREngine
     {
         //public static OCREngine Instance { get; private set; }
-        public Tesseract OCR { get; private set; }
+        public Tessy OCR { get; private set; }
         public static OCREngine Instance { get; private set; }
         public OCREngine()
         {
@@ -29,11 +29,11 @@ namespace TBChestTracker.Engine
             {
                 if (OCR == null)
                 {
-                    OcrEngineMode ocrmode = OcrEngineMode.LstmOnly;
+                    OcrEngineMode ocrmode = OcrEngineMode.Lstm;
 
                     if(ocrSettings.TessDataConfig.Prefix.Equals("_best") || ocrSettings.TessDataConfig.Prefix.Equals("_fast"))
                     {
-                        ocrmode = OcrEngineMode.LstmOnly;
+                        ocrmode = OcrEngineMode.Lstm;
                     }
 
                     var languages = String.Empty;
@@ -49,13 +49,12 @@ namespace TBChestTracker.Engine
                     {
                         var tessdata = $@"{ocrSettings.TessDataFolder}\";
                         
-                        OCR = new Tesseract();
+                        OCR = new Tessy();
 
                         //-- accessviolationexception being tossed because of OcrEngineMode.LstmOnly
-                        OCR.Init(tessdata, languages, ocrmode);
-                        OCR.PageSegMode = PageSegMode.SparseTextOsd;
-
-                        OCR.SetVariable("tessedit_char_whitelist", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:-' ");
+                        OCR.Init(tessdata, languages, OcrEngineMode.Lstm);
+                        OCR.SetPageSegmentation(PageSegmentationMode.PSM_AUTO);
+                        //OCR.SetVariable("tessedit_char_whitelist", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:-' ");
                         //OCR.SetVariable("load_system_dawg", "F");
                         //OCR.SetVariable("load_freq_dawg", "F");
                     }
@@ -63,18 +62,16 @@ namespace TBChestTracker.Engine
                     {
                         throw new Exception($"Failed to initialize Tesseract. Reason given: => {ex.Message}");
                     }
-                    var psm = OCR.PageSegMode;
-
                 }
             }
             catch (Exception ex)
             {
                 //-- OCR failed.
-                com.HellStormGames.Logging.Console.Write($"{ex.Message}", "OCR Init", com.HellStormGames.Logging.LogType.ERROR);
+                // com.HellStormGames.Logging.Console.Write($"{ex.Message}", "OCR Init", com.HellStormGames.Logging.LogType.ERROR);
                 return false;
             }
 
-            com.HellStormGames.Logging.Console.Write($"Tesseract ({Tesseract.VersionString}) Initialized Successfully", "OCR Init", com.HellStormGames.Logging.LogType.INFO);
+            // com.HellStormGames.Logging.Console.Write($"Tesseract ({OCR.Version}) Initialized Successfully", "OCR Init", com.HellStormGames.Logging.LogType.INFO);
             return true;
         }
 
@@ -104,9 +101,9 @@ namespace TBChestTracker.Engine
             return languages;
         }
 
-        public Task<TessResult> ReadAsync(IInputArray image) => Task.Run(() => Read(image));
+        public Task<TessResult> ReadAsync(System.Drawing.Bitmap image) => Task.Run(() => Read(image));
 
-        public TessResult Read(IInputArray image)
+        public TessResult Read(System.Drawing.Bitmap image)
         {
             try
             {
@@ -114,30 +111,42 @@ namespace TBChestTracker.Engine
                 {
                     return null;
                 }
+
                 //-- AccessViolationException -- Correupted Memory sometimes.
-                OCR.SetImage(image);
-                OCR.Recognize();
-                
-                var resultstr = OCR.GetUTF8Text();
-                resultstr = resultstr.Replace("\r\n", ",");
-                string[] results = resultstr.Split(',');
-                List<String> ocrResults = new List<string>();
-                foreach (var r in results.ToList())
+                System.Drawing.Imaging.BitmapData data = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite,
+                image.PixelFormat);
+                OCR.SetImage(image, 600);
+                image.UnlockBits(data); 
+
+                if (OCR.Recongize() == 0)
                 {
-                    if (!String.IsNullOrEmpty(r))
+                    var resultstr = OCR.GetUTF8Text();
+                    if (String.IsNullOrEmpty(resultstr))
                     {
-                        ocrResults.Add(r);
+                        throw new Exception("Tesseract OCR UTF8 Text isn't Suppose To be empty.");
                     }
+                    resultstr = resultstr.Replace("\r\n", ",");
+                    string[] results = resultstr.Split(',');
+                    List<String> ocrResults = new List<string>();
+                    foreach (var r in results.ToList())
+                    {
+                        if (!String.IsNullOrEmpty(r))
+                        {
+                            ocrResults.Add(r);
+                        }
+                    }
+
+                    TessResult result = new TessResult();
+                    result.Words = new List<string>();
+                    result.Words = ocrResults.ToList();
+                    results = null;
+                    ocrResults = null;
+                    resultstr = string.Empty;
+
+                    return result;
                 }
-
-                TessResult result = new TessResult();
-                result.Words = new List<string>();
-                result.Words = ocrResults.ToList();
-                results = null;
-                ocrResults = null;
-                resultstr = string.Empty;
-
-                return result;
+                else 
+                    return null;
             }
             catch (Exception e)
             {
@@ -149,7 +158,7 @@ namespace TBChestTracker.Engine
         {
             if (OCR != null)
             {
-                OCR.Dispose();
+                OCR.Destroy();
                 OCR = null;
             }
         }

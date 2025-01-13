@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace com.HellStormGames.Diagnosis
+namespace com.HellStormGames.Diagnostics
 {
     public class BenchmarkerEventArgs : EventArgs
     {
