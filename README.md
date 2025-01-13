@@ -3,6 +3,11 @@
 ![GitHub contributors](https://img.shields.io/github/contributors/SICGames/TBChestTracker)
 [![Github All Releases](https://img.shields.io/github/downloads/SICGames/TBChestTracker/total.svg)]()
 
+## 2.6.6. Known Issues
+- Index Out Of Range exception occurs with ChestBoxBuilder.exe. This has been patched in 2.6.7. Unfortunately, I am placing in a new logger and placing in a newer version of Tesseract.
+- Mispelled clan names are result from EMGU.cv tesseract's version. Unable to load Tesseract's Best Trained Models without causing issues. Newer Tesseract version, I can load Best Trained Models containing LSTM.
+- With the new tesseract version, filtering out the image and cleaning up may be removed. Since accuracy has improved significally.
+
 ## Description
 TotalBattle Chest Tracker was designed to easily track your clan's chest count. 
 
@@ -48,11 +53,6 @@ Clanmate Management
  * Remove multiple clanmate names.
  
 </details>
-
-## Become a Patreon 
-If you want to support this project, become a Patreon and get access to the Discord server. 
-[Click Here](https://www.patreon.com/TotalBattleGuide) to become a Patreon and support this project.
-
 
 ## Are you stuck on something?
 Watch the Youtube videos 
