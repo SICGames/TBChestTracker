@@ -1,13 +1,6 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using TBChestTracker.Localization;
 
@@ -75,7 +68,10 @@ namespace TBChestTracker
             //-- configure crashbox
             CrashBox crashBox = new CrashBox();
 
-            Loggio.Logger = new LoggioConfiguration().WriteTo.DebugOutput().CreateLogger();
+            var logsFolder = $"{AppContext.Instance.LocalApplicationPath}Logs\\";
+            var logFile = $"loggio_{DateTimeOffset.Now.ToString(@"yyyy-MM-dd")}.log";
+            Loggio.Logger = new LoggioConfiguration().SubscribeTo.DebugOutput()
+                .SubscribeTo.File($"{logsFolder}{logFile}").CreateLogger();
             Loggio.Info("Total Battle Chest Tracker is starting...");
             
             splashScreen.Show();
@@ -83,16 +79,17 @@ namespace TBChestTracker
 
         private void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
-            Console.WriteLine("I AM PROCESS KILLER! MUAHAHAHA!");
         }
 
         private void SplashScreen_onSplashScreenComplete(object sender, EventArgs e)
         {
             var splash = (SplashScreen)sender;
             var startpage = splash.startPageWindow;
+
             startpage.Show();
 
             splash.Close(); 
+            Loggio.Info($"Splash Screen closing..."); 
         }
 
         private void Application_Exit(object sender, ExitEventArgs e)

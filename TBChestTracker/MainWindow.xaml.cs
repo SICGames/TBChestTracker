@@ -149,9 +149,7 @@ namespace TBChestTracker
             return Task.Run(() =>
             {
                 SettingsManager = new SettingsManager();
-
-               // com.HellStormGames.Logging.Console.Write("Settings Loaded.", com.HellStormGames.Logging.LogType.INFO);
-
+                Loggio.Info("Settings Loaded.");
                 //-- init appContext
                 AppContext.Instance.IsAutomationPlayButtonEnabled = false;
                 AppContext.Instance.IsCurrentClandatabase = false;
@@ -383,7 +381,7 @@ namespace TBChestTracker
         {
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
-                //com.HellStormGames.Logging.Console.Write("Automation Started", com.HellStormGames.Logging.LogType.INFO);
+                Loggio.Info("Automation Started.");
                 AppContext.Instance.IsAutomationPlayButtonEnabled = false;
                 AppContext.Instance.IsAutomationStopButtonEnabled = true;
 
@@ -400,7 +398,7 @@ namespace TBChestTracker
                 //-- automatically repairs chest data if necessary
                 AppContext.Instance.IsAutomationPlayButtonEnabled = true;
                 AppContext.Instance.IsAutomationStopButtonEnabled = false;
-                //com.HellStormGames.Logging.Console.Write("Automation stopped.", com.HellStormGames.Logging.LogType.INFO);
+                Loggio.Info("Automation Stopped.");
 
                 BuildingChestsWindow buildingChestsWindow = new BuildingChestsWindow();
                 if (buildingChestsWindow.ShowDialog() == true)
@@ -415,12 +413,12 @@ namespace TBChestTracker
                             var result = ClanManager.Instance.ClanChestManager.Repair();
                             if (result)
                             {
-                                //com.HellStormGames.Logging.Console.Write("Chest Data Automatically Repaired", "Chest Integrity", LogType.INFO);
+                                Loggio.Info("Chest Data automatically repaired.");
                             }
                         }
                         else
                         {
-                            //com.HellStormGames.Logging.Console.Write("Clan Chest Data is looking good. No need for repairs.", com.HellStormGames.Logging.LogType.INFO);
+                            Loggio.Info("Chest Data is looking good. No need for repairs.");
                         }
                     }
 
@@ -477,13 +475,17 @@ namespace TBChestTracker
 
             if (window is SplashScreen splashScreen)
             {
-
+                Loggio.Info("Total Battle Chest Tracker Initializing...");
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     splashScreen.UpdateStatus("Checking For Updates...", 0);
                 }));
+
                 await Task.Delay(500);
+
+                Loggio.Info("Checking for new updates...");
+
                 var upgradeAvailable = await CheckForUpgrades();
                 AppContext.Instance.upgradeAvailable = upgradeAvailable;
                 UpgradeAlertButton.ToolTip = upgradeAvailable == true ? TBChestTracker.Resources.Strings.UpdateAvailable : TBChestTracker.Resources.Strings.UpToDate;
@@ -495,12 +497,19 @@ namespace TBChestTracker
                 recentlyOpenedListManager = new RecentlyOpenedListManager();
 
                 await Task.Delay(500);
+
+                Loggio.Info("Initializing Settings...");
+
                 SettingsManager = await InitSettings();
 
                 if(SettingsManager == null)
                 {
+                    Loggio.Warn("SettingsManager is null. It should not be null.");
+
                     throw new Exception("SettingsManager is null");
                 }
+
+                Loggio.Info("Settingsmanager is initialized.");
 
                 //-- New TessData folder Path in Local User Data Folder
                 var localAppFolder = new System.IO.DirectoryInfo(AppContext.Instance.LocalApplicationPath);
@@ -511,18 +520,23 @@ namespace TBChestTracker
 
                 if(String.IsNullOrEmpty(SettingsManager.Instance.Settings.OCRSettings.TessDataFolder))
                 {
+                    Loggio.Warn("Wasn't able to obtain TessData path from 'Settings.json' properly.");
+
                     throw new Exception("Unable to correctly populate settings.");
                 }
 
                 if(AppContext.Instance.bDeleteTessData == true)
                 {
+
                     await this.Dispatcher.BeginInvoke(new Action(() =>
                     {
                         splashScreen.UpdateStatus("Deleting Tesseract Data folder...", 10);
                     }));
 
+                    Loggio.Info("Cleaning Tesseract Data Folder...");
                     await DeleteTessData();
                     await Task.Delay(250);
+                    Loggio.Info("Cleaned Tesseract Data Folder.");
                 }
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
@@ -531,8 +545,12 @@ namespace TBChestTracker
                 }));
 
                 await Task.Delay(500);
-                
+
+                Loggio.Info("Initialized Captain Hook.");
+
                 InitCaptainHook();
+
+                await Task.Delay(200);
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
@@ -540,26 +558,35 @@ namespace TBChestTracker
                 
                 }));
 
+                Loggio.Info("Finishing up Initializing...");
                 await Task.Delay(250);
+
                 await FinishingUpTask();
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     splashScreen.UpdateStatus("Validating Clan databases...", 91);
                 }));
+
                 await Task.Delay(500);
+
+                Loggio.Info("Validating Clan Databases...");
+
                 var databasesNeedUpgrade = await ValidateClanDatabases();
+
                 if (databasesNeedUpgrade.Count > 0)
                 {
-
                     await this.Dispatcher.BeginInvoke(new Action(() =>
                     {
                         splashScreen.UpdateStatus("Upgrading Clan databases...", 92);
                     }));
+                    Loggio.Info("Upgrading Clan Databases...");
+
                     await Task.Delay(250);
                     await UpgradeClanDatabases(databasesNeedUpgrade);
                 }
 
+                Loggio.Info("Clan Databases finished validating...");
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
@@ -567,6 +594,8 @@ namespace TBChestTracker
                 }));
 
                 await Task.Delay(250);
+                Loggio.Info("Validating Tesseract Trained Models Are Installed...");
+
                 var tessDataExists = await ValidateTessDataExists();    
                 if(tessDataExists == false)
                 {
@@ -575,6 +604,7 @@ namespace TBChestTracker
                     {
                         splashScreen.UpdateStatus("Downloading Tesseract's Trained Models...", 94);
                     }));
+                    Loggio.Info("Downloading Tesseract's Trained Models...");
 
                     var downloadUrl = await GetTesseractGithubDownloadPath();
 
@@ -597,17 +627,21 @@ namespace TBChestTracker
                         }));
 
                         var archiveFile = $@"{downloadFolderPath}\{SettingsManager.Instance.Settings.OCRSettings.TessDataConfig.TesseractPackage}.zip";
+
+                        Loggio.Info("Extracting Downloaded Tesseract Trained Models...");
+
                         await ExtractArchive(splashScreen, archiveFile, $"{AppContext.Instance.TesseractData}");
 
                         //-- remove archive file
                         //-- update SettingsManager.OCRSettings
-                        //SettingsManager.Instance.Settings.OCRSettings.TessDataFolder = $@"{AppContext.Instance.TesseractData}";
                         SettingsManager.Instance.Save();
                         bTessDataDownloadComplete = true;
 
                     }
                     else
                     {
+                        Loggio.Warn("Unable to obtain Tesseract Download Path");
+
                         throw new Exception("Failed to obtain Tesseract download path.");
                     }
                 }
@@ -619,9 +653,11 @@ namespace TBChestTracker
                     {
                         splashScreen.UpdateStatus("Cleaning up Temporary Files...", 97);
                     }));
+
+                    Loggio.Info("Cleaning temporary files from Tesseract's Trained Models Download....");
+
                     await DeleteDownloadedTempFolder();
                     await Task.Delay(150);
-
                 }
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
@@ -630,7 +666,9 @@ namespace TBChestTracker
                 }));
 
                 await Task.Delay(250);
-                
+
+                Loggio.Info("Initializing Chest Automation...");
+
                 await InitChestAutomation();
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
@@ -639,12 +677,15 @@ namespace TBChestTracker
                 }));
                 await Task.Delay(100);
 
+                Loggio.Info("Building Chest Builder Variables...");
                 await BuildChestData();
 
                 await this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     splashScreen.UpdateStatus("Starting Clan Insights Server...", 99);
                 }));
+
+                Loggio.Info("Starting Clan Insights NodeJS Server...");
 
                 await Task.Delay(250);
                 await StartInsightsServer();
@@ -653,6 +694,8 @@ namespace TBChestTracker
                 {
                     splashScreen.UpdateStatus("Launching...", 100);
                 }));
+                
+                Loggio.Info("Launching Total Battle Chest Tracker...");
 
                 await Task.Delay(1000);
                 await LaunchTask(splashScreen);
@@ -664,8 +707,7 @@ namespace TBChestTracker
                         LocalizationManager.Set("en-US");
                         break;
                 }
-
-                //com.HellStormGames.Logging.Console.Write($"Using Culture Info ('{CultureInfo.CurrentCulture.Name}')", com.HellStormGames.Logging.LogType.INFO);
+                Loggio.Info($"Using culture info ('{CultureInfo.CurrentCulture.Name}')");
             }
         }
         #endregion
@@ -694,7 +736,7 @@ namespace TBChestTracker
 
         private void CaptainHook_onInstalled(object sender, EventArgs e)
         {
-            //com.HellStormGames.Logging.Console.Write("Installed Keyboard hooks successfully.", com.HellStormGames.Logging.LogType.INFO);
+            Loggio.Info("Installed Keyboard hooks successfully.");
         }
 
 
@@ -956,13 +998,13 @@ namespace TBChestTracker
 
                     }
 
-                    // com.HellStormGames.Logging.Console.Write($"Loaded Clan ({ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}) Database Successfully.",
-                        // com.HellStormGames.Logging.LogType.INFO);
-
+                    Loggio.Info($"Loaded Clan ({ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}) successfully.");
                     AppContext.Instance.IsCurrentClandatabase = true;
                     if (AppContext.Instance.IsClanChestDataCorrupted == true)
                     {
                         AppContext.Instance.IsAutomationPlayButtonEnabled = false;
+
+                        Loggio.Warn("Was not able to load clan chest database file. Possibly corrupted.");
 
                         if (MessageBox.Show("Oh no! There is an error loading your clan chest database file. It is possibly corrupted. Be sure to restore a previously known good clan chest data file inside Tools -> Restore Clan Chest Data", "Clan Chest Data Loading Error", MessageBoxButton.OK, MessageBoxImage.Stop) == MessageBoxResult.OK)
                         {
@@ -976,12 +1018,12 @@ namespace TBChestTracker
                     }
 
                     ExportClan.IsEnabled = true;
-                    //CloseDatabase.IsEnabled = true;
                     
                     bIsLoaded = true;
                 }
                 else
                 {
+                    Loggio.Warn("Wasn't able to load clan chest database. It is empty.");
                     MessageBox.Show("Something went horribly wrong. Database is not suppost to be blank.");
                     bIsLoaded = false;
                 }
@@ -1392,14 +1434,15 @@ namespace TBChestTracker
                         var result = ClanManager.Instance.ClanChestManager.Repair();
                         if (result)
                         {
-                            // com.HellStormGames.Logging.Console.Write("Chest Data Automatically Repaired", "Chest Integrity", LogType.INFO);
+                            Loggio.Info("Chest Data Automatically Repaired.");
                         }
                     }
                     else
                     {
-                        // com.HellStormGames.Logging.Console.Write("Clan Chest Data is looking good. No need for repairs.", com.HellStormGames.Logging.LogType.INFO);
+                        Loggio.Info("Chest Data is looking good. No Need for repairs.");
                     }
                 }
+
                 ClanManager.Instance.ClanChestManager.ClearCache();
             }
         }

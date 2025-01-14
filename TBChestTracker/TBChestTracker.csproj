@@ -115,6 +115,16 @@
       <HintPath>..\..\Tessy\x64\Debug\Tessy.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <Reference Include="Loggio.NET">
+      <HintPath>..\..\Loggio.NET\Loggio.NET\bin\x64\Debug\Loggio.NET.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <Reference Include="Loggio.NET">
+      <HintPath>..\..\Loggio.NET\Loggio.NET\bin\x64\Release\Loggio.NET.dll</HintPath>
+    </Reference>
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="Snapture, Version=1.0.8966.4104, Culture=neutral, processorArchitecture=AMD64">

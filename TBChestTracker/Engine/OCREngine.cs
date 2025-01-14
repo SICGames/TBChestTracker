@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 using TBChestTracker.Helpers;
 using com.HellStormGames.TesseractOCR;
 using com.HellStormGames.TesseractOCR.Collections;
+using com.HellStormGames.Diagnostics;
+using com.HellStormGames.Diagnostics.Logging;
 
 using System.Diagnostics;
 using Emgu.CV.Dai;
+using System.Windows;
 
 namespace TBChestTracker.Engine
 {
@@ -45,12 +48,22 @@ namespace TBChestTracker.Engine
                     {
                         languages = ocrSettings.Languages;
                     }
+
                     try
                     {
                         var tessdata = $@"{ocrSettings.TessDataFolder}\";
-                        
-                        OCR = new Tessy();
+                        if (!System.IO.Directory.Exists(tessdata))
+                        {
+                            Loggio.Warn($"No folder TessData Path ('{tessdata}') exists. Ensure it exists.");
+                            return false;
+                        }
 
+                        if(languages == null)
+                        {
+                            MessageBox.Show("There was a problem with initializing Tesseract. View recent log file for more information.");
+                            return false;
+                        }
+                        OCR = new Tessy();
                         //-- accessviolationexception being tossed because of OcrEngineMode.LstmOnly
                         OCR.Init(tessdata, languages, OcrEngineMode.Lstm);
                         OCR.SetPageSegmentation(PageSegmentationMode.PSM_AUTO);
@@ -60,18 +73,19 @@ namespace TBChestTracker.Engine
                     }
                     catch(Exception ex)
                     {
-                        throw new Exception($"Failed to initialize Tesseract. Reason given: => {ex.Message}");
+                        Loggio.Error(ex, "",$"Failed to initialize Tesseract.");
+                        return false;
                     }
                 }
             }
             catch (Exception ex)
             {
                 //-- OCR failed.
-                // com.HellStormGames.Logging.Console.Write($"{ex.Message}", "OCR Init", com.HellStormGames.Logging.LogType.ERROR);
+                Loggio.Error(ex, "", "Exception occured while attempting initialize Tesseract.");
                 return false;
             }
 
-            // com.HellStormGames.Logging.Console.Write($"Tesseract ({OCR.Version}) Initialized Successfully", "OCR Init", com.HellStormGames.Logging.LogType.INFO);
+            Loggio.Info($"Tesseract ({OCR.Version}) successfully initialized.");
             return true;
         }
 
@@ -82,7 +96,8 @@ namespace TBChestTracker.Engine
 
             if (!System.IO.Directory.Exists(tessdata_path))
             {
-                throw new Exception($"No folder 'tessdata' exists. Ensure it exists.");
+                Loggio.Warn($"No folder TessData Path ('{tessdata_path}') exists. Ensure it exists.");
+                return null;
             }
 
             var tessdatafiles = System.IO.Directory.GetFiles(tessdata_path, "*.traineddata");

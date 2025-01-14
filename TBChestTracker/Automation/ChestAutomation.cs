@@ -69,7 +69,7 @@ namespace TBChestTracker.Automation
                 isRunning = false;
                 isCancelled = true;
                 AppContext.Instance.AutomationRunning = false;
-                Debug.WriteLine($"Automation is stopped.");
+                Loggio.Info("Chest Automation is stopped...");
                 handler(this, args);
             }
         }
@@ -151,7 +151,20 @@ namespace TBChestTracker.Automation
             {
                 AppContext.Instance.TessDataExists = true;
                 var languages = ocrSettings.Languages;
-                OCREngine.Init(ocrSettings);
+                Loggio.Info("Initializing OCR Engine...");
+
+                if(OCREngine.Init(ocrSettings) == false)
+                {
+                    if(MessageBox.Show("OCR Engine failed to be initialized. Check recent log file for more information.", 
+                        "OCR Initialization.", 
+                        MessageBoxButton.OK, 
+                        MessageBoxImage.Error, 
+                        MessageBoxResult.OK, 
+                        MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.OK)
+                    {
+                        return false;
+                    }
+                }
             }
             else
             {
@@ -166,7 +179,8 @@ namespace TBChestTracker.Automation
             Snapture.onFrameCaptured += Snapture_onFrameCaptured;
             Snapture.Start(FrameCapturingMethod.GDI);
 
-            Consolio.Write("Snapture Started.", LogType.INFO);
+            Loggio.Info("Snapture Started...");
+            
             isInitialized = true;
 
             TextProcessed += ChestAutomation_TextProcessed;
@@ -201,12 +215,10 @@ namespace TBChestTracker.Automation
         {
             var result = e.ProcessResult;
 
-            //Benchmarker.Stop();
-
             if(result.Result == ClanChestProcessEnum.NO_GIFTS)
             {
                 StopAutomation();
-                Consolio.Write($"There are no more gifts to collect.", "Automation Result", LogType.INFO);
+                Loggio.Info("There are no more chests to collect.");
             }
 
             if (result.Result == ClanChestProcessEnum.SUCCESS)
@@ -244,7 +256,7 @@ namespace TBChestTracker.Automation
                 var result = MessageBox.Show($"Stopping automation and saving chest data. Reason: {errormessage}", "OCR Error", MessageBoxButton.OK);
                 if (result == MessageBoxResult.OK)
                 {
-                    Consolio.Write($"Error Occured Processing Chests. Automation Stopped.", "Automation Result", LogType.ERROR);
+                    Loggio.Warn("Automation Stopped and saved chest data. Reason for issue was => " + errormessage);
                     StopAutomation();
                 }
             }
@@ -377,7 +389,7 @@ namespace TBChestTracker.Automation
             {
                 // token.ThrowIfCancellationRequested();
                 clicksTotal = 0;
-                Debug.WriteLine("Automation is beginning to run...");
+                Loggio.Info("Chest Automation is beginning to run...");
                 var automationSettings = SettingsManager.Instance.Settings.AutomationSettings;
                 var maxClicksReached = false;
                 while (isRunning)
@@ -410,7 +422,7 @@ namespace TBChestTracker.Automation
                     }
                     catch(OperationCanceledException e)
                     {
-                        Debug.WriteLine("Automation is being cancelled...");
+                        Loggio.Info("Chest Automation is being cancelled...");
                     }
                 }
                 if(maxClicksReached)
@@ -427,7 +439,7 @@ namespace TBChestTracker.Automation
         }
         public async Task StartAutomation()
         {
-            Debug.WriteLine($"Automation is being started.");
+            Loggio.Info("Chest Automation is being started...");
             onAutomationStarted(new AutomationEventArguments(true, false));
             await Task.Run(() => StartAutomationTask());
         }
