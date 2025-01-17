@@ -103,18 +103,6 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
-  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <Reference Include="Tessy, Version=1.0.9141.33333, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Tessy\x64\Release\Tessy.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <Reference Include="Tessy, Version=1.0.9141.33333, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Tessy\x64\Debug\Tessy.dll</HintPath>
-    </Reference>
-  </ItemGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <Reference Include="Loggio.NET">
       <HintPath>..\..\Loggio.NET\Loggio.NET\bin\x64\Debug\Loggio.NET.dll</HintPath>
@@ -147,6 +135,9 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="Tessy">
+      <HintPath>..\..\Tessy\Tessy\bin\x64\Debug\Tessy.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -156,13 +147,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AboutWindow.xaml.cs">
+    <Compile Include="Windows\About\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AbsentClanmatesCleanerWindow.xaml.cs">
+    <Compile Include="Windows\AbsentClanmates\AbsentClanmatesCleanerWindow.xaml.cs">
       <DependentUpon>AbsentClanmatesCleanerWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AbsentClanmatesWindow.xaml.cs">
+    <Compile Include="Windows\AbsentClanmates\AbsentClanmatesWindow.xaml.cs">
       <DependentUpon>AbsentClanmatesWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Arrays\Collection.cs" />
@@ -177,10 +168,10 @@
     <Compile Include="Automation\Events\AutomationTextProcessedEventArguments.cs" />
     <Compile Include="Automation\Native\Automator.cs" />
     <Compile Include="Benchmark\Benchmarker.cs" />
-    <Compile Include="BuildingChestsWindow.xaml.cs">
+    <Compile Include="Windows\BuildingChests\BuildingChestsWindow.xaml.cs">
       <DependentUpon>BuildingChestsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ChestBuilderWindow.xaml.cs">
+    <Compile Include="Windows\ChestBuilder\ChestBuilderWindow.xaml.cs">
       <DependentUpon>ChestBuilderWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ChestProcessor\ChestProcessor.cs" />
@@ -188,7 +179,7 @@
     <Compile Include="ChestProcessor\Events\ChestProcessingStateChangedEventArguments.cs" />
     <Compile Include="ChestRewards\ChestReward.cs" />
     <Compile Include="ChestProcessor\ChestBox.cs" />
-    <Compile Include="ClanChestDatabaseUpdaterWindow.xaml.cs">
+    <Compile Include="Windows\ClanChests\ClanChestDatabaseUpdaterWindow.xaml.cs">
       <DependentUpon>ClanChestDatabaseUpdaterWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ClanChestSettings\ChestOptions.cs" />
@@ -201,27 +192,27 @@
     <Compile Include="ClanData\ClanChestExporter.cs" />
     <Compile Include="ClanData\DateRangeEnum.cs" />
     <Compile Include="ClanData\GeneralClanSettings.cs" />
-    <Compile Include="ClanInsightsWindow.xaml.cs">
+    <Compile Include="Windows\ClanInsights\ClanInsightsWindow.xaml.cs">
       <DependentUpon>ClanInsightsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ClanInsights\ClanInsightsData.cs" />
-    <Compile Include="ClanmateEditorWindow.xaml.cs">
+    <Compile Include="Windows\Clanmates\ClanmateEditorWindow.xaml.cs">
       <DependentUpon>ClanmateEditorWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ClanmatesFloatingWindow.xaml.cs">
+    <Compile Include="Windows\Clanmates\ClanmatesFloatingWindow.xaml.cs">
       <DependentUpon>ClanmatesFloatingWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ClanmateValidationWindow.xaml.cs">
+    <Compile Include="Windows\Clanmates\ClanmateValidationWindow.xaml.cs">
       <DependentUpon>ClanmateValidationWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Clanmate\AbsentClanmate.cs" />
     <Compile Include="Clanmate\Clanmate.cs" />
     <Compile Include="Clanmate\ClanmateDatabase.cs" />
     <Compile Include="Clanmate\LazyClanmates.cs" />
-    <Compile Include="ClanWealthBuilderWindow.xaml.cs">
+    <Compile Include="Windows\Clan\ClanWealthBuilderWindow.xaml.cs">
       <DependentUpon>ClanWealthBuilderWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ClanWizardWindow.xaml.cs">
+    <Compile Include="Windows\Clan\ClanWizardWindow.xaml.cs">
       <DependentUpon>ClanWizardWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ClanWizard\ClanWizardContext.cs" />
@@ -231,7 +222,7 @@
     <Compile Include="ConsoleInterlop\Events\ConsoleInterlopEventArgs.cs" />
     <Compile Include="Progresses\ClanMovingProgress.cs" />
     <Compile Include="Progresses\ConsoleInterlopProgress.cs" />
-    <Compile Include="ConsoleWindow.xaml.cs">
+    <Compile Include="Windows\Console\ConsoleWindow.xaml.cs">
       <DependentUpon>ConsoleWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Console\Console.cs" />
@@ -248,13 +239,13 @@
     <Compile Include="CustomControls\DpiAwareImage.cs" />
     <Compile Include="DateParser\DateKeys.cs" />
     <Compile Include="DateParser\DateParser.cs" />
-    <Compile Include="EditChestPointValueWindow.xaml.cs">
+    <Compile Include="Windows\ClanChestSettings\EditChestPointValueWindow.xaml.cs">
       <DependentUpon>EditChestPointValueWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Engine\OCREngine.cs" />
     <Compile Include="Enums\ChestBuildDataResult.cs" />
     <Compile Include="ErrorHandlers\ChestProcessingError.cs" />
-    <Compile Include="ExportDatabaseWindow.xaml.cs">
+    <Compile Include="Windows\Clan\ExportDatabaseWindow.xaml.cs">
       <DependentUpon>ExportDatabaseWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Extensions\DateExtensions.cs" />
@@ -262,7 +253,7 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Helpers\WindowHelper.cs" />
     <Compile Include="ImageEffects\ImageEffects.cs" />
-    <Compile Include="ImportDatabaseWindow.xaml.cs">
+    <Compile Include="Windows\Clan\ImportDatabaseWindow.xaml.cs">
       <DependentUpon>ImportDatabaseWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Managers\ChestRewardsManager.cs" />
@@ -292,7 +283,7 @@
       <DependentUpon>RepairClanmatesPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Progresses\BuildingChestsProgress.cs" />
-    <Compile Include="RestoreClanChestDataWindow.xaml.cs">
+    <Compile Include="Windows\ClanChests\RestoreClanChestDataWindow.xaml.cs">
       <DependentUpon>RestoreClanChestDataWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Results\CommonResult.cs" />
@@ -316,19 +307,19 @@
     <Compile Include="Managers\LocalizationManager.cs" />
     <Compile Include="ChestProcessor\ProcessingTextResult.cs" />
     <Compile Include="Managers\SettingsManager.cs" />
-    <Compile Include="MergeClanmateWindow.xaml.cs">
+    <Compile Include="Windows\Clanmates\MergeClanmateWindow.xaml.cs">
       <DependentUpon>MergeClanmateWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MoveClanFolderWindow.xaml.cs">
+    <Compile Include="Windows\Clan\MoveClanFolderWindow.xaml.cs">
       <DependentUpon>MoveClanFolderWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NewChestPointWindow.xaml.cs">
+    <Compile Include="Windows\ClanChestSettings\NewChestPointWindow.xaml.cs">
       <DependentUpon>NewChestPointWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="OCRWizardManualEditorWindow.xaml.cs">
+    <Compile Include="Windows\OCRWizard\OCRWizardManualEditorWindow.xaml.cs">
       <DependentUpon>OCRWizardManualEditorWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="OCRWizardWindow.xaml.cs">
+    <Compile Include="Windows\OCRWizard\OCRWizardWindow.xaml.cs">
       <DependentUpon>OCRWizardWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="OCRWizard\OCRWizardEventArgs.cs" />
@@ -380,10 +371,10 @@
     <Compile Include="Pages\Settings\OCRSettingsPage.xaml.cs">
       <DependentUpon>OCRSettingsPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PreviewCroppedImageViewer.xaml.cs">
+    <Compile Include="Windows\ClanmateStudio\PreviewCroppedImageViewer.xaml.cs">
       <DependentUpon>PreviewCroppedImageViewer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PreviewScreenshotWindow.xaml.cs">
+    <Compile Include="Windows\ClanmateStudio\PreviewScreenshotWindow.xaml.cs">
       <DependentUpon>PreviewScreenshotWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="RecentData\RecentClanDatabase.cs" />
@@ -397,7 +388,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.fr-FR.resx</DependentUpon>
     </Compile>
-    <Compile Include="SettingsWindow.xaml.cs">
+    <Compile Include="Windows\Settings\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings\AOIRect.cs" />
@@ -413,28 +404,28 @@
     <Compile Include="Shared\AbsentClanmatesViewModel.cs" />
     <Compile Include="Shared\AppContext.cs" />
     <Compile Include="Progresses\ZipProgress.cs" />
-    <Compile Include="SplashScreen.xaml.cs">
+    <Compile Include="Windows\SplashScreen\SplashScreen.xaml.cs">
       <DependentUpon>SplashScreen.xaml</DependentUpon>
     </Compile>
-    <Compile Include="StartPageWindow.xaml.cs">
+    <Compile Include="Windows\StartPage\StartPageWindow.xaml.cs">
       <DependentUpon>StartPageWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="States\CaptureMode.cs" />
     <Compile Include="States\ChestProcessingState.cs" />
     <Compile Include="ClanData\Clan.cs" />
-    <Compile Include="ClanManagementWindow.xaml.cs">
+    <Compile Include="Windows\Clan\ClanManagementWindow.xaml.cs">
       <DependentUpon>ClanManagementWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\BooleanToWidthConverter.cs" />
-    <Compile Include="CaptureRegionWindow.xaml.cs">
+    <Compile Include="Windows\ClanmateStudio\CaptureRegionWindow.xaml.cs">
       <DependentUpon>CaptureRegionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Chest\Chest.cs" />
     <Compile Include="ClanChestSettings\ChestConditions.cs" />
     <Compile Include="Export\ChestExportData.cs" />
     <Compile Include="ChestProcessor\ChestData.cs" />
-    <Compile Include="ChestingRequirementsWindow.xaml.cs">
+    <Compile Include="Windows\ClanChestSettings\ChestingRequirementsWindow.xaml.cs">
       <DependentUpon>ChestingRequirementsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ClanChestSettings\ChestRequirements.cs" />
@@ -446,7 +437,7 @@
     <Compile Include="Managers\ClanDatabaseManager.cs" />
     <Compile Include="ClanData\ClanStatStatisticData.cs" />
     <Compile Include="Converters\EnumToIntConverter.cs" />
-    <Compile Include="EditConditionWindow.xaml.cs">
+    <Compile Include="Windows\ClanChestSettings\EditConditionWindow.xaml.cs">
       <DependentUpon>EditConditionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helpers\TessResult.cs" />
@@ -454,19 +445,19 @@
     <Compile Include="Managers\ClanManager.cs" />
     <Compile Include="Shared\CustomCommandBindings.cs" />
     <Compile Include="Converters\EnumToBooleanConverter.cs" />
-    <Compile Include="ExportWindow.xaml.cs">
+    <Compile Include="Windows\Export\ExportWindow.xaml.cs">
       <DependentUpon>ExportWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="CustomControls\FilePicker.xaml.cs">
       <DependentUpon>FilePicker.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NewClanDatabaseWindow.xaml.cs">
+    <Compile Include="Windows\Clan\NewClanDatabaseWindow.xaml.cs">
       <DependentUpon>NewClanDatabaseWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NewConditionWindow.xaml.cs">
+    <Compile Include="Windows\ClanChestSettings\NewConditionWindow.xaml.cs">
       <DependentUpon>NewConditionWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SelectRegionWindow.xaml.cs">
+    <Compile Include="Windows\ClanmateStudio\SelectRegionWindow.xaml.cs">
       <DependentUpon>SelectRegionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Export\SortType.cs" />
@@ -480,10 +471,10 @@
     </Compile>
     <Compile Include="UI\Notification.cs" />
     <Compile Include="UpdateManifest\Manifest.cs" />
-    <Compile Include="UpdateWindow.xaml.cs">
+    <Compile Include="Windows\Update\UpdateWindow.xaml.cs">
       <DependentUpon>UpdateWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ValidateClanChestsIntegrityWindow.xaml.cs">
+    <Compile Include="Windows\ClanChests\ValidateClanChestsIntegrityWindow.xaml.cs">
       <DependentUpon>ValidateClanChestsIntegrityWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\ClanDatabaseBackupItem.cs" />
@@ -491,47 +482,47 @@
     <Compile Include="ViewModels\ClanmatesValidationProgress.cs" />
     <Compile Include="ViewModels\RestoreClanDatabaseViewModel.cs" />
     <Compile Include="ViewModels\VerifiedClanmatesViewModel.cs" />
-    <Page Include="AboutWindow.xaml">
+    <Page Include="Windows\About\AboutWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AbsentClanmatesCleanerWindow.xaml">
+    <Page Include="Windows\AbsentClanmates\AbsentClanmatesCleanerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AbsentClanmatesWindow.xaml">
+    <Page Include="Windows\AbsentClanmates\AbsentClanmatesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="BuildingChestsWindow.xaml">
+    <Page Include="Windows\BuildingChests\BuildingChestsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ChestBuilderWindow.xaml">
+    <Page Include="Windows\ChestBuilder\ChestBuilderWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ClanChestDatabaseUpdaterWindow.xaml">
+    <Page Include="Windows\ClanChests\ClanChestDatabaseUpdaterWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ClanInsightsWindow.xaml">
+    <Page Include="Windows\ClanInsights\ClanInsightsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ClanmateEditorWindow.xaml">
+    <Page Include="Windows\Clanmates\ClanmateEditorWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ClanmatesFloatingWindow.xaml">
+    <Page Include="Windows\Clanmates\ClanmatesFloatingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ClanmateValidationWindow.xaml">
+    <Page Include="Windows\Clanmates\ClanmateValidationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ClanWealthBuilderWindow.xaml">
+    <Page Include="Windows\Clan\ClanWealthBuilderWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -539,43 +530,43 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ExportDatabaseWindow.xaml">
+    <Page Include="Windows\Clan\ExportDatabaseWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ImportDatabaseWindow.xaml">
+    <Page Include="Windows\Clan\ImportDatabaseWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ManageClanmatesWindow.xaml">
+    <Page Include="Windows\Clanmates\ManageClanmatesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="CaptureRegionWindow.xaml">
+    <Page Include="Windows\ClanmateStudio\CaptureRegionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ChestingRequirementsWindow.xaml">
+    <Page Include="Windows\ClanChestSettings\ChestingRequirementsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ClanManagementWindow.xaml">
+    <Page Include="Windows\Clan\ClanManagementWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ClanWizardWindow.xaml">
+    <Page Include="Windows\Clan\ClanWizardWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ConsoleWindow.xaml">
+    <Page Include="Windows\Console\ConsoleWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="EditChestPointValueWindow.xaml">
+    <Page Include="Windows\ClanChestSettings\EditChestPointValueWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ExportWindow.xaml">
+    <Page Include="Windows\Export\ExportWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -587,7 +578,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="ManageClanmatesWindow.xaml.cs">
+    <Compile Include="Windows\Clanmates\ManageClanmatesWindow.xaml.cs">
       <DependentUpon>ManageClanmatesWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="App.xaml.cs">
@@ -599,35 +590,35 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="MergeClanmateWindow.xaml">
+    <Page Include="Windows\Clanmates\MergeClanmateWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MoveClanFolderWindow.xaml">
+    <Page Include="Windows\Clan\MoveClanFolderWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="NewChestPointWindow.xaml">
+    <Page Include="Windows\ClanChestSettings\NewChestPointWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="NewClanDatabaseWindow.xaml">
+    <Page Include="Windows\Clan\NewClanDatabaseWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="EditConditionWindow.xaml">
+    <Page Include="Windows\ClanChestSettings\EditConditionWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="NewConditionWindow.xaml">
+    <Page Include="Windows\ClanChestSettings\NewConditionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="OCRWizardManualEditorWindow.xaml">
+    <Page Include="Windows\OCRWizard\OCRWizardManualEditorWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="OCRWizardWindow.xaml">
+    <Page Include="Windows\OCRWizard\OCRWizardWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -727,31 +718,31 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PreviewCroppedImageViewer.xaml">
+    <Page Include="Windows\ClanmateStudio\PreviewCroppedImageViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PreviewScreenshotWindow.xaml">
+    <Page Include="Windows\ClanmateStudio\PreviewScreenshotWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="RestoreClanChestDataWindow.xaml">
+    <Page Include="Windows\ClanChests\RestoreClanChestDataWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SelectRegionWindow.xaml">
+    <Page Include="Windows\ClanmateStudio\SelectRegionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SettingsWindow.xaml">
+    <Page Include="Windows\Settings\SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SplashScreen.xaml">
+    <Page Include="Windows\SplashScreen\SplashScreen.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="StartPageWindow.xaml">
+    <Page Include="Windows\StartPage\StartPageWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -767,11 +758,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UpdateWindow.xaml">
+    <Page Include="Windows\Update\UpdateWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ValidateClanChestsIntegrityWindow.xaml">
+    <Page Include="Windows\ClanChests\ValidateClanChestsIntegrityWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

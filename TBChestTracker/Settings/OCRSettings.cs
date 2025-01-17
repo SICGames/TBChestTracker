@@ -159,6 +159,16 @@ namespace TBChestTracker
             }
         }
 
+        private bool? _enableImageFilter;
+        public bool EnableImageFilter
+        {
+            get => _enableImageFilter.GetValueOrDefault(false);
+            set
+            {
+                _enableImageFilter = value;
+                OnPropertyChanged(nameof(EnableImageFilter));
+            }
+        }
         private TessDataConfig _TessDataConfig = null;
         private bool disposedValue;
 

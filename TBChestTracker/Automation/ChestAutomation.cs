@@ -1,24 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Emgu;
 using Emgu.CV;
 using com.HellstormGames.ScreenCapture;
 using com.HellstormGames.Imaging.Extensions;
-using com.HellStormGames.Logging;
 using System.Windows;
 using TBChestTracker.Engine;
 using TBChestTracker.Managers;
 using Emgu.CV.Structure;
 using TBChestTracker.Effects;
-using TBChestTracker.Helpers;
 using System.Diagnostics;
-using System.Threading;
-using Newtonsoft.Json.Linq;
-using System.Drawing;
-using CefSharp.DevTools.Database;
 using com.HellStormGames.Diagnostics;
 
 
@@ -271,6 +261,7 @@ namespace TBChestTracker.Automation
                     Debug.WriteLine($"Automation is running.");
                     var bitmap = e.ScreenCapturedBitmap;
                     var ocrSettings = SettingsManager.Instance.Settings.OCRSettings;
+
                     var brightness = ocrSettings.GlobalBrightness;
                     var threshold = new Gray(ocrSettings.Threshold); //-- 85
                     var maxThreshold = new Gray(ocrSettings.MaxThreshold); //--- 255
@@ -292,13 +283,16 @@ namespace TBChestTracker.Automation
                         }
                         original_image.Save($@"{outputPath}\OCR_ImageOriginal.png");
                     }
+                    if (ocrSettings.EnableImageFilter)
+                    {
+                        outputImage = ImageEffects.ConvertToGrayscale(original_image, bSave, outputPath);
+                        outputImage = ImageEffects.Brighten(outputImage, brightness, bSave, outputPath);
+                        //-- OCR Incorrect Text Bug - e.g. Slash Jr III is read Slash )r III
+                        //-- Fix: Upscaling input image large enough to read properly.
+                        outputImage = ImageEffects.Resize(outputImage, 3, Emgu.CV.CvEnum.Inter.Cubic, bSave, outputPath);
+                        outputImage = ImageEffects.ThresholdBinaryInv(outputImage, threshold, maxThreshold, bSave, outputPath);
+                    }
 
-                    outputImage = ImageEffects.ConvertToGrayscale(original_image, bSave, outputPath);
-                    outputImage = ImageEffects.Brighten(outputImage, brightness, bSave, outputPath);
-                    //-- OCR Incorrect Text Bug - e.g. Slash Jr III is read Slash )r III
-                    //-- Fix: Upscaling input image large enough to read properly.
-                    outputImage = ImageEffects.Resize(outputImage, 3, Emgu.CV.CvEnum.Inter.Cubic, bSave, outputPath);
-                    outputImage = ImageEffects.ThresholdBinaryInv(outputImage, threshold, maxThreshold, bSave, outputPath);
                     //-- if it is null or empty somehow, we update it.
                     if (String.IsNullOrEmpty(ocrSettings.PreviewImage))
                     {
@@ -311,8 +305,8 @@ namespace TBChestTracker.Automation
                         if (bitmap != null)
                         {
                             Debug.WriteLine("Preparing Bitmap to be read by OCR");
-                            var finalMat = outputImage.ToImage<Bgr, byte>();
-                            var ocrResult = OCREngine.Read(finalMat.ToBitmap());
+                            var outImage = ocrSettings.EnableImageFilter == true ? outputImage.ToBitmap() : bitmap;
+                            var ocrResult = OCREngine.Read(outImage);
 
                             if (ocrResult != null)
                             {

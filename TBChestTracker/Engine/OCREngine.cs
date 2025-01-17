@@ -4,14 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TBChestTracker.Helpers;
-using com.HellStormGames.TesseractOCR;
-using com.HellStormGames.TesseractOCR.Collections;
+using com.HellStormGames.OCR;
 using com.HellStormGames.Diagnostics;
 using com.HellStormGames.Diagnostics.Logging;
 
 using System.Diagnostics;
 using Emgu.CV.Dai;
 using System.Windows;
+using CsvHelper.Configuration.Attributes;
+using System.Runtime.InteropServices;
+using MS.WindowsAPICodePack.Internal;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
 
 namespace TBChestTracker.Engine
 {
@@ -21,6 +25,8 @@ namespace TBChestTracker.Engine
         //public static OCREngine Instance { get; private set; }
         public Tessy OCR { get; private set; }
         public static OCREngine Instance { get; private set; }
+        //public TessyWords[] WordCollection { get; private set; }
+
         public OCREngine()
         {
           Instance = this;
@@ -32,11 +38,11 @@ namespace TBChestTracker.Engine
             {
                 if (OCR == null)
                 {
-                    OcrEngineMode ocrmode = OcrEngineMode.Lstm;
+                    OcrEngineMode ocrmode = OcrEngineMode.LstmOnly;
 
                     if(ocrSettings.TessDataConfig.Prefix.Equals("_best") || ocrSettings.TessDataConfig.Prefix.Equals("_fast"))
                     {
-                        ocrmode = OcrEngineMode.Lstm;
+                        ocrmode = OcrEngineMode.LstmOnly;
                     }
 
                     var languages = String.Empty;
@@ -65,8 +71,10 @@ namespace TBChestTracker.Engine
                         }
                         OCR = new Tessy();
                         //-- accessviolationexception being tossed because of OcrEngineMode.LstmOnly
-                        OCR.Init(tessdata, languages, OcrEngineMode.Lstm);
-                        OCR.SetPageSegmentation(PageSegmentationMode.PSM_AUTO);
+                        OCR.Init(tessdata, languages, OcrEngineMode.LstmOnly);
+                        OCR.PageSegmentMode = PageSegMode.PSM_AUTO_ONLY;
+                        OCR.SetSourceResolution(600);
+
                         //OCR.SetVariable("tessedit_char_whitelist", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:-' ");
                         //OCR.SetVariable("load_system_dawg", "F");
                         //OCR.SetVariable("load_freq_dawg", "F");
@@ -85,7 +93,7 @@ namespace TBChestTracker.Engine
                 return false;
             }
 
-            Loggio.Info($"Tesseract ({OCR.Version}) successfully initialized.");
+            Loggio.Info($"Tesseract ({Tessy.Version}) successfully initialized.");
             return true;
         }
 
@@ -124,20 +132,29 @@ namespace TBChestTracker.Engine
             {
                 if (image == null)
                 {
+                    Loggio.Warn("Screenshot bitmap is null. Shouldn't be null.");
                     return null;
                 }
 
                 //-- AccessViolationException -- Correupted Memory sometimes.
                 System.Drawing.Imaging.BitmapData data = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite,
-                image.PixelFormat);
-                OCR.SetImage(image, 600);
-                image.UnlockBits(data); 
+                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                
+                int height = image.Height;
+                var width = image.Width;    
+                var stride = data.Stride;
+                
+                Byte[] bytes = new Byte[stride * height];
+                Marshal.Copy(data.Scan0, bytes, 0, bytes.Length);
+                OCR.SetImage(bytes, (uint)width, (uint)height, 4, ((uint)4 * (uint)width));
+                image.UnlockBits(data);
 
-                if (OCR.Recongize() == 0)
+                if (OCR.Recognize() == 0)
                 {
                     var resultstr = OCR.GetUTF8Text();
                     if (String.IsNullOrEmpty(resultstr))
                     {
+                        Loggio.Warn("OCR Result Text shouldn't be null or empty.");
                         throw new Exception("Tesseract OCR UTF8 Text isn't Suppose To be empty.");
                     }
                     resultstr = resultstr.Replace("\r\n", ",");
@@ -165,15 +182,112 @@ namespace TBChestTracker.Engine
             }
             catch (Exception e)
             {
+                Loggio.Error(e, "OCR Read Issue", "There's a issue with the OCR Reading. More details are provided.");
                 throw new Exception(e.Message, e);
             }
+        }
+
+        public TessyWords[] GetWords(System.Drawing.Bitmap bitmap)
+        {
+            try
+            {
+                if (bitmap == null)
+                {
+                    Loggio.Warn("Screenshot bitmap is null. Shouldn't be null.");
+                    throw new ArgumentNullException(nameof(bitmap));
+                }
+
+                TessyWords[] WordCollection = null;
+
+                //-- AccessViolationException -- Correupted Memory sometimes.
+                System.Drawing.Imaging.BitmapData data = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height), 
+                    System.Drawing.Imaging.ImageLockMode.ReadWrite,
+                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                int height = bitmap.Height;
+                var width = bitmap.Width;
+                var stride = data.Stride;
+                int channels = 3;
+                Byte[] bytes = new byte[stride * height];
+
+                if (bitmap.PixelFormat == System.Drawing.Imaging.PixelFormat.Format32bppArgb)
+                {
+                    channels = 4;
+                }
+                else if (bitmap.PixelFormat == System.Drawing.Imaging.PixelFormat.Format8bppIndexed)
+                {
+                    channels = 1;
+                }
+                else if (bitmap.PixelFormat == System.Drawing.Imaging.PixelFormat.Format24bppRgb)
+                {
+                    channels = 3;
+                }
+
+                var ppi = channels * (uint)width;
+                Marshal.Copy(data.Scan0, bytes, 0, bytes.Length);
+                OCR.SetImage(bytes, (uint)width, (uint)height, (uint)channels, ((uint)channels * (uint)width));
+
+                bitmap.UnlockBits(data);
+
+                if (OCR.Recognize() == 0)
+                {
+                    WordCollection = OCR.GetWords();
+                    
+                    return WordCollection;
+                }
+                else
+                    return null;
+            }
+            catch (Exception e)
+            {
+                Loggio.Error(e, "OCR Read Issue", "There's a issue with the OCR Reading. More details are provided.");
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public bool RenderOCRResults(TessyWords[] wordcollection, WriteableBitmap writeablebitmap, AOIRect areaofinterest, int penthickness = 3, int offset = 8)
+        {
+            if (wordcollection == null)
+            {
+                throw new ArgumentNullException(nameof(wordcollection));
+            }
+            if (writeablebitmap == null)
+            {
+                throw new ArgumentNullException(nameof(writeablebitmap));
+            }
+            if (wordcollection.Length > 0 && wordcollection != null)
+            {
+                //--- render the letters obtained from Tesseract
+                foreach (var word in wordcollection)
+                {
+                    var boundingbox = word.BoundingBox;
+                    var region = new System.Drawing.Rectangle(boundingbox.X,
+                        boundingbox.Y,
+                        boundingbox.Width, boundingbox.Height);
+
+                    region.Offset(offset, offset);
+
+                    var letterX = region.X + areaofinterest.x;
+                    var letterY = region.Y + areaofinterest.y;
+                    var letterWidth = (int)letterX + region.Width + 2;
+                    var letterHeight = (int)letterY + region.Height + 2;
+
+                    for (var stoke_thickness = 0; stoke_thickness < penthickness; stoke_thickness++)
+                    {
+                        writeablebitmap.DrawRectangle((int)letterX--, (int)letterY--, letterWidth++, letterHeight++, Colors.Green);
+                    }
+                }
+                return true;
+            }
+
+            return false;
         }
 
         public void Destroy()
         {
             if (OCR != null)
             {
-                OCR.Destroy();
+                OCR.Shutdown();
                 OCR = null;
             }
         }

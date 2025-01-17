@@ -238,31 +238,46 @@ namespace TBChestTracker
                 {
                     var brightness = SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness;
 
+                    TessResult ocrResult = null;
+
                     // Bash Jr III
-
-                    Image<Gray, byte> result_image = result.ToImage<Gray, byte>();
-                    Image<Gray, byte> modified_image = result_image.Mul(brightness) + brightness;
-                    var imageScaled = modified_image.Resize(5, Emgu.CV.CvEnum.Inter.Cubic);
-                    var thresholdImage = imageScaled.ThresholdBinaryInv(new Gray(SettingsManager.Instance.Settings.OCRSettings.Threshold), new Gray(SettingsManager.Instance.Settings.OCRSettings.MaxThreshold));
-                    
-                    if (AppContext.Instance.SaveOCRImages)
+                    Image<Gray, byte> result_image, modified_image, imageScaled, thresholdImage;
+                    bool filteringEnabled = SettingsManager.Instance.Settings.OCRSettings.EnableImageFilter;
+                    if (filteringEnabled)
                     {
-                        var outputPath = $@"{AppContext.Instance.AppFolder}\Output";
-                        System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(outputPath);
-                        if (di.Exists == false)
+                        result_image = result.ToImage<Gray, byte>();
+                        modified_image = result_image.Mul(brightness) + brightness;
+                        imageScaled = modified_image.Resize(5, Emgu.CV.CvEnum.Inter.Cubic);
+                        thresholdImage = imageScaled.ThresholdBinaryInv(new Gray(SettingsManager.Instance.Settings.OCRSettings.Threshold), new Gray(SettingsManager.Instance.Settings.OCRSettings.MaxThreshold));
+                        if (AppContext.Instance.SaveOCRImages)
                         {
-                            di.Create();
-                        }
+                            var outputPath = $@"{AppContext.Instance.AppFolder}\Output";
+                            System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(outputPath);
+                            if (di.Exists == false)
+                            {
+                                di.Create();
+                            }
 
-                        result_image.Save($@"{outputPath}\OCR_Original.png");
-                        modified_image.Save($@"{outputPath}\OCR_Brightened.png");
-                        imageScaled.Save($@"{outputPath}\OCR_ImageScaled.png");
-                        thresholdImage.Save($@"{outputPath}\OCR_Threshold.png");
+                            result_image.Save($@"{outputPath}\OCR_Original.png");
+                            modified_image.Save($@"{outputPath}\OCR_Brightened.png");
+                            imageScaled.Save($@"{outputPath}\OCR_ImageScaled.png");
+                            thresholdImage.Save($@"{outputPath}\OCR_Threshold.png");
+                        }
+                        var finalResult = thresholdImage.Mat.ToImage<Bgr, byte>();
+                        var thresholdBitmap = finalResult.ToBitmap();
+                        ocrResult = OCREngine.Instance.Read(thresholdBitmap);
+
+                        thresholdImage.Dispose();
+                        imageScaled.Dispose();
+                        modified_image.Dispose();
+                        modified_image = null;
+                        result_image.Dispose();
+                        result_image = null;
                     }
-                    var finalResult = thresholdImage.Mat.ToImage<Bgr, byte>();
-                    var thresholdBitmap = finalResult.ToBitmap();
-                    
-                    var ocrResult = OCREngine.Instance.Read(thresholdBitmap);
+                    else
+                    {
+                        ocrResult = OCREngine.Instance.Read(result);
+                    }
 
                     if (ocrResult != null)
                     {
@@ -282,12 +297,7 @@ namespace TBChestTracker
                     }
 
                     ocrResult.Words.Clear();
-                    thresholdImage.Dispose();
-                    imageScaled.Dispose();  
-                    modified_image.Dispose();
-                    modified_image = null;
-                    result_image.Dispose();
-                    result_image = null;
+                   
                     result.Dispose();
                 }
                 

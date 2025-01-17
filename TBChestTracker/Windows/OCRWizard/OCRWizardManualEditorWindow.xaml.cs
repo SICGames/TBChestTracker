@@ -24,8 +24,11 @@ using TBChestTracker.Managers;
 using System.Security;
 using com.HellstormGames.Imaging;
 
-using com.HellStormGames.TesseractOCR.Collections;
+using com.HellStormGames.OCR;
 using TBChestTracker.Engine;
+using CsvHelper.Configuration.Attributes;
+using System.Runtime.InteropServices;
+using com.HellStormGames.Diagnostics;
 
 namespace TBChestTracker
 {
@@ -54,8 +57,8 @@ namespace TBChestTracker
         private Snapture snapture;
         public OCRManualMode OCRManualMode { get; set; }
         private BitmapSource preview {  get; set; }
-        WordCollection tessy_characters { get; set; }
-
+        //WordCollection tessy_characters { get; set; }
+        private TessyWords[] tessy_characters {  get; set; }    
         private WriteableBitmap writeableBitmap { get; set; }
         private Image WriteableImage { get; set; }
 
@@ -224,126 +227,60 @@ namespace TBChestTracker
                     CroppedBitmap cropped_bitmap = null;
                     BitmapSource bms = null;
 
-                    WordCollection tessy_result = null;
-
                     try
                     {
                         bms = (BitmapSource)PreviewImage.Source;
                         cropped_bitmap = new CroppedBitmap(bms, CroppedRect);
 
                         SuggestedAreaOfInterest = new AOIRect(CroppedRect.X, CroppedRect.Y, CroppedRect.Width, CroppedRect.Height);
-
                         SelectionRectangle = null;
-
                         //-- Now we have Tesseract read the cropped image.
                         System.Drawing.Bitmap result = cropped_bitmap.ToBitmap();
 
                         if (result != null)
                         {
-                            Image<Gray, byte> result_image = result.ToImage<Gray, byte>();
 
-                            //Image<Gray, byte> scaled_image = result_image.Resize(3, Emgu.CV.CvEnum.Inter.Cubic);
-
-                            var brightness = SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness;
-                            var threshold = new Gray(SettingsManager.Instance.Settings.OCRSettings.Threshold);
-                            var maxThreshold = new Gray(SettingsManager.Instance.Settings.OCRSettings.MaxThreshold);
-
-                            Image<Gray, byte> modified_image = result_image.Mul(brightness) + brightness;
-                            var thresholdImage = modified_image.ThresholdBinaryInv(threshold, maxThreshold);
-                            //var erodedImage = thresholdImage.Erode(1);6
-
-                            //--- grab words from region 
-                            //--- ensure to make sure user is happy as a gopher
-                            //--- after confirmation, save rectangle and move onto Open button editor.
-
-                            var tessy = OCREngine.Instance.OCR;
-
-                            var finalResult = thresholdImage.Mat.ToImage<Bgr, byte>();  
-                            var finalBitmap = finalResult.ToBitmap();
-
-                            tessy.SetImage(finalBitmap);
-                            if (tessy.Recongize() == 0)
+                            var tessy = OCREngine.Instance;
+                            var words = tessy.GetWords(result);
+                            var hasRenderedResult = tessy.RenderOCRResults(words, writeableBitmap, SuggestedAreaOfInterest);
+                            if (hasRenderedResult)
                             {
-                                tessy_result = tessy.GetWords();
-                                tessy_characters = tessy_result;
-                                //-- clean up
-                                tessy = null;
+                                //--- make sure user is happy as a duck
+                                var msgresult = MessageBox.Show($"Are you happy with the result?", "OCR Result", MessageBoxButton.YesNo);
+                                if (msgresult == MessageBoxResult.Yes)
+                                {
+                                    //-- we can close
+                                    this.DialogResult = true;
+                                    //-- be sure to save area of interest
+                                    SettingsManager.Instance.Settings.OCRSettings.SuggestedAreaOfInterest = SuggestedAreaOfInterest;
+                                    PreviewCanvas.PreviewMouseLeftButtonDown -= PreviewCanvas_PreviewMouseLeftButtonDown;
+                                    PreviewCanvas.PreviewMouseMove -= PreviewCanvas_PreviewMouseMove;
+                                    PreviewCanvas.PreviewMouseLeftButtonUp -= PreviewCanvas_PreviewMouseLeftButtonUp;
+                                    this.Close();
+                                }
+                                else
+                                {
+                                    //--- we need to redo it
+                                    ResetCanvas();
 
-                                finalBitmap.Dispose();
-                                finalBitmap = null;
-                                finalResult.Dispose();
-                                finalResult = null;
-                                    
-                                //erodedImage.Dispose();
-                                thresholdImage.Dispose();
-                                modified_image.Dispose();
-                                modified_image = null;
-                                // scaled_image.Dispose();
-                                // scaled_image = null;
-                                result_image.Dispose();
-                                result_image = null;
-                                result.Dispose();
+                                    mouseDown = false;
+                                }
                             }
+                            //-- clean up
+                            tessy = null;
+                            result.Dispose();
+
                         }
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message);
+                        Loggio.Error(ex, "OCR Wizard Failed.", "OCR Wizard ran into a issue. More details are provided.");
                     }
 
                     cropped_bitmap = null;
                     bms = null;
-
-                    //--- let's render the rectangles around the words 
-                    var hasRenderedResult = false;
-
-                    if (tessy_characters != null)
-                    {
-                        //--- render the letters obtained from Tesseract
-                        foreach (var letter in tessy_characters.Words)
-                        {
-                            
-                            var region = (System.Drawing.Rectangle)letter.BoundingBox;
-                            region.Offset(8, 8);
-
-                            var letterX = region.X + SuggestedAreaOfInterest.x;
-                            var letterY = region.Y + SuggestedAreaOfInterest.y;
-                            var letterWidth = (int)letterX + region.Width + 2;
-                            var letterHeight = (int)letterY + region.Height + 2;
-
-                            for (var stoke_thickness = 0; stoke_thickness < 3; stoke_thickness++)
-                            {
-                                writeableBitmap.DrawRectangle((int)letterX--, (int)letterY--, letterWidth++, letterHeight++, Colors.Green);
-                            }
-                            hasRenderedResult = true;
-                        }
-
-                        if (hasRenderedResult)
-                        {
-                            //--- make sure user is happy as a duck
-                            var result = MessageBox.Show($"Are you happy with the result?", "OCR Result", MessageBoxButton.YesNo);
-                            if (result == MessageBoxResult.Yes)
-                            {
-                                //-- we can close
-                                this.DialogResult = true;
-                                //-- be sure to save area of interest
-                                SettingsManager.Instance.Settings.OCRSettings.SuggestedAreaOfInterest = SuggestedAreaOfInterest;
-                                PreviewCanvas.PreviewMouseLeftButtonDown -= PreviewCanvas_PreviewMouseLeftButtonDown;
-                                PreviewCanvas.PreviewMouseMove -= PreviewCanvas_PreviewMouseMove;
-                                PreviewCanvas.PreviewMouseLeftButtonUp -= PreviewCanvas_PreviewMouseLeftButtonUp;
-                                this.Close();
-                            }
-                            else
-                            {
-                                //--- we need to redo it
-                                ResetCanvas();
-
-                                mouseDown = false;
-                            }
-                        }
-                    }
                 }
-                else if(OCRManualMode == OCRManualMode.MARKER_PLACEMENT)
+                else if (OCRManualMode == OCRManualMode.MARKER_PLACEMENT)
                 {
                     //-- now we render the marker 
 
@@ -355,7 +292,7 @@ namespace TBChestTracker
                         if (messageresult == MessageBoxResult.Yes)
                         {
                             this.DialogResult = true;
-                            if(SettingsManager.Instance.Settings.OCRSettings.ClaimChestButtons.Count() > 0)
+                            if (SettingsManager.Instance.Settings.OCRSettings.ClaimChestButtons.Count() > 0)
                             {
                                 SettingsManager.Instance.Settings.OCRSettings.ClaimChestButtons.Clear();
                             }
@@ -379,7 +316,6 @@ namespace TBChestTracker
 
         private void ResetCanvas()
         {
-            tessy_characters = null;
             PreviewCanvas.PreviewMouseLeftButtonUp -= PreviewCanvas_PreviewMouseLeftButtonUp;
             PreviewCanvas.PreviewMouseMove -= PreviewCanvas_PreviewMouseMove;
 
