@@ -7,8 +7,8 @@
 
 ## Dependancies 
 - [KonquestUI](https://github.com/SICGames/KonquestUI/)
-- [Snapster](https://github.com/SICGames/Snapster/)
-- [Tessy](https://github.com/SICGames/Tessy/)
+- [Snapster](https://github.com/SICGames/Snapster/). *Requires libSnapture as dependency.
+- [Tessy](https://github.com/SICGames/Tessy/). *Requires libTessy as dependancy. Dependencies already compiled are in libTessy Releases section.
 - [Loggio](https://github.com/SICGames/Loggio/)
 - [CaptainHook](https://github.com/SICGames/CaptainHook)
 - [ChestBoxBuilder](https://github.com/SICGames/ChestBoxBuilder)
