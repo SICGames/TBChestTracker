@@ -6,6 +6,7 @@
 - NodeJS
 
 ## Dependancies 
+- ClanInsights - coming soon to repository.
 - [KonquestUI](https://github.com/SICGames/KonquestUI/)
 - [Snapster](https://github.com/SICGames/Snapster/). *Requires libSnapture as dependency.
 - [Tessy](https://github.com/SICGames/Tessy/). *Requires libTessy as dependency. Dependencies for libTessy include the following:
