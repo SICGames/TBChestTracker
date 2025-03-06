@@ -8,6 +8,7 @@
 - Become a VIP Patreon and don't miss out on the latest builds. Or you can wait.
 
 ## Total Total Battle Chest Tracker v2.0 Release Candidate 3.2 coming soon!
+There's a overhaul down in code and introducing new features. Patreons are liking the new version and so far has stated results are accurate. 
 
 ## Description
 TotalBattle Chest Tracker was designed to easily track your clan's chest count. 
