@@ -6,10 +6,8 @@
 ## Patreons get a special treat!
 - They get a sneak peak at the latest builds available on Discord. Until those latest builds pass with flying colors by a jury of patreons, they will hit Github. And in addition, it speeds up the development when I have instant feedback. 
 - Become a VIP Patreon and don't miss out on the latest builds. Or you can wait.
-## 2.6.6. Known Issues
-- Index Out Of Range exception occurs with ChestBoxBuilder.exe. This has been patched in 2.6.7. Unfortunately, I am placing in a new logger and placing in a newer version of Tesseract.
-- Mispelled clan names are result from EMGU.cv tesseract's version. Unable to load Tesseract's Best Trained Models without causing issues. Newer Tesseract version, I can load Best Trained Models containing LSTM.
-- With the new tesseract version, filtering out the image and cleaning up may be removed. Since accuracy has improved significally.
+
+## Total Total Battle Chest Tracker v2.0 Release Candidate 3.2 coming soon!
 
 ## Description
 TotalBattle Chest Tracker was designed to easily track your clan's chest count. 
