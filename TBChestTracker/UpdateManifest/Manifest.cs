@@ -15,5 +15,6 @@ namespace TBChestTracker
         public static string Version = $@"v{Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
         public static string Build = "['Release Candidate 3.3.5']";
         public static string Tag = "v2.0-RC3.3.5";
+
     }
 }
