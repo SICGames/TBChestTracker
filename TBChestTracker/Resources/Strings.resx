@@ -124,7 +124,7 @@
     <value>Chest</value>
   </data>
   <data name="ChestBuilder" xml:space="preserve">
-    <value>Chest Builder</value>
+    <value>Chest Creator</value>
   </data>
   <data name="Clan" xml:space="preserve">
     <value>Clan</value>
@@ -172,7 +172,7 @@
     <value>Heroic</value>
   </data>
   <data name="LaunchOCRWizardTooltip" xml:space="preserve">
-    <value>Launch OCR Wizard</value>
+    <value>Launch OCR Studio</value>
   </data>
   <data name="Level" xml:space="preserve">
     <value>Level</value>

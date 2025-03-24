@@ -80,5 +80,15 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(AutoRepairAfterStoppingAutomation));
             }
         }
+        private bool? _BuildChestsAfterStoppingAutomation;
+        public bool BuildChestsAfterStoppingAutomation
+        {
+            get => _BuildChestsAfterStoppingAutomation.GetValueOrDefault(true);
+            set
+            {
+                _BuildChestsAfterStoppingAutomation = value;
+                OnPropertyChanged(nameof(BuildChestsAfterStoppingAutomation));
+            }
+        }
     }
 }

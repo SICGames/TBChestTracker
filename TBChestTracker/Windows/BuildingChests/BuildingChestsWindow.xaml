@@ -28,7 +28,11 @@
             <ProgressBar Grid.Row="1" Height="16" Foreground="#0077ff" Minimum="0" Maximum="100" Value="{Binding Progress}"/>
         </Grid>
         <DockPanel Grid.Row="3" Height="32" HorizontalAlignment="Right" Margin="10,0" Visibility="{Binding PanelVisible}" x:Name="ClosePanel">
-            <ui:FancyButton Text="Close" Background="#0077ff" HilightBrush="#0099ff" Foreground="White" Width="125" Height="24" RenderMode="TEXT" Name="CloseBtn" Click="CloseBtn_Click"/>
+            <ui:FancyButton Text="Close" 
+                            Background="{StaticResource FancyButton.Background}" 
+                            HoverBrush="{StaticResource FancyButton.Hover.Background}" 
+                            Foreground="{StaticResource FancyButton.Foreground}" Width="125" Height="24" 
+                            Name="CloseBtn" Click="CloseBtn_Click"/>
         </DockPanel>
     </Grid>
 </Window>

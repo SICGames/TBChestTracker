@@ -21,6 +21,7 @@ using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 using System.Linq.Expressions;
 using System.Diagnostics;
+using com.HellStormGames.Diagnostics;
 
 namespace TBChestTracker
 {
@@ -97,7 +98,7 @@ namespace TBChestTracker
             {
                 SaveExportSettings();
             }
-
+            
             var export = new ClanChestExporter(file,exportSettings);
             bool result = export.Export();
             if(result)
@@ -109,8 +110,7 @@ namespace TBChestTracker
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             bool failedToParseDates = false;
-
-            var root = $"{SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder}";
+           
             var clanfolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
 
             FilePicker01.DefaultFolder = $"{clanfolder}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanChestDatabaseExportFolderPath}";
@@ -128,19 +128,35 @@ namespace TBChestTracker
             }
 
             HeadersComboBox.SelectedIndex = 0;
-            var clanRootFolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}";
-            ExportSettingsFile = $@"{clanRootFolder}\exportSettings.db";
+            //var clanRootFolder = $"{root}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanFolderPath}{ClanManager.Instance.ClanDatabaseManager.ClanDatabase.ClanDatabaseFolder}";
+            var clandatabaseFolder = $"{clanfolder}\\db\\";
+            var dbDI = new DirectoryInfo(clandatabaseFolder);
+            if (dbDI.Exists == false)
+            {
+                //-- shouldn't happen.
+                Loggio.Warn("Clan Database Export", $"`{clandatabaseFolder}` doesn't exist");
+                MessageBox.Show($"`{clandatabaseFolder}` doesn't exist. Closing window to prevent further issues.");
+                this.Close();
+            }
+
+            ExportSettingsFile = $"{clandatabaseFolder}exportSettings.db";
 
             exportSettings = new ExportSettings();
 
             if (System.IO.File.Exists(ExportSettingsFile))
             {
+                Loggio.Info("Clan Database Export", "Loading Export Settings.");
                 LoadExportSettings();
             }
+            IList<ChestsDatabase> chestsDatabase = null;
+            if(ClanManager.Instance.ChestDataManager.Load())
+            {
+                chestsDatabase = ClanManager.Instance.ChestDataManager.GetDatabase();
+            }
 
-            var dailyclanchestdata = ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions != ChestOptions.UseConditions ? ClanManager.Instance.ClanChestManager.Database.ClanChestData : ClanManager.Instance.ClanChestManager.FilterClanChestByConditions();
-            var firstDate = dailyclanchestdata.First().Key;
-            var lastDate = dailyclanchestdata.Last().Key;
+            //var dailyclanchestdata = ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions != ChestOptions.UseConditions ? ClanManager.Instance.ClanChestManager.Database.ClanChestData : ClanManager.Instance.ClanChestManager.FilterClanChestByConditions();
+            var firstDate = chestsDatabase.First().Date;
+            var lastDate = chestsDatabase.Last().Date;
 
             DateTime FirstDateTimeObject, LastDateTimeObject = new DateTime();
             
@@ -170,6 +186,7 @@ namespace TBChestTracker
             }
 
             this.DataContext = exportSettings;
+         
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

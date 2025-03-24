@@ -77,16 +77,15 @@ namespace TBChestTracker
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
                 cb.Items.Clear();
-                var previousChestType = String.Empty;
-
+                
                 foreach (var gameChest in GameChests)
                 {
-                    if (gameChest.ChestType != previousChestType)
+                    bool bAlreadyExists = cb.Items.Cast<ComboBoxItem>().Any(cbi => cbi.Content.Equals(gameChest.ChestType));
+                    if(bAlreadyExists == false)
                     {
                         ComboBoxItem cbi = new ComboBoxItem();
                         cbi.Content = gameChest.ChestType;
                         cb.Items.Add(cbi);
-                        previousChestType = gameChest.ChestType;
                     }
                 }
             }));

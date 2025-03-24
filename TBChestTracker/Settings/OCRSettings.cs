@@ -24,10 +24,7 @@ namespace TBChestTracker
     {
         private string? _TessDataFolder;
         public string? CaptureMethod { get; set; }
-        public AOIRect AreaOfInterest { get; set; }
-        public AOIRect SuggestedAreaOfInterest { get; set; }
-        public List<Point> ClaimChestButtons { get; set; }
-
+       
         public string TessDataFolder
         {
             get
@@ -63,16 +60,7 @@ namespace TBChestTracker
                 _languages = value;
             }
         }
-        private double? _ClanmateSimilarity;
-        public double ClanmateSimilarity
-        {
-            get => _ClanmateSimilarity.GetValueOrDefault(80);
-            set
-            {
-                _ClanmateSimilarity = value;
-                OnPropertyChanged(nameof(ClanmateSimilarity));  
-            }
-        }
+    
 
         private double? _GlobalBrightness;
         public double GlobalBrightness
@@ -88,12 +76,11 @@ namespace TBChestTracker
             }
         }
 
-        private ObservableCollection<string> _tags = new ObservableCollection<string>();
+        private ObservableCollection<String> _tags;
         public ObservableCollection<String> Tags 
         {
             get {
-         
-                return  _tags.Count() < 1  ? new ObservableCollection<string>(new List<string> { "Chest", "From", "Source", "Gift", "Contains" }) : _tags;
+                return _tags ?? new ObservableCollection<String>() { "Chest", "From", "Source", "Gift" };
             }
             set {
                 _tags = value;
@@ -158,7 +145,7 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(Dpi));
             }
         }
-
+        /*
         private bool? _enableImageFilter;
         public bool EnableImageFilter
         {
@@ -169,12 +156,31 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(EnableImageFilter));
             }
         }
-        private TessDataConfig _TessDataConfig = null;
+        */
+
+        private bool? _saveScreenCaptures;
+        public bool SaveScreenCaptures
+        {
+            get  => _saveScreenCaptures.GetValueOrDefault(false);   
+            set
+            {
+                _saveScreenCaptures = value;
+                OnPropertyChanged(nameof(SaveScreenCaptures));
+            }
+        }
+        private TessDataConfig _TessDataConfig;
         private bool disposedValue;
 
         public TessDataConfig TessDataConfig
         {
-            get => _TessDataConfig;
+            get
+            {
+                if (_TessDataConfig == null)
+                {
+                    
+                }
+                return _TessDataConfig;
+            }
             set
             {
                 _TessDataConfig = value;
@@ -184,10 +190,10 @@ namespace TBChestTracker
 
         public OCRSettings() 
         { 
-            AreaOfInterest = new AOIRect();
-            SuggestedAreaOfInterest = new AOIRect();
-            ClaimChestButtons = new List<Point>();
-            TessDataConfig = new TessDataConfig(TessDataOption.None);
+            // AreaOfInterest = new AOIRect();
+            // SuggestedAreaOfInterest = new AOIRect();
+            // ClaimChestButtons = new List<Point>();
+            // TessDataConfig = new TessDataConfig(TessDataOption.Best);
         }
 
         protected void OnPropertyChanged(string propertyName)
@@ -205,6 +211,7 @@ namespace TBChestTracker
                 {
                     // TODO: dispose managed state (managed objects)
                     TessDataConfig = null;
+                    /*
                     if (ClaimChestButtons != null)
                     {
                         ClaimChestButtons.Clear();
@@ -212,6 +219,7 @@ namespace TBChestTracker
                     }
                     SuggestedAreaOfInterest.Dispose();
                     AreaOfInterest.Dispose();
+                    */
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer

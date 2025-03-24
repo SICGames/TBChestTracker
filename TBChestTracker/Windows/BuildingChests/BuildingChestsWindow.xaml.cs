@@ -22,11 +22,14 @@ namespace TBChestTracker
     /// </summary>
     public partial class BuildingChestsWindow : Window, INotifyPropertyChanged
     {
+        IChestDataBuilder builder;
+        AutomationSettings AutomationSettings;
 
-        public BuildingChestsWindow()
+        public BuildingChestsWindow(AutomationSettings automationSettings)
         {
             InitializeComponent();
             this.DataContext = this;
+            AutomationSettings = automationSettings;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -72,48 +75,81 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(PanelVisible));
             }
         }
+
+        private String[] _ChestFiles;
+        public String[] ChestFiles
+        {
+            get => _ChestFiles;
+            set => _ChestFiles = value;
+        }
+
         private void UpdateUI(string status, double progress)
         {
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
                 Status = status;
                 Progress = progress;
-                
+
             }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        }
+
+        private async Task BuildTempChests(IProgress<BuildingChestsProgress> progress)
+        {
+            if (ChestFiles.Count() == 0)
+            {
+                var clanfolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
+                var chestsFolder = $"{clanfolder}\\Chests\\Temp";
+                var p = new BuildingChestsProgress($"Oh no, doesn't seem to be any chests files within folder '{chestsFolder}'. So, we can not continue building chests.", -1, 0, 0, false, true);
+                progress.Report(p);
+                await Task.Delay(100);
+                return;
+            }
+            await Build(progress, true);
+        }
+
+        private async Task BuildChests(IProgress<BuildingChestsProgress> progress)
+        {
+            if (ChestFiles.Count() == 0)
+            {
+                var clanfolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
+                var chestsFolder = $"{clanfolder}\\Chests\\Data";
+                var p = new BuildingChestsProgress($"Oh no, doesn't seem to be any chests files within folder '{chestsFolder}'. So, we can not continue building chests.", -1, 0, 0, false, true);
+                progress.Report(p);
+                await Task.Delay(100);
+                return;
+            }
+            await Build(progress);
+        }
+
+        private async Task Build(IProgress<BuildingChestsProgress> progress, bool hasTempFiles = false)
+        {
+            var p1 = new BuildingChestsProgress("Preparing...", -1, 0, 0, false);
+            progress.Report(p1);
+            await Task.Delay(100);
+            if (hasTempFiles)
+            {
+                builder = new ChestDataBuildConfiguration(ChestFiles, progress, hasTempFiles).CreateBuilder();
+            }
+            else
+            {
+                builder = new ChestDataBuildConfiguration(ChestFiles, progress, hasTempFiles).CreateBuilder();
+            }
+            await builder.Build();
         }
 
         private Task BeginBuildingChestsTask(IProgress<BuildingChestsProgress> progress)
         {
-            return Task.Run(async() =>
+            return Task.Run(async () =>
             {
-                var clanfolder = $"{ClanManager.Instance.CurrentProjectDirectory}";
-                var cacheFolder = $"{clanfolder}\\cache";
-                DirectoryInfo di = new DirectoryInfo(cacheFolder);
-
-                if(di.Exists == false)
+                if (AutomationSettings != null)
                 {
-                    var p = new BuildingChestsProgress($"Oh no, there doesn't seem to be a cache folder. Have you done some chest counting today? Cache folder should be located in '{cacheFolder}'. So, we can not continue building chests.", -1, 0, 0, false, true);
-                    progress.Report(p);
-                    await Task.Delay(100);
-                    return;
-                }
-                if (di.Exists)
-                {
-                    var files = di.GetFiles("*.txt");
-                    var filepaths = files.Select(f => f.FullName).ToArray();
-                    if (filepaths.Length > 0)
+                    if (AutomationSettings.BuildChestsAfterStoppingAutomation)
                     {
-                        var p = new BuildingChestsProgress("Preparing...", -1, 0, 0, false);
-                        progress.Report(p);
-                        await Task.Delay(100);
-
-                        await ClanManager.Instance.ClanChestManager.BuildChests(filepaths, progress);
+                        await BuildTempChests(progress);
                     }
                     else
                     {
-                        var p = new BuildingChestsProgress($"No suitable cached files found within {di.FullName}...", -1, 0, 0, false, true);
-                        progress.Report(p);
-                        await Task.Delay(100);
+                        await BuildChests(progress);
                     }
                 }
             });
@@ -121,6 +157,15 @@ namespace TBChestTracker
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             Progress<BuildingChestsProgress> progress = new Progress<BuildingChestsProgress>();
+            AppContext.Instance.IsBuildingChests = true;
+            //-- check to see if we need to create Data folder
+            var DataFolder = $"{ClanManager.Instance.CurrentProjectDirectory}\\Chests\\Data";
+            var DataFolderDi = new DirectoryInfo(DataFolder);
+            if(DataFolderDi.Exists == false)
+            {
+                DataFolderDi.Create();
+            }
+
             progress.ProgressChanged += (s, o) =>
             {
                 UpdateUI(o.Status, o.Progress);
@@ -128,7 +173,6 @@ namespace TBChestTracker
                 {
                     if (SettingsManager.Instance.Settings.AutomationSettings.AutomaticallyCloseChestBuildingDialogAfterFinished)
                     {
-                        this.DialogResult = true;
                         this.Close();
                     }
                     else
@@ -147,11 +191,16 @@ namespace TBChestTracker
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            
+            builder?.Dispose();
+            ChestFiles = null;
+            AppContext.Instance.HasBuiltChests = true;
+            AppContext.Instance.IsBuildingChests = false;
         }
 
         private void CloseBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = true;
+            this.Close();
         }
     }
 }

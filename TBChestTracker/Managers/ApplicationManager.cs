@@ -18,6 +18,9 @@ using Octokit;
 using Newtonsoft.Json;
 using System.Configuration;
 using System.Security.Principal;
+using com.HellStormGames.Diagnostics;
+using System.Linq.Expressions;
+using System.Windows.Threading;
 
 namespace TBChestTracker
 {
@@ -38,11 +41,15 @@ namespace TBChestTracker
         public string Language { get; private set; }
         public string LocalePath { get; private set; }
         public Process ServerProcess { get; private set; }  
-
         public Release LatestReleaseInfo { get; private set; }
-
         private Manifest UpdateManifest = null;
-       
+
+        private bool? _NodeServerStarted;
+        public bool? NodeServerStarted
+        {
+            get => _NodeServerStarted.GetValueOrDefault(false);
+            set => _NodeServerStarted = value;
+        }
         public ApplicationManager() 
         { 
             if (Instance == null)
@@ -77,78 +84,62 @@ namespace TBChestTracker
                     }
                 }
             }
-            var localeFolder = $@"{AppContext.Instance.LocalApplicationPath}locale";
+            var localeFolder = $@"{AppContext.Instance.LocalApplicationPath}locale\{Language}";
             var di = new DirectoryInfo(localeFolder);
 
-            if(di.Exists == false)
+            if(di.Exists)
             {
-                di.Create();
-                var languageFolder = $@"{di.FullName}\{Language}";
-                var di2 = new DirectoryInfo(languageFolder);
-                if(!di2.Exists)
+                var defaultChestsFile = $@"{localeFolder}\DefaultChests.csv";
+                var NewChestsFile = $@"{localeFolder}\Chests.csv";
+                if(File.Exists(defaultChestsFile) == true && File.Exists(NewChestsFile) == false)
                 {
-                    di2.Create();
-                    //-- need to acquire old Chests.csv and stuff them in new folder.
-                    var oldLocalePath = $@"{AppContext.Instance.CommonAppFolder}locale\{Language}\";
-                    var oldChestsPath = $@"{oldLocalePath}Chests.csv";
-                    if (System.IO.File.Exists(oldChestsPath))
+                    //-- we create Chests.csv file.
+                    using (System.IO.FileStream fileStream = File.Open(defaultChestsFile, System.IO.FileMode.Open))
                     {
-                        var newLocalePath = di2.FullName;
-                        var newChestsPath = $@"{newLocalePath}\Chests.csv";
-                        using (System.IO.FileStream fileStream = File.Open(oldChestsPath, System.IO.FileMode.Open))
+                        using (System.IO.FileStream destinationStream = File.OpenWrite(NewChestsFile))
                         {
-                            using (System.IO.FileStream destinationStream = File.OpenWrite(newChestsPath))
-                            {
-                                fileStream.CopyTo(destinationStream);
-                            }
-                        }
-
-                        var oldLocaleDirInfo = new DirectoryInfo($@"{AppContext.Instance.CommonAppFolder}locale");
-                        if(oldLocaleDirInfo.Exists)
-                        {
-                            File.Delete(oldChestsPath);
-                            oldLocaleDirInfo.Delete(true);
+                            fileStream.CopyTo(destinationStream);
                         }
                     }
-                    
                 }
+            }
+            else
+            {
+                Loggio.Warn($"{localeFolder} does not exist. It needs to exist.");
+                return false;
             }
 
             LocalePath = $@"{AppContext.Instance.LocalApplicationPath}locale\{Language}\";
           
             string ChestsFile = $"{LocalePath}Chests.csv";
-          
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 HasHeaderRecord = false,
             };
-            
+
             //--- Chests
             //-- Mandatory this file exists. Binds everything together.
-            if (!System.IO.File.Exists(ChestsFile))
+            using (var reader = new StreamReader(ChestsFile))
             {
-                //-- file doesn't exist. Need to throw it. 
-                //-- allow user to rebuild it.
-            }
-            else
-            {
-                using (var reader = new StreamReader(ChestsFile))
+                using (var csv = new CsvReader(reader, config))
                 {
-                    using (var csv = new CsvReader(reader, config))
-                    {
-                        Chests = csv.GetRecords<GameChest>().ToList();
-                    }
-
-                    reader.Close();
+                    Chests = csv.GetRecords<GameChest>().ToList();
                 }
+
+                reader.Close();
             }
 
             return true;
         }
 
+        public async Task<bool> NeedsClanMigration(string migrationFolder)
+        {
+            return new DirectoryInfo(migrationFolder).Exists == true ? false : true;
+        }
+      
         public bool StartNodeServer()
         {
-            var working_Directory = $@"{AppContext.Instance.CommonAppFolder}ClanInsights\";
+            var working_Directory = $@"{AppContext.Instance.LocalApplicationPath}Server\";
             var WindowStyle = ProcessWindowStyle.Normal;
 #if !DEBUG
     WindowStyle = ProcessWindowStyle.Hidden;
@@ -172,6 +163,7 @@ namespace TBChestTracker
                 MessageBox.Show(ex.Message, "NodeJS Execution Failed.");
                 return false;
             }
+            NodeServerStarted = true;
 
             return true;
         }
@@ -183,6 +175,7 @@ namespace TBChestTracker
                 try
                 {
                     ServerProcess.Kill();
+                    NodeServerStarted=false;
                 }
                 catch(Exception e)
                 {
@@ -253,8 +246,8 @@ namespace TBChestTracker
                     // TODO: dispose managed state (managed objects)
                     LatestReleaseInfo = null;
                     client = null;
-                    ServerProcess.Dispose();
-                    Chests.Clear();
+                    ServerProcess?.Dispose();
+                    Chests?.Clear();
                     Chests = null;
                 }
 

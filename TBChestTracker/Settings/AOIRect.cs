@@ -16,32 +16,8 @@ namespace TBChestTracker
         public double y { get; set; }
         public double width { get; set; }
         public double height { get; set; }
-        public List<Marker> Markers = new List<Marker>();
+        public Point ClickTarget { get; set; }
 
-        private void BuildMarkers()
-        {
-            for(int i = 0; i < 4; i++)
-                Markers.Add(new Marker());
-
-
-            var markerHalf = Markers[0].Size / 2;
-            
-            Markers[0].x = x - markerHalf;
-            Markers[0].y = y - markerHalf;
-            Markers[1].x = width - markerHalf;
-            Markers[1].y = y - markerHalf;
-            Markers[2].x = x - markerHalf;
-            Markers[2].y = height - markerHalf;
-            Markers[3].x = width - markerHalf;
-            Markers[3].y = height - markerHalf;
-
-            /*
-            var marker_top_left = new Point(x - markerHalf, y - markerHalf);
-            var marker_top_right = new Point(width - 16, y - 16);
-            var marker_bottom_left = new Point(x - 16, height - 16);
-            var marker_bottom_right = new Point(width - 16, height - 16);
-            */
-        }
         public AOIRect() 
         { 
             x = 0;
@@ -49,21 +25,21 @@ namespace TBChestTracker
             width = 0;
             height = 0;
         }
-        public AOIRect(double x, double y, double width, double height)
+        public AOIRect(double x, double y, double width, double height, Point ClickLocation)
         {
             this.x = x;
             this.y = y;
             this.width = width;
             this.height = height;
-            BuildMarkers();
+            this.ClickTarget = ClickLocation;
         }
-        public AOIRect(Point location, SizeF size)
+        public AOIRect(Point location, SizeF size, Point ClickLocation)
         {
             this.x = location.X;
             this.y = location.Y;
             this.width = size.Width;
             this.height = size.Height;
-            BuildMarkers();
+            this.ClickTarget = ClickLocation;
         }
 
         protected virtual void Dispose(bool disposing)
@@ -73,8 +49,7 @@ namespace TBChestTracker
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects)
-                    Markers.Clear();
-                    Markers = null;
+                  
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer

@@ -14,7 +14,7 @@ namespace TBChestTracker
         
         private bool LoadRecentList(string file = "recent.db")
         {
-            var filePath = $"{AppContext.Instance.CommonAppFolder}{file}";
+            var filePath = $"{AppContext.Instance.LocalApplicationPath}{file}";
             if (File.Exists(filePath) == false)
                 return false;
 
@@ -31,7 +31,7 @@ namespace TBChestTracker
         private bool SaveRecentList(string file = "recent.db")
         {
             //var saveFilePath = $"Settings.json";
-            var savePath = $"{AppContext.Instance.CommonAppFolder}{file}";
+            var savePath = $"{AppContext.Instance.LocalApplicationPath}{file}";
             try
             {
                 

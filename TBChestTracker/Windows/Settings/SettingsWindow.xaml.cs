@@ -21,7 +21,7 @@ namespace TBChestTracker
     /// </summary>
     public partial class SettingsWindow : Window
     {
-        
+        public BitmapSource MonitorPreviewImage { get; set; }
         public SettingsWindow()
         {
             InitializeComponent();

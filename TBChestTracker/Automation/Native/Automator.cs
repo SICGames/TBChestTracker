@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Runtime.InteropServices;
-using com.HellstormGames.ScreenCapture;
+using com.HellStormGames.Imaging.ScreenCapture;
+
 
 namespace TBChestTracker
 {
@@ -59,11 +60,11 @@ namespace TBChestTracker
         public static void LeftClick(int x, int y)
         {
             //-- need to convert x, y
-            var mx = (x * 65535 / Snapture.Instance.ScreenWidth);
-            var my = (y * 65535 / Snapture.Instance.ScreenHeight);
+            var mx = (x * 65535 / Snapster.MonitorConfiguration.Monitor.ScreenBounds.Width);
+            var my = (y * 65535 / Snapster.MonitorConfiguration.Monitor.ScreenBounds.Height);
             mouse_event((int)(MouseEventFlags.MOVE | MouseEventFlags.ABSOLUTE), mx,my, 0, 0);    
-            mouse_event((int)(MouseEventFlags.LEFTDOWN), mx, my, 0, 0);
-            mouse_event((int)(MouseEventFlags.LEFTUP), mx, my, 0, 0);
+            mouse_event((int)(MouseEventFlags.LEFTDOWN | MouseEventFlags.ABSOLUTE), mx, my, 0, 0);
+            mouse_event((int)(MouseEventFlags.LEFTUP | MouseEventFlags.ABSOLUTE), mx, my, 0, 0);
         }
         public static short GetVirtualKeyCode(char c)
         {
@@ -72,8 +73,8 @@ namespace TBChestTracker
 
         public static void MoveTo(int x, int y)
         {
-            var mx = (x * 65535 / Snapture.Instance.ScreenWidth);
-            var my = (y * 65535 / Snapture.Instance.ScreenHeight);
+            var mx = (x * 65535 / Snapster.MonitorConfiguration.Monitor.ScreenBounds.Width);
+            var my = (y * 65535 / Snapster.MonitorConfiguration.Monitor.ScreenBounds.Height);
             mouse_event((int)(MouseEventFlags.MOVE | MouseEventFlags.ABSOLUTE), mx, my , 0, 0); 
         }
     }

@@ -9,9 +9,21 @@ namespace TBChestTracker
     public class BuildingChestsProgress
     {
         public string Status {  get; set; }
-        public double Total {  get; set; }
+        private double? _Total;
+        public double Total
+        {
+            get => _Total.GetValueOrDefault(0.0);
+            set => _Total = value;
+        }
+
         public double Current { get; set; }
-        public double Progress { get; set; }
+        private double? _Progress;
+        public double Progress
+        {
+            get => _Progress.GetValueOrDefault(0.0);
+            set => _Progress = value;
+        }
+
         public bool isFinished { get; set; }
         public bool hasFailed { get; set; }
         public BuildingChestsProgress(string status, double progress, double total = 0, double current = 0, bool isFinished = false, bool hasFailed = false)
@@ -19,7 +31,11 @@ namespace TBChestTracker
             Status = status;
             Total = total;
             Current = current;
-            Progress = progress == -1 ? current / total * 100.0 : progress;
+            if (Double.IsNaN(progress) == false)
+            {
+                Progress = progress == -1 ? current / total * 100.0 : progress;
+            }
+
             this.isFinished = isFinished;
             this.hasFailed = hasFailed;
         }

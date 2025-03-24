@@ -103,6 +103,31 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <Reference Include="Loggio.NET">
+      <HintPath>..\..\Loggio.NET\Loggio.NET\bin\x64\Release\Loggio.NET.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <Reference Include="Snapster">
+      <HintPath>..\..\Snapster\Snapster\bin\x64\Debug\Snapster.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <Reference Include="Snapster">
+      <HintPath>..\..\Snapster\Snapster\bin\x64\Release\Snapster.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <Reference Include="CaptainHook">
+      <HintPath>..\..\CaptainHook\CaptainHook\bin\x64\Debug\CaptainHook.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <Reference Include="CaptainHook">
+      <HintPath>..\..\CaptainHook\CaptainHook\bin\x64\Release\CaptainHook.dll</HintPath>
+    </Reference>
+  </ItemGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <Reference Include="Loggio.NET">
       <HintPath>..\..\Loggio.NET\Loggio.NET\bin\x64\Debug\Loggio.NET.dll</HintPath>
@@ -113,12 +138,18 @@
       <HintPath>..\..\Loggio.NET\Loggio.NET\bin\x64\Release\Loggio.NET.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <Reference Include="KonquestUI">
+      <HintPath>..\..\KonquestUI\KonquestUI\bin\x64\Debug\KonquestUI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <Reference Include="KonquestUI">
+      <HintPath>..\..\KonquestUI\KonquestUI\bin\x64\Release\KonquestUI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework.Aero2" />
-    <Reference Include="Snapture, Version=1.0.8966.4104, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Snapture\x64\Release\Snapture.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
@@ -147,16 +178,55 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ChestDatabase\ChestsDatatbase.cs" />
+    <Compile Include="ChestDataBuilder\ChestDataBuildConfiguration.cs" />
+    <Compile Include="ChestDataBuilder\ChestDataBuilder.cs" />
+    <Compile Include="ChestDataBuilder\IChestDataBuildConfiguration.cs" />
+    <Compile Include="ChestDataBuilder\IChestDataBuilder.cs" />
+    <Compile Include="ChestDataBuilder\TempChestDataBuilder.cs" />
+    <Compile Include="ClanData\ChestDataItem.cs" />
+    <Compile Include="ClanMigration\ClanMigration.cs" />
+    <Compile Include="ClanSettings\ClanSettings.cs" />
+    <Compile Include="ClanSettings\OCRProfiles\OCRProfileManager.cs" />
+    <Compile Include="Converters\BooleanNotZeroConverter.cs" />
+    <Compile Include="Converters\NullBooleanConverter.cs" />
+    <Compile Include="Converters\NullStringBooleanConverter.cs" />
+    <Compile Include="Converters\NullVisibilityConverter.cs" />
+    <Compile Include="Data\OcrLanguages\OcrLanguage.cs" />
+    <Compile Include="Data\OcrLanguages\OcrLanguages.cs" />
+    <Compile Include="Extensions\BitmapExtensions.cs" />
+    <Compile Include="Factory\ChestDataCollection.cs" />
+    <Compile Include="Factory\ChestDataConditionalCollection.cs" />
+    <Compile Include="Factory\IChestDataCollection.cs" />
+    <Compile Include="Helpers\ColorExtensions.cs" />
+    <Compile Include="Helpers\TreeViewHighlighter.cs" />
+    <Compile Include="Managers\ChestDataManager.cs" />
+    <Compile Include="Shared\ChestDataItemComparator.cs" />
+    <Compile Include="Shared\OCRStudioCommandBindings.cs" />
+    <Compile Include="TessData\TessDataManifest.cs" />
+    <Compile Include="UI\FancyLabel\FancyLabel.cs" />
+    <Compile Include="UI\FancySearchBox\FancySearchBox.cs" />
+    <Compile Include="UI\FancyToggleButton.cs" />
+    <Compile Include="UI\FancyTooltip\FancyTooltip.xaml.cs">
+      <DependentUpon>FancyTooltip.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\TransformGizmo\FancyTransformGizmo.xaml.cs">
+      <DependentUpon>FancyTransformGizmo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\TransformGizmo\FancyTransformRect.cs" />
+    <Compile Include="UI\TransformGizmo\FancyTransformPoint.cs" />
+    <Compile Include="UI\TransformGizmo\RoutedEvents\GizmoMovedEventHandler.cs" />
+    <Compile Include="UI\TransformGizmo\RoutedEvents\GizmoSizeChangedEventHandler.cs" />
+    <Compile Include="UI\TransformGizmo\RoutedEvents\GizmoSizeChangedRoutedEventArgs.cs" />
+    <Compile Include="UI\TransformGizmo\RoutedEvents\TransformGizmoMovedEventArgs.cs" />
+    <Compile Include="ViewModels\AffectedWords.cs" />
+    <Compile Include="ViewModels\OCRPreviewView.cs" />
+    <Compile Include="WebView\IWebViewConfig.cs" />
+    <Compile Include="WebView\WebView.cs" />
+    <Compile Include="WebView\WebViewConfig.cs" />
     <Compile Include="Windows\About\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\AbsentClanmates\AbsentClanmatesCleanerWindow.xaml.cs">
-      <DependentUpon>AbsentClanmatesCleanerWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\AbsentClanmates\AbsentClanmatesWindow.xaml.cs">
-      <DependentUpon>AbsentClanmatesWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Arrays\Collection.cs" />
     <Compile Include="Arrays\IDataCollection.cs" />
     <Compile Include="Automation\ChestAutomation.cs" />
     <Compile Include="Automation\Events\AutomationChestProcessedEventArguments.cs" />
@@ -168,27 +238,23 @@
     <Compile Include="Automation\Events\AutomationTextProcessedEventArguments.cs" />
     <Compile Include="Automation\Native\Automator.cs" />
     <Compile Include="Benchmark\Benchmarker.cs" />
+    <Compile Include="Windows\BuildingChests\BuildingChestsDateRangeWindow.xaml.cs">
+      <DependentUpon>BuildingChestsDateRangeWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\BuildingChests\BuildingChestsWindow.xaml.cs">
       <DependentUpon>BuildingChestsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\ChestBuilder\ChestBuilderWindow.xaml.cs">
-      <DependentUpon>ChestBuilderWindow.xaml</DependentUpon>
+    <Compile Include="Windows\ChestCreator\ChestCreatorWindow.xaml.cs">
+      <DependentUpon>ChestCreatorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ChestProcessor\ChestProcessor.cs" />
     <Compile Include="ChestProcessor\Events\ChestProcessingEventArguments.cs" />
     <Compile Include="ChestProcessor\Events\ChestProcessingStateChangedEventArguments.cs" />
-    <Compile Include="ChestRewards\ChestReward.cs" />
     <Compile Include="ChestProcessor\ChestBox.cs" />
-    <Compile Include="Windows\ClanChests\ClanChestDatabaseUpdaterWindow.xaml.cs">
-      <DependentUpon>ClanChestDatabaseUpdaterWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ClanChestSettings\ChestOptions.cs" />
-    <Compile Include="ClanChestSettings\ChestPointsData.cs" />
+    <Compile Include="ClanChestSettings\ChestPoints.cs" />
     <Compile Include="ClanChestSettings\ChestPointsSettings.cs" />
-    <Compile Include="ChestBuilder\GameChest.cs" />
-    <Compile Include="ClanChestDatabase\ClanChestDatabase.cs" />
-    <Compile Include="ClanChestIntegrity\IntegrityResult.cs" />
-    <Compile Include="ClanData\ClanChestComparer.cs" />
+    <Compile Include="GameChests\GameChest.cs" />
     <Compile Include="ClanData\ClanChestExporter.cs" />
     <Compile Include="ClanData\DateRangeEnum.cs" />
     <Compile Include="ClanData\GeneralClanSettings.cs" />
@@ -196,19 +262,6 @@
       <DependentUpon>ClanInsightsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ClanInsights\ClanInsightsData.cs" />
-    <Compile Include="Windows\Clanmates\ClanmateEditorWindow.xaml.cs">
-      <DependentUpon>ClanmateEditorWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\Clanmates\ClanmatesFloatingWindow.xaml.cs">
-      <DependentUpon>ClanmatesFloatingWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\Clanmates\ClanmateValidationWindow.xaml.cs">
-      <DependentUpon>ClanmateValidationWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Clanmate\AbsentClanmate.cs" />
-    <Compile Include="Clanmate\Clanmate.cs" />
-    <Compile Include="Clanmate\ClanmateDatabase.cs" />
-    <Compile Include="Clanmate\LazyClanmates.cs" />
     <Compile Include="Windows\Clan\ClanWealthBuilderWindow.xaml.cs">
       <DependentUpon>ClanWealthBuilderWindow.xaml</DependentUpon>
     </Compile>
@@ -256,36 +309,8 @@
     <Compile Include="Windows\Clan\ImportDatabaseWindow.xaml.cs">
       <DependentUpon>ImportDatabaseWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Managers\ChestRewardsManager.cs" />
     <Compile Include="Managers\RecentlyOpenedListManager.cs" />
-    <Compile Include="Pages\ChestDataIntegrity\ErrorsFound.xaml.cs">
-      <DependentUpon>ErrorsFound.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\ChestDataIntegrity\NoRepairsNeeded.xaml.cs">
-      <DependentUpon>NoRepairsNeeded.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\ChestDataIntegrity\RepairingClanChestData.xaml.cs">
-      <DependentUpon>RepairingClanChestData.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\ChestDataIntegrity\RepairsCompleted.xaml.cs">
-      <DependentUpon>RepairsCompleted.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\ChestDataIntegrity\StartPage.xaml.cs">
-      <DependentUpon>StartPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\ClanmatesValidation\CompletedPage.xaml.cs">
-      <DependentUpon>CompletedPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\ClanmatesValidation\CreateVerifiedClanmatesPage.xaml.cs">
-      <DependentUpon>CreateVerifiedClanmatesPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\ClanmatesValidation\RepairClanmatesPage.xaml.cs">
-      <DependentUpon>RepairClanmatesPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Progresses\BuildingChestsProgress.cs" />
-    <Compile Include="Windows\ClanChests\RestoreClanChestDataWindow.xaml.cs">
-      <DependentUpon>RestoreClanChestDataWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Results\CommonResult.cs" />
     <Compile Include="Settings\TessDataConfig.cs" />
     <Compile Include="Progresses\UpgradeProgressStatus.cs" />
@@ -307,39 +332,41 @@
     <Compile Include="Managers\LocalizationManager.cs" />
     <Compile Include="ChestProcessor\ProcessingTextResult.cs" />
     <Compile Include="Managers\SettingsManager.cs" />
-    <Compile Include="Windows\Clanmates\MergeClanmateWindow.xaml.cs">
-      <DependentUpon>MergeClanmateWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Windows\Clan\MoveClanFolderWindow.xaml.cs">
       <DependentUpon>MoveClanFolderWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\ClanChestSettings\NewChestPointWindow.xaml.cs">
       <DependentUpon>NewChestPointWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\OCRWizard\OCRWizardManualEditorWindow.xaml.cs">
-      <DependentUpon>OCRWizardManualEditorWindow.xaml</DependentUpon>
+    <Compile Include="Windows\OCRCorrection\OcrCorrectionWindow.xaml.cs">
+      <DependentUpon>OcrCorrectionWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\OCRCorrection\WordsPickerWindow.xaml.cs">
+      <DependentUpon>WordsPickerWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\OcrLanguageSelection\OcrLanguageSelectionWindow.xaml.cs">
+      <DependentUpon>OcrLanguageSelectionWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\OCRStudio\Enum\StudioCanvasTools.cs" />
+    <Compile Include="Windows\OCRStudio\Layers\CanvasLayer.cs" />
+    <Compile Include="Windows\OCRStudio\Layers\CanvasRectangle.cs" />
+    <Compile Include="Windows\OCRStudio\Layers\ICanvasLayer.cs" />
+    <Compile Include="Windows\OCRStudio\Layers\ICanvasShape.cs" />
+    <Compile Include="Windows\OCRStudio\Layers\IHoverable.cs" />
+    <Compile Include="Windows\OCRStudio\Layers\ISelectableShape.cs" />
+    <Compile Include="Windows\OCRStudio\OCRResultsPreviewWindow.xaml.cs">
+      <DependentUpon>OCRResultsPreviewWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\OCRStudio\StudioCanvas.xaml.cs">
+      <DependentUpon>StudioCanvas.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\OCRStudio\StudioToolbarWindow.xaml.cs">
+      <DependentUpon>StudioToolbarWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\OCRStudio\NativeInterlop\NativeInterlop.cs" />
+    <Compile Include="Windows\OCRStudio\NativeInterlop\NativePoint.cs" />
     <Compile Include="Windows\OCRWizard\OCRWizardWindow.xaml.cs">
       <DependentUpon>OCRWizardWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="OCRWizard\OCRWizardEventArgs.cs" />
-    <Compile Include="Pages\AbsentClanmates\ErrorPage.xaml.cs">
-      <DependentUpon>ErrorPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\AbsentClanmates\ProcessingPage.xaml.cs">
-      <DependentUpon>ProcessingPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\AbsentClanmates\ResultsPage.xaml.cs">
-      <DependentUpon>ResultsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\ClanmatesValidation\ClanmatesValidationCompleted.xaml.cs">
-      <DependentUpon>ClanmatesValidationCompleted.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\ClanmatesValidation\ClanmatesValidationProcessingPage.xaml.cs">
-      <DependentUpon>ClanmatesValidationProcessingPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\ClanmatesValidation\ClanmatesValidationStartPage.xaml.cs">
-      <DependentUpon>ClanmatesValidationStartPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\ClanPage.xaml.cs">
       <DependentUpon>ClanPage.xaml</DependentUpon>
@@ -371,12 +398,6 @@
     <Compile Include="Pages\Settings\OCRSettingsPage.xaml.cs">
       <DependentUpon>OCRSettingsPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\ClanmateStudio\PreviewCroppedImageViewer.xaml.cs">
-      <DependentUpon>PreviewCroppedImageViewer.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\ClanmateStudio\PreviewScreenshotWindow.xaml.cs">
-      <DependentUpon>PreviewScreenshotWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="RecentData\RecentClanDatabase.cs" />
     <Compile Include="Resources\Strings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -401,7 +422,6 @@
     <Compile Include="Settings\MarkerCollection.cs" />
     <Compile Include="Settings\OCRSettings.cs" />
     <Compile Include="Settings\Settings.cs" />
-    <Compile Include="Shared\AbsentClanmatesViewModel.cs" />
     <Compile Include="Shared\AppContext.cs" />
     <Compile Include="Progresses\ZipProgress.cs" />
     <Compile Include="Windows\SplashScreen\SplashScreen.xaml.cs">
@@ -418,9 +438,6 @@
     </Compile>
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\BooleanToWidthConverter.cs" />
-    <Compile Include="Windows\ClanmateStudio\CaptureRegionWindow.xaml.cs">
-      <DependentUpon>CaptureRegionWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Chest\Chest.cs" />
     <Compile Include="ClanChestSettings\ChestConditions.cs" />
     <Compile Include="Export\ChestExportData.cs" />
@@ -429,13 +446,10 @@
       <DependentUpon>ChestingRequirementsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ClanChestSettings\ChestRequirements.cs" />
-    <Compile Include="ClanData\ClanChestData.cs" />
     <Compile Include="Managers\ClanChestManager.cs" />
-    <Compile Include="ClanData\ClanChestReport.cs" />
     <Compile Include="ClanData\ClanChestSettings.cs" />
     <Compile Include="ClanData\ClanDatabase.cs" />
     <Compile Include="Managers\ClanDatabaseManager.cs" />
-    <Compile Include="ClanData\ClanStatStatisticData.cs" />
     <Compile Include="Converters\EnumToIntConverter.cs" />
     <Compile Include="Windows\ClanChestSettings\EditConditionWindow.xaml.cs">
       <DependentUpon>EditConditionWindow.xaml</DependentUpon>
@@ -457,9 +471,6 @@
     <Compile Include="Windows\ClanChestSettings\NewConditionWindow.xaml.cs">
       <DependentUpon>NewConditionWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\ClanmateStudio\SelectRegionWindow.xaml.cs">
-      <DependentUpon>SelectRegionWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Export\SortType.cs" />
     <Compile Include="Helpers\StringHelpers.cs" />
     <Compile Include="UI\FancyPicker.cs" />
@@ -474,23 +485,24 @@
     <Compile Include="Windows\Update\UpdateWindow.xaml.cs">
       <DependentUpon>UpdateWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\ClanChests\ValidateClanChestsIntegrityWindow.xaml.cs">
-      <DependentUpon>ValidateClanChestsIntegrityWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ViewModels\ClanDatabaseBackupItem.cs" />
-    <Compile Include="ViewModels\ClanmatesReparProgress.cs" />
-    <Compile Include="ViewModels\ClanmatesValidationProgress.cs" />
     <Compile Include="ViewModels\RestoreClanDatabaseViewModel.cs" />
-    <Compile Include="ViewModels\VerifiedClanmatesViewModel.cs" />
+    <Compile Include="Windows\WebViewWindow\WebViewWindow.xaml.cs">
+      <DependentUpon>WebViewWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="UI\FancyTooltip\FancyTooltip.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\TransformGizmo\FancyTransformGizmo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\About\AboutWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\AbsentClanmates\AbsentClanmatesCleanerWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\AbsentClanmates\AbsentClanmatesWindow.xaml">
+    <Page Include="Windows\BuildingChests\BuildingChestsDateRangeWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -498,27 +510,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\ChestBuilder\ChestBuilderWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\ClanChests\ClanChestDatabaseUpdaterWindow.xaml">
+    <Page Include="Windows\ChestCreator\ChestCreatorWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\ClanInsights\ClanInsightsWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\Clanmates\ClanmateEditorWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\Clanmates\ClanmatesFloatingWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\Clanmates\ClanmateValidationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -535,14 +531,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\Clan\ImportDatabaseWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\Clanmates\ManageClanmatesWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\ClanmateStudio\CaptureRegionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -578,22 +566,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Windows\Clanmates\ManageClanmatesWindow.xaml.cs">
-      <DependentUpon>ManageClanmatesWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Managers\ClanmateManager.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Windows\Clanmates\MergeClanmateWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Windows\Clan\MoveClanFolderWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -614,67 +594,31 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\OCRWizard\OCRWizardManualEditorWindow.xaml">
+    <Page Include="Windows\OCRCorrection\OcrCorrectionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\OCRCorrection\WordsPickerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\OcrLanguageSelection\OcrLanguageSelectionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\OCRStudio\OCRResultsPreviewWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\OCRStudio\StudioCanvas.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\OCRStudio\StudioToolbarWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\OCRWizard\OCRWizardWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\AbsentClanmates\ErrorPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\AbsentClanmates\ProcessingPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\AbsentClanmates\ResultsPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\ChestDataIntegrity\ErrorsFound.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\ChestDataIntegrity\NoRepairsNeeded.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\ChestDataIntegrity\RepairingClanChestData.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\ChestDataIntegrity\RepairsCompleted.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\ChestDataIntegrity\StartPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\ClanmatesValidation\ClanmatesValidationCompleted.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\ClanmatesValidation\ClanmatesValidationProcessingPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\ClanmatesValidation\ClanmatesValidationStartPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\ClanmatesValidation\CompletedPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\ClanmatesValidation\CreateVerifiedClanmatesPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\ClanmatesValidation\RepairClanmatesPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -718,22 +662,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\ClanmateStudio\PreviewCroppedImageViewer.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\ClanmateStudio\PreviewScreenshotWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\ClanChests\RestoreClanChestDataWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\ClanmateStudio\SelectRegionWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Windows\Settings\SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -762,7 +690,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\ClanChests\ValidateClanChestsIntegrityWindow.xaml">
+    <Page Include="Windows\WebViewWindow\WebViewWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -795,6 +723,9 @@
     </EmbeddedResource>
     <Resource Include="app.manifest" />
     <None Include="CHANGES.md" />
+    <Content Include="Data\OcrLanguages\languages.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="locale\en-US\ChestNames.csv" />
     <None Include="locale\en-US\ChestSources.csv" />
     <None Include="locale\TODO.md" />
@@ -807,23 +738,20 @@
     <Resource Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CaptainHook">
-      <Version>1.0.1</Version>
-    </PackageReference>
     <PackageReference Include="CefSharp.Wpf">
-      <Version>131.3.50</Version>
+      <Version>133.4.21</Version>
     </PackageReference>
     <PackageReference Include="CsvHelper">
       <Version>33.0.1</Version>
     </PackageReference>
     <PackageReference Include="Emgu.CV">
-      <Version>4.9.0.5494</Version>
+      <Version>4.10.0.5680</Version>
     </PackageReference>
     <PackageReference Include="Emgu.CV.Bitmap">
-      <Version>4.9.0.5494</Version>
+      <Version>4.10.0.5680</Version>
     </PackageReference>
     <PackageReference Include="Emgu.CV.runtime.windows">
-      <Version>4.9.0.5494</Version>
+      <Version>4.10.0.5680</Version>
     </PackageReference>
     <PackageReference Include="Emgu.runtime.windows.msvc.rt.x64">
       <Version>19.39.33523</Version>
@@ -831,23 +759,20 @@
     <PackageReference Include="Emgu.runtime.windows.msvc.rt.x86">
       <Version>19.39.33523</Version>
     </PackageReference>
-    <PackageReference Include="KonquestUI">
-      <Version>1.0.1</Version>
-    </PackageReference>
     <PackageReference Include="Markdig">
-      <Version>0.39.1</Version>
+      <Version>0.40.0</Version>
     </PackageReference>
     <PackageReference Include="Markdig.Wpf">
       <Version>0.5.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces">
+      <Version>9.0.3</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.3</Version>
     </PackageReference>
     <PackageReference Include="Octokit">
       <Version>14.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="Snapture">
-      <Version>1.0.0</Version>
     </PackageReference>
     <PackageReference Include="String.Similarity">
       <Version>3.0.0</Version>
@@ -856,7 +781,7 @@
       <Version>4.3.4</Version>
     </PackageReference>
     <PackageReference Include="System.Text.Json">
-      <Version>9.0.0</Version>
+      <Version>9.0.3</Version>
     </PackageReference>
     <PackageReference Include="System.Text.RegularExpressions">
       <Version>4.3.1</Version>
@@ -893,6 +818,9 @@
     <Content Include="Images\ui\anvil.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\ui\BuildIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\ui\camera_64x64.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -908,6 +836,12 @@
     <Content Include="Images\ui\ClanStatsIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\ui\ClickMarkerIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ui\ClickTargetIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\ui\close-button.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -917,6 +851,9 @@
     <Content Include="Images\ui\DownArrow-Icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\ui\DownArrow.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\ui\EditIcon-White.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -924,6 +861,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\ui\errorIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ui\ExitIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\ui\export-icon.png">
@@ -938,6 +878,7 @@
     <Content Include="Images\ui\heart-icon-white.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Images\ui\HelpIcon.png" />
     <Content Include="Images\ui\icons_chest_1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -953,7 +894,31 @@
     <Content Include="Images\ui\infoIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\ui\LeftArrow.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ui\ListIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ui\ListIcon_Light.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\ui\MinusIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ui\MousePointerIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ui\MoveAllToLeft.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ui\MoveAllToRight.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ui\MoveToEnd.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ui\MoveToStart.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\ui\NewFileIcon.png">
@@ -968,6 +933,15 @@
     <Content Include="Images\ui\notificationBell-Black.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\ui\OcrStudio\DrawClickMarker_Anim.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ui\OcrStudio\DrawRectangle_Anim.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ui\OcrStudio\SelectObjectMove_Anim.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\ui\OCR_Icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -977,10 +951,22 @@
     <Content Include="Images\ui\PlusIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\ui\PreviewIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ui\Restart.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ui\RightArrow.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\ui\saveIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\ui\searchIcon-gray.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ui\SelectRegionIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\ui\Select_ClanmateIcon-White.png">
@@ -1007,6 +993,9 @@
     <Content Include="Images\ui\UpArrow-Icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\ui\UpArrow.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\ui\warningIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -1016,7 +1005,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ConsoleInterlop\Progress\" />
-    <Folder Include="NodeJS\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -59,24 +59,7 @@ namespace TBChestTracker
                             clandb = null;
                             sr.Close();
                         }
-                        var clanmates_file = $@"{directory}\db\clanmates.db";
-                        if (File.Exists(clanmates_file))
-                        {
-                            using (StreamReader sr = File.OpenText(clanmates_file))
-                            {
-                                var tmp_clanmates_db = new ClanmatesDatabase();
-
-                                var data = StringHelpers.ConvertToUTF8(sr.ReadToEnd());
-
-                                tmp_clanmates_db = JsonConvert.DeserializeObject<ClanmatesDatabase>(data);
-                                clan.Members = tmp_clanmates_db.Clanmates.Count;
-                                sr.Close();
-                            }
-
-                        }
-                        else
-                            clan.Members = 0;
-
+                        
                         clans.Add(clan);
                     }
                 }

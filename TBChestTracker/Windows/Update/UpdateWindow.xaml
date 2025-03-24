@@ -21,7 +21,8 @@
             </Grid>
         </Grid>
         <DockPanel LastChildFill="False" Grid.Row="2" Height="48" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <ui:FancyButton RenderMode="TEXT" Text="Visit Github" Foreground="White" Background="#0077ff" Height="24" Width="75" Corners="5" FontWeight="Bold" HilightBrush="#0099FF" Click="FancyButton_Click"/>
+            <ui:FancyButton Text="Visit Github" Foreground="{StaticResource FancyButton.Foreground}" Background="{StaticResource FancyButton.Background}" Height="24" Width="75" Corners="5" FontWeight="Bold" HoverBrush="{StaticResource FancyButton.Hover.Background}" 
+                            Click="FancyButton_Click"/>
         </DockPanel>
     </Grid>
 </Window>

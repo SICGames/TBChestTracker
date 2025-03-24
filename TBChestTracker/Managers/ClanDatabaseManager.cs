@@ -11,12 +11,13 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows;
 using TBChestTracker.Managers;
+using com.HellStormGames.Diagnostics;
 
 
 namespace TBChestTracker
 {
     
-    public class ClanDatabaseManager
+    public class ClanDatabaseManager : IDisposable
     {
         private ClanDatabase _clandatabase = null;
         public ClanDatabase ClanDatabase
@@ -49,7 +50,7 @@ namespace TBChestTracker
                 return;
             }
 
-            var clanrootfolder = $"{mainpath}\\{clanname}";
+            var clanrootfolder = $"{mainpath}{clanname}";
 
             ClanDatabase.ClanFolderPath = clanname;
             ClanDatabase.ClanChestDatabaseExportFolderPath = $"\\exports";
@@ -110,9 +111,6 @@ namespace TBChestTracker
 
         public void Load(string file, ClanChestManager m_ClanChestManager, Action<bool> result)
         {
-            //m_ClanChestManager.ClearData();
-            m_ClanChestManager.Clear();
-
             if (File.Exists(file) == false)
             {
                 MessageBox.Show($@"'{file}' does not exist.", "Clan Database Not Found");
@@ -120,10 +118,10 @@ namespace TBChestTracker
             }
 
             var _clandatabase = new ClanDatabase();
-            if(JsonHelper.TryLoad<ClanDatabase>(file, out _clandatabase))
+            if (JsonHelper.TryLoad<ClanDatabase>(file, out _clandatabase))
             {
                 ClanDatabase = _clandatabase;
-                if(ClanDatabase != null)
+                if (ClanDatabase != null)
                 {
                     var clanFolderPath = Path.GetDirectoryName(file);
                     ClanManager.Instance.SetProjectDirectory($"{clanFolderPath}");
@@ -139,21 +137,6 @@ namespace TBChestTracker
                     {
                         AppContext.Instance.NewClandatabaseBeenCreated = true;
                         CommandManager.InvalidateRequerySuggested();
-                        if(AppContext.Instance.IsClanChestDatabaseUpgradeRequired)
-                        {
-                            if(MessageBox.Show("Clan Chest Database requires an update. To continue with updating the database, click on 'Ok'.") == MessageBoxResult.OK)
-                            {
-                                ClanChestDatabaseUpdaterWindow clanChestDatabaseUpdaterWindow = new ClanChestDatabaseUpdaterWindow();
-                                if(clanChestDatabaseUpdaterWindow.ShowDialog() == true)
-                                {
-                                    m_ClanChestManager.BuildData();
-                                }
-                            }
-                            else
-                            {
-
-                            }
-                        }
                         result(true);
                     }
                 }
@@ -171,9 +154,14 @@ namespace TBChestTracker
         public Dictionary<string, bool> ClanDatabasesToUpgrade()
         {
             var clanroot = SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder;
-            var directories = System.IO.Directory.GetDirectories(clanroot);
-            bool needsUpgrade = false;
+            
+            if (String.IsNullOrEmpty(clanroot))
+            {
+                Loggio.Warn("Clan Databases To Upgrade", "Clan Root Folder came up null or empty.");
+                throw new ArgumentNullException(nameof(clanroot));  
+            }
 
+            var directories = System.IO.Directory.GetDirectories(clanroot);
             Dictionary<string, bool> DatabasesRequireUpgrade = new Dictionary<string, bool>();
 
             foreach (var directory in directories)
@@ -189,90 +177,73 @@ namespace TBChestTracker
                 
                 var tmp_Clandatabase = new ClanDatabase();
 
-                using (StreamReader sr = File.OpenText(clandatabasefile))
+                JsonHelper.TryLoad<ClanDatabase>(clandatabasefile, out tmp_Clandatabase);
+
+                if (tmp_Clandatabase != null)
                 {
-                    JsonSerializer serializer = new JsonSerializer();
-                    serializer.Formatting = Formatting.Indented;
+                    //--- if tmp_Clandatabase doesn't have new changes applied. 
+                    var version = tmp_Clandatabase.Version;
 
-                    tmp_Clandatabase = (ClanDatabase)serializer.Deserialize(sr, typeof(ClanDatabase));
+                    //-- was [documents folder]\TotalBattleChestTracker\AwesomeClan\
+                    //-- now is AwesomeClan\\
+                    var clanNameFolder = tmp_Clandatabase.ClanFolderPath;
+                    var clanName = tmp_Clandatabase.Clanname;
 
-                    if (tmp_Clandatabase != null)
+                    if (DatabasesRequireUpgrade.ContainsKey(clandatabasefile) == false)
                     {
-                        //--- if tmp_Clandatabase doesn't have new changes applied. 
-                        var version = tmp_Clandatabase.Version;
-
-                        //-- was [documents folder]\TotalBattleChestTracker\AwesomeClan\
-                        //-- now is AwesomeClan\\
-                        var clanNameFolder = tmp_Clandatabase.ClanFolderPath;
-                        var clanName = tmp_Clandatabase.Clanname;
-
-                        if (DatabasesRequireUpgrade.ContainsKey(clandatabasefile) == false)
+                        if (clanNameFolder.IndexOf(clanName) > 0)
                         {
-                            if (clanNameFolder.IndexOf(clanName) > 0)
-                            {
-                                DatabasesRequireUpgrade.Add(clandatabasefile, true);
-                            }
-                        }
-
-                        if (DatabasesRequireUpgrade.ContainsKey(clandatabasefile) == false)
-                        {
-                            if (tmp_Clandatabase.Version != 2)
-                            {
-                                DatabasesRequireUpgrade.Add(clandatabasefile, true);
-                            }
+                            DatabasesRequireUpgrade.Add(clandatabasefile, true);
                         }
                     }
-                    sr.Close();
-                    sr.Dispose();
+
+                    if (DatabasesRequireUpgrade.ContainsKey(clandatabasefile) == false)
+                    {
+                        if (tmp_Clandatabase.Version != 2)
+                        {
+                            DatabasesRequireUpgrade.Add(clandatabasefile, true);
+                        }
+                    }
                 }
+
             }
             return DatabasesRequireUpgrade;
         }
 
         public void UpgradeClanDatabases(Dictionary<string, bool> databases)
         {
-            
             foreach(var database in databases)
             {
                 var clandatabasefile = database.Key;
                 if (databases[clandatabasefile] == true)
                 {
-
                     var tmp_Clandatabase = new ClanDatabase();
                     var root = SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder;
 
-                    using (StreamReader sr = File.OpenText(clandatabasefile))
+                    JsonHelper.TryLoad<ClanDatabase>(clandatabasefile, out tmp_Clandatabase); 
+                    if (tmp_Clandatabase != null)
                     {
-                        JsonSerializer serializer = new JsonSerializer();
-                        serializer.Formatting = Formatting.Indented;
-
-                        tmp_Clandatabase = (ClanDatabase)serializer.Deserialize(sr, typeof(ClanDatabase));
-
                         var clanroot = $"{root}{tmp_Clandatabase.Clanname}";
+                        var clanname = tmp_Clandatabase.Clanname;
 
-                        if (tmp_Clandatabase != null)
+                        if (tmp_Clandatabase.ClanFolderPath.IndexOf(clanname) > 0)
                         {
-                            var clanname = tmp_Clandatabase.Clanname;
-                            if(tmp_Clandatabase.ClanFolderPath.IndexOf(clanname) > 0) {
-                              tmp_Clandatabase.ClanFolderPath =  tmp_Clandatabase.ClanFolderPath.Substring(tmp_Clandatabase.ClanFolderPath.LastIndexOf("\\") + 1);
-                            }
-
-                            if (tmp_Clandatabase.ClanChestDatabaseExportFolderPath.ToLower().Contains(clanroot.ToLower()))
-                            {
-                                tmp_Clandatabase.ClanChestDatabaseExportFolderPath = tmp_Clandatabase.ClanChestDatabaseExportFolderPath.Replace(clanroot, "");
-                            }
-                            if (tmp_Clandatabase.ClanDatabaseBackupFolderPath.ToLower().Contains(clanroot.ToLower()))
-                            {
-                                tmp_Clandatabase.ClanDatabaseBackupFolderPath = tmp_Clandatabase.ClanDatabaseBackupFolderPath.Replace(clanroot, "");
-                            }
-                            tmp_Clandatabase.Version = 2;
+                            tmp_Clandatabase.ClanFolderPath = tmp_Clandatabase.ClanFolderPath.Substring(tmp_Clandatabase.ClanFolderPath.LastIndexOf("\\") + 1);
                         }
-                        sr.Close();
-                        sr.Dispose();
-                    }
 
+                        if (tmp_Clandatabase.ClanChestDatabaseExportFolderPath.ToLower().Contains(clanroot.ToLower()))
+                        {
+                            tmp_Clandatabase.ClanChestDatabaseExportFolderPath = tmp_Clandatabase.ClanChestDatabaseExportFolderPath.Replace(clanroot, "");
+                        }
+                        if (tmp_Clandatabase.ClanDatabaseBackupFolderPath.ToLower().Contains(clanroot.ToLower()))
+                        {
+                            tmp_Clandatabase.ClanDatabaseBackupFolderPath = tmp_Clandatabase.ClanDatabaseBackupFolderPath.Replace(clanroot, "");
+                        }
+                        tmp_Clandatabase.Version = 2;
+                    }
+                    
                     //-- now save the data.
-                    using (StreamWriter sw = File.CreateText(clandatabasefile))
+                    using (StreamWriter sw = new StreamWriter(clandatabasefile))
                     {
                         JsonSerializer serializer = new JsonSerializer();
                         serializer.Formatting = Formatting.Indented;
@@ -283,6 +254,12 @@ namespace TBChestTracker
                 }
             }
         }
+
+        public void Dispose()
+        {
+            _clandatabase?.Dispose();
+        }
+
         public ClanDatabaseManager() { }
     }
 }

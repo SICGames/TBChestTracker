@@ -21,7 +21,6 @@ namespace TBChestTracker
     /// </summary>
     public partial class NewClanDatabaseWindow : Window
     {
-
         public NewClanDatabaseWindow()
         {
             InitializeComponent();
@@ -35,9 +34,16 @@ namespace TBChestTracker
                 if (result)
                 {
                     this.DialogResult = true;
+                    ClanManager.Instance.AddOcrProfile("Default", null);
+                    ClanManager.Instance.SetCurrentOcrProfile("Default");
                     ClanManager.Instance.ClanDatabaseManager.Save();
                     AppContext.Instance.IsCurrentClandatabase = true;
                     AppContext.Instance.NewClandatabaseBeenCreated = true;
+                    AppContext.Instance.OCRCompleted = false;
+                    AppContext.Instance.RequiresOCRWizard = true;
+                    AppContext.Instance.IsAutomationPlayButtonEnabled = false;
+
+                    
                     this.Close();
                 }
                 

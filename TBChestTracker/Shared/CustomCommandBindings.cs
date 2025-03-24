@@ -49,16 +49,6 @@ namespace Hellscape.Commands
                     new KeyGesture(Key.A, ModifierKeys.Control | ModifierKeys.Shift)
                 }
             );
-        public static readonly RoutedUICommand ValidateChestData = new RoutedUICommand
-            (
-                "Validate Chest Data Integrity",
-                "Validate Chest Data Integrity",
-                typeof(CustomCommandBindings),
-                new InputGestureCollection()
-                {
-                    new KeyGesture(Key.V, ModifierKeys.Control | ModifierKeys.Shift)
-                }
-            );
         public static readonly RoutedUICommand ExportClanDatabase = new RoutedUICommand
             (
                 "Export CLan Database",
@@ -79,13 +69,7 @@ namespace Hellscape.Commands
                     new KeyGesture(Key.Q, ModifierKeys.Control)
                 }
             );
-        public static readonly RoutedUICommand ManageClanmates = new RoutedUICommand
-            (
-                "Manage Clanmates",
-                "Manage Clanmates",
-                typeof(CustomCommandBindings),
-                null
-            );
+      
         public static readonly RoutedUICommand ManageClanChestSettings = new RoutedUICommand
             (
                 "Manage Clanchest Settings",
@@ -119,5 +103,14 @@ namespace Hellscape.Commands
                 "Settings",
                 "Settings", typeof(CustomCommandBindings), null
             );
+        public static readonly RoutedUICommand BuildClanChests = new RoutedUICommand
+           (
+               "Build Clan Chests",
+               "Build Clan Chests", typeof(CustomCommandBindings),
+               new InputGestureCollection()
+                {
+                    new KeyGesture(Key.B, ModifierKeys.Control)
+                }
+           );
     }
 }

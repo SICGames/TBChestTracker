@@ -2,53 +2,37 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Documents;
 using System.Threading.Tasks;
-using Emgu;
-using Emgu.CV;
-using Emgu.Util;
-using Emgu.CV.Structure;
-using System.Drawing.Imaging;
-using Emgu.CV.Cuda;
-using System.Text;
 using System.Diagnostics;
 using System.Windows.Input;
-using Emgu.CV.OCR;
-using System.Security.AccessControl;
 using System.Text.RegularExpressions;
 using System.Linq;
-using System.Xml.Linq;
-using Newtonsoft.Json;
-using Microsoft.Win32;
-using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using System.Threading;
 using System.Windows.Controls;
-using TBChestTracker.Helpers;
-using TBChestTracker.Managers;
-using System.Reflection;
-
-using com.HellstormGames.ScreenCapture;
-using com.HellstormGames.Imaging;
-using com.HellstormGames.Imaging.Extensions;
-using com.CaptainHook;
-using com.KonquestUI.Controls;
-using System.Windows.Media.Imaging;
-using System.Windows.Media;
-using System.Net;
+using System.Text;
 using System.Net.Http;
-using TBChestTracker.Engine;
-using TBChestTracker.Properties;
-using TBChestTracker.Resources;
-
-using TBChestTracker.Effects;
-using TBChestTracker.Automation;
-using com.HellStormGames.Logging;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using TBChestTracker.UI;
 using System.Globalization;
-using TBChestTracker.Localization;
+
+using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
+
+using Emgu.CV;
+using Newtonsoft.Json;
+
+using com.CaptainHook;
+using com.HellStormGames.Imaging.ScreenCapture;
 using com.HellStormGames.Diagnostics;
+using com.HellStormGames.Imaging.Extensions;
+
+using TBChestTracker.Automation;
+using TBChestTracker.Managers;
+using TBChestTracker.Localization;
+using TBChestTracker.Extensions;
+using TBChestTracker.Windows.BuildingChests;
+using TBChestTracker.Windows.OCRCorrection;
+using TBChestTracker.Web;
+using TBChestTracker.Windows;
 
 namespace TBChestTracker
 {
@@ -72,8 +56,7 @@ namespace TBChestTracker
         public SettingsManager SettingsManager { get; set; }
         public ClanManager ClanManager { get; private set; }
         private CaptainHook CaptainHook { get; set; }
-        public Snapture Snapture { get; private set; }
-
+        
         //public AppContext appContext { get; private set; }
         
         ConsoleWindow consoleWindow { get; set; }
@@ -123,16 +106,79 @@ namespace TBChestTracker
             consoleWindow = new ConsoleWindow();
         }
         #endregion
-        #region Initializing functions
-        private void InitCaptainHook()
-        {
 
+        #region Initializing functions
+        private async Task InitCaptainHook()
+        {
             CaptainHook = new CaptainHook();
-            CaptainHook.onKeyboardMessage += CaptainHook_onKeyboardMessage;
+            CaptainHook.onKeyboardMessage += CaptainHook_KeyboardMessage;
             CaptainHook.onInstalled += CaptainHook_onInstalled;
+            CaptainHook.onError += CaptainHook_onError;
             CaptainHook.Install();
         }
-        
+
+        private void CaptainHook_KeyboardMessage(object sender, KeyboardHookMessageEventArgs e)
+        {
+            if (!AppContext.Instance.IsConfiguringHotKeys)
+            {
+
+                int vkey = e.VirtKeyCode;
+                var key = KeyInterop.KeyFromVirtualKey(vkey);
+                var bIsNewKey = false;
+
+                //--- to allow customized hot keys, will reuire update.
+                bool keyDown = e.MessageType == KeyboardMessage.KeyDown ? true : false;
+                if (keyDown)
+                {
+                    newKey = key;
+                    if (previousKey != newKey)
+                    {
+                        bIsNewKey = true;
+                        previousKey = newKey;
+                    }
+                    else
+                        bIsNewKey = false;
+
+                    if (bIsNewKey)
+                    {
+                        if (String.IsNullOrEmpty(keyStr))
+                            keyStr = key.ToString();
+                        else
+                            keyStr += $"+{key.ToString()}";
+                    }
+                }
+                else
+                {
+                    if (keyStr.Equals(SettingsManager.Instance.Settings.HotKeySettings.StartAutomationKeys))
+                    {
+                        StartAutomation();
+                        AppContext.Instance.hasHotkeyBeenPressed = true;
+                        keyStr = String.Empty;
+                        previousKey = Key.None;
+                        newKey = Key.None;
+                    }
+                    if (keyStr.Equals(SettingsManager.Instance.Settings.HotKeySettings.StopAutomationKeys))
+                    {
+                        if (AppContext.Instance.IsAutomationStopButtonEnabled == true)
+                        {
+                            StopAutomation();
+                        }
+                        AppContext.Instance.hasHotkeyBeenPressed = true;
+                        keyStr = String.Empty;
+                        previousKey = Key.None;
+                        newKey = Key.None;
+                    }
+                    keyStr = String.Empty;
+                    bIsNewKey = false;
+                }
+            }
+        }
+
+        private void CaptainHook_onError(object sender, EventArgs e)
+        {
+            
+        }
+
         private void InitSettingsTask()
         {
             Task t = new Task(new Action(async () =>
@@ -142,93 +188,110 @@ namespace TBChestTracker
             t.Start();
             t.Wait();
         }
-        
-        //--- missing Settings.json file causes headaches for people. Need to fix this.
-        private Task<SettingsManager> InitSettings()
-        {
-            return Task.Run(() =>
-            {
-                SettingsManager = new SettingsManager();
-                Loggio.Info("Settings Loaded.");
-                //-- init appContext
-                AppContext.Instance.IsAutomationPlayButtonEnabled = false;
-                AppContext.Instance.IsCurrentClandatabase = false;
-                AppContext.Instance.IsAutomationStopButtonEnabled = false;
-                AppContext.Instance.UpdateApplicationTitle();
-                return SettingsManager;
 
-            });
+        //--- missing Settings.json file causes headaches for people. Need to fix this.
+        private async Task<SettingsManager> InitSettings()
+        {
+
+            SettingsManager = new SettingsManager();
+            Loggio.Info("Settings Loaded.");
+            //-- init appContext
+            AppContext.Instance.IsAutomationPlayButtonEnabled = false;
+            AppContext.Instance.IsCurrentClandatabase = false;
+            AppContext.Instance.IsAutomationStopButtonEnabled = false;
+            AppContext.Instance.UpdateApplicationTitle();
+            return SettingsManager;
         }
 
-        private Task FinishingUpTask()
+        private async Task InitSnapster()
         {
-            return Task.Run(() =>
+
+            //-- depending on settings. Which monitor to load.
+            try
             {
-                this.ClanManager = new ClanManager();
-
-                if (System.IO.Directory.Exists(SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder) == false)
+                Loggio.Info("Initializing Snapster.");
+                var monitorIndex = SettingsManager.Instance?.Settings?.GeneralSettings?.MonitorIndex;
+                var usePrimaryMonitor = false;
+                if(monitorIndex == -1)
                 {
-                    System.IO.Directory.CreateDirectory(SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder);
+                    usePrimaryMonitor = true;
                 }
-
-                if (File.Exists(AppContext.Instance.RecentOpenedClanDatabases))
+                if (usePrimaryMonitor)
                 {
-                    if(recentlyOpenedListManager.Build())
-                    {
-                        foreach(var recent in recentlyOpenedListManager.RecentClanDatabases)
-                        {
-                            if(string.IsNullOrEmpty(recent.FullClanRootFolder) ) 
-                            {
-                                continue;
-                            }
-                            this.Dispatcher.BeginInvoke(new Action(() =>
-                            {
-                                MenuItem mu = new MenuItem();
-                                mu.Header = recent.ShortClanRootFolder;
-                                mu.Tag = recent.FullClanRootFolder;
-                                mu.Click += Mu_Click;
-                                RecentlyOpenedParent.Items.Add(mu);
-                            }));
-                        }
-                    }
-                    //-- add seperator to recently opened clan databases.
-                    this.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        Separator separator = new Separator();
-                        RecentlyOpenedParent.Items.Add(separator);
-                        MenuItem mi = new MenuItem();
-                        mi.Tag = "CLEAR_HISTORY";
-                        mi.Header = "Clear Recent Clan Databases";
-                        mi.Click += Mu_Click;
-                        RecentlyOpenedParent.Items.Add(mi);
-                    }));
+                    Snapster.Capturer = new SnapsterConfiguration().
+                    CapturerContext.WindowsGDI(MonitorConfiguration.MainMonitor).CreateCapturer();
+                    SettingsManager.Instance.Settings.GeneralSettings.MonitorIndex = Snapster.MonitorConfiguration.Monitor.ID;
+                    SettingsManager.Save();
                 }
                 else
                 {
-
+                    Snapster.Capturer = new SnapsterConfiguration().
+                    CapturerContext.WindowsGDI(MonitorConfiguration.ByIndex(monitorIndex.Value)).CreateCapturer();
                 }
-              
-            });
-        }
 
-        private Task BuildChestData()
-        {
-            return Task.Run(() =>
+            }
+            catch (Exception ex)
             {
-                //applicationManager = new ApplicationManager();
-                applicationManager.Build();
-            });
+                Loggio.Error(ex, "Snapster Init", $"Failed to initialize Snapster. Following reason: {ex.Message}.");
+                throw new Exception(ex.Message);
+            }
         }
-
-        private Task StartInsightsServer()
+        private async Task FinishingUpTask()
         {
-            return Task.Run(() =>
+
+            this.ClanManager = new ClanManager();
+
+            if (System.IO.Directory.Exists(SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder) == false)
             {
-                if(applicationManager != null)
+                System.IO.Directory.CreateDirectory(SettingsManager.Instance.Settings.GeneralSettings.ClanRootFolder);
+            }
+
+            if (File.Exists(AppContext.Instance.RecentOpenedClanDatabases))
+            {
+                if (recentlyOpenedListManager.Build())
                 {
-                    applicationManager.StartNodeServer();
+                    foreach (var recent in recentlyOpenedListManager.RecentClanDatabases)
+                    {
+                        if (string.IsNullOrEmpty(recent.FullClanRootFolder))
+                        {
+                            continue;
+                        }
+                        await this.Dispatcher.BeginInvoke(new Action(() =>
+                              {
+                                  MenuItem mu = new MenuItem();
+                                  mu.Header = recent.ShortClanRootFolder;
+                                  mu.Tag = recent.FullClanRootFolder;
+                                  mu.Click += Mu_Click;
+                                  RecentlyOpenedParent.Items.Add(mu);
+                              }));
+                    }
                 }
-            });
+                //-- add seperator to recently opened clan databases.
+                await this.Dispatcher.BeginInvoke(new Action(() =>
+                   {
+                       Separator separator = new Separator();
+                       RecentlyOpenedParent.Items.Add(separator);
+                       MenuItem mi = new MenuItem();
+                       mi.Tag = "CLEAR_HISTORY";
+                       mi.Header = "Clear Recent Clan Databases";
+                       mi.Click += Mu_Click;
+                       RecentlyOpenedParent.Items.Add(mi);
+                   }));
+            }
+        }
+
+        private async Task BuildChestData()
+        {
+            //applicationManager = new ApplicationManager();
+            applicationManager.Build();
+        }
+
+        private async Task StartInsightsServer()
+        {
+            if (applicationManager != null)
+            {
+                applicationManager.StartNodeServer();
+            }
         }
         private Task LaunchTask(SplashScreen splashScreen)
         {
@@ -240,28 +303,22 @@ namespace TBChestTracker
                 }));
             });
         }
-        public Task<Dictionary<string, bool>> ValidateClanDatabases()
+        public async Task<Dictionary<string, bool>> ValidateClanDatabases()
         {
-            return Task.Run(() =>
+            if (ClanManager != null)
             {
-                if (ClanManager != null)
-                {
-                    var clandatabases = ClanManager.Instance.ClanDatabaseManager.ClanDatabasesToUpgrade();
-                    return clandatabases;
-                }
-                else
-                {
-                    return null;
-                }
-            });
+                var clandatabases = ClanManager.Instance.ClanDatabaseManager.ClanDatabasesToUpgrade();
+                return clandatabases;
+            }
+            else
+            {
+                return null;
+            }
         }
                
-        public Task UpgradeClanDatabases(Dictionary<string, bool> clandatabases)
+        public async Task UpgradeClanDatabases(Dictionary<string, bool> clandatabases)
         {
-            return Task.Run(() =>
-            {
-                ClanManager.Instance.ClanDatabaseManager.UpgradeClanDatabases(clandatabases);
-            });
+            ClanManager.Instance.ClanDatabaseManager.UpgradeClanDatabases(clandatabases);
         }
 
         public async Task<bool> CheckForUpgrades()
@@ -274,21 +331,52 @@ namespace TBChestTracker
             return updateAvailable;
         }
 
+        private async Task<bool> RequiresTessDataCleaning()
+        {
+            if(SettingsManager.Instance.Settings.OCRSettings.TessDataConfig == null)
+            {
+                //-- this shouldn't happen unless migrating from v1.5 to latest version.
+                Loggio.Warn("Tesseract Data Configuration inside OCR Settings is null (empty). Possibly migrating from 1.5 to latest version of Total Battle Chest Tracker.");
+                SettingsManager.Instance.Settings.OCRSettings.TessDataConfig = new TessDataConfig(TessDataOption.Best);
+                SettingsManager.Instance.Save();
+                
+                return true;
+            }
+            else  if(SettingsManager.Instance.Settings.OCRSettings.TessDataConfig.Option != TessDataOption.Best)
+            {
+                Loggio.Info("Not The Best Trained Models are configured within Tesseract Data Configuration.");
+                return true;
+            }
+            Loggio.Info("The Best Trained Models are configured within Tesseract Data Configuration.");
+            return false;
+        }
         public async Task<bool> ValidateTessDataExists()
         {
+            Loggio.Info("Ensuring Tesseract Data Configuration is not null.");
+            if(SettingsManager.Instance.Settings.OCRSettings.TessDataConfig == null)
+            {
+                SettingsManager.Instance.Settings.OCRSettings.TessDataConfig = new TessDataConfig(TessDataOption.Best);
+                Loggio.Info("Ensuring Tesseract Data Configuration corrected..");
+            }
+
+            Loggio.Info("Checking to see if the Tesseract Data Folder exists specified within OCR Settings.");
             var dirInfo = new System.IO.DirectoryInfo(SettingsManager.Instance.Settings.OCRSettings.TessDataFolder);
             if(dirInfo.Exists == false)
             {
+                Loggio.Info("Creating Tesseract Data Folder.");
                 dirInfo.Create();
                 return false;
             }
             else
             {
+                Loggio.Info("Fetching trained data files within Tesseract Data folder.");
                 var files = dirInfo.GetFiles("*.traineddata");
                 if(files.Length > 0)
                 {
+                    Loggio.Info("Trained Tesseract Models are present.");
                     return true;
                 }
+                Loggio.Info("Trained Tesseract Models are not present.");
 
                 return false;
             }
@@ -296,13 +384,20 @@ namespace TBChestTracker
 
         public async Task<string> GetTesseractGithubDownloadPath()
         {
-
-            var releases = await ApplicationManager.Instance.client.Repository.Release.GetAll("tesseract-ocr", SettingsManager.Instance.Settings.OCRSettings.TessDataConfig.TesseractPackage);
-            var latest = releases[0];
-            if(latest != null)
+            try
             {
-                var downloadUrl = latest.ZipballUrl;
-                return downloadUrl;
+                var releases = await ApplicationManager.Instance.client.Repository.Release.GetAll("tesseract-ocr", SettingsManager.Instance.Settings.OCRSettings.TessDataConfig.TesseractPackage);
+                var latest = releases[0];
+                if (latest != null)
+                {
+                    var downloadUrl = latest.ZipballUrl;
+                    return downloadUrl;
+                }
+            }
+            catch (Exception ex)
+            {
+                Loggio.Error(ex, "Fetching Tesseract's Trained Models from Github", "An error has occurred while attempting to download Tesseract's Trained Models. Log file has more information to send to developer.");
+                return string.Empty;
             }
             return String.Empty;
         }
@@ -384,9 +479,14 @@ namespace TBChestTracker
                 Loggio.Info("Automation Started.");
                 AppContext.Instance.IsAutomationPlayButtonEnabled = false;
                 AppContext.Instance.IsAutomationStopButtonEnabled = true;
-
             }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
+        }
+
+        private void BuildClanChests()
+        {
+            BuildingChestsDateRangeWindow chestDateRangeWindow  = new BuildingChestsDateRangeWindow();
+            chestDateRangeWindow.Show();
         }
         private void ChestAutomation_AutomationStopped(object sender, AutomationEventArguments e)
         {
@@ -400,37 +500,31 @@ namespace TBChestTracker
                 AppContext.Instance.IsAutomationStopButtonEnabled = false;
                 Loggio.Info("Automation Stopped.");
 
-                BuildingChestsWindow buildingChestsWindow = new BuildingChestsWindow();
-                if (buildingChestsWindow.ShowDialog() == true)
+                if (ChestAutomation.isCancelled)
                 {
-                    ClanManager.Instance.ClanChestManager.Save();
-                    ClanManager.Instance.ClanChestManager.CreateBackup();
-                    
-                    if (SettingsManager.Instance.Settings.AutomationSettings.AutoRepairAfterStoppingAutomation)
+                    bool buildChestsAfterStopping = SettingsManager.Settings.AutomationSettings.BuildChestsAfterStoppingAutomation;
+                    if (buildChestsAfterStopping)
                     {
-                        if (ClanManager.Instance.ClanChestManager.CheckIntegrity() != null)
+                        var tmpdirdi = new DirectoryInfo($"{ClanManager.Instance.CurrentProjectDirectory}\\Chests\\Temp");
+                        
+                        if (tmpdirdi.Exists)
                         {
-                            var result = ClanManager.Instance.ClanChestManager.Repair();
-                            if (result)
+                            var chestfiles = tmpdirdi.EnumerateFiles("chests_*.txt", SearchOption.AllDirectories).Select(f => f.FullName).ToArray();
+                            if (chestfiles.Length > 0)
                             {
-                                Loggio.Info("Chest Data automatically repaired.");
+                                BuildingChestsWindow buildingchestswindow = new BuildingChestsWindow(SettingsManager.Settings.AutomationSettings);
+                                buildingchestswindow.ChestFiles = chestfiles;
+                                buildingchestswindow.Show();
                             }
                         }
-                        else
-                        {
-                            Loggio.Info("Chest Data is looking good. No need for repairs.");
-                        }
                     }
-
-                    ClanManager.Instance.ClanChestManager.ClearCache();
                 }
-
             }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         }
 
         private void ChestAutomation_AutomationError(object sender, AutomationErrorEventArguments e)
         {
-
+          
         }
         public async Task DeleteTessData()
         {
@@ -469,47 +563,203 @@ namespace TBChestTracker
             }
         }
 
-        public async void Init(Window window)
+        public async Task<CommonResult> Init(Window window)
         {
             bool bTessDataDownloadComplete = false;
 
             if (window is SplashScreen splashScreen)
             {
+                
                 Loggio.Info("Total Battle Chest Tracker Initializing...");
 
-                await this.Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    splashScreen.UpdateStatus("Checking For Updates...", 0);
-                }));
-
-                await Task.Delay(500);
-
+                await UpdateSplashScreen(splashScreen,"Checking For Updates...", 0);
+                
                 Loggio.Info("Checking for new updates...");
 
                 var upgradeAvailable = await CheckForUpgrades();
                 AppContext.Instance.upgradeAvailable = upgradeAvailable;
-                UpgradeAlertButton.ToolTip = upgradeAvailable == true ? TBChestTracker.Resources.Strings.UpdateAvailable : TBChestTracker.Resources.Strings.UpToDate;
-                await this.Dispatcher.BeginInvoke(new Action(() =>
+
+                await UpgradeAlertButton.Dispatcher.BeginInvoke(() =>
                 {
-                    splashScreen.UpdateStatus("Initalizing...", 10);
-                }));
+                    UpgradeAlertButton.ToolTip = upgradeAvailable == true ? TBChestTracker.Resources.Strings.UpdateAvailable : TBChestTracker.Resources.Strings.UpToDate;
+                });
+
+                await UpdateSplashScreen(splashScreen, "Initializing...", 10);
 
                 recentlyOpenedListManager = new RecentlyOpenedListManager();
 
-                await Task.Delay(500);
-
                 Loggio.Info("Initializing Settings...");
+
+                await UpdateSplashScreen(splashScreen, "Initializing Settings...", 12);
 
                 SettingsManager = await InitSettings();
 
                 if(SettingsManager == null)
                 {
                     Loggio.Warn("SettingsManager is null. It should not be null.");
-
-                    throw new Exception("SettingsManager is null");
+                    return new CommonResult(CommonResult.Error, "Settings Manager is Null");
+                    //throw new Exception("SettingsManager is null");
                 }
 
-                Loggio.Info("Settingsmanager is initialized.");
+                //-- forcefully remove Contains. We don't care about it no more. 
+                if(SettingsManager.Settings.OCRSettings.Tags.Contains("Contains"))
+                {
+                    SettingsManager.Settings.OCRSettings.Tags.Remove("Contains");
+                    SettingsManager.Save();
+                }
+
+                Loggio.Info("Settings Manager is initialized.");
+
+                //-- need to figure out if user is new or not. 
+                //-- OldClanPath doesn't exist for new users. Created at FinishingUpTask. 
+                //-- Older users have files already within OldClanRoot. 
+                var newClanRoot = $"{AppContext.Instance.LocalApplicationPath}Clans\\";
+                var clanrootDi = new DirectoryInfo(newClanRoot);
+                bool hasMigrated = false;
+                bool isNewUser = false;
+                bool hasNewClanrootHasfiles = false;
+                bool hasOldClanrootHasFiles = false;
+
+                if(clanrootDi.Exists)
+                {
+                    var files = clanrootDi.EnumerateFileSystemInfos("*.*", SearchOption.AllDirectories);
+                    
+                    hasNewClanrootHasfiles = files.Count() > 0;
+                }
+                
+                var obsoletepath = SettingsManager.Settings.GeneralSettings.ClanRootFolder;
+                if (obsoletepath.ToLower().Equals(newClanRoot.ToLower()) == false) 
+                {
+                    var obsoleteDi = new DirectoryInfo(obsoletepath);   
+                    hasOldClanrootHasFiles = obsoleteDi?.Exists == true ? 
+                        (obsoleteDi.EnumerateFiles("*.*", SearchOption.AllDirectories).Count() > 0 ? true : false) 
+                        : false; 
+                }
+                if(hasOldClanrootHasFiles == false && hasNewClanrootHasfiles == true)
+                {
+                    hasMigrated = true;
+                    isNewUser = false;
+                }
+                else if(hasOldClanrootHasFiles == true && hasNewClanrootHasfiles == false)
+                {
+                    hasMigrated = false;
+                    isNewUser = false;
+                }
+                else if(hasOldClanrootHasFiles == false && hasNewClanrootHasfiles == false)
+                {
+                    hasMigrated = false;
+                    isNewUser = true;
+                }
+
+                if (obsoletepath.ToLower().Equals(newClanRoot.ToLower()))
+                {
+                    hasMigrated = true;
+                    isNewUser = hasOldClanrootHasFiles == true ? true : false;
+                }
+                else
+                {
+                    if (newClanRoot.ToLower().Contains(obsoletepath.ToLower()))
+                    {
+                        //-- need to ensure those that had migrated before patch gets fixed.
+                        var localappdata = AppContext.Instance.LocalApplicationPath;
+                        if (obsoletepath.ToLower().Equals(localappdata.ToLower()))
+                        {
+                            hasMigrated = true;
+                            isNewUser = false;
+                            SettingsManager.Settings.GeneralSettings.ClanRootFolder = newClanRoot;
+                            SettingsManager.Save();
+                        }
+                    }
+                }
+                if (hasMigrated == false && isNewUser == false)
+                {
+                    //-- user hasn't migrated.
+                    //-- Incase user still has 
+                    await UpdateSplashScreen(splashScreen, "Checking to see if Clans need to be migrated...", 13);
+                    bool needsClanMigration = await ApplicationManager.Instance.NeedsClanMigration(newClanRoot);
+                    await Task.Delay(100);
+                    if (needsClanMigration)
+                    {
+                        await UpdateSplashScreen(splashScreen, "Migrating Clans, Please Wait...", 15);
+                        bool migrated = await new ClanMigration(obsoletepath, newClanRoot).Migrate(SettingsManager);
+                        if (migrated == false)
+                        {
+                            //-- something happened. Couldn't migrate. But technically, this shouldn't even happen.
+                            SettingsManager.Settings.GeneralSettings.ClanRootFolder = newClanRoot;
+                            SettingsManager.Save();
+                            Loggio.Warn("Clan Migration", "Couldn't migrate clans to new path. Reverting back to using old clan root path.");
+                            await UpdateSplashScreen(splashScreen, "Migration Failed, rolling back changes...", 17);
+                            await Task.Delay(100);
+                        }
+                        else
+                        {
+                            Loggio.Info("Clan Migration", "Clans have successfully migrated to new clan rooth path.");
+                            await UpdateSplashScreen(splashScreen, "Clans have been migrated successfully...", 17);
+                            await Task.Delay(100);
+                            await UpdateSplashScreen(splashScreen, "Removing Obsolete Clans Root Path...", 18);
+                            bool cleanedup = await ClanMigration.Cleanup(obsoletepath);
+                            if (cleanedup)
+                            {
+                                await UpdateSplashScreen(splashScreen, "Obsolete Clan Root Path Cleaned...", 19);
+                            }
+                            else
+                            {
+                                await UpdateSplashScreen(splashScreen, "Issues cleaning Obsolete Path. Manual Deletion is required...", 19);
+                            }
+                            await Task.Delay(500);
+                        }
+                    }
+                }
+                await UpdateSplashScreen(splashScreen, "Verifying Clans Integrity...", 17);
+
+                var localappPath = $"{AppContext.Instance.LocalApplicationPath}";
+                var localAppPathDi = new DirectoryInfo(localappPath);
+                var badClanLocation = new List<string>();
+                if(localAppPathDi.Exists)
+                {
+                    var clanFiles = localAppPathDi.EnumerateFileSystemInfos("*.cdb", SearchOption.AllDirectories);
+                    foreach(var clanFile in clanFiles.ToList())
+                    {
+                        var clanDirectory = clanFile.FullName.Substring(0, clanFile.FullName.LastIndexOf("\\") + 1);
+                        if(String.IsNullOrEmpty(clanDirectory)  == false)
+                        {
+                            if (clanDirectory.Contains($"{localappPath}Clans\\") == false)
+                            {
+                                badClanLocation.Add(clanDirectory);
+                            }
+                        }
+                    }
+                    if(badClanLocation?.Count() > 0)
+                    {
+                        foreach(var badlocation in badClanLocation)
+                        {
+                            var clanNameFolder = badlocation.Substring(0, badlocation.LastIndexOf("\\"));
+                            clanNameFolder = clanNameFolder.Substring(clanNameFolder.LastIndexOf("\\") + 1);
+                            var newClanLocation = $"{newClanRoot}{clanNameFolder}\\";
+                         
+
+                            var m = await new ClanMigration(badlocation, newClanLocation).Migrate();
+                            if(m == false)
+                            {
+
+                            }
+                            else
+                            {
+                                await ClanMigration.Cleanup(badlocation);
+                            }
+                        }
+                    }
+                }
+
+                //-- now we initialize Snapster. 
+                await UpdateSplashScreen(splashScreen, "Initializing Snapster...", 18);
+                await InitSnapster();
+                if (Snapster.MonitorConfiguration != null)
+                {
+                    var monitor = Snapster.MonitorConfiguration.Monitor;
+                    Loggio.Info($"Snapster Initialized using Monitor ({monitor.MonitorName}, X: {monitor.ScreenBounds.X}, Y: {monitor.ScreenBounds.Y}, Width: {monitor.ScreenBounds.Width}, Height: {monitor.ScreenBounds.Height}) ");
+                }
+                await Task.Delay(250);
 
                 //-- New TessData folder Path in Local User Data Folder
                 var localAppFolder = new System.IO.DirectoryInfo(AppContext.Instance.LocalApplicationPath);
@@ -522,53 +772,26 @@ namespace TBChestTracker
                 {
                     Loggio.Warn("Wasn't able to obtain TessData path from 'Settings.json' properly.");
 
-                    throw new Exception("Unable to correctly populate settings.");
+                    return new CommonResult(CommonResultCodes.Error, "Tesseract Data Folder field within Settings.json is empty. This isn't correct.");
                 }
 
                 if(AppContext.Instance.bDeleteTessData == true)
                 {
-
-                    await this.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        splashScreen.UpdateStatus("Deleting Tesseract Data folder...", 10);
-                    }));
+                    await UpdateSplashScreen(splashScreen, "Deleting Tesseract Data Folder...", 16);
 
                     Loggio.Info("Cleaning Tesseract Data Folder...");
                     await DeleteTessData();
-                    await Task.Delay(250);
                     Loggio.Info("Cleaned Tesseract Data Folder.");
                 }
-
-                await this.Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    splashScreen.UpdateStatus("Initializing Captain Hook...", 25);
-                }));
-
-                await Task.Delay(500);
-
-                Loggio.Info("Initialized Captain Hook.");
-
-                InitCaptainHook();
-
                 await Task.Delay(200);
 
-                await this.Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    splashScreen.UpdateStatus("Tidying everything up...", 50);
-                
-                }));
+                await UpdateSplashScreen(splashScreen, "Tidying everything up...", 30);
 
                 Loggio.Info("Finishing up Initializing...");
-                await Task.Delay(250);
 
                 await FinishingUpTask();
 
-                await this.Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    splashScreen.UpdateStatus("Validating Clan databases...", 91);
-                }));
-
-                await Task.Delay(500);
+                await UpdateSplashScreen(splashScreen, "Validating Clan Databases...", 35);
 
                 Loggio.Info("Validating Clan Databases...");
 
@@ -576,34 +799,49 @@ namespace TBChestTracker
 
                 if (databasesNeedUpgrade.Count > 0)
                 {
-                    await this.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        splashScreen.UpdateStatus("Upgrading Clan databases...", 92);
-                    }));
-                    Loggio.Info("Upgrading Clan Databases...");
-
-                    await Task.Delay(250);
+                    await UpdateSplashScreen(splashScreen, "Upgrading Clan Databases...", 38);
+                    Loggio.Info("Upgrading Clan Databases...");                
                     await UpgradeClanDatabases(databasesNeedUpgrade);
                 }
 
                 Loggio.Info("Clan Databases finished validating...");
+                Loggio.Info("Checking to see if Tesseract Data is at it's Best.");
 
-                await this.Dispatcher.BeginInvoke(new Action(() =>
+                await UpdateSplashScreen(splashScreen, "Verifying Tesseract's Trained Models Are The Best...", 40);
+
+                var requiresTessDataCleanup = await RequiresTessDataCleaning();
+                
+                await Task.Delay(250); //-- wait incase something needs to catch up.
+
+                string requiresCleanup = requiresTessDataCleanup == true ? "Yes" : "No";
+
+                Loggio.Info($"Does Tesseract Data need spring cleaning? [{requiresCleanup}].");
+
+                if(requiresTessDataCleanup)
                 {
-                    splashScreen.UpdateStatus("Verifying Tesseract's TessData Installed...", 93);
-                }));
+                    if(MessageBox.Show("Since this version of Total Battle Chest Tracker uses the best tesseract training models, you will need to perform TessData Cleanup. Press Ok button to restart application to clean TessData.") ==  MessageBoxResult.OK)
+                    {
+                        //-- should attempt to quit
 
-                await Task.Delay(250);
+                        SettingsManager.Instance.Settings.OCRSettings.TessDataConfig = new TessDataConfig(TessDataOption.Best);
+                        SettingsManager.Instance.Save();
+                        Loggio.Info($"Settings saved with new TessDataConfiguration applied. Restarting application safely.");
+
+                        return new CommonResult(CommonResultCodes.Error, "CleanTesseractData");
+                        
+                        //AppContext.RestartApplication("--delete_tessdata");
+                    }
+                }
+                
                 Loggio.Info("Validating Tesseract Trained Models Are Installed...");
 
+                await UpdateSplashScreen(splashScreen, "Verifying Tesseract's Trained Models Are Installed...", 45);
                 var tessDataExists = await ValidateTessDataExists();    
                 if(tessDataExists == false)
                 {
                     //-- we need to download the TessData-Best.zip from tesseract-ocr Github page.
-                    await this.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        splashScreen.UpdateStatus("Downloading Tesseract's Trained Models...", 94);
-                    }));
+                    await UpdateSplashScreen(splashScreen, "Downloading Tesseract's Trained Models...", 50);
+                    
                     Loggio.Info("Downloading Tesseract's Trained Models...");
 
                     var downloadUrl = await GetTesseractGithubDownloadPath();
@@ -616,16 +854,14 @@ namespace TBChestTracker
                         {
                             downloadFolderDirInfo.Create(); 
                         }
+
                         //-- we begin downloading now
                         await DownloadTessData(splashScreen, downloadUrl, downloadFolderPath);
 
-                        await Task.Delay(500);
+                        await Task.Delay(150);
 
-                        await this.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            splashScreen.UpdateStatus("Extracting trained Tesseract models...", 95);
-                        }));
-
+                        await UpdateSplashScreen(splashScreen, "Extracting trained tesseract's models...", 55);
+                        
                         var archiveFile = $@"{downloadFolderPath}\{SettingsManager.Instance.Settings.OCRSettings.TessDataConfig.TesseractPackage}.zip";
 
                         Loggio.Info("Extracting Downloaded Tesseract Trained Models...");
@@ -641,18 +877,15 @@ namespace TBChestTracker
                     else
                     {
                         Loggio.Warn("Unable to obtain Tesseract Download Path");
-
-                        throw new Exception("Failed to obtain Tesseract download path.");
+                        return new CommonResult(CommonResultCodes.Error, "Unable to obtain Tesseract's Download Path");
+                        //throw new Exception("Failed to obtain Tesseract download path.");
                     }
                 }
 
 
                 if(bTessDataDownloadComplete)
                 {
-                    await this.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        splashScreen.UpdateStatus("Cleaning up Temporary Files...", 97);
-                    }));
+                    await UpdateSplashScreen(splashScreen, "Cleaning up temporary files...", 75);
 
                     Loggio.Info("Cleaning temporary files from Tesseract's Trained Models Download....");
 
@@ -660,54 +893,53 @@ namespace TBChestTracker
                     await Task.Delay(150);
                 }
 
-                await this.Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    splashScreen.UpdateStatus("Initializing Chest Automation...", 98);
-                }));
-
-                await Task.Delay(250);
-
                 Loggio.Info("Initializing Chest Automation...");
+
+                await UpdateSplashScreen(splashScreen, "Intializing Chest Automation...", 80);
 
                 await InitChestAutomation();
 
-                await this.Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    splashScreen.UpdateStatus("Building Chest Variables...", 99);
-                }));
-                await Task.Delay(100);
+                await UpdateSplashScreen(splashScreen, "Building Chest Variables...", 85);
 
                 Loggio.Info("Building Chest Builder Variables...");
                 await BuildChestData();
 
-                await this.Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    splashScreen.UpdateStatus("Starting Clan Insights Server...", 99);
-                }));
+                await UpdateSplashScreen(splashScreen, "Starting Clan Insights Server...", 90);
 
                 Loggio.Info("Starting Clan Insights NodeJS Server...");
-
-                await Task.Delay(250);
+                                
                 await StartInsightsServer();
 
-                await this.Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    splashScreen.UpdateStatus("Launching...", 100);
-                }));
-                
-                Loggio.Info("Launching Total Battle Chest Tracker...");
-
-                await Task.Delay(1000);
-                await LaunchTask(splashScreen);
-
                 var language = SettingsManager.Instance.Settings.GeneralSettings.UILanguage;
-                switch(language.ToLower())
+                switch (language.ToLower())
                 {
                     case "english":
                         LocalizationManager.Set("en-US");
                         break;
                 }
+
                 Loggio.Info($"Using culture info ('{CultureInfo.CurrentCulture.Name}')");
+
+                await UpdateSplashScreen(splashScreen, "Launching...", 100);
+
+                Loggio.Info("Launching Total Battle Chest Tracker...");
+
+                return new CommonResult(CommonResultCodes.Success, "Launch");
+                //await LaunchTask(splashScreen);
+            }
+            return new CommonResult(CommonResultCodes.Fail, "Not SplashScreenWindow.");
+
+        }
+
+        private async Task UpdateSplashScreen(Window window, string message, Int32 progress, int delay = 200)
+        {
+            if (window is SplashScreen splash)
+            {
+                await splash.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    splash.UpdateStatus(message, progress); 
+                }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+                await Task.Delay(delay);
             }
         }
         #endregion
@@ -716,20 +948,36 @@ namespace TBChestTracker
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // throw new Exception("Testing");
+            InitCaptainHook();
         }
         #endregion
 
         public void ShowWindow()
         {
             this.Show();
-            if(AppContext.Instance.RequiresOCRWizard)
+            Loggio.Info("Showing Main Window");
+            //-- a fancier message will appear.
+            if(Snapster.MonitorConfiguration.InvalidMonitorIndexSelected)
+            {
+                MessageBox.Show("You may have powered off another monitor that you wanted to use for chest automation. But because it is not detected until you power on that monitor, Total Battle Chest Tracker has reverted back to your primary monitor. Please relaunch OCR Wizard to correct any issues.");
+                Loggio.Info("Invalid Monitor Index Detected...");
+                var PrimaryMonitorIndex = Snapster.MonitorConfiguration.Monitor.isPrimary == 1 ? Snapster.MonitorConfiguration.Monitor.ID : 0;
+                SettingsManager.Instance.Settings.GeneralSettings.MonitorIndex = PrimaryMonitorIndex;
+                SettingsManager.Save();
+            }
+            if(AppContext.Instance.RequiresOCRWizard && AppContext.Instance.UserClosedStartPageDirectly == false)
             {
                 //-- prompt the user to set up OCR for the first time.
                 OCRWizardWindow = new OCRWizardWindow();
+                Loggio.Info("Showing OCR Window...");
                 if (OCRWizardWindow != null)
                     OCRWizardWindow.Show();
             }
-            
+            if(SettingsManager.Settings.GeneralSettings.ShowOcrLanguageSelection)
+            {
+                OcrLanguageSelectionWindow ocrLanguageSelectionWindow = new OcrLanguageSelectionWindow(SettingsManager);
+                ocrLanguageSelectionWindow.Show();
+            }
         }
         
         #region CaptionHook Events
@@ -742,7 +990,7 @@ namespace TBChestTracker
 
         private async Task StartAutomation()
         {
-            if (AppContext.Instance.IsAutomationPlayButtonEnabled == true)
+            if (AppContext.Instance.IsAutomationPlayButtonEnabled == true && AppContext.Instance.IsBuildingChests == false)
             {
                 if (!AppContext.Instance.AutomationRunning)
                 {
@@ -758,82 +1006,28 @@ namespace TBChestTracker
                 if (AppContext.Instance.AutomationRunning)
                 {
                     ChestAutomation.StopAutomation();
+                 
                 }
             }
         }
-
-        private void CaptainHook_onKeyboardMessage(object sender, KeyboardHookMessageEventArgs e)
-        {
-            if(!AppContext.Instance.IsConfiguringHotKeys) { 
-                
-                int vkey = e.VirtKeyCode;
-                var key = KeyInterop.KeyFromVirtualKey(vkey);
-                var bIsNewKey = false;
-                
-                //--- to allow customized hot keys, will reuire update.
-                bool keyDown = e.MessageType == KeyboardMessage.KeyDown ? true : false;
-                if(keyDown)
-                {
-                    newKey = key;
-                    if (previousKey != newKey)
-                    {
-                        bIsNewKey = true;
-                        previousKey = newKey;
-                    }
-                    else
-                        bIsNewKey = false;
-
-                    if(bIsNewKey)
-                    {
-                        if (String.IsNullOrEmpty(keyStr))
-                            keyStr = key.ToString();
-                        else
-                            keyStr += $"+{key.ToString()}";
-                    }
-                }
-                else
-                {
-                    if(keyStr.Equals(SettingsManager.Instance.Settings.HotKeySettings.StartAutomationKeys))
-                    {
-                      
-                        StartAutomation();
-                        AppContext.Instance.hasHotkeyBeenPressed = true;
-                        keyStr = String.Empty;
-                        previousKey = Key.None;
-                        newKey = Key.None;
-                    }
-                    if(keyStr.Equals(SettingsManager.Instance.Settings.HotKeySettings.StopAutomationKeys))
-                    {
-                        StopAutomation();
-
-                        AppContext.Instance.hasHotkeyBeenPressed = true;
-                        keyStr = String.Empty;
-                        previousKey = Key.None;
-                        newKey = Key.None;
-                    }
-                    keyStr = String.Empty;
-                    bIsNewKey = false;
-
-                }
-            }
-        }
-
+    
         #endregion
 
         #region Window Closing
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            ChestAutomation.Release();
-
+            ChestAutomation?.Release();
             AppContext.Instance.isAppClosing = true;
-            applicationManager.KillNodeServer();
-            CaptainHook.Uninstall();
-            
-            ClanManager.Instance.Destroy();
-            
-            //com.HellStormGames.Logging.Console.Destroy();
-            SettingsManager.Dispose();
-            applicationManager.Dispose();
+            if (applicationManager?.NodeServerStarted.Value == true)
+            {
+                applicationManager?.KillNodeServer();
+            }
+
+            CaptainHook?.Uninstall();
+            CaptainHook?.Dispose();
+            ClanManager.Instance?.Destroy();
+            SettingsManager?.Dispose();
+            applicationManager?.Dispose();
         }
         #endregion
 
@@ -851,7 +1045,11 @@ namespace TBChestTracker
                 if(result)
                 {
                     ExportClan.IsEnabled = true;
-                    //CloseDatabase.IsEnabled = true;
+                    CloseDatabase.IsEnabled = true;
+                }
+                else
+                {
+                    CloseDatabase.IsEnabled = false;
                 }
             });
            
@@ -895,6 +1093,7 @@ namespace TBChestTracker
         
         public void CreateNewClan(Action<bool> response)
         {
+            ClanManager = new ClanManager();
             NewClanDatabaseWindow newClanDatabaseWindow = new NewClanDatabaseWindow();
             if (newClanDatabaseWindow.ShowDialog() == true)
             {
@@ -953,6 +1152,10 @@ namespace TBChestTracker
         {
             bool bIsLoaded = false;
 
+            if(ClanManager.Instance == null || ClanManager == null)
+            {
+                ClanManager = new ClanManager();
+            }
             if (ClanManager.Instance.ClanChestSettings.ChestRequirements != null)
                 ClanManager.Instance.ClanChestSettings.Clear();
 
@@ -999,27 +1202,131 @@ namespace TBChestTracker
                     }
 
                     Loggio.Info($"Loaded Clan ({ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname}) successfully.");
+
                     AppContext.Instance.IsCurrentClandatabase = true;
-                    if (AppContext.Instance.IsClanChestDataCorrupted == true)
+
+                    //-- check if archive folder exist
+                    var archiveFolder = $"{ClanManager.Instance.CurrentProjectDirectory}\\archives";
+                    var di = new DirectoryInfo(archiveFolder);
+                    if (di.Exists)
                     {
-                        AppContext.Instance.IsAutomationPlayButtonEnabled = false;
-
-                        Loggio.Warn("Was not able to load clan chest database file. Possibly corrupted.");
-
-                        if (MessageBox.Show("Oh no! There is an error loading your clan chest database file. It is possibly corrupted. Be sure to restore a previously known good clan chest data file inside Tools -> Restore Clan Chest Data", "Clan Chest Data Loading Error", MessageBoxButton.OK, MessageBoxImage.Stop) == MessageBoxResult.OK)
+                        //-- we need to move all files to newer folder 
+                        var ChestsFolder = $"{ClanManager.CurrentProjectDirectory}\\Chests\\Data";
+                        var dif = new DirectoryInfo(ChestsFolder);
+                        if (dif.Exists == false)
                         {
-                            RestoreClanChestDataWindow restoreClanChestDataWindow = new RestoreClanChestDataWindow();
-                            restoreClanChestDataWindow.Show();
+                            dif.Create();
+                        }
+
+                        var archiveFiles = di.EnumerateFiles("*.txt");
+                        foreach (var file in archiveFiles.ToList())
+                        {
+                            var oldFile = file.FullName;
+                            var newFilename = file.Name;
+                            Regex r = new Regex(@"(\d+-\d+-\d+)");
+                            var matches = r.Match(newFilename);
+                            string newFile = string.Empty;
+                            if (matches.Success)
+                            {
+                                newFile = $"{ChestsFolder}\\chests_{matches.Value}.txt";
+                                using (StreamReader sr = new StreamReader(oldFile))
+                                {
+                                    var data = sr.ReadToEnd();
+                                    using (StreamWriter sw = new StreamWriter(newFile, true))
+                                    {
+                                        sw.Write(data);
+                                        sw.Close();
+                                    }
+                                    sr.Close();
+                                }
+                            }
+                        }
+
+                        di.Delete(true);
+                    }
+
+                    var cacheFolder = $"{ClanManager.Instance.CurrentProjectDirectory}\\cache";
+                    di = new DirectoryInfo (cacheFolder);
+                    if (di.Exists)
+                    {
+                        //-- we need to move all files to newer folder 
+                        var ChestsFolder = $"{ClanManager.CurrentProjectDirectory}\\Chests\\Data";
+                        var dif = new DirectoryInfo(ChestsFolder);
+                        if (dif.Exists == false)
+                        {
+                            dif.Create();
+                        }
+
+                        var cacheFiles = di.EnumerateFiles("*.txt");
+                        foreach (var file in cacheFiles.ToList())
+                        {
+                            var oldFile = file.FullName;
+                            var newFilename = file.Name;
+                            Regex r = new Regex(@"(\d+-\d+-\d+)");
+                            var matches = r.Match(newFilename);
+                            string newFile = string.Empty;
+                            if (matches.Success)
+                            {
+                                newFile = $"{ChestsFolder}\\chests_{matches.Value}.txt";
+                                using (StreamReader sr = new StreamReader(oldFile))
+                                {
+                                    var data = sr.ReadToEnd();
+                                    using (StreamWriter sw = new StreamWriter(newFile, true))
+                                    {
+                                        sw.Write(data);
+                                        sw.Close();
+                                    }
+                                    sr.Close();
+                                }
+                            }
+                        }
+
+                        di.Delete(true);
+                    }
+
+                    AppContext.Instance.IsAutomationPlayButtonEnabled = true;
+                    ExportClan.IsEnabled = true;
+                    CloseDatabase.IsEnabled = true;
+                    bIsLoaded = true;
+
+                    //-- we need to check to see if we can load ClanSettings.json. If not, not big of a deal.
+                    //-- If fails, we'd know it either doesn't exist or there's an issue.
+                    if(ClanManager.Instance.ClanSettings.Load() == false)
+                    {
+                        //-- we couldn't load it. So perhaps it doesn't exist and this is the user's first time using newest version.
+                        var aoirect = SettingsManager.Instance.ObtainObseleteAOIRect();
+                        if (aoirect != null)
+                        {
+                            //-- obselete AOI data obtained.
+                            ClanManager.Instance.AddOcrProfile("Default", aoirect);
+                            ClanManager.Instance.SetCurrentOcrProfile("Default");
+                            ClanManager.Instance.ClanSettings.Save();
+                            AppContext.Instance.RequiresOCRWizard = false;
+                            AppContext.Instance.OCRCompleted = true;
+
+                            //-- now we add to OCR Profiles Menu.
+                        }
+                        else
+                        {
+                            if (AppContext.Instance.UserClosedStartPageDirectly == false)
+                            {
+                                ClanManager.Instance.AddOcrProfile("Default", null);
+                                ClanManager.Instance.SetCurrentOcrProfile("Default");
+                                AppContext.Instance.OCRCompleted = false;
+                                AppContext.Instance.RequiresOCRWizard = true;
+                            }
                         }
                     }
                     else
                     {
-                        AppContext.Instance.IsAutomationPlayButtonEnabled = true;
+                        //-- We're able to load ClanSettings.json successfully.
+                        //-- We need to obtain all the profiles. Get the current profile. 
+                        //-- Also create the menu items inside OCR Profiles Menu.
+                        var currentProfileName = ClanManager.Instance.GetCurrentOcrProfileName();
+                        ClanManager.Instance.SetCurrentOcrProfile(currentProfileName);
+                        AppContext.Instance.OCRCompleted = true;
+                        AppContext.Instance.RequiresOCRWizard = false;
                     }
-
-                    ExportClan.IsEnabled = true;
-                    
-                    bIsLoaded = true;
                 }
                 else
                 {
@@ -1028,11 +1335,15 @@ namespace TBChestTracker
                     bIsLoaded = false;
                 }
             });
-
+            ClanManager.Instance.ChestDataManager ??= new ChestDataManager();
             return bIsLoaded;
         }
         public void ShowLoadClanWindow(Action<bool> response)
         {
+            if(String.IsNullOrEmpty(ClanManager.CurrentProjectDirectory) == false)
+            {
+                CloseClanProject();
+            }
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Clan Databases | *.cdb";
             openFileDialog.RestoreDirectory = true;
@@ -1080,7 +1391,7 @@ namespace TBChestTracker
         #region Export Clan Database
         private void ExportClanDatabase_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            if (AppContext.Instance.NewClandatabaseBeenCreated && AppContext.Instance.ClanmatesBeenAdded)
+            if (AppContext.Instance.NewClandatabaseBeenCreated && AppContext.Instance.HasBuiltChests)
                 e.CanExecute = true;
             else 
                 e.CanExecute = false;
@@ -1105,24 +1416,6 @@ namespace TBChestTracker
         }
         #endregion
 
-        #region Manage Clanmates
-        private void ManageClanmatesCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = AppContext.Instance.NewClandatabaseBeenCreated;
-        }
-
-        private void ManageClanmatesCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            ManageClanmatesWindow addClanmatesWindow = new ManageClanmatesWindow();
-            if (addClanmatesWindow.ShowDialog() == true)
-            {
-                AppContext.Instance.ClanmatesBeenAdded = true;
-
-                AppContext.Instance.IsAutomationPlayButtonEnabled = !AppContext.Instance.IsClanChestDataCorrupted;
-            }
-        }
-        #endregion
-
         #region Manage Clan Chests Settings
         private void ManageClanchestSettingsCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -1142,7 +1435,7 @@ namespace TBChestTracker
         private void StartAutomationCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             if (AppContext.Instance.NewClandatabaseBeenCreated
-                && AppContext.Instance.ClanmatesBeenAdded && AppContext.Instance.OCRCompleted && AppContext.Instance.IsClanChestDataCorrupted == false)
+                &&AppContext.Instance.OCRCompleted && AppContext.Instance.IsBuildingChests == false)
             {
                 e.CanExecute = true;
             }
@@ -1154,15 +1447,13 @@ namespace TBChestTracker
         private void StartAutomationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             StartAutomation();
-           
         }
         #endregion
 
         #region Stop Automation
         private void StopAutomationCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            if (AppContext.Instance.ClanmatesBeenAdded 
-                && AppContext.Instance.NewClandatabaseBeenCreated && AppContext.Instance.OCRCompleted)
+            if (AppContext.Instance.NewClandatabaseBeenCreated && AppContext.Instance.OCRCompleted)
                 e.CanExecute = true;
             else
                 e.CanExecute = false;
@@ -1176,7 +1467,16 @@ namespace TBChestTracker
         #region Clan Stats
         private void ClanStatsCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            if (AppContext.Instance.ClanmatesBeenAdded && AppContext.Instance.NewClandatabaseBeenCreated)
+            if (ClanManager.Instance != null)
+            {
+                var chestsfile = $"{ClanManager.Instance.CurrentProjectDirectory}\\Chests\\ChestData.csv";
+                AppContext.Instance.HasBuiltChests = File.Exists(chestsfile);
+            }
+            else
+            {
+                AppContext.Instance.HasBuiltChests = false;
+            }
+            if (AppContext.Instance.NewClandatabaseBeenCreated && AppContext.Instance.HasBuiltChests)
                 e.CanExecute = true;
             else
                 e.CanExecute = false;
@@ -1185,16 +1485,33 @@ namespace TBChestTracker
 
         private async void PrepareClanInsightsData()
         {
+            
             var server = "http://127.0.0.1:8888/";
             var apiCall = "api/Build";
             var responseData = String.Empty;
 
             //-- build ClanInsightsData
-            var chestdata = ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions != ChestOptions.UseConditions 
-                ? ClanManager.Instance.ClanChestManager.Database.ClanChestData : ClanManager.Instance.ClanChestManager.FilterClanChestByConditions();
+            IChestDataCollection chestDataCollection = null;
+            bool use_chest_conditions = ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions != ChestOptions.UseConditions ? false : true;
+            ClanManager.Instance.ChestDataManager.Load();
+            var chestcollection = ClanManager.Instance.ChestDataManager.GetDatabase();
+
+            if(use_chest_conditions)
+            {
+                chestDataCollection = new ChestDataConditionalCollection(chestcollection, ClanManager.Instance.ClanChestSettings.ChestRequirements);
+            }
+            else
+            {
+                chestDataCollection = new ChestDataCollection(chestcollection);
+            }
+
+            chestDataCollection.Build();
+            var builtChestData = chestDataCollection.Items;
             var gameChests = new List<string>();
             var previousChest = String.Empty;
             var dateformat = AppContext.Instance.ForcedDateFormat;
+            var members = new List<string>();
+
             foreach(var chest in ApplicationManager.Instance.Chests)
             {
                 if (chest.ChestType != previousChest)
@@ -1204,32 +1521,35 @@ namespace TBChestTracker
                 }
             }
 
+            foreach(var chestdata in builtChestData)
+            {
+                var d = builtChestData[chestdata.Key];
+                foreach (var x in d)
+                {
+                    if (members.Contains(x.Key) == false)
+                        members.Add(x.Key);
+                }
+            }
+
             var clan = ClanManager.Instance.ClanDatabaseManager.ClanDatabase.Clanname;
-            var size = ClanManager.Instance.ClanmateManager.Database.NumClanmates;
-            var clanmates = ClanManager.Instance.ClanmateManager.Database.Clanmates;
-            var clanmateNames = clanmates.Select(n => n.Name).ToList();
             var usePoints = ClanManager.Instance.ClanChestSettings.GeneralClanSettings.ChestOptions == ChestOptions.UsePoints;
             var locale = CultureInfo.CurrentCulture.Name;
 
-            ClanInsightsData insightsData = new ClanInsightsData(clan,size,clanmateNames,gameChests, chestdata, usePoints, dateformat, locale);
-
+            ClanInsightsData insightsData = new ClanInsightsData(clan, members, gameChests, builtChestData, usePoints, dateformat, locale);
             var JsonStr = JsonConvert.SerializeObject(insightsData, Formatting.Indented);
 
-            var stringContent = new StringContent(JsonStr, Encoding.UTF8, "application/json");
-            var httpClient = new HttpClient();
-            var httpResponse = await httpClient.PostAsync($"{server}{apiCall}", stringContent);
-            if(httpResponse.Content != null)
+            //-- we should save to where Clan Insights Server is. What happens if string is too big?
+            var dataPath = $"{AppContext.Instance.LocalApplicationPath}Server\\NodeJS\\public\\ClanInsights\\data\\ClanInsights.json";
+            using(var streamwriter= new StreamWriter(dataPath))
             {
-                var responseContent = await httpResponse.Content.ReadAsStringAsync();
-                Debug.WriteLine(responseContent);
+                streamwriter.Write(JsonStr);
+                streamwriter.Close();
             }
         }
         private void ClanStatsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             PrepareClanInsightsData();
-            
-            ClanInsightsWindow clanInsightsWindow = new ClanInsightsWindow();
-            clanInsightsWindow.Show();
+            WebView.Show("Clan Insights", "http://127.0.0.1:8888/View/ClanInsights", 800,800, false, true, true);
         }
         #endregion
 
@@ -1254,7 +1574,7 @@ namespace TBChestTracker
         #region Show Console
         private void ConsoleMenuButton_Click(object sender, RoutedEventArgs e)
         {
-            consoleWindow.Show();
+            //consoleWindow.Show();
         }
 
         #endregion
@@ -1270,7 +1590,19 @@ namespace TBChestTracker
         }
         private void ManageSettingsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            
             SettingsWindow = new SettingsWindow();
+            using(var image = Snapster.CaptureDesktop()) {
+                try
+                {
+                    SettingsWindow.MonitorPreviewImage = image.ToBitmap().AsBitmapSource();
+                }
+                catch(Exception ex)
+                {
+                    Loggio.Error(ex, "Monitor Preview", "Couldn't capture desktop for monitor preview. More details in log.");
+                }
+            }
+
             SettingsWindow.Show();
         }
         #endregion
@@ -1287,12 +1619,15 @@ namespace TBChestTracker
 
         private void ConsoleButton_Click(object sender, RoutedEventArgs e)
         {
+            
+            /*
             if(consoleWindow != null) consoleWindow.Show();
             else
             {
                 consoleWindow = new ConsoleWindow();
                 consoleWindow.Show();
             }
+            */
         }
 
         private void OCRWizardButton_Click(object sender, RoutedEventArgs e)
@@ -1355,12 +1690,6 @@ namespace TBChestTracker
             chestBuilderWindow.Show();
         }
 
-        private void AbsentClanmateCleanerMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            AbsentClanmatesCleanerWindow absentClanmatesCleanerWindow = new AbsentClanmatesCleanerWindow();
-            absentClanmatesCleanerWindow.ShowDialog();
-        }
-
         private void ClanWealthBuilderMenuItem_Click(object sender, RoutedEventArgs e)
         {
 
@@ -1375,27 +1704,6 @@ namespace TBChestTracker
                 updateWindow.Show();
 
             }
-        }
-
-        private void ClanmateValidationMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            ClanmateValidationWindow clanmateValidationWindow = new ClanmateValidationWindow();
-            clanmateValidationWindow.Show();
-        }
-
-        private void RestoreClanChestDataMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            RestoreClanChestDataWindow restoreclandatabasewindow = new RestoreClanChestDataWindow();
-            if(restoreclandatabasewindow.ShowDialog() == true)
-            {
-
-            }
-        }
-
-        private void ValidateClanChestIntegrityMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            ValidateClanChestsIntegrityWindow validateChestDataIntegrity = new ValidateClanChestsIntegrityWindow();
-            validateChestDataIntegrity.Show();
         }
 
         private void ExportClan_Click(object sender, RoutedEventArgs e)
@@ -1421,52 +1729,92 @@ namespace TBChestTracker
 
         private void BuildChests_Click(object sender, RoutedEventArgs e)
         {
-            BuildingChestsWindow buildingChestsWindow = new BuildingChestsWindow();
-            if (buildingChestsWindow.ShowDialog() == true)
-            {
-                ClanManager.Instance.ClanChestManager.Save();
-                ClanManager.Instance.ClanChestManager.CreateBackup();
-
-                if (SettingsManager.Instance.Settings.AutomationSettings.AutoRepairAfterStoppingAutomation)
-                {
-                    if (ClanManager.Instance.ClanChestManager.CheckIntegrity() != null)
-                    {
-                        var result = ClanManager.Instance.ClanChestManager.Repair();
-                        if (result)
-                        {
-                            Loggio.Info("Chest Data Automatically Repaired.");
-                        }
-                    }
-                    else
-                    {
-                        Loggio.Info("Chest Data is looking good. No Need for repairs.");
-                    }
-                }
-
-                ClanManager.Instance.ClanChestManager.ClearCache();
-            }
+            BuildClanChests();
         }
 
-        private void RollbackDatabase_Click(object sender, RoutedEventArgs e)
+        private void ReloadStartPage()
         {
-            ClanManager.Instance.ClanChestManager.RollBack();
-        }
+            if (startPageWindow != null)
+            {
+                startPageWindow.Close();
+                startPageWindow = null;
+            }
 
+            startPageWindow = new StartPageWindow();
+
+            startPageWindow.MainWindow = this;
+            startPageWindow.Show();
+            this.Hide();
+        }
         private void CloseClanProject()
         {
-            ClanManager.Instance.Destroy();
+            ClanManager.UnloadClan();
+            //ClanManager = null;
             // com.HellStormGames.Logging.Console.Destroy();
         }
         private void CloseDatabase_Click(object sender, RoutedEventArgs e)
         {
             CloseClanProject();
-            if(startPageWindow == null)
-            {
-                startPageWindow = new StartPageWindow();
-            }
-            startPageWindow.MainWindow = this;
-            startPageWindow.Show();
+            ReloadStartPage();
+        }
+        
+        private void OcrCorrectionToolMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            OcrCorrectionWindow ocrCorrectionWindow
+                = new OcrCorrectionWindow();
 
+            ocrCorrectionWindow.Show();
+        }
+
+        private void BuildClanChestsCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            bool? isAutomatic = SettingsManager?.Settings?.AutomationSettings?.BuildChestsAfterStoppingAutomation;
+            isAutomatic ??= false;
+            var chestsDirectory = $"{ClanManager?.CurrentProjectDirectory}\\Chests\\Data";
+            var chestsDI = new DirectoryInfo(chestsDirectory);
+            bool hasChestFiles = false;
+            if(chestsDI.Exists)
+            {
+                hasChestFiles = chestsDI.EnumerateFiles("chests_*.txt").Count() > 0;
+            }
+
+            if(AppContext.Instance.NewClandatabaseBeenCreated && hasChestFiles && isAutomatic == false)
+            {
+                e.CanExecute = true;
+            }
+            else
+            {
+                e.CanExecute = false;
+            }
+        }
+
+        private void BuildClanChestsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            BuildClanChests();
+        }
+
+        private void ViewMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var mi = (MenuItem)e.OriginalSource;
+            var menutag = mi.Tag;
+            switch (menutag)
+            {
+                case "ClansRoot":
+                    Process.Start($"{AppContext.Instance.LocalApplicationPath}Clans\\");
+                    break;
+                case "LogFiles":
+                    Process.Start($"{AppContext.Instance.LocalApplicationPath}Logs\\");
+                    break;
+            }
+        }
+        private void DoBug()
+        {
+            var a = new string[5];
+            a[7] = "Meow!";
+        }
+        private void CauseCrashMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            DoBug();            
         }
     }
 }

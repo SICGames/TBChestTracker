@@ -1,4 +1,5 @@
-﻿using Emgu.CV.Flann;
+﻿using com.HellStormGames.Diagnostics;
+using Emgu.CV.Flann;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -82,8 +83,7 @@ namespace TBChestTracker
             this.DataContext = this;
 
         }
-
-
+        
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName)
         {
@@ -106,13 +106,38 @@ namespace TBChestTracker
             }
         }
 
+        private void UpdateUI(string status, int current, int total, bool isIndeterminate = false, bool aborted = false, bool completed = false)
+        {
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                Status = status;
+                Progress = current;
+                Progressbar01.IsIndeterminate = isIndeterminate;
+                Max = total;
+                var percentage = Math.Round(((decimal)current / (decimal)total) * 100) + "%";
+                Percent = percentage;
+                if(aborted)
+                {
+                    bAborted = true;
+                    AbortButton.Text = "Close";
+                }
+                if (completed)
+                {
+                    AbortButton.Text = "Close";
+                    bAborted = false;
+                }
+            }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+
+        }
         private async Task CopyDirectoryAsync(string sourceDir, string destinationDir, bool recursive, CancellationToken token) 
         {
             Debug.WriteLine("Copying files....");
 
             var dir = new DirectoryInfo(sourceDir);
             if (!dir.Exists)
+            {
                 throw new DirectoryNotFoundException($"Source directory not found: {dir.FullName}");
+            }
 
             DirectoryInfo[] dirs = dir.GetDirectories();
 
@@ -129,17 +154,10 @@ namespace TBChestTracker
                 using (FileStream sourceStream = File.Open(file, FileMode.Open))
                 {
                     var destFile = $"{destinationDir}{file.Substring(file.LastIndexOf("\\"))}";
-                    await this.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        Max = Directory.EnumerateFiles(sourceDir).Count();
-                        Status = $"Copying - {destFile}";
-                        Progressbar01.IsIndeterminate = false;
-                        Progress = index;
-                        var percentage = Math.Round((index / Max) * 100) + "%" ;
-                        Percent = percentage;
-
-                    }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-
+                    var status = $"Copying - {destFile}";
+                    var current = index;
+                    var total = Directory.EnumerateFiles(sourceDir).Count();
+                    UpdateUI(status, current, total);
                     using (FileStream destinationStream = File.OpenWrite(destFile))
                     {
                         await sourceStream.CopyToAsync(destinationStream);
@@ -158,17 +176,9 @@ namespace TBChestTracker
             index = 0;
             if(bAborted)
             {
-                await this.Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    Max = 100;
-                    Status = $"Aborted!";
-                    Progress = 0;
-                    var percentage = 0 + "%";
-                    Percent = percentage;
-                    AbortButton.Text = "Close";
-                }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-                
-                await Task.Delay(1000);
+                UpdateUI("Aborted!", 0, 0, false, true);
+
+                await Task.Delay(3000);
 
                 this.Close();
             }
@@ -178,27 +188,26 @@ namespace TBChestTracker
                 foreach (DirectoryInfo subDir in dirs)
                 {
                     string newDestinationDir = Path.Combine(destinationDir, subDir.Name);
-                    CopyDirectoryAsync(subDir.FullName, newDestinationDir, true, token);
+                    await CopyDirectoryAsync(subDir.FullName, newDestinationDir, true, token);
                 }
             }
 
             Debug.WriteLine("Copying Complete");
-            await this.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                Max = 100;
-                Status = $"Complete!";
-                Progress = 100;
-                var percentage = 100 + "%";
-                Percent = percentage;
-                AbortButton.Text = "Close";
-            }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+            UpdateUI("Completed", 100, 100, false, false, true);
         }
 
         private Task BeginCopyingTask(string oldFolder, string newFolder, CancellationToken token)
         {
             return Task.Run(() =>
             {
-                CopyDirectoryAsync(oldFolder, newFolder, true, token);
+                try
+                {
+                    CopyDirectoryAsync(oldFolder, newFolder, true, token).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    _CancellationTokenSource.Cancel();  
+                }
             });
         }
 
@@ -211,7 +220,13 @@ namespace TBChestTracker
         {
             _CancellationTokenSource = new CancellationTokenSource();
             //-- we need to ensure user select only drive letter
-            
+            if(Directory.Exists(OldClanRootFolder) == false)
+            {
+                Loggio.Warn("Moving Clans", "Ran into a issue while attempting to move clans.");
+                UpdateUI($"Failed To Move Clans. {OldClanRootFolder} may not exist.", 0, 1, false, true, false);
+                return;
+            }
+
             BeginMovingClanDatabasesTask(OldClanRootFolder, NewClanRootFolder, _CancellationTokenSource.Token); 
         }
 

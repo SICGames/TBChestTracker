@@ -10,15 +10,14 @@ namespace TBChestTracker.Managers
     public class ClanManager
     {
         public static ClanManager Instance {get; private set;}
-        
-        private ClanmateManager _clanmatemanager = null;
-        public ClanmateManager ClanmateManager => _clanmatemanager;
         private ClanDatabaseManager _databasemanager = null;
         public ClanDatabaseManager ClanDatabaseManager => _databasemanager;
         private ClanChestManager _chestmanager = null;
         public ClanChestManager ClanChestManager => _chestmanager;
-        private ClanChestSettings _clansettings = null;
-        public ClanChestSettings ClanChestSettings => _clansettings;
+        private ClanChestSettings _clanchestsettings = null;
+        public ClanChestSettings ClanChestSettings => _clanchestsettings;
+        public ClanSettings ClanSettings;
+        public ChestDataManager ChestDataManager;
 
         private string currentProjectDirectory = String.Empty;
         public string CurrentProjectDirectory
@@ -30,33 +29,64 @@ namespace TBChestTracker.Managers
         {
             CurrentProjectDirectory = path;
         }
+        public void UpdateOcrProfile(string profilename, AOIRect value)
+        {
+            ClanSettings?.OcrProfileManager?.UpdateOcrProfile(profilename, value);
+        }
+        public string GetCurrentOcrProfileName()
+        {
+            return ClanSettings?.OcrProfileManager?.CurrentOcrProfileName;
 
-
+        }
+        public AOIRect GetCurrentOcrProfile()
+        {
+            return ClanSettings?.OcrProfileManager?.GetCurrentOcrProfile();
+        }
         public ClanManager()
         {
-            if(Instance == null)
-            {
-                Instance = this;
-            }
-            if (_clanmatemanager == null)
-                _clanmatemanager = new ClanmateManager();
-            if(_databasemanager == null) 
-                _databasemanager = new ClanDatabaseManager();
-            if(_chestmanager == null)
-                _chestmanager= new ClanChestManager();
-            if(_clansettings == null)
-                _clansettings= new ClanChestSettings();
+            Instance ??= this;
+
+            _databasemanager ??= new ClanDatabaseManager();
+            _chestmanager ??= new ClanChestManager();
+            _clanchestsettings ??= new ClanChestSettings();
+            ClanSettings ??= new ClanSettings();
+            
+        }
+        public void AddOcrProfile(string profilename, AOIRect roi)
+        {
+            ClanSettings?.OcrProfileManager?.AddProfile(profilename, roi);
+        }
+        public void RemoveOcrProfile(string profilename)
+        {
+            ClanSettings?.OcrProfileManager?.RemoveProfile(profilename);
+        }
+
+        public void SetCurrentOcrProfile(string profilename)
+        {
+            ClanSettings?.OcrProfileManager?.SetCurrentOcrProfile(profilename);
+        }
+
+        public AOIRect GetOcrProfile(string  profilename)
+        {
+            return ClanSettings?.OcrProfileManager?.GetProfile(profilename);
+        }
+
+        public void UnloadClan()
+        {
+            ChestDataManager?.Dispose();
+            CurrentProjectDirectory = String.Empty;
+            ClanSettings = null;
+            _clanchestsettings?.Clear();
+            _clanchestsettings = null;
+            _chestmanager?.Dispose();
+            _chestmanager = null;
+            _databasemanager?.Dispose();
+            _databasemanager = null;
+            Instance = null;
         }
         public void Destroy()
         {
-            _clansettings.Clear();
-            _chestmanager.Dispose();
-            //_chestmanager.ClearData();
-            _databasemanager = null;
-            _clanmatemanager.Database.Clanmates.Clear();
-            _clanmatemanager.Database.Clanmates = null;
-            _clanmatemanager = null;
-            _databasemanager = null;
+            UnloadClan();
         }
     }
 }

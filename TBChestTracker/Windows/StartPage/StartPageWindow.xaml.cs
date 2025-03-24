@@ -39,6 +39,7 @@ namespace TBChestTracker
 
         private void CloseBtn_Click(object sender, RoutedEventArgs e)
         {
+            AppContext.Instance.UserClosedStartPageDirectly = true;
             MainWindow.ShowWindow();
             this.Close();
         }
@@ -101,6 +102,7 @@ namespace TBChestTracker
                     {
                         if (result)
                         {
+                            AppContext.Instance.UserClosedStartPageDirectly = false;
                             MainWindow.ShowWindow();
                             this.Close();
                         }
@@ -111,6 +113,7 @@ namespace TBChestTracker
                     {
                         if (result)
                         {
+                            AppContext.Instance.UserClosedStartPageDirectly = false;
                             MainWindow.ShowWindow();
                             this.Close();
                         }

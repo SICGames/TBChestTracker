@@ -1,0 +1,156 @@
+﻿<Window x:Class="TBChestTracker.Windows.OCRCorrection.OcrCorrectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TBChestTracker.Windows.OCRCorrection"
+        xmlns:ui="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
+        xmlns:utilities="clr-namespace:SKNotes.Utilities"
+        mc:Ignorable="d"
+        Title="OCR Correction Tool" SizeToContent="Height" d:Width="400" Width="420"  Topmost="True" Loaded="Window_Loaded" Closing="Window_Closing">
+    <Window.Resources>
+        <SolidColorBrush x:Key="FancyButton.Background" Color="#0088ff"/>
+        <SolidColorBrush x:Key="FancyButton.Hover" Color="#aa0099ff"/>
+        <Style x:Key="TreeViewItemStyle" TargetType="{x:Type TreeViewItem}">
+            <Setter Property="IsExpanded" Value="True"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="48"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" FontWeight="Bold" FontSize="20" Text="OCR Correction Tool" Margin="15,5"/>
+            <ui:FancyButton Grid.Column="1" 
+                            x:Name="HelpBtn" 
+                            HoverBrush="Transparent" 
+                            Background="Transparent" 
+                            Source="pack://application:,,,/Images/ui/HelpIcon.png" 
+                            Height="32"
+                            Width="32"
+                            VerticalAlignment="Center"
+                            ShowSeperator="False"
+                            HorizontalAlignment="Center" Click="HelpBtn_Click"/>
+        </Grid>
+        
+        <TextBlock Grid.Row="1" Text="Sometimes the OCR will mispell words. This is the tool to correct that. Ranging from mispelled chest names, clanmates, and even chest types. Although, this is not a miracle tool where mistakes don't happen. It will attempt its best to prevent mistakes though." TextWrapping="Wrap" Margin="25,5"/>
+        <TextBlock Grid.Row="2" Text="You would want to first add the correct spelling. Then you'll want to click on the correct word and add the incorrect spelling. When finished, click on the Save button." TextWrapping="Wrap" Margin="15,5"/>
+        <Grid Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Margin="10" Height="32">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Word" Margin="5,0" VerticalAlignment="Center"/>
+                <TextBox x:Name="CorrectWordTextBox" Grid.Column="1" Width="265" Height="16" VerticalAlignment="Center" Margin="5,2"/>
+                <ui:FancyImageButton Grid.Column="2" 
+                                     Padding="5"
+                                     x:Name="AddWordButton" Width="24" Height="24" 
+                                     Foreground="White" 
+                                     Background="{StaticResource FancyButton.Background}" 
+                                     HighlightBrush="{StaticResource FancyButton.Hover}"
+                                     ToolTip="Add Word"
+                                     BorderThickness="0" 
+                                     Margin="5,1" Click="AddWordButton_Click" 
+                                     ImageSource="pack://application:,,,/Images/ui/plusButton.png"
+                                     
+                                     IsEnabled="{Binding ElementName=CorrectWordTextBox, 
+                                                 Path=Text, 
+                                                 Mode=TwoWay, 
+                                                 Converter={StaticResource NullStringBooleanConverter}}"/>
+                <ui:FancyImageButton Grid.Column="3"
+                                     x:Name="PickFromListButton" 
+                                     ImageSource="pack://application:,,,/Images/ui/ListIcon_Light.png" 
+                                     Height="24" 
+                                     Width="24" 
+                                     Padding="5"
+                                     BorderThickness="0"
+                                     Background="{StaticResource FancyButton.Background}" 
+                                     HighlightBrush="{StaticResource FancyButton.Hover}"
+                                     HighlightOpacity="0.75" 
+                                     ToolTip="Choose Word From List"
+                                     Click="PickFromListButton_Click" VerticalAlignment="Center"/>
+            </Grid>
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <TreeView  x:Name="AffectedWordsViewBox"
+                              Grid.Column="0" Width="350"
+                              Height="420"
+                              ItemsSource="{Binding AffectedWordsCollection}" 
+                              SelectedItemChanged="AffectedWordsViewBox_SelectedItemChanged" 
+                              AllowDrop="True" Drop="AffectedWordsViewBox_Drop" DragEnter="AffectedWordsViewBox_DragEnter" DragOver="AffectedWordsViewBox_DragOver">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}">
+                            <Setter Property="FontWeight" Value="Normal" />
+                            <Setter Property="IsExpanded" Value="True"/>
+                            <Style.Triggers>
+                                <Trigger Property="utilities:TreeViewDropHighlighter.IsPossibleDropTarget" Value="True">
+                                    <Setter Property="Background" Value="#FFBEE6FD" />
+                                    <Setter Property="BorderBrush" Value="#FF3C7FB1"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding IncorrectWords}">
+                            <Grid>
+                                <TextBlock Text="{Binding Word}" 
+                                           AllowDrop="True" DragOver="TextBlock_DragOver" 
+                                           DragEnter="TextBlock_DragEnter" DragLeave="TextBlock_DragLeave" Drop="TextBlock_Drop"/>
+                            </Grid>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+                <StackPanel Orientation="Vertical" Grid.Column="1" Margin="5,5">
+                    <ui:FancyImageButton x:Name="RemoveSelectedItemsButton" 
+                                         Background="{StaticResource FancyButton.Background}" 
+                                         HighlightBrush="{StaticResource FancyButton.Hover}"
+                                         BorderThickness="0" HighlightOpacity="0.75" Margin="0,5" Padding="5"
+                                         Foreground="White"
+                                         Height="24"
+                                         Width="24"
+                                         ToolTip="Removes elected item from tree view"
+                                         ImageSource="pack://application:,,,/Images/ui/MinusIcon.png"
+                                         IsEnabled="True" Click="RemoveSelectedItemsButton_Click"/>
+                    <ui:FancyImageButton x:Name="ClearAllButton" Background="{StaticResource FancyButton.Background}" 
+                                         HighlightBrush="{StaticResource FancyButton.Hover}"
+                                         BorderThickness="0" HighlightOpacity="0.75" Padding="5"
+                                         Foreground="White"
+                                         ToolTip="Removes everything within tree view"
+                                         Height="24"
+                                         Width="24"
+                                         ImageSource="pack://application:,,,/Images/ui/TrashIcon-white.png"
+                                         IsEnabled="True" Click="ClearAllButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+        <DockPanel LastChildFill="True" Grid.Row="4" Height="32">
+            <ui:FancyButton x:Name="SaveButton" 
+                            VerticalAlignment="Center" 
+                            Text="Save And Apply" 
+                            HorizontalAlignment="Right" 
+                            Margin="15,0" 
+                            Foreground="White" 
+                            Background="#0099ff" 
+                            HoverBrush="#aa009aff" 
+                            Height="24" Width="115" Corners="5" IsEnabled="{Binding ElementName=AffectedWordsViewBox, Path=HasItems}" Click="SaveButton_Click" />
+        </DockPanel>
+    </Grid>
+</Window>

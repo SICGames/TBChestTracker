@@ -88,7 +88,7 @@ namespace TBChestTracker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Chest Builder.
+        ///   Looks up a localized string similar to Chest Creator.
         /// </summary>
         public static string ChestBuilder {
             get {
@@ -241,7 +241,7 @@ namespace TBChestTracker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Launch OCR Wizard.
+        ///   Looks up a localized string similar to Launch OCR Studio.
         /// </summary>
         public static string LaunchOCRWizardTooltip {
             get {

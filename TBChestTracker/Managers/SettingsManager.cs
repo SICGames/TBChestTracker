@@ -10,6 +10,9 @@ using System.Windows;
 using System.Windows.Input;
 using Newtonsoft;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using com.HellStormGames.Logging;
+using com.HellStormGames.Diagnostics;
 
 
 namespace TBChestTracker
@@ -33,6 +36,7 @@ namespace TBChestTracker
             {
                 di.Create();
             }
+
             Settings = new Settings();
 
             try
@@ -41,6 +45,7 @@ namespace TBChestTracker
             }
             catch (Exception ex)
             {
+                Loggio.Error(ex, "Settings Manager", "Issue occured while attempting to load Settings.json.");
 
             }
 
@@ -49,17 +54,63 @@ namespace TBChestTracker
                 //-- it got corrupted 
                 Settings = new Settings();
             }
-
-            var aoiHeight = Settings.OCRSettings.SuggestedAreaOfInterest.height;
-            var aoiWidth = Settings.OCRSettings.SuggestedAreaOfInterest.width;
-            var claimButtonsSize = Settings.OCRSettings.ClaimChestButtons.Count;
-
-            AppContext.Instance.RequiresOCRWizard = (aoiHeight > 0 && aoiWidth > 0) ? false : true;
-            AppContext.Instance.OCRCompleted = (aoiHeight > 0 && aoiWidth > 0 && claimButtonsSize > 0) ? true : false;
-
-            Save();
         }
-        
+
+        //-- Used to load clan. 
+        //-- returns null if there's an issue or nothing needs to be done. 
+        //-- returns AOIRect if obtained old SuggestedAreaOfInterest from Settings File.
+        public AOIRect ObtainObseleteAOIRect(string file = "Settings.json")
+        {
+            var filePath = $"{AppContext.Instance.LocalApplicationPath}{file}";
+            if (File.Exists(filePath) == false)
+            {
+                Loggio.Warn("Settings Manager", $"{filePath} doesn't exist.");
+                return null;
+            }
+
+            AOIRect AOIRect = null;
+            using (var sr = new StreamReader(filePath))
+            {
+                var jsonString = sr.ReadToEnd();
+                var jObject = JObject.Parse(jsonString);
+                foreach (var JProperty in jObject.Properties())
+                {
+                    var item = (JObject)JProperty.Value;
+                    if (item.Path == "OCRSettings")
+                    {
+                        var ocrSettingsObject = item;
+                        foreach (var settingsProperties in ocrSettingsObject.Properties())
+                        {
+                            if (settingsProperties.Path == "OCRSettings.SuggestedAreaOfInterest")
+                            {
+                                var AOIObject = settingsProperties;
+                                var token = jObject.SelectToken("OCRSettings.SuggestedAreaOfInterest");
+                                AOIRect = token.ToObject<AOIRect>();
+                            }
+                            if(settingsProperties.Path == "OCRSettings.ClaimChestButtons")
+                            {
+                                var claimbuttonsToken = jObject.SelectToken("OCRSettings.ClaimChestButtons");
+                                var claimButtons = claimbuttonsToken.ToObject<List<string>>();
+                                var claimButtonsArray = claimButtons[0].Split(','); 
+                                int x, y;
+                                x = y = 0;
+                                Int32.TryParse(claimButtonsArray[0], out x);  
+                                Int32.TryParse(claimButtonsArray[1], out y);
+
+                                AOIRect.ClickTarget = new System.Drawing.Point(x,y);
+                                break;
+                            }
+                        }
+                        if (AOIRect != null)
+                        {
+                            break;
+                        }
+                    }
+                }
+                sr.Close();
+            }
+            return AOIRect;
+        }
 
         private bool Load(string file = "Settings.json")
         {
@@ -67,13 +118,14 @@ namespace TBChestTracker
             if (File.Exists(filePath) == false)
                 return false;
 
-            using (StreamReader sr = File.OpenText(filePath))
+            using (StreamReader sr = new StreamReader(filePath))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Formatting = Formatting.Indented;
                 
                 Settings = (Settings)serializer.Deserialize(sr, typeof(Settings));
                 CommandManager.InvalidateRequerySuggested();
+                sr.Close();
                 return true;
             }
         }

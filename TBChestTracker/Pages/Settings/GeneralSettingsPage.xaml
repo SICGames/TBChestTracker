@@ -25,15 +25,52 @@
         </Grid.RowDefinitions>
 
         <TextBlock  Grid.Row="0" Grid.Column="0" Text="Clan Root Path" Margin="5,5" VerticalAlignment="Center"/>
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="UI Language" Margin="5,5" VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="UI Language" Margin="5,5" VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Capture From Monitor" Margin="5" VerticalAlignment="Top"/>
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Capture Using" Margin="5" VerticalAlignment="Center"/>
         
         <ui:FancyPicker Grid.Column="1" Grid.Row="0" Margin="0,5,0,5" ToolTip="Root directory where all newly created clans will be stored."
                         Height="18" BorderBrush="#aaa" Source="{Binding ClanRootFolder}"
                         Corners="10" 
                         BorderThickness="1" Padding="1" Background="#fff" Foreground="#000" Tag="ClanRoot" Click="ClanRootFolderPicker_Click" x:Name="ClanRootFolderPicker"/>
         
-        <ComboBox x:Name="UILanguageComboBox" Grid.Row="2" Grid.Column="1" Width="200" SelectionChanged="UILanguageComboBox_SelectionChanged" HorizontalAlignment="Left" Margin="0,5" SelectedIndex="0" Text="{Binding UILanguage}">
+        <ComboBox x:Name="UILanguageComboBox" Grid.Row="1" Grid.Column="1" Width="200" SelectionChanged="UILanguageComboBox_SelectionChanged" 
+                  HorizontalAlignment="Left" Margin="0,5" SelectedIndex="0" Text="{Binding UILanguage}">
             <ComboBoxItem Content="English"/>
         </ComboBox>
+        <StackPanel Orientation="Vertical" Grid.Row="2" Grid.Column="1">
+            
+            <ComboBox x:Name="MonitorSelectionBox" 
+           Width="200" SelectedIndex="{Binding MonitorIndex}"
+          SelectionChanged="MonitorSelectionBox_SelectionChanged" 
+          HorizontalAlignment="Left" Margin="0,5"></ComboBox>
+            <Image Width="320" Height="240" x:Name="MonitorPreview"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Grid x:Name="WarningBoxMonitorChange" Grid.Row="0" Margin="25,12" Visibility="Collapsed">
+                    <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="5">
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Image Grid.Column="0" Source="pack://application:,,,/Images/ui/warningIcon.png" Height="24" Width="24" Margin="0"/>
+                            <TextBlock Margin="5" 
+                       Grid.Column="1"
+           Text="You'll need to relaunch OCR Wizard after changing monitors. When running automation, the game will need to be switched to the new monitor. Switching an application to another monitor by holding down Windows Key + Left Or Right Arrow Keys on keyboard." 
+           TextWrapping="Wrap"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+            
+        </StackPanel>
+        <ComboBox x:Name="CaptureMethodBox" Grid.Row="4" Grid.Column="1" Width="200" HorizontalAlignment="Left" SelectedIndex="0">
+            <ComboBoxItem Content="Windows GDI+"/>
+        </ComboBox>
+
     </Grid>
 </Page>

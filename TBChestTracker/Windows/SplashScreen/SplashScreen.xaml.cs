@@ -105,12 +105,39 @@ namespace TBChestTracker
             StatusMessage = message;
             StatusProgress = progress;
         }
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async Task<CommonResult> StartInitTask()
+        {
+            return await Task.Run(() =>  mainWindow.Init(this));
+        }
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             this.DataContext = this;
 
             if (mainWindow != null)
-                mainWindow.Init(this);
+            {
+                var result = await StartInitTask();
+                if(result.Code == CommonResultCodes.Success)
+                {
+                    await this.Dispatcher.BeginInvoke(() =>
+                    {
+                        Complete();
+                    });
+                }
+                else if(result.Code == CommonResultCodes.Error)
+                {
+                    //-- check type of message.
+                    if(result.Message.Equals("CleanTesseractData"))
+                    {
+                        //-- we should restart application. 
+                        AppContext.RestartApplication("--delete_tessdata");
+                    }
+                }
+                else if(result.Code == CommonResultCodes.Fail)
+                {
+                    throw new Exception("Initialization failed.");
+                }
+            }
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)

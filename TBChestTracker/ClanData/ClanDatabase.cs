@@ -9,7 +9,7 @@ namespace TBChestTracker
 {
    
     [Serializable]
-    public class ClanDatabase : INotifyPropertyChanged
+    public class ClanDatabase : INotifyPropertyChanged, IDisposable
     {
         private int? _version;
         public int Version { get; set; }
@@ -24,40 +24,20 @@ namespace TBChestTracker
         }
 
         public string ClanFolderPath { get; set; }
-        
-        public string ClanmateDatabaseFile 
-        {
-            get
-            {
-                return $"{ClanDatabaseFolder}\\clanmates.db";
-            }
-        }
-
-        public string ClanChestDatabaseFile 
-        {
-            get
-            {
-                return $"{ClanDatabaseFolder}\\clanchests.db";
-            }
-        }
+        private string _ClanChestRequirementsFile => $"{ClanDatabaseFolder}\\chestrequirements.db";
         public string ClanChestRequirementsFile
         {
             get
             {
-                return $"{ClanDatabaseFolder}\\chestrequirements.db";
+                return _ClanChestRequirementsFile;
             }
         }
+        private string _ClanSettingsFile => $"{ClanDatabaseFolder}\\clansettings.db";
         public string ClanSettingsFile
         {
-            get => $"{ClanDatabaseFolder}\\clansettings.db";
+            get => _ClanSettingsFile;
         }
-        public string ClanChestDatabaseBackupFile
-        {
-            get
-            {
-                return $"{ClanDatabaseBackupFolderPath}\\clanchests_backup.db";
-            }
-        }
+
         public string ClanChestDatabaseExportFolderPath { get; set; }
         public string ClanDatabaseBackupFolderPath { get; set; }
 
@@ -68,6 +48,14 @@ namespace TBChestTracker
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-
+        public void Dispose()
+        {
+          Version = 0;
+            ClanAbbreviations = String.Empty;
+            Clanname = String.Empty;
+            _ClanDatabaseFolder = String.Empty;
+            ClanFolderPath = String.Empty;
+            ClanDatabaseBackupFolderPath = String.Empty;
+        }
     }
 }

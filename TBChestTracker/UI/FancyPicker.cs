@@ -25,6 +25,7 @@ namespace TBChestTracker.UI
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(FancyPicker), new FrameworkPropertyMetadata(typeof(FancyPicker)));
         }
+
         public static readonly DependencyProperty HoverBrushProperty = DependencyProperty.Register("HoverBrush", typeof(Brush), typeof(FancyPicker),
             new PropertyMetadata(new SolidColorBrush(Colors.AliceBlue)));
         public Brush HoverBrush

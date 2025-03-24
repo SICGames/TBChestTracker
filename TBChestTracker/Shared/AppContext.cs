@@ -57,15 +57,27 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(bShowDebugMenu));
             }
         }
+
+        private bool? _isBuildingChests;
+        public bool IsBuildingChests
+        {
+            get => _isBuildingChests.GetValueOrDefault(false);
+            set
+            {
+                _isBuildingChests = value;
+                OnPropertyChanged(nameof(IsBuildingChests));
+            }
+        }
+
+        private bool? _HasBuiltChests;
+        private bool? _HasCollectedChests;
+
         private bool isAutomationPlayButtonEnabled;
         private bool isAutomationPauseButtonEnabled;
         private bool isAutomationStopButtonEnabled;
         private bool isCurrentClandatabase;
         private bool newClanDatabaseCreated;
-        private bool clanmatesBeenAdded;
-
-        private bool? corruptedClanChestData;
-
+        
         private string pAppName = "Total Battle Chest Tracker";
         private string pCurrentProject = "Untitled";
         private string pAppTitle = $"";
@@ -83,20 +95,6 @@ namespace TBChestTracker
                 _bDeleteTessData = value;
             }
         }
-
-        public bool IsClanChestDataCorrupted
-        {
-            get
-            {
-                return corruptedClanChestData.GetValueOrDefault(false);
-            }
-            set
-            {
-                corruptedClanChestData = value;
-                OnPropertyChanged(nameof(IsClanChestDataCorrupted));    
-            }
-        }
-       
         public bool upgradeAvailable
         {
             get => _upgradeAvailable;
@@ -121,7 +119,7 @@ namespace TBChestTracker
         }
         public string RecentOpenedClanDatabases
         {
-            get => $@"{CommonAppFolder}recent.db";
+            get => $@"{LocalApplicationPath}recent.db";
         }
         public string TesseractData => $@"{LocalApplicationPath}TessData";
 
@@ -173,16 +171,7 @@ namespace TBChestTracker
             }
         }
 
-        public void UpdateCurrentProject(string currentProject)
-        {
-            CurrentProject = currentProject;
-        }
-
-        public void UpdateApplicationTitle()
-        {
-            AppTitle = $"{pAppName} {AppVersionString} - {CurrentProject}";
-
-        }
+      
         public bool IsCurrentClandatabase
         {
             get => isCurrentClandatabase;
@@ -219,16 +208,6 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(NewClandatabaseBeenCreated));  
             }
         }
-        public bool ClanmatesBeenAdded
-        {
-            get => clanmatesBeenAdded;
-            set
-            {
-                clanmatesBeenAdded = value;
-                OnPropertyChanged(nameof(ClanmatesBeenAdded));
-            }
-        }
-
         private bool _TessDataExists = false;
 
         public bool TessDataExists 
@@ -250,10 +229,10 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(AutomationRunning));
             }
         }
-        private bool _IsConfiguringHotKeys = false;
+        private bool? _IsConfiguringHotKeys;
         public bool IsConfiguringHotKeys
         {
-            get => _IsConfiguringHotKeys;
+            get => _IsConfiguringHotKeys.GetValueOrDefault(false);
             set
             {
                 _IsConfiguringHotKeys = value;
@@ -349,6 +328,43 @@ namespace TBChestTracker
             get => _isClanChestDatabaseUpgradeRequired;
             set => _isClanChestDatabaseUpgradeRequired = value;
         }
+
+        private bool _isCleaningTessData = false;
+        public bool IsCleaningTessData
+        {
+            get => _isCleaningTessData;
+            set => _isCleaningTessData= value;
+        }
+
+        public bool HasBuiltChests
+        {
+            get => _HasBuiltChests.GetValueOrDefault(false);
+            set
+            {
+                _HasBuiltChests = value;
+                OnPropertyChanged(nameof(HasBuiltChests));
+            }
+        }
+        public bool HasCollectedChests
+        {
+            get => _HasCollectedChests.GetValueOrDefault(false);
+            set
+            {
+                _HasCollectedChests = value;
+                OnPropertyChanged(nameof(HasCollectedChests));  
+            }
+        }
+
+        private bool? _UserClosedStartPageDirectly;
+        public bool UserClosedStartPageDirectly
+        {
+            get => _UserClosedStartPageDirectly.GetValueOrDefault(false);
+            set
+            {
+                _UserClosedStartPageDirectly = value;
+                OnPropertyChanged(nameof(UserClosedStartPageDirectly));
+            }
+        }
         #endregion
 
         #region OnPropertyChanged 
@@ -360,6 +376,15 @@ namespace TBChestTracker
         }
         #endregion
 
+        public void UpdateCurrentProject(string currentProject)
+        {
+            CurrentProject = currentProject;
+        }
+
+        public void UpdateApplicationTitle()
+        {
+            AppTitle = $"{pAppName} {AppVersionString} - {CurrentProject}";
+        }
         public static void ShowDebugMenu(bool state)
         {
             if(Instance == null)
@@ -379,8 +404,13 @@ namespace TBChestTracker
             startinfo.FileName = selfApplication;
             startinfo.Arguments = commandlineargs;
             startinfo.WorkingDirectory = AppContext.Instance.AppFolder;
-            Process.Start(startinfo);
+            Process process = new Process();
+            process.StartInfo = startinfo;
+            process.Start();
+            Task.Delay(1000);
+
             Application.Current.Shutdown();
+            return;
         }
         #region AppContext() & Instance
         public static AppContext Instance { get; private set; }

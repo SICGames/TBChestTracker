@@ -10,10 +10,8 @@
       mc:Ignorable="d" 
       x:Name="OCR_Settings_Page"
       d:DesignHeight="2000" d:DesignWidth="960"
+      
       Title="OCRSettingsPage" Loaded="Page_Loaded" Unloaded="Page_Unloaded">
-    <Page.Resources>
-        <main:EnumToRadioOptionConverter x:Key="CaptureMethodConverter"/>
-    </Page.Resources>
     <Grid Background="White">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
@@ -36,84 +34,91 @@
         
         <TextBlock Text="OCR Languages" Margin="5" Grid.Column="0" Grid.Row="1"/>
         <TextBlock Text="OCR Filtering" Margin="5"  Grid.Column="0" Grid.Row="3"/>
-        
-        <TextBlock Text="Clanmate Similarity %" Margin="5"  Grid.Column="0" Grid.Row="5"/>
-        
-        <TextBlock Text="Screen Capturer" Margin="5"  Grid.Column="0" Grid.Row="6"/>
-        <TextBlock Text="Preview" Margin="5" Grid.Column="0" Grid.Row="7"/>
-        
-        <TextBlock Text="Global OCR Brightness" Margin="5" Grid.Column="0" Grid.Row="8"/>
-        <TextBlock Text="Threshold" Margin="5" Grid.Column="0" Grid.Row="9"/>
-        <TextBlock Text="Max Threshold" Margin="5" Grid.Column="0" Grid.Row="10"/>
-        
-        <UniformGrid Grid.Column="1" Grid.Row="1" Columns="4" HorizontalAlignment="Left" Margin="0,5,0,5" x:Name="CHECKBOXES_PARENT">
-            <CheckBox Content="English" Margin="3,5" Tag="eng"/>
-            <CheckBox Content="French" Margin="3,5" Tag="fra"/>
-            <CheckBox Content="Spanish" Margin="3,5" Tag="spa"/>
-            <CheckBox Content="Arabic" Margin="3,5" Tag="ara"/>
-            <CheckBox Content="Turkish" Margin="3,5" Tag="tur"/>
-            <CheckBox Content="Taditional Chinese" Margin="3,5" Tag="chi_tra"/>
-            <CheckBox Content="Simplified Chinese" Margin="3,5" Tag="chi_sim"/>
-            <CheckBox Content="Korean" Margin="3,5" Tag="kor"/>
-            <CheckBox Content="Ukranian" Margin="3,5" Tag="ukr"/>
-            <CheckBox Content="Russian" Margin="3,5" Tag="rus"/>
-            <CheckBox Content="Polish" Margin="3,5" Tag="pol"/>
-            <CheckBox Content="German" Margin="3,5" Tag="deu"/>
-            <CheckBox Content="Japanese" Margin="3,5" Tag="jpn"/>
-            <CheckBox Content="All" Margin="3,5" Tag="all" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
-        </UniformGrid>
-        
-       
-        <ui:FancyTagBox Grid.Row="3" Grid.Column="1" Height="100" x:Name="TagBox" BorderBrush="Silver" BorderThickness="1" Background="White" Foreground="Black" Margin="5" 
+        <TextBlock Text="Preview" Margin="5" Grid.Column="0" Grid.Row="6"/>
+        <Grid x:Name="FilterControls" Grid.ColumnSpan="3" Grid.Row="9">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Global OCR Brightness" Margin="5" Grid.Column="0" Grid.Row="0"/>
+            <TextBlock Text="Threshold" Margin="5" Grid.Column="0" Grid.Row="1"/>
+            <TextBlock Text="Max Threshold" Margin="5" Grid.Column="0" Grid.Row="2"/>
+            <ui:FancyNumericValue BorderBrush="LightGray" 
+                    HoverBrush="SkyBlue"
+                    BorderThickness="2" 
+                    Minimal="0.0" Maximum="1.0" Steps="0.01" Value="{Binding GlobalBrightness}"
+                    ValueChanged="FancyNumericValue_ValueChanged"
+                    CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" 
+                    Grid.Row="0" Grid.Column="1"/>
+            <ui:FancyNumericValue x:Name="ThresholdNumericValue" BorderBrush="LightGray" 
+                    HoverBrush="SkyBlue"
+                    BorderThickness="2" 
+                    Minimal="0.0" Maximum="255" Steps="1.0" Value="{Binding Threshold}"
+                    ValueChanged="ThresholdNumericValue_ValueChanged"
+                    CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1"/>
+            <ui:FancyNumericValue x:Name="MaxThresholdNumericValue" BorderBrush="LightGray" 
+                    HoverBrush="SkyBlue"
+                    BorderThickness="2" 
+                    Minimal="0.0" Maximum="255" Steps="1.0" Value="{Binding MaxThreshold}"
+                    ValueChanged="MaxThresholdNumericValue_ValueChanged"
+                   CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="1"/>
+        </Grid>
+
+        <TextBlock Text="Save Screen Captures?" Grid.Column="0" Grid.Row="10" Margin="5"/>
+        <CheckBox IsChecked="{Binding SaveScreenCaptures}" Grid.Column="1" Grid.Row="10" Margin="5"/>
+        <TextBlock Grid.Column="1" Grid.Row="1" Margin="0,5,0,5">
+            Languages has moved to the New Ocr Language Selection.
+            <Hyperlink x:Name="OcrLanguagesToolLink" Click="OcrLanguagesToolLink_Click">Check it out here</Hyperlink>
+        </TextBlock>
+
+        <ui:FancyTagBox Grid.Row="3" Grid.Column="1" 
+                        Height="100" 
+                        x:Name="TagBox" 
+                        BorderBrush="Silver" 
+                        BorderThickness="1" 
+                        Background="White" 
+                        Foreground="Black" Margin="5" 
                         Tags="{Binding Tags, Mode=TwoWay}">
         </ui:FancyTagBox>
         
         <TextBlock Margin="5" FontWeight="Bold" Grid.Column="1" Grid.Row="4">* Use SPACEBAR key to seperate tags.</TextBlock>
-
-        <ui:FancyNumericValue BorderBrush="LightGray" x:Name="ClanmateSimilarityNumericValue"
-           HoverBrush="SkyBlue"
-           BorderThickness="2" 
-           Minimal="0.0" Maximum="100.0" Steps="1.0" Value="{Binding ClanmateSimilarity}"
-           ValueChanged="ClanmateSimilarityNumericValue_ValueChanged"
-           CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="5" Grid.Column="1"/>
         
-        <ComboBox x:Name="CaptureMethodBox" Grid.Row="6" Grid.Column="1" Width="200" HorizontalAlignment="Left" SelectedIndex="0">
-            <ComboBoxItem Content="GDI+"/>
-        </ComboBox>
-
+        
         <Grid Grid.ColumnSpan="2" Grid.Row="7" Margin="5,25,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Image x:Name="ImagePreview"  Height="500" Width="500" HorizontalAlignment="Left" Stretch="UniformToFill" Grid.Column="0"/>
-            <ListView x:Name="ocrResultsListView" Grid.Column="1">
-            </ListView>
+            <Image x:Name="ImagePreview"  Height="500" Width="500" HorizontalAlignment="Left" 
+                   Stretch="UniformToFill"  Grid.Column="0"/>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="36"/>
+                </Grid.RowDefinitions>
+                <ListView ItemTemplate="{DynamicResource OCRResultsTemplate_Light}" x:Name="ocrResultsListView" 
+                          ItemsSource="{Binding OcrPreviewResults}" Grid.Column="0" Grid.Row="0"/>
+                
+                <Grid Grid.Column="0" Grid.Row="0" x:Name="Curtain" Background="White">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock x:Name="CurtainText" Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:OCRSettingsPage}},Path=CurtainMessage, Mode=OneWay}" Foreground="Black" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                    
+                </Grid>
+                <ui:FancyButton Grid.Row="1" x:Name="PreviewOCRButton" Click="PreviewOCRButton_Click" Text="Preview" Width="120" Height="24" HoverBrush="{StaticResource FancyButton.Hover.Background}" 
+                                Foreground="{StaticResource FancyButton.Foreground}" 
+                                Background="{StaticResource FancyButton.Background}"/>
+            </Grid>
         </Grid>
         
 
         
-        <ui:FancyNumericValue BorderBrush="LightGray" 
-                   HoverBrush="SkyBlue"
-                   BorderThickness="2" 
-                   Minimal="0.0" Maximum="1.0" Steps="0.01" Value="{Binding GlobalBrightness}"
-                   ValueChanged="FancyNumericValue_ValueChanged"
-                   CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="8" Grid.Column="1"/>
-        
-        <ui:FancyNumericValue x:Name="ThresholdNumericValue" BorderBrush="LightGray" 
-                  HoverBrush="SkyBlue"
-                  BorderThickness="2" 
-                  Minimal="0.0" Maximum="255" Steps="1.0" Value="{Binding Threshold}"
-                  ValueChanged="ThresholdNumericValue_ValueChanged"
-                  CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="9" Grid.Column="1"/>
-
-        <ui:FancyNumericValue x:Name="MaxThresholdNumericValue" BorderBrush="LightGray" 
-          HoverBrush="SkyBlue"
-          BorderThickness="2" 
-          Minimal="0.0" Maximum="255" Steps="1.0" Value="{Binding MaxThreshold}"
-          ValueChanged="MaxThresholdNumericValue_ValueChanged"
-          CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="10" Grid.Column="1"/>
-
-
+       
     </Grid>
 </Page>

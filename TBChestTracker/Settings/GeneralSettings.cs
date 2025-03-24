@@ -23,7 +23,9 @@ namespace TBChestTracker
         {
             get
             {
-                return String.IsNullOrEmpty(_ClanRootFolder) == true ? $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\TotalBattleChestTracker\\" : _ClanRootFolder;
+                return String.IsNullOrEmpty(_ClanRootFolder) == true ? 
+                    $@"{System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\SICGames\TotalBattleChestTracker\"
+                    : _ClanRootFolder;
             }
             set
             {
@@ -42,6 +44,27 @@ namespace TBChestTracker
                 OnPropertyChanged(nameof(UILanguage));
             }
         }
+        private int? _monitorindex;
+        public int MonitorIndex
+        {
+            get => _monitorindex.GetValueOrDefault(-1);
+            set
+            {
+                _monitorindex = value;
+                OnPropertyChanged(nameof(MonitorIndex));
+            }
+        }
+
+        private bool? _showOcrLanguageSelection;
+        public bool ShowOcrLanguageSelection
+        {
+            get => _showOcrLanguageSelection.GetValueOrDefault(true);
+            set
+            {
+                _showOcrLanguageSelection = value;
+                OnPropertyChanged(nameof(ShowOcrLanguageSelection));
+            }
+        }
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged(string propertyName)
@@ -49,6 +72,7 @@ namespace TBChestTracker
             if(PropertyChanged != null) 
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
+
         public GeneralSettings() 
         { 
 

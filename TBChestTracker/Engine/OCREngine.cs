@@ -26,6 +26,7 @@ namespace TBChestTracker.Engine
         public Tessy OCR { get; private set; }
         public static OCREngine Instance { get; private set; }
         //public TessyWords[] WordCollection { get; private set; }
+        object CaptureLock = new object();
 
         public OCREngine()
         {
@@ -66,22 +67,25 @@ namespace TBChestTracker.Engine
 
                         if(languages == null)
                         {
-                            MessageBox.Show("There was a problem with initializing Tesseract. View recent log file for more information.");
+                            Loggio.Warn("Tesseract Init", "Failed to initialize Tesseract due to the following reason: Languages string is null. Languages was not obtained within Settings.json");
+                            MessageBox.Show("There was a problem with initializing Tesseract. Was not able to obtain languages from settings. View recent log file for more information.");
                             return false;
                         }
                         OCR = new Tessy();
                         //-- accessviolationexception being tossed because of OcrEngineMode.LstmOnly
-                        OCR.Init(tessdata, languages, OcrEngineMode.LstmOnly);
-                        OCR.PageSegmentMode = PageSegMode.PSM_AUTO_ONLY;
-                        OCR.SetSourceResolution(600);
+                        var result  =   OCR.Init(tessdata, languages, OcrEngineMode.LstmOnly);
+                        Loggio.Info("Tesseract Init", $"Tesseract Initialization response came back with => {result}");
 
+                        //OCR.PageSegmentMode = PageSegMode.PSM_AUTO_ONLY;
+                        OCR.PageSegmentMode = PageSegMode.PSM_SPARSE_TEXT;
+                        
                         //OCR.SetVariable("tessedit_char_whitelist", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:-' ");
                         //OCR.SetVariable("load_system_dawg", "F");
                         //OCR.SetVariable("load_freq_dawg", "F");
                     }
                     catch(Exception ex)
                     {
-                        Loggio.Error(ex, "",$"Failed to initialize Tesseract.");
+                        Loggio.Error(ex, "Tesseract Init",$"Failed to initialize Tesseract.");
                         return false;
                     }
                 }
@@ -89,7 +93,7 @@ namespace TBChestTracker.Engine
             catch (Exception ex)
             {
                 //-- OCR failed.
-                Loggio.Error(ex, "", "Exception occured while attempting initialize Tesseract.");
+                Loggio.Error(ex, "Tesseract Init", "Exception occured while attempting initialize Tesseract.");
                 return false;
             }
 
@@ -130,61 +134,78 @@ namespace TBChestTracker.Engine
         {
             try
             {
-                if (image == null)
+                lock (CaptureLock)
                 {
-                    Loggio.Warn("Screenshot bitmap is null. Shouldn't be null.");
-                    return null;
-                }
+                    TessResult result = null;
+                    bool successful = false;
 
-                //-- AccessViolationException -- Correupted Memory sometimes.
-                System.Drawing.Imaging.BitmapData data = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite,
-                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                
-                int height = image.Height;
-                var width = image.Width;    
-                var stride = data.Stride;
-                
-                Byte[] bytes = new Byte[stride * height];
-                Marshal.Copy(data.Scan0, bytes, 0, bytes.Length);
-                OCR.SetImage(bytes, (uint)width, (uint)height, 4, ((uint)4 * (uint)width));
-                image.UnlockBits(data);
-
-                if (OCR.Recognize() == 0)
-                {
-                    var resultstr = OCR.GetUTF8Text();
-                    if (String.IsNullOrEmpty(resultstr))
+                    if (image == null)
                     {
-                        Loggio.Warn("OCR Result Text shouldn't be null or empty.");
-                        throw new Exception("Tesseract OCR UTF8 Text isn't Suppose To be empty.");
+                        Loggio.Warn("Screenshot bitmap is null. Shouldn't be null.");
+                        return null;
                     }
-                    resultstr = resultstr.Replace("\r\n", ",");
-                    string[] results = resultstr.Split(',');
-                    List<String> ocrResults = new List<string>();
-                    foreach (var r in results.ToList())
+
+
+                    int height, width, stride;
+                    height = width = stride = 0;
+
+                    //-- AccessViolationException -- Correupted Memory sometimes.
+                    System.Drawing.Imaging.BitmapData data = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite,
+                    System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                    height = image.Height;
+                    width = image.Width;
+                    stride = data.Stride;
+
+                    Byte[] bytes = new Byte[stride * height];
+                    Marshal.Copy(data.Scan0, bytes, 0, bytes.Length);
+
+                    OCR.SetImage(bytes, (uint)width, (uint)height, 4, ((uint)4 * (uint)width));
+                    OCR.SetSourceResolution(600);
+
+                    //-- during debugging, will jump back to line 151 again. 
+                    //-- guessing it's a task issue
+                    //-- which may result in the crash to desktop
+
+                    if (OCR.Recognize() == 0)
                     {
-                        if (!String.IsNullOrEmpty(r))
+                        var resultstr = OCR.GetUTF8Text();
+                        if (String.IsNullOrEmpty(resultstr))
                         {
-                            ocrResults.Add(r);
+                            Loggio.Warn("OCR Result Text shouldn't be null or empty.");
+                            return null;
+                            //throw new Exception("Tesseract OCR UTF8 Text isn't Suppose To be empty.");
                         }
+                        resultstr = resultstr.Replace("\r\n", ",");
+                        string[] results = resultstr.Split(',');
+                        List<String> ocrResults = new List<string>();
+                        foreach (var r in results.ToList())
+                        {
+                            if (!String.IsNullOrEmpty(r))
+                            {
+                                ocrResults.Add(r);
+                            }
+                        }
+
+                        result = new TessResult();
+                        result.Words = new List<string>();
+                        result.Words = ocrResults.ToList();
+
+                        results = null;
+                        ocrResults = null;
+                        resultstr = string.Empty;
                     }
-
-                    TessResult result = new TessResult();
-                    result.Words = new List<string>();
-                    result.Words = ocrResults.ToList();
-                    results = null;
-                    ocrResults = null;
-                    resultstr = string.Empty;
-
+                    bytes = null;
+                    image.UnlockBits(data);
                     return result;
                 }
-                else 
-                    return null;
             }
             catch (Exception e)
             {
                 Loggio.Error(e, "OCR Read Issue", "There's a issue with the OCR Reading. More details are provided.");
                 throw new Exception(e.Message, e);
             }
+            
         }
 
         public TessyWords[] GetWords(System.Drawing.Bitmap bitmap)
@@ -249,14 +270,18 @@ namespace TBChestTracker.Engine
         {
             if (wordcollection == null)
             {
-                throw new ArgumentNullException(nameof(wordcollection));
+                Loggio.Warn("OCR Engine", "Word Collection is null. Possibly no results.");
+                return false;
             }
             if (writeablebitmap == null)
             {
-                throw new ArgumentNullException(nameof(writeablebitmap));
+                Loggio.Warn("OCR Engine", "Writtable Bitmap is null. Couldn't render rectangles. Returning false.");
+                return false;
             }
-            if (wordcollection.Length > 0 && wordcollection != null)
+            if (wordcollection?.Length > 0 && wordcollection != null)
             {
+                Loggio.Info("OCR Engine", "Going through Word Collection.");
+
                 //--- render the letters obtained from Tesseract
                 foreach (var word in wordcollection)
                 {
@@ -277,9 +302,10 @@ namespace TBChestTracker.Engine
                         writeablebitmap.DrawRectangle((int)letterX--, (int)letterY--, letterWidth++, letterHeight++, Colors.Green);
                     }
                 }
+                Loggio.Info("OCR Engine", "Render rectangles and everything to user. Returning true.");
                 return true;
             }
-
+            Loggio.Warn("OCR Engine", "Something went horribly wrong attempting to render rectangles around the detected words.");
             return false;
         }
 

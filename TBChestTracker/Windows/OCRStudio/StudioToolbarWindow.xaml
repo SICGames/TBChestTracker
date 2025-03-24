@@ -1,0 +1,163 @@
+﻿<Window x:Class="TBChestTracker.Windows.OCRStudio.StudioToolbarWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TBChestTracker.Windows.OCRStudio"
+        xmlns:ui="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
+        xmlns:ui_x="clr-namespace:TBChestTracker.UI"
+        xmlns:main="clr-namespace:TBChestTracker"
+        mc:Ignorable="d"
+        Title="StudioToolbarWindow" 
+        Height="36" Width="800" 
+        Topmost="True" 
+        AllowsTransparency="True" 
+        Background="Transparent" 
+        WindowStartupLocation="Manual" 
+        ShowInTaskbar="False" 
+        WindowStyle="None" Closed="Window_Closed" Loaded="Window_Loaded">
+    <Window.CommandBindings>
+        <CommandBinding Command="main:OCRStudioCommandBindings.SelectObject"
+                        x:Name="SelectObjectCommand"
+                        CanExecute="SelectObjectCommand_CanExecute"
+                        Executed="SelectObjectCommand_Executed"/>
+        <CommandBinding Command="main:OCRStudioCommandBindings.DrawRegion"
+                        x:Name="DrawRegionCommand"
+                        CanExecute="DrawRegionCommand_CanExecute"
+                        Executed="DrawRegionCommand_Executed"/>
+        <CommandBinding Command="main:OCRStudioCommandBindings.DrawClickMarker"
+                        x:Name="DrawClickMarker"
+                        CanExecute="DrawClickMarker_CanExecute"
+                        Executed="DrawClickMarker_Executed"/>
+        <CommandBinding Command="main:OCRStudioCommandBindings.PreviewOCRResults"
+                        x:Name="PreviewResultsCommand"
+                        CanExecute="PreviewResultsCommand_CanExecute"
+                        Executed="PreviewResultsCommand_Executed"/>
+        <CommandBinding Command="main:OCRStudioCommandBindings.StartOver"
+                        x:Name="StartOverCommand"
+                        CanExecute="StartOverCommand_CanExecute"
+                        Executed="StartOverCommand_Executed"/>
+    </Window.CommandBindings>
+    <Grid>
+        <Border Background="#1a1a1a" BorderThickness="1" CornerRadius="5" BorderBrush="#010101">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="24"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid x:Name="GripBar" Grid.Column="0"
+                      ToolTip="This is a gripbar, so you can easily move the window wherever you wish." 
+                      MouseEnter="GripBar_MouseEnter" MouseLeave="GripBar_MouseLeave" 
+                      PreviewMouseLeftButtonDown="GripBar_PreviewMouseLeftButtonDown" 
+                      PreviewMouseLeftButtonUp="GripBar_PreviewMouseLeftButtonUp" Margin="0,4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Ellipse Fill="White" Width="4" Height="4" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2" Grid.Row="0"/>
+                    <Ellipse Fill="White" Width="4" Height="4" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2" Grid.Row="1"/>
+                    <Ellipse Fill="White" Width="4" Height="4" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2" Grid.Row="2"/>
+                </Grid>
+                <StackPanel Orientation="Horizontal" x:Name="StudioControls" Grid.Column="1" >
+                    <ui_x:FancyToggleButton x:Name="SelectObjectButton"
+                                            Source="pack://Application:,,,/Images/ui/MousePointerIcon.png"
+                                            Width="24" Height="24"
+                                            Grid.Column="2" Margin="5,0"
+                                            Command="main:OCRStudioCommandBindings.SelectObject"
+                                            IsEnabled="True"
+                                            HoverBrush="#BF0088ff" SelectedBrush="#BF0088ff" Background="Transparent">
+                        <ui_x:FancyToggleButton.ToolTip>
+                            <ui_x:FancyTooltip Background="Transparent" BorderBrush="Transparent" BorderThickness="0" AnimatedSource="pack://application:,,,/Images/ui/OcrStudio/SelectObjectMove_Anim.gif" Title="Select Tool" Description="Select\Move\Resize controls with ease."/>
+                        </ui_x:FancyToggleButton.ToolTip>
+                    </ui_x:FancyToggleButton>
+                    
+                    <ui_x:FancyToggleButton 
+                            x:Name="DrawRegionButton"
+                            Source="pack://application:,,,/Images/ui/SelectRegionIcon.png" 
+                            Width="24" Height="24" 
+                            IsEnabled="True"
+                            Command="main:OCRStudioCommandBindings.DrawRegion"
+                            Grid.Column="2" Margin="5,0" HoverBrush="#BF0088ff" 
+                        SelectedBrush="#BF0088ff" BorderBrush="Transparent"  Background="Transparent">
+                        <ui_x:FancyToggleButton.ToolTip>
+                            <ui_x:FancyTooltip Background="Transparent" BorderBrush="Transparent" BorderThickness="0" AnimatedSource="pack://application:,,,/Images/ui/OcrStudio/DrawRectangle_Anim.gif" Title="Rectangle Tool" Description="Create Region Of Interest for OCR to focus on."/>
+                        </ui_x:FancyToggleButton.ToolTip>
+                    </ui_x:FancyToggleButton>
+                    <ui_x:FancyToggleButton 
+                            x:Name="PlaceMarkerButton"
+                            Source="pack://application:,,,/Images/ui/ClickMarkerIcon.png" 
+                        Command="main:OCRStudioCommandBindings.DrawClickMarker"
+                            Width="24" Height="24" 
+                            Grid.Column="2" Margin="5,0" 
+                        IsEnabled="True"
+                            HoverBrush="#BF0088ff" SelectedBrush="#BF0088ff" BorderBrush="Transparent" Background="Transparent">
+                        <ui_x:FancyToggleButton.ToolTip>
+                            <ui_x:FancyTooltip Background="Transparent" BorderBrush="Transparent" BorderThickness="0" AnimatedSource="pack://application:,,,/Images/ui/OcrStudio/DrawClickMarker_Anim.gif" Title="Click Marker Tool" Description="Instruct OCR where to perform automate clicks."/>
+                        </ui_x:FancyToggleButton.ToolTip>
+                        <Style TargetType="{x:Type ToolTip}">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="BorderBrush" Value="Transparent"/>
+                        </Style>
+                    </ui_x:FancyToggleButton>
+                    <ui:FancyImageButton 
+                            x:Name="RestartButton"
+                            ImageSource="pack://application:,,,/Images/ui/Restart.png" 
+                            Width="24" Height="24" 
+                            Grid.Column="2" Margin="5,0" 
+                           HighlightBrush="#0099ff" 
+                        IsEnabled="{Binding CanRestartCanvas}"
+                        Command="main:OCRStudioCommandBindings.StartOver"
+                        BorderBrush="Transparent" HighlightOpacity="0.75" Background="Transparent">
+                        <ui:FancyImageButton.ToolTip>
+                            <ui_x:FancyTooltip Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Title="Restart Tool" Description="Want to do everything over again? Start from scratch."/>
+                        </ui:FancyImageButton.ToolTip>
+                    </ui:FancyImageButton>
+                    <ui:FancyImageButton 
+                            x:Name="PreviewResultsButton"
+                            ImageSource="pack://application:,,,/Images/ui/PreviewIcon.png" 
+                            Width="24" Height="24"
+                            Grid.Column="2" Margin="5,0" 
+                            Command="main:OCRStudioCommandBindings.PreviewOCRResults"
+                            IsEnabled="{Binding EnableOcrPreview}"
+                            HighlightBrush="#0099ff" 
+                            BorderBrush="Transparent" 
+                            HighlightOpacity="0.75" 
+                            Background="Transparent">
+                        <ui:FancyImageButton.ToolTip>
+                            <ui_x:FancyTooltip Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Title="Preview Tool" Description="ALlows you to see the OCR Results first hand."/>
+                        </ui:FancyImageButton.ToolTip>
+                        <Style TargetType="{x:Type ToolTip}">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="BorderBrush" Value="Transparent"/>
+                        </Style>
+                    </ui:FancyImageButton>
+                </StackPanel>
+                <ui:FancyImageButton 
+                        x:Name="SaveApplyButton"
+                        ImageSource="pack://application:,,,/Images/ui/Checkmark.png" 
+                        Width="24" Height="24"
+                        IsEnabled="{Binding CanApplyChanges}"
+                        Grid.Column="2" Margin="5,0" HighlightBrush="#0099ff" BorderBrush="Transparent" HighlightOpacity="0.75"
+                    Click="SaveApplyButton_Click">
+                    <ui:FancyImageButton.ToolTip>
+                        <ui_x:FancyTooltip Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Title="Apply Changes" Description="When you're happy with how everything looks, applying changes will save and apply them."/>
+                    </ui:FancyImageButton.ToolTip>
+                </ui:FancyImageButton>
+
+                <ui:FancyImageButton 
+                        x:Name="ExitStudioButton"
+                        
+                        ImageSource="pack://application:,,,/Images/ui/close-button.png" 
+                        Width="24" Height="24" 
+                        Grid.Column="3" Margin="5,0" HighlightBrush="#ff0000" Background="#dd0000" BorderBrush="Transparent" HighlightOpacity="0.75"  Click="ExitStudioButton_Click">
+                    <ui:FancyImageButton.ToolTip>
+                        <ui_x:FancyTooltip Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Title="Exit OCR Studio" Description="This won't apply changes nor save them."/>
+                    </ui:FancyImageButton.ToolTip>
+                </ui:FancyImageButton>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

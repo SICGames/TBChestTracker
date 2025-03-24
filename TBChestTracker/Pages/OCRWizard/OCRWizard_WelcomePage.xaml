@@ -27,7 +27,7 @@
             </Grid.RowDefinitions>
             <TextBlock Text="Welcome" Grid.Row="0" Foreground="White" FontWeight="Bold" FontSize="24"/>
             <TextBlock 
-                Text="Since this is your first time. Let's make sure you have the most accurate results while using TotalBattle Chest Tracker. "
+                Text="Let's get started with getting you the best accurate Onscreen Character Recognition (OCR) Results possible. OCR isn't sorcery, though made by wizards, the OCR engine does its best to recognize characters as best as it can. Cloud Based OCR engines can be expensives. Google's Tesseract Open Source Code allows Total Battle Chest Tracker to harness Tesseract's power for free. Let's get started!   "
                 TextWrapping="Wrap"
                 Grid.Row="1" Foreground="White"
                 Margin="10,5"/>

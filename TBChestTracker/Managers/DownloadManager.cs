@@ -1,4 +1,5 @@
-﻿using System;
+﻿using com.HellStormGames.Diagnostics;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -102,33 +103,37 @@ namespace TBChestTracker
         {
             if (window is SplashScreen splashScreen)
             {
+                try
+                {
+                    HttpClient client = new HttpClient();
+                    client.Timeout = TimeSpan.FromMinutes(10);
 
-                HttpClient client = new HttpClient();
-                client.Timeout = TimeSpan.FromMinutes(10);
-                
-                //-- Sometimes new user agent will help get download progress bar rolling.
-                List<string> userAgents = new List<string>
+                    //-- Sometimes new user agent will help get download progress bar rolling.
+                    List<string> userAgents = new List<string>
                 {
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:130.0) Gecko/20100101 Firefox/130.0",
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 Edg/128.0.0.0",
                 };
-                var random = new Random();
-                int randomIndex = random.Next(userAgents.Count);
+                    var random = new Random();
+                    int randomIndex = random.Next(userAgents.Count);
 
-                // Select a random UA using the randomIndex
-                string randomUserAgent = userAgents[randomIndex];
-                client.DefaultRequestHeaders.UserAgent.ParseAdd(randomUserAgent);
-                
+                    // Select a random UA using the randomIndex
+                    string randomUserAgent = userAgents[randomIndex];
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd(randomUserAgent);
 
-                using (var filestream = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.None))
+                    using (var filestream = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.None))
+                    {
+                        await client.DownloadAsync(url, filestream, progress, token);
+                        filestream.Close();
+                        filestream.Dispose();
+                    };
+                }
+                catch (Exception ex)
                 {
-
-                    await client.DownloadAsync(url, filestream, progress, token);
-                    filestream.Close();
-                    filestream.Dispose();
-                };
+                    Loggio.Error(ex, "Download Manager", $"An error has occurred while attempting to download from {url}");
+                }
             }
         }
     }

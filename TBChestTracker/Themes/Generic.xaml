@@ -79,4 +79,163 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style TargetType="{x:Type local:FancyToggleButton}">
+        <Setter Property="Padding" Value="3"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:FancyToggleButton}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid x:Name="FILL" Grid.Row="0" Grid.Column="0"
+                                  Background="{TemplateBinding HoverBrush}"
+                                  Visibility="Hidden"/>
+                            <Grid x:Name="TOGGLE_FILL" Grid.Row="0" Grid.Column="0"
+                                  Background="{TemplateBinding SelectedBrush}"
+                                  Visibility="Hidden"/>
+                            <Viewbox Grid.Column="0" Grid.Row="0" x:Name="PRESENTER" 
+                                     HorizontalAlignment="Center" 
+                                     VerticalAlignment="Center" Margin="{TemplateBinding Padding}">
+                                <Image x:Name="ICON" Source="{TemplateBinding Source}" Stretch="UniformToFill"/>
+                            </Viewbox>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="FILL" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="TOGGLE_FILL" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:FancyTransformRect}">
+        <Style.Resources>
+            <SolidColorBrush x:Key="TransformGizmoBackground" Color="#02ffffff"/>
+            <SolidColorBrush x:Key="TransformGizmoBorder" Color="#ffcecece"/>
+        </Style.Resources>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:FancyTransformRect}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Rectangle Grid.Row="0" Grid.Column="0" 
+                             x:Name="TRANFORM_RECTANGLE" 
+                             Fill="{DynamicResource TransformGizmoBackground}" 
+                             Stroke="{DynamicResource TransformGizmoBorder}" 
+                             StrokeThickness="{TemplateBinding Thickness}"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:FancyTransformPoint}">
+        <Style.Resources>
+            <SolidColorBrush x:Key="TransformPointBackground" Color="#ffdedede"/>
+            <SolidColorBrush x:Key="TranformPointStroke" Color="#a0111111"/>
+        </Style.Resources>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:FancyTransformPoint}">
+                    <Ellipse x:Name="TRANSFORM_POINT" 
+                             Fill="{DynamicResource TransformPointBackground}" 
+                             Stroke="{DynamicResource TranformPointStroke}" 
+                             StrokeThickness="{TemplateBinding BorderThickness}"/>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="TRANSFORM_POINT" Property="Fill" Value="#ff0099ff"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:FancySearchBox}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:FancySearchBox}">
+                    <Border x:Name="SEARCHBOX_CONTENT" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding Corners}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" x:Name="SEARCH_BOX" BorderBrush="Transparent" BorderThickness="0" VerticalAlignment="Center" Margin="5,0" IsHitTestVisible="True"/>
+                            <TextBlock x:Name="PLACEHOLDER" Foreground="LightGray" Background="Transparent" 
+                                       Text="{TemplateBinding PlaceholderText}" 
+                                       FontWeight="Bold" FontStyle="Italic" VerticalAlignment="Center"  Grid.Column="0" Margin="5,0" IsHitTestVisible="False"/>
+                            <Viewbox Grid.Column="1" Width="32" Margin="{TemplateBinding Padding}" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <Image Source="pack://application:,,,/Images/ui/searchIcon-gray.png" Stretch="Uniform" Margin="0,0,10,0"/>
+                            </Viewbox>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" Value="CornflowerBlue" TargetName="SEARCHBOX_CONTENT" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:FancyLabel}">
+        <Setter Property="HoverBrush" Value="#600077ff"/>
+        <Setter Property="Padding" Value="1"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:FancyLabel}">
+                    <Border x:Name="MAIN_BORDER" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding Corners}">
+                        <Grid x:Name="GRID" Margin="{TemplateBinding Padding}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock x:Name="Labelbox" Text="{TemplateBinding Text}" 
+                                       Foreground="{TemplateBinding Foreground}"
+                                       FontSize="{TemplateBinding FontSize}" 
+                                       FontWeight="{TemplateBinding FontWeight}" 
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       FontStyle="{TemplateBinding FontStyle}" TextAlignment="{TemplateBinding TextAlign}"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="MAIN_BORDER" Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=local:FancyLabel}, Path=HoverBrush}"/>
+                            <Setter TargetName="Labelbox" Property="Foreground" Value="White"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="MAIN_BORDER" Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=local:FancyLabel}, Path=SelectedBrush}"/>
+                            <Setter TargetName="Labelbox" Property="Foreground" Value="White"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

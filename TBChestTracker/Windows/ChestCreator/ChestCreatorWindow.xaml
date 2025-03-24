@@ -1,0 +1,95 @@
+﻿<Window x:Class="TBChestTracker.ChestBuilderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TBChestTracker"
+        xmlns:ui="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
+        mc:Ignorable="d"
+        Title="Chest Builder" Height="450" Width="800" WindowStartupLocation="CenterScreen" WindowState="Maximized" Loaded="Window_Loaded" Closing="Window_Closing">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <ToolBarTray Grid.Row="0" Grid.Column="0" Height="42">
+            <ToolBar VerticalAlignment="Center" HorizontalAlignment="Center" 
+                     Height="48"
+                      Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type ToolBarTray}}, Path=ActualWidth}">
+                <ui:FancyImageButton ImageSource="pack://application:,,,/Images/ui/PlusIcon.png" Height="24" Width="24" Margin="5" x:Name="AddChestBtn" HighlightBrush="#0088ff" HighlightStrokeBrush="#0044ff" HighlightOpacity="0.25" ToolTip="Add Chest" Click="AddChestBtn_Click"/>
+                <ui:FancyImageButton ImageSource="pack://application:,,,/Images/ui/MinusIcon.png" Height="24" Width="24" Margin="5" x:Name="RemoveChestBtn" HighlightBrush="#0088ff" HighlightStrokeBrush="#0044ff" HighlightOpacity="0.25" ToolTip="Remove Chest" Click="RemoveChestBtn_Click"/>
+                <Separator/>
+                <ui:FancyImageButton ImageSource="pack://application:,,,/Images/ui/editIcon.png" Height="24" Width="24" Margin="5" x:Name="EditChestBtn" HighlightBrush="#0088ff" HighlightStrokeBrush="#0044ff" HighlightOpacity="0.25" ToolTip="Edit Chest" Click="EditChestBtn_Click"/>
+                <Separator/>
+                <ui:FancyImageButton ImageSource="pack://application:,,,/Images/ui/TrashIcon.png" Height="24" Width="24" Margin="5" x:Name="RemoveAllChestsBtn" HighlightBrush="#0088ff" HighlightStrokeBrush="#0044ff" HighlightOpacity="0.25" ToolTip="Remove All Chests" Click="RemoveAllChestsBtn_Click"/>
+            </ToolBar>
+        </ToolBarTray>
+        <Grid Grid.Column="0" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0">
+                <TextBlock TextWrapping="Wrap" Margin="5,2" 
+                            Text="Chest Builder will allow you to have full control of how the chest counter understands newer types of chests that come from the game. "/>
+                <TextBlock TextWrapping="Wrap" Margin="5,2" 
+                            Text="This affects Clan Chest Requirements when creating Chest Conditions and Chest Points."/>
+                <TextBlock TextWrapping="Wrap" Margin="5,2" 
+                            Text="Story Chest Types, do not have a level. Heroic chest types do have a chest and have a minimal level of 16. Max Level is always the highest achievable chests for that chest type. Highest chest level for a Rare Crypt Type is level 30. Whereas, an epic crypt type is level 35."/>
+            </StackPanel>
+            <Grid Grid.Row="1" x:Name="ChestBuilder_Editor" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock  Grid.Row="0" Grid.Column="0" Text="Type" Width="100" Margin="10,2" TextAlignment="Center" />
+                <TextBox Grid.Row="1" Grid.Column="0" Width="100" Margin="10,2" Text="{Binding ChestType}"/>
+                <TextBlock  Grid.Row="0" Grid.Column="1" Text="Name" Width="100" Margin="10,2" TextAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Width="100" Margin="10,2" Text="{Binding ChestName}"/>
+                <TextBlock  Grid.Row="0" Grid.Column="3" Text="Has Level?" Width="100" Margin="10,2" TextAlignment="Center"/>
+                <CheckBox Grid.Row="1" Grid.Column="3" Margin="10,5" Content="Yes" HorizontalAlignment="Center" IsChecked="{Binding HasLevel}"/>
+                <TextBlock  Grid.Row="0" Grid.Column="4" Text="Min Level" Width="100" Margin="10,2" TextAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="4" Width="100" Margin="10,2" Text="{Binding MinLevel}"/>
+                <TextBlock  Grid.Row="0" Grid.Column="5" Text="Max Level" Width="100" Margin="10,2" TextAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="5" Width="100" Margin="10,2" Text="{Binding MaxLevel}"/>
+                <TextBlock  Grid.Row="0" Grid.Column="6" Text="Increment Per Level" Width="125" Margin="10,2" TextAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="6" Width="100" Margin="10,2" Text="{Binding IncrementPerLevel}"/>
+                <Button Grid.Row="1" Grid.Column="7" Content="OK" x:Name="OkBtn" Click="OkBtn_Click"  ToolTip="" Width="50"/>
+            </Grid>
+            <ListView x:Name="CHESTS_LISTVIEW" Grid.Row="2" Grid.Column="0" Margin="0,5,0,0" ItemsSource="{Binding Chests}" SelectionChanged="CHESTS_LISTVIEW_SelectionChanged">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Type" Width="100" DisplayMemberBinding="{Binding ChestType}"/>
+                        <GridViewColumn Header="Name" Width="100" DisplayMemberBinding="{Binding ChestName}"/>
+                        <GridViewColumn Header="Has Level" Width="100" DisplayMemberBinding="{Binding HasLevel}"/>
+                        <GridViewColumn Header="Min Level" Width="100" DisplayMemberBinding="{Binding MinLevel}"/>
+                        <GridViewColumn Header="Max Level" Width="100" DisplayMemberBinding="{Binding MaxLevel}"/>
+                        <GridViewColumn Header="Increments" Width="100" DisplayMemberBinding="{Binding IncrementPerLevel}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+        <Grid Grid.Row="4" Height="32" Background="#dfdfdf">
+            <ui:FancyButton Text="Save" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="15,5" Padding="30,0"  
+                            Corners="5" BorderBrush="#0044ff" Background="{StaticResource FancyButton.Background}" Foreground="{StaticResource FancyButton.Foreground}" 
+                            HoverBrush="{StaticResource FancyButton.Hover.Background}" x:Name="SaveBtn" Click="SaveBtn_Click"/>
+        </Grid>
+        
+    </Grid>
+</Window>

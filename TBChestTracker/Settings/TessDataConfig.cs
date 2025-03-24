@@ -12,7 +12,7 @@ namespace TBChestTracker
         Best,
         Fast
     };
-
+    [System.Serializable]
     public sealed class TessDataConfig 
     {
         public string Prefix { get; private set; }  

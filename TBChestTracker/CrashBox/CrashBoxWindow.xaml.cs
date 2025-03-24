@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using TBChestTracker.Managers;
 using CefSharp;
 using CefSharp.Wpf;
+using com.HellStormGames.Diagnostics;
 
 namespace TBChestTracker.Dialogs
 {
@@ -25,56 +26,28 @@ namespace TBChestTracker.Dialogs
     /// </summary>
     public partial class CrashBoxWindow : Window
     {
-        public Exception exception { get; set; }
         bool viewingReport = false;
-        public CrashBoxWindow()
+        readonly Exception ExceptionObject;
+        public CrashBoxWindow(Exception exception)
         {
+            ExceptionObject = exception;
             InitializeComponent();
         }
-
-        private void Window_Unloaded(object sender, RoutedEventArgs e)
-        {
-            //-- make sure we save everything
-            ClanManager.Instance.ClanChestManager.Save();
-        }
-
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if(exception == null)
-            {
-                //-- somehow this is odd. And shouldn't happen. 
-                exception = new Exception("CrashBox exception was null. Odd.");
-            }
-            var reasonOfCrash = exception;
-            var crashDate = DateTime.Now;
-            var crashTime = DateTime.Now;
-
-            var crashDateStr = DateTime.Now.ToString(@"d");
-            var crashTimeStr = DateTime.Now.ToString(@"t");
-            var logFolder = $@"{AppContext.Instance.CommonAppFolder}Logs";
-            if (!Directory.Exists(logFolder))
-            {
-                Directory.CreateDirectory(logFolder);
-            }
-
-            var crashLogFile = $@"{logFolder}\crash_{crashDate.ToString(@"yyyy-MM-dd")}_{crashTime.ToString(@"HH_mm_ss")}.log";
-
-            using (var sw = new StreamWriter(crashLogFile, true))
-            {
-                var crashMessage = $"Crash Log {crashDateStr} - {crashTimeStr}:\n {reasonOfCrash.Message} \n {reasonOfCrash.StackTrace.ToString()}\n";
-                sw.WriteLine(crashMessage);
-                sw.Close();
-            }
+            Loggio.Fatal(ExceptionObject, "Application Crash", $"Crash has occured. Reason: {ExceptionObject.Message}. More information in log file.");
         }
 
         private void ViewCrashReportBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (viewingReport == false)
-            {
-                System.Diagnostics.Process.Start($@"{AppContext.Instance.CommonAppFolder}\Logs\crash.log");
-                viewingReport = true;
-            }
             this.Close();
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            //-- make sure we save everything
+            Loggio.Shutdown();
+            Application.Current.Shutdown();
         }
     }
 }

@@ -7,7 +7,7 @@
         xmlns:ui="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
         xmlns:Pages="clr-namespace:TBChestTracker.Pages" x:Class="TBChestTracker.SettingsWindow"
         mc:Ignorable="d"
-        Title="Settings" Height="720" Width="960" Topmost="True" Loaded="Window_Loaded" Closing="Window_Closing">
+        Title="Settings" Height="1024" Width="1080" Topmost="True" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
@@ -52,12 +52,10 @@
             </ScrollViewer>
             <StackPanel Orientation="Horizontal" Height="42" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <ui:FancyButton Width="100" Height="24" 
-                                Background="#0077ff" 
-                                HilightBrush="#00AAff" 
-                                Text="Save" RenderMode="TEXT" 
-                                BorderBrush="#0066ff" 
+                                Background="{StaticResource FancyButton.Background}" HoverBrush="{StaticResource FancyButton.Hover.Background}" Foreground="{StaticResource FancyButton.Foreground}"
+                                Text="Save" 
                                 Corners="5"
-                                Margin="10,0" VerticalAlignment="Center" Foreground="White" FontWeight="Bold" Click="FancyButton_Click"/>
+                                Margin="10,0" VerticalAlignment="Center" FontWeight="Bold" Click="FancyButton_Click"/>
             </StackPanel>
         </Grid>
     </Grid>

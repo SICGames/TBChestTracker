@@ -10,18 +10,18 @@ namespace TBChestTracker
 {
     public class CrashBoxDialog
     {
-        public static void Show(Exception e)
+        public static void Show(Exception ex)
         {
+            
             try
             {
-                CrashBoxWindow crashBoxWindow = new CrashBoxWindow();
-                crashBoxWindow.exception = e;
-                crashBoxWindow.Show();
+                CrashBoxWindow crashBoxWindow = new CrashBoxWindow(ex);
+                crashBoxWindow.ShowDialog();
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                //-- don't do anything. 
-                Loggio.Error(ex, "Crash", "A crash occured.");
+                Loggio.Fatal(e, "Application Crash", $"Attempt to catch issue raised exception inside CrashBox.");
+                Loggio.Shutdown();
             }
         }
     }

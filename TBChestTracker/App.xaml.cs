@@ -6,6 +6,9 @@ using TBChestTracker.Localization;
 
 using com.HellStormGames.Diagnostics;
 using com.HellStormGames.Diagnostics.Logging;
+using System.Linq;
+using System.Diagnostics;
+using System.IO;
 
 namespace TBChestTracker
 {
@@ -18,19 +21,19 @@ namespace TBChestTracker
         {
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
             AppContext appContext = new AppContext();
-            MainWindow mainwnd = new MainWindow();
-            StartPageWindow startPageWindow = new StartPageWindow();
-            
-            startPageWindow.MainWindow = mainwnd;
 
-            SplashScreen splashScreen = new SplashScreen();
-
-            splashScreen.onSplashScreenComplete += SplashScreen_onSplashScreenComplete;
-            splashScreen.mainWindow = mainwnd;
-            splashScreen.startPageWindow = startPageWindow;
+            var logsFolder = $"{AppContext.Instance.LocalApplicationPath}Logs\\";
+            var logFile = $"loggio_{DateTimeOffset.Now.ToString(@"yyyy-MM-dd")}.log";
+            var logfilepath = logsFolder + logFile;
+#if DEBUG
+            Loggio.Logger = new LoggioConfiguration().SubscribeTo.DebugOutput()
+                .SubscribeTo.File(logfilepath, LoggioEventType.VERBOSE).CreateLogger();
+#else
+            Loggio.Logger = new LoggioConfiguration().SubscribeTo.File(logfilepath, LoggioEventType.VERBOSE).CreateLogger();
+#endif
+          
             
             Dictionary<string,string> argumentsDictionary = new Dictionary<string,string>();
-
             if(e.Args.Length > 0)
             {
                 string[] args = Environment.GetCommandLineArgs();
@@ -68,17 +71,21 @@ namespace TBChestTracker
             //-- configure crashbox
             CrashBox crashBox = new CrashBox();
 
-            var logsFolder = $"{AppContext.Instance.LocalApplicationPath}Logs\\";
-            var logFile = $"loggio_{DateTimeOffset.Now.ToString(@"yyyy-MM-dd")}.log";
-            Loggio.Logger = new LoggioConfiguration().SubscribeTo.DebugOutput()
-                .SubscribeTo.File($"{logsFolder}{logFile}").CreateLogger();
-            Loggio.Info("Total Battle Chest Tracker is starting...");
-            
+            MainWindow mainwnd = new MainWindow();
+            StartPageWindow startPageWindow = new StartPageWindow();
+            startPageWindow.MainWindow = mainwnd;
+
+            SplashScreen splashScreen = new SplashScreen();
+            splashScreen.onSplashScreenComplete += SplashScreen_onSplashScreenComplete;
+            splashScreen.mainWindow = mainwnd;
+            splashScreen.startPageWindow = startPageWindow;
+
+            Loggio.Info($"Total Battle Chest Tracker ({AppContext.Instance.AppVersionString})  is starting...");
             splashScreen.Show();
         }
-
         private void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
+            
         }
 
         private void SplashScreen_onSplashScreenComplete(object sender, EventArgs e)
@@ -95,9 +102,7 @@ namespace TBChestTracker
         private void Application_Exit(object sender, ExitEventArgs e)
         {
             Loggio.Info("Total Battle Chest Tracker is exiting...");
-
             Loggio.Shutdown();
-            Console.WriteLine("I AM EXITING!!!");
         }
     }
 }

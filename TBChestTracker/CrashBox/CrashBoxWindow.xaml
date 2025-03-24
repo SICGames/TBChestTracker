@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Title="A Crash Occured!" SizeToContent="Height" Width="500" WindowStartupLocation="CenterScreen" 
         Loaded="Window_Loaded" 
-        Unloaded="Window_Unloaded" 
+        Closing="Window_Closing"
         ResizeMode="NoResize" WindowStyle="ToolWindow" Topmost="True">
     <Grid Background="#aaa" x:Name="MAIN_CONTENT" Margin="0">
         <Grid.RowDefinitions>
@@ -31,7 +31,6 @@
             <TextBlock Foreground="White" Text="Well that was embarassing!" Margin="5,10" FontSize="16"/>
             <TextBlock Foreground="White" Text="Don't worry. There has been a crash log saved to your computer. Copy the crash report and submit an issue on Github, so the developer can resolve this." TextWrapping="Wrap" Margin="10,5"/>
         </StackPanel>
-        <UI:FancyButton x:Name="ViewCrashReportBtn" Click="ViewCrashReportBtn_Click" RenderMode="TEXT" 
-                        Foreground="White" Background="#07f" HilightBrush="#0af" Grid.Column="0" Grid.Row="2" Width="100" Height="24" Text="View Log Report" Corners="10" HorizontalAlignment="Right" Margin="10"/>
+        <UI:FancyButton x:Name="ViewCrashReportBtn" Click="ViewCrashReportBtn_Click" Foreground="{StaticResource FancyButton.Foreground}" Background="{StaticResource FancyButton.Background}" HoverBrush="{StaticResource FancyButton.Hover.Background}" Grid.Column="0" Grid.Row="2" Width="100" Height="24" Text="Close" Corners="10" HorizontalAlignment="Right" Margin="10"/>
     </Grid>
 </Window>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using com.HellStormGames.Imaging.ScreenCapture;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -13,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using TBChestTracker.Pages.OCRWizard;
+using TBChestTracker.Windows.OCRStudio;
 
 namespace TBChestTracker
 {
@@ -22,8 +24,8 @@ namespace TBChestTracker
     public partial class OCRWizardWindow : Window
     {
         private bool isCompleted = false;
-
-        OCRWizardManualEditorWindow OCRWizardManualEditorWindow;
+        StudioCanvas OCRStudio;
+        //OCRWizardManualEditorWindow OCRWizardManualEditorWindow;
 
         public OCRWizardWindow()
         {
@@ -51,15 +53,11 @@ namespace TBChestTracker
             var page = OCRWizardGuideViewer.Content;
             if(page.GetType() == typeof(OCRWizard_Successful))
             {
+                SettingsManager.Instance.Settings.GeneralSettings.IsFirstRun = false;
                 SettingsManager.Instance.Save();
-                var firstRunFile = $@"{AppContext.Instance.CommonAppFolder}.FIRSTRUN";
-                if(System.IO.File.Exists(firstRunFile))
-                {
-                    System.IO.File.Delete(firstRunFile);    
-                }
-
                 AppContext.Instance.OCRCompleted = true;
                 AppContext.Instance.RequiresOCRWizard = false;
+                AppContext.Instance.IsAutomationPlayButtonEnabled = true;
             }
         }
 
@@ -74,14 +72,14 @@ namespace TBChestTracker
         }
         public void OCRWizardSuccesful()
         {
-            this.NavigateTo("Pages/OCRWizard/OCRWizard_Successful.xaml");
+            this.NavigateTo("../../Pages/OCRWizard/OCRWizard_Successful.xaml");
             BeginButton.Visibility = Visibility.Collapsed;
             DoneButton.Visibility = Visibility.Visible;
             ManualEditButton.Visibility = Visibility.Collapsed;
         }
         public void OCRWizardFailed()
         {
-            this.NavigateTo("Pages/OCRWizard/OCRWizard_Failed.xaml");
+            this.NavigateTo("../../Pages/OCRWizard/OCRWizard_Failed.xaml");
 
             BeginButton.Visibility = Visibility.Collapsed;
             DoneButton.Visibility = Visibility.Collapsed;
@@ -90,34 +88,23 @@ namespace TBChestTracker
         private void BeginButton_Click(object sender, RoutedEventArgs e)
         {
             var page = OCRWizardGuideViewer.Content;
-            OCRWizardManualEditorWindow = new OCRWizardManualEditorWindow();
-            
-            if (page.GetType() == typeof(OCRWizard_SelectRegion))
-            {
-                OCRWizardManualEditorWindow.OCRManualMode = OCRManualMode.REGION_SELECTION;
-            }
-            else if(page.GetType() == typeof(OCRWizard_CreateMarker))
-            {
-                OCRWizardManualEditorWindow.OCRManualMode = OCRManualMode.MARKER_PLACEMENT;
-            }
+            OCRStudio = new StudioCanvas();
+            OCRStudio.Left = Snapster.MonitorConfiguration.Monitor.ScreenBounds.X;
+            OCRStudio.Top = Snapster.MonitorConfiguration.Monitor.ScreenBounds.Y;
             this.Hide();
-            
-            if (OCRWizardManualEditorWindow.ShowDialog() == true)
+
+            if (OCRStudio.ShowDialog() == true)
             {
                 this.Show();
-                //-- we need to move to next step
-                var ocrMode = OCRWizardManualEditorWindow.OCRManualMode;
-                if (ocrMode == OCRManualMode.REGION_SELECTION)
-                {
-                    NavigateTo("Pages/OCRWizard/OCRWizard_CreateMarker.xaml");
-                }
-                else if(ocrMode == OCRManualMode.MARKER_PLACEMENT)
-                {
-                    NavigateTo("Pages/OCRWizard/OCRWizard_Successful.xaml");
-                    BeginButton.Visibility = Visibility.Hidden;
-                    NextButton.Visibility = Visibility.Hidden;
-                    DoneButton.Visibility = Visibility.Visible;
-                }
+                NavigateTo("../../Pages/OCRWizard/OCRWizard_Successful.xaml");
+                BeginButton.Visibility = Visibility.Hidden;
+                NextButton.Visibility = Visibility.Hidden;
+                DoneButton.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                //-- if false then there's nothing the user wants to do.
+                this.Close();
             }
         }
 
@@ -127,11 +114,11 @@ namespace TBChestTracker
 
             if (uri.GetType() == typeof(OCRWizard_WelcomePage))
             {
-                NavigateTo("Pages/OCRWizard/OCRWizard_GiftsTab.xaml");
+                NavigateTo("../../Pages/OCRWizard/OCRWizard_GiftsTab.xaml");
             }
             else if(uri.GetType() == typeof(OCRWizard_GiftsTab))
             {
-                NavigateTo("Pages/OCRWizard/OCRWizard_SelectRegion.xaml");
+                NavigateTo("../../Pages/OCRWizard/OCRWizard_SelectRegion.xaml");
                 NextButton.Visibility = Visibility.Collapsed;
                 BeginButton.Visibility = Visibility.Visible;
             }

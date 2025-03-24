@@ -1,4 +1,5 @@
-﻿using System;
+﻿using com.HellStormGames.Diagnostics;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace TBChestTracker
     //--- Wouldn't be a bad thing to collect OS, hardware but again, would need to require users agree to privacy policy agreement when launching application. 
     public class CrashBox
     {
+        bool showned = false;
         public CrashBox() 
         {
             //-- catches every exception across application domain
@@ -25,13 +27,13 @@ namespace TBChestTracker
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
             Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
         }
-        private void ShowCrashBoxDialog(Exception exception)
+        private void ShowCrashBoxDialog(Exception ex)
         {
-            Thread thread = new Thread(new ThreadStart(() =>
+            if (!showned)
             {
-                CrashBoxDialog.Show(exception);
-            }));
-            thread.Start();
+                CrashBoxDialog.Show(ex);
+                showned = true;
+            }
         }
         private void Current_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
@@ -45,7 +47,8 @@ namespace TBChestTracker
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            ShowCrashBoxDialog(e.ExceptionObject as Exception);
+            Exception ex = e.ExceptionObject as Exception;
+            ShowCrashBoxDialog(ex);
         }
     }
 }

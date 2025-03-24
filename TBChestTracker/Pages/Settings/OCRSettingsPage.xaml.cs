@@ -18,19 +18,28 @@ using System.Windows.Shapes;
 using TBChestTracker.Managers;
 using com.KonquestUI.Controls;
 using System.ComponentModel;
-using com.HellstormGames.Imaging.Extensions;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using TBChestTracker.UI;
+using TBChestTracker.Extensions;
+using System.Drawing;
+using com.HellStormGames.OCR;
+using TBChestTracker.Engine;
+using System.Collections.ObjectModel;
+using TBChestTracker.ViewModels;
 
 namespace TBChestTracker.Pages.Settings
 {
     /// <summary>
     /// Interaction logic for OCRSettingsPage.xaml
     /// </summary>
+    /// 
+
+    ///- need to make BitmapExtensions for ToBitmap() and ToBitmapSource()
+    ///
     public partial class OCRSettingsPage : Page, INotifyPropertyChanged
     {
         private BitmapSource _PreviewImage = null;
-
+        private ObservableCollection<OCRPreviewView> OcrPreviewResults = new ObservableCollection<OCRPreviewView>();
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void onPropertyChanged(string propertyName)
@@ -48,12 +57,23 @@ namespace TBChestTracker.Pages.Settings
                 onPropertyChanged(nameof(PreviewImage));
             }
         }
+
+        private string _CurtainMessage = "Click Preview Button To Show OCR Results from Preview Image.";
+        public string CurtainMessage
+        {
+            get => _CurtainMessage; 
+            set
+            {
+                _CurtainMessage = value;
+                onPropertyChanged(nameof(CurtainMessage));
+            }
+        }
+
         public OCRSettingsPage()
         {
             InitializeComponent();
 
             //-- TessDataFolder value not showing in uiFancyPicker. Only in Page_Loaded event.
-
             this.DataContext = SettingsManager.Instance.Settings.OCRSettings;
         }
 
@@ -66,71 +86,22 @@ namespace TBChestTracker.Pages.Settings
             }
             return elements;
         }
-        private string BuildSelectedLanguagesToString()
-        {
-            string result = String.Empty;
-            var selectedCheckboxes = ToList(CHECKBOXES_PARENT.Children).Where(cb => (bool)((CheckBox)cb).IsChecked);
-            for (var x = 0; x < selectedCheckboxes.Count(); x++)
-            {
-                if (x == selectedCheckboxes.Count() - 1)
-                    result += $"{((CheckBox)selectedCheckboxes.ToList()[x]).Tag}";
-                else
-                    result += $"{((CheckBox)selectedCheckboxes.ToList()[x]).Tag}+";
-            }
-            return result;
-        }
-        private void BuildCheckboxes()
-        {
-            var languages = SettingsManager.Instance.Settings.OCRSettings.Languages;
-            var LanguagesArray = languages.Split('+');
-            var checkboxes = CHECKBOXES_PARENT.Children;
-            foreach (var checkbox in checkboxes)
-            {
-                var cb = (CheckBox)checkbox;
-                if (cb != null)
-                {
-                    if (cb.Tag != null)
-                    {
-                        if (languages.ToLower().Contains("all"))
-                        {
-                            cb.IsChecked = true;
-                        }
-                        else
-                        {
-                            foreach (var language in LanguagesArray)
-                            {
-
-                                if (cb.Tag.ToString().ToLower().Equals(language.ToLower()))
-                                {
-                                    cb.IsChecked = true;
-                                    break;
-                                }
-                                else
-                                {
-                                    cb.IsChecked = false;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+      
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             //-- let's ensure we have the updated image preview
-            
+            ocrResultsListView.DataContext = this;
             var ocr = SettingsManager.Instance.Settings.OCRSettings;
             UpdatePreviewImage(ocr.GlobalBrightness, (int)ocr.Threshold, (int)ocr.MaxThreshold);
-            BuildCheckboxes();
             
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            var result = BuildSelectedLanguagesToString();
-            SettingsManager.Instance.Settings.OCRSettings.Languages = result;
-            SettingsManager.Instance.Settings.OCRSettings.CaptureMethod = CaptureMethodBox.Text;
+            OcrPreviewResults.Clear();
+            OcrPreviewResults = null;
+            SettingsManager.Instance.Settings.OCRSettings.Tags = TagBox.Tags;
         }
 
         private void TessDataFolderPicker_Click(object sender, RoutedEventArgs e)
@@ -153,12 +124,70 @@ namespace TBChestTracker.Pages.Settings
 
         }
 
+        private void ShowTessyResults(Bitmap bitmap)
+        {
+            var ocr = OCREngine.Instance;
+            var result = ocr.Read(bitmap);
+            var step = 3;
+
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                for (var index = 0; index < result.Words.Count; index++)
+                {
+                    try
+                    {
+                        var i = result.Words.FindIndex(index, s => s.StartsWith("Contains:"));
+                        if (i > index)
+                        {
+                            //-- we have a expired chest.
+                            step = 4;
+                        }
+                        else
+                        {
+                            step = 3;
+                        }
+                        var chestname = result.Words[index + 0];
+                        var clanmate = result.Words[index + 1];
+                        var sourceOfChest = result.Words[index + 2];
+                        var contains = step == 4 ? result.Words[index + 3] : "";
+                        OcrPreviewResults.Add(new OCRPreviewView(chestname, clanmate, sourceOfChest, contains));
+                        index += step - 1;
+                    }
+                    catch (Exception ex)
+                    {
+                        if(ex is IndexOutOfRangeException)
+                        {
+                            //-- possibly due to bad filter settings.
+                            CurtainMessage = "Hit a rock in the road. Bad filtering settings, maybe. Adjust filtering settings and try again.";
+                            ocr = null;
+                            return;
+                        }
+                    }
+                }
+                if (OcrPreviewResults.Count > 0)
+                {
+                    ocrResultsListView.ItemsSource = OcrPreviewResults;
+                }
+                else
+                {
+                    //-- display error.
+                    CurtainMessage = "There's No Results Available.";
+                }
+
+                ocr = null;
+            }));
+        }
+        private Task ShowTessyResultsTask(System.Drawing.Bitmap bitmap)
+        {
+            return Task.Run(() => ShowTessyResults(bitmap));
+        }
+
         private void UpdatePreviewImage(double brightness, int threshold, int maxthreshold)
         {
             if (String.IsNullOrEmpty(SettingsManager.Instance.Settings.OCRSettings.PreviewImage) == false)
             {
                 var bmp = System.Drawing.Bitmap.FromFile(SettingsManager.Instance.Settings.OCRSettings.PreviewImage);
-
+               
                 Image<Gray, byte> image = ((System.Drawing.Bitmap)bmp).ToImage<Gray, byte>();
                 
                 var imageBrightened = image.Mul(brightness) + brightness;
@@ -168,13 +197,21 @@ namespace TBChestTracker.Pages.Settings
                 var maxThreshold_gray = new Gray(maxthreshold);
 
                 var imageThreshold = imageScaled.ThresholdBinaryInv(threshold_gray, maxThreshold_gray);
-                
-                Image<Gray,byte> erodedImage = imageThreshold.Erode(1);
-
-                ImagePreview.Source =  erodedImage.ToBitmap().ToBitmapSource();
+                imageThreshold = 255 - imageThreshold;
+                ImagePreview.Source = imageThreshold.ToBitmap().AsBitmapSource();
                 SettingsManager.Instance.Settings.OCRSettings.Threshold = threshold;
                 SettingsManager.Instance.Settings.OCRSettings.MaxThreshold = maxthreshold;
-                
+                imageThreshold.Dispose();
+                imageThreshold = null;
+                imageScaled.Dispose();
+                imageScaled = null;
+                imageBrightened.Dispose();
+                imageBrightened = null;
+
+                image.Dispose();
+                image = null;
+                bmp.Dispose();
+                bmp = null;
             }
         }
 
@@ -192,37 +229,41 @@ namespace TBChestTracker.Pages.Settings
             UpdatePreviewImage(brightness, SettingsManager.Instance.Settings.OCRSettings.Threshold, (int)fancyNumeric.Value);
         }
 
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        private void EnableImageFilterCheckBox_Click(object sender, RoutedEventArgs e)
         {
-            var checkboxes = CHECKBOXES_PARENT.Children;
-            foreach (var checkbox in checkboxes)
+            UpdatePreviewImage(SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness, SettingsManager.Instance.Settings.OCRSettings.Threshold, SettingsManager.Instance.Settings.OCRSettings.MaxThreshold);
+        }
+
+        private async void PreviewOCRButton_Click(object sender, RoutedEventArgs e)
+        {
+            var bs = ImagePreview.Source;
+            if (bs != null)
             {
-                var cb = (CheckBox)checkbox;
-                if (cb != null)
+                CurtainMessage = "Generating OCR Result...";
+                Curtain.Visibility = Visibility.Visible;
+                OcrPreviewResults.Clear();
+
+                PreviewOCRButton.IsEnabled = false;
+                var bmp = ((BitmapImage)bs).AsBitmap();
+                await ShowTessyResultsTask(bmp).ContinueWith(t =>
                 {
-                    cb.IsChecked = true;
-                }
+                    this.Dispatcher.BeginInvoke(() =>
+                    {
+                        if (OcrPreviewResults.Count > 0)
+                        {
+                            Curtain.Visibility = Visibility.Hidden;
+                        }
+                        PreviewOCRButton.IsEnabled = true;
+                    });
+                });
+
             }
         }
 
-        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        private void OcrLanguagesToolLink_Click(object sender, RoutedEventArgs e)
         {
-            var checkboxes = CHECKBOXES_PARENT.Children;
-            foreach (var checkbox in checkboxes)
-            {
-                var cb = (CheckBox)checkbox;
-                if (cb != null)
-                {
-                    cb.IsChecked = false;
-                }
-            }
-        }
-
-        private void ClanmateSimilarityNumericValue_ValueChanged(object sender, RoutedEventArgs e)
-        {
-            var value = ((FancyNumericValue)sender).Value;
-            var ocr = SettingsManager.Instance.Settings.OCRSettings;
-            SettingsManager.Instance.Settings.OCRSettings.ClanmateSimilarity = value;
+            OcrLanguageSelectionWindow langselect = new OcrLanguageSelectionWindow(SettingsManager.Instance);
+            langselect.Show();
         }
     }
 }
