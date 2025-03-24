@@ -7,9 +7,6 @@
 - They get a sneak peak at the latest builds available on Discord. Until those latest builds pass with flying colors by a jury of patreons, they will hit Github. And in addition, it speeds up the development when I have instant feedback. 
 - Become a VIP Patreon and don't miss out on the latest builds. Or you can wait.
 
-## Total Total Battle Chest Tracker v2.0 Release Candidate 3.2 coming soon!
-There's a overhaul down in code and introducing new features. Patreons are liking the new version and so far has stated results are accurate. 
-
 ## Description
 TotalBattle Chest Tracker was designed to easily track your clan's chest count. 
 
@@ -42,18 +39,6 @@ Clan Insights
  * Filter clan insights data by name using Quick Filter feature.
  * Filter clan insights data by chest type.
 
-</details>
-<details>
-<summary>
-Clanmate Management
-</summary>
-  
- * Add clanmates via text file.
- * Add clanmates via selection rectangle.
- * Clanmate search box filters a clan mate. 
- * Create clanmate aliases by selecting parent clanmate name then their known aliases. In case OCR misreads their name. 
- * Remove multiple clanmate names.
- 
 </details>
 
 ## Are you stuck on something?
