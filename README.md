@@ -57,13 +57,11 @@ Watch the Youtube videos
 ## Want to contribute? 
 Head over to [Contributions section](https://github.com/SICGames/TBChestTracker/blob/master/CONTRIBUTING.md) to contribute to this project.
 
-## Launched Program and now what?
+## How Do I use this? HOW? HOW?????!!!
 - In the Start Up Page, click on New Clan and create your clan. 
-- Follow the OCR Wizard. 
-- Begin adding new clan mates. 
+- You'll be prompted to choose the Ocr Languages you want the OCR to understand and the OCR Studio. Once you're done selecting the Ocr Languages and enter into OCR Studio, you click on the Rectangle icon to draw a Region of Interest you want the OCR to focus on. Then you click on the cross hair icon and place it on the Open button. You can preview what the OCR sees by clicking on the eye icon. When you're happy, click on the Checkmark icon and it will save.  
+- Inside the game, head over to Gifts tab and press F9 to start the automation process. Let it count through and once it sees the words, "No gifts" it will stop automation and begin building chests. 
 - If you're using chest points, add chest point values via Clan Chest Requirements window under the Chest Points tab.
-- When you're ready to begin the automation process, press F9 to start automation procecss and F10 to stop automation process.
-- Everything is saved when creating new clan and when new clanmate is added, in addition when automation is stopped.
 - When chest period is done, click on File then click on Export and click on the File textbox. Save it as CSV file. CSV file is used to upload to Google Sheets. 
 
 
