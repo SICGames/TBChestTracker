@@ -2,12 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using TBChestTracker.Crashhandling;
 
 namespace TBChestTracker
 {
@@ -26,13 +28,39 @@ namespace TBChestTracker
             //--- catches exceptions tossed by any function using async operations. 
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
             Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
+            
         }
         private void ShowCrashBoxDialog(Exception ex)
         {
             if (!showned)
             {
-                CrashBoxDialog.Show(ex);
-                showned = true;
+                try
+                {
+                    Loggio.Shutdown();
+
+                    var logspath = $"{AppContext.Instance.LocalApplicationPath}Logs";
+                    var crashFile = $"{logspath}\\Crash.log";
+
+                    var cr = new CrashReport(crashFile);
+
+                    var stacktrace = ex.StackTrace;
+                    cr.CrashException.StackTrace = stacktrace.ToString();
+                    cr.CrashException.Message = ex.Message;
+                    cr.CrashException.ExceptionType = ex.GetType().Name;
+
+                    cr.Generate();
+
+                    //-- startup new Crash Box Procecss.
+                    var args = $"--app_name \"TotalBattle Chest Tracker\"";
+                    var crashboxApp = $"CrashBox.exe";
+                    var p = Process.Start(crashboxApp, args);
+                   
+                    showned = true;
+                }
+                catch (Exception ex2)
+                {
+                    throw new Exception(ex2.Message);
+                }
             }
         }
         private void Current_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

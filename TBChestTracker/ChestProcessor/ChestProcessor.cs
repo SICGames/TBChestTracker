@@ -1,4 +1,4 @@
-﻿using CefSharp.DevTools.Database;
+﻿
 using com.HellStormGames.Logging;
 using MS.WindowsAPICodePack.Internal;
 using System;
@@ -17,7 +17,7 @@ using System.Windows.Controls;
 using TBChestTracker.Automation;
 using TBChestTracker.Helpers;
 using TBChestTracker.Managers;
-using static System.Net.Mime.MediaTypeNames;
+
 using com.HellStormGames.Diagnostics;
 using TBChestTracker.Pages;
 using CsvHelper;
@@ -91,10 +91,7 @@ namespace TBChestTracker
         {
             try
             {
-                if(OcrCorrectionWords != null)
-                {
-                    OcrCorrectionWords.Clear();
-                }
+                ClearOcrCorrectionWords();
 
                 var ocrCorrectionListFIle = $"{ClanManager.Instance.CurrentProjectDirectory}\\db\\OcrCorrectionList.json";
                 if (File.Exists(ocrCorrectionListFIle))
@@ -110,6 +107,11 @@ namespace TBChestTracker
             }
 
             return false;
+        }
+        public void ClearOcrCorrectionWords()
+        {
+            OcrCorrectionWords?.Clear();
+
         }
         #region Init 
         public ChestDataBuildResult Init()

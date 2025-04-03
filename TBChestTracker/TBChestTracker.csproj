@@ -192,6 +192,8 @@
     <Compile Include="Converters\NullBooleanConverter.cs" />
     <Compile Include="Converters\NullStringBooleanConverter.cs" />
     <Compile Include="Converters\NullVisibilityConverter.cs" />
+    <Compile Include="CrashBox\CrashException.cs" />
+    <Compile Include="CrashBox\CrashReport.cs" />
     <Compile Include="Data\OcrLanguages\OcrLanguage.cs" />
     <Compile Include="Data\OcrLanguages\OcrLanguages.cs" />
     <Compile Include="Extensions\BitmapExtensions.cs" />
@@ -739,7 +741,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CefSharp.Wpf">
-      <Version>133.4.21</Version>
+      <Version>134.3.90</Version>
     </PackageReference>
     <PackageReference Include="CsvHelper">
       <Version>33.0.1</Version>

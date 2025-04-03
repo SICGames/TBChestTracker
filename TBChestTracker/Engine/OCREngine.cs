@@ -145,7 +145,6 @@ namespace TBChestTracker.Engine
                         return null;
                     }
 
-
                     int height, width, stride;
                     height = width = stride = 0;
 
@@ -173,9 +172,12 @@ namespace TBChestTracker.Engine
                         if (String.IsNullOrEmpty(resultstr))
                         {
                             Loggio.Warn("OCR Result Text shouldn't be null or empty.");
+                            bytes = null;
+                            image.UnlockBits(data);
                             return null;
                             //throw new Exception("Tesseract OCR UTF8 Text isn't Suppose To be empty.");
                         }
+
                         resultstr = resultstr.Replace("\r\n", ",");
                         string[] results = resultstr.Split(',');
                         List<String> ocrResults = new List<string>();
@@ -188,7 +190,7 @@ namespace TBChestTracker.Engine
                         }
 
                         result = new TessResult();
-                        result.Words = new List<string>();
+                       // result.Words = new List<string>();
                         result.Words = ocrResults.ToList();
 
                         results = null;

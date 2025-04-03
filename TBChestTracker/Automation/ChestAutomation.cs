@@ -397,21 +397,31 @@ namespace TBChestTracker.Automation
                                 {
                                     AutomationTextProcessedEventArguments arg = new AutomationTextProcessedEventArguments(ocrResult);
 
-                                    outputImage.Dispose();
+                                    outputImage?.Dispose();
                                     outputImage = null;
-                                    original_image.Dispose();
+                                    original_image?.Dispose();
                                     original_image = null;
-
-                                    bitmap.Dispose();
+                                    bitmap?.Dispose();
                                     bitmap = null;
                                     image.Dispose();
                                     onTextProcessed(arg);
+
+                                    
                                     return;
                                 }
                                 else
                                 {
                                     //-- there's an issue regarding Tesseract.
                                     //-- need to cancel.
+
+                                    outputImage?.Dispose();
+                                    outputImage = null;
+                                    original_image?.Dispose();
+                                    original_image = null;
+                                    bitmap?.Dispose();
+                                    bitmap = null;
+                                    image.Dispose();
+
                                     throw new Exception("Issue with Tessy. Returned NULL. Possible empty page.");
                                 }
                             }

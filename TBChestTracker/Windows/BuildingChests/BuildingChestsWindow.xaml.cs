@@ -154,6 +154,12 @@ namespace TBChestTracker
                 }
             });
         }
+
+        private async Task DelayClose(int milliseconds)
+        {
+            await Task.Delay(milliseconds);
+            this.Close();
+        }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             Progress<BuildingChestsProgress> progress = new Progress<BuildingChestsProgress>();
@@ -166,14 +172,14 @@ namespace TBChestTracker
                 DataFolderDi.Create();
             }
 
-            progress.ProgressChanged += (s, o) =>
+            progress.ProgressChanged += async (s, o) =>
             {
                 UpdateUI(o.Status, o.Progress);
                 if(o.isFinished)
                 {
                     if (SettingsManager.Instance.Settings.AutomationSettings.AutomaticallyCloseChestBuildingDialogAfterFinished)
                     {
-                        this.Close();
+                        DelayClose(3000);
                     }
                     else
                     {

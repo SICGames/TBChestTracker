@@ -29,7 +29,7 @@
         </Grid>
         <StackPanel Orientation="Vertical" VerticalAlignment="Top" Grid.Row="1" Grid.Column="0">
             <TextBlock Foreground="White" Text="Well that was embarassing!" Margin="5,10" FontSize="16"/>
-            <TextBlock Foreground="White" Text="Don't worry. There has been a crash log saved to your computer. Copy the crash report and submit an issue on Github, so the developer can resolve this." TextWrapping="Wrap" Margin="10,5"/>
+            <TextBlock Foreground="White" Text="Don't worry. There has been a Crash.log saved to your computer. Copy the crash report and submit an issue on Github, so the developer can resolve this." TextWrapping="Wrap" Margin="10,5"/>
         </StackPanel>
         <UI:FancyButton x:Name="ViewCrashReportBtn" Click="ViewCrashReportBtn_Click" Foreground="{StaticResource FancyButton.Foreground}" Background="{StaticResource FancyButton.Background}" HoverBrush="{StaticResource FancyButton.Hover.Background}" Grid.Column="0" Grid.Row="2" Width="100" Height="24" Text="Close" Corners="10" HorizontalAlignment="Right" Margin="10"/>
     </Grid>

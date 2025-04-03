@@ -78,10 +78,10 @@ namespace TBChestTracker
             if (errorOccured == false)
             {
                
-                await SaveChestDataToFile(chestdatafile, configuration.BuildingProgress, chestcollection);
+                await SaveChestDataToFile(chestdatafile, configuration?.BuildingProgress, chestcollection);
                 await Task.Delay(100);
                 var p2 = new BuildingChestsProgress($"Finished Building Clan Chests...", -1, 1, 1, true, false);
-                configuration.BuildingProgress.Report(p2);
+                configuration?.BuildingProgress?.Report(p2);
             }
         }
 

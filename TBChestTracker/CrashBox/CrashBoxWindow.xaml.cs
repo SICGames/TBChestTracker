@@ -35,7 +35,7 @@ namespace TBChestTracker.Dialogs
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            Loggio.Fatal(ExceptionObject, "Application Crash", $"Crash has occured. Reason: {ExceptionObject.Message}. More information in log file.");
+           // Loggio.Fatal(ExceptionObject, "Application Crash", $"Crash has occured. Reason: {ExceptionObject.Message}. More information in log file.");
         }
 
         private void ViewCrashReportBtn_Click(object sender, RoutedEventArgs e)
@@ -46,7 +46,6 @@ namespace TBChestTracker.Dialogs
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             //-- make sure we save everything
-            Loggio.Shutdown();
             Application.Current.Shutdown();
         }
     }

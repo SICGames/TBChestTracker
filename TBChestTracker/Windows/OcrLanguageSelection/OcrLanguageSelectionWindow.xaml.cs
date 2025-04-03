@@ -16,6 +16,8 @@ using System.Windows.Shapes;
 using TBChestTracker.Automation;
 using TBChestTracker.Data;
 using TBChestTracker.UI;
+using com.HellStormGames.Diagnostics.Logging;
+using com.HellStormGames.Diagnostics;
 
 namespace TBChestTracker
 {
@@ -41,7 +43,15 @@ namespace TBChestTracker
         private void BuildLanguagesFromSettings()
         {
             if (SettingsManager == null)
+            {
+                Loggio.Warn("Ocr Language Selection", "Settings Manager is null");
                 return;
+            }
+            if (String.IsNullOrEmpty(SettingsManager.Settings.OCRSettings.Languages))
+            {
+                Loggio.Warn("Ocr Languages Selection", "Ocr Languages from settings.json file is empty. It could be because the user is new.");
+                return;
+            }
 
             var languages = SettingsManager.Settings.OCRSettings.Languages.Split('+');
             foreach (var language in languages)
@@ -52,14 +62,22 @@ namespace TBChestTracker
         }
         private void BuildAvailableLanguageList()
         {
-            OcrLanguagesList.Clear();
-            foreach(var lang in OcrLanguages.Languages)
+            OcrLanguagesList?.Clear();
+            if (OcrLanguages.Languages.Any() == false)
             {
-                OcrLanguagesList.Add(lang);
+                Loggio.Warn("Ocr Languages Selection", "Languages are empty or didn't load properly. Technically, shouldn't have happened.");
             }
-            AvailableLanguagesBox.ItemsSource = OcrLanguagesList;
-            CollectionViewSource.GetDefaultView(AvailableLanguagesBox.Items).SortDescriptions.Add(new System.ComponentModel.SortDescription("Language", System.ComponentModel.ListSortDirection.Ascending));
-            SelectedLanguagesBox.ItemsSource = SelectedLanguageList;
+
+            foreach(var lang in OcrLanguages?.Languages)
+            {
+                OcrLanguagesList?.Add(lang);
+            }
+            if (OcrLanguagesList?.Count > 0)
+            {
+                AvailableLanguagesBox.ItemsSource = OcrLanguagesList;
+                CollectionViewSource.GetDefaultView(AvailableLanguagesBox.Items).SortDescriptions.Add(new System.ComponentModel.SortDescription("Language", System.ComponentModel.ListSortDirection.Ascending));
+                SelectedLanguagesBox.ItemsSource = SelectedLanguageList;
+            }
         }
         private void Resort()
         {
@@ -69,33 +87,40 @@ namespace TBChestTracker
         {
             if (OcrLanguages.Load())
             {
-              BuildAvailableLanguageList();
+                BuildAvailableLanguageList();
                 BuildLanguagesFromSettings();
             }
         }
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            Loggio.Info("Ocr Languages Selection", "Closing window.");
             OcrLanguagesList?.Clear();
             OcrLanguagesList = null;
             SelectedLanguageList?.Clear();
             SelectedLanguageList = null;
-            OcrLanguages.Dispose();
+            OcrLanguages?.Dispose();
         }
 
         private void Applybtn_Click(object sender, RoutedEventArgs e)
         {
             var langStr = String.Empty;
-            foreach(var langage in SelectedLanguageList.ToList())
+            Loggio.Info("Ocr Languages Selection", "Ocr Languages being generated and applied to settings.");
+            foreach (var langage in SelectedLanguageList?.ToList())
             {
                 langStr += $"{langage.Code}+";
             }
             langStr = langStr.Substring(0, langStr.Length - 1);
             SettingsManager.Settings.OCRSettings.Languages = langStr;
             SettingsManager.Settings.GeneralSettings.ShowOcrLanguageSelection = false;
-            SettingsManager.Save();
+            SettingsManager?.Save();
+            Loggio.Info("Ocr Languages Selection", "Ocr Languages Selected and saved.");
+
             if(MessageBox.Show("New Ocr Language Configuration have been applied. Requires to restart Tesseract OCR", "New Ocr Languages Applied", MessageBoxButton.OK) == MessageBoxResult.OK)
             {
-                ChestAutomation.Instance.Reinitialize(SettingsManager.Settings.OCRSettings);
+                if (ChestAutomation.Instance != null)
+                {
+                    ChestAutomation.Instance.Reinitialize(SettingsManager.Settings.OCRSettings);
+                }
             }
             this.Close();            
         }
