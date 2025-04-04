@@ -94,8 +94,7 @@
                               Grid.Column="0" Width="350"
                               Height="420"
                               ItemsSource="{Binding AffectedWordsCollection}" 
-                              SelectedItemChanged="AffectedWordsViewBox_SelectedItemChanged" 
-                              AllowDrop="True" Drop="AffectedWordsViewBox_Drop" DragEnter="AffectedWordsViewBox_DragEnter" DragOver="AffectedWordsViewBox_DragOver">
+                              AllowDrop="True" Drop="AffectedWordsViewBox_Drop">
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}">
                             <Setter Property="FontWeight" Value="Normal" />

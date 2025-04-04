@@ -441,7 +441,7 @@ namespace TBChestTracker
                         {
                             var incorrect = incorrectword.Word;
                             var escaped_IncorrectWord = Regex.Escape(incorrect);
-                            var match_pattern = $@"({escaped_IncorrectWord})+";
+                            var match_pattern = $@"{escaped_IncorrectWord}";
                             var hasMatches = false;
 
                             //var fake_result_string = "JÃ³rmungandr's Chest\r\nFrom: Maximus not Jeff\r\nSource: Jormungandr Shop\r\nJÃ³rmungandr's Chest\r\nFrom: Maximus not Jeff\r\nSource: Jormungandr Shop\r\nJÃ³rmungandr's Chest\r\nFrom: Maximus not Jeff\r\nSource: Jormungandr Shop\r\nJÃ³rmungandr's Chest\r\nFrom: Maximus not Jeff\r\nSource: Jormungandr Shop\r\n";
@@ -451,16 +451,12 @@ namespace TBChestTracker
                             if (r.Count > 0)
                             {
                                 hasMatches = true;
-                                foreach (Match m in r)
-                                {
-                                    var matchstring = m.Value;
-                                    Loggio.Info("Ocr Correction", $"Directed incorrect word => {matchstring}");
-                                }
+                                Loggio.Info("Ocr Correction", $"Detected incorrect word => {incorrect}");
+                                filtered_result_string = filtered_result_string.Replace(incorrect, correct);
+                                Loggio.Info("Ocr Correction", $"Fixed incorrect word => {incorrect} to correct word => {correct}");
 
                                 if(hasMatches)
                                 {
-                                    filtered_result_string = Regex.Replace(filtered_result_string, match_pattern, correct);
-                                    //fake_result_string = Regex.Replace(fake_result_string, match_pattern, correct);
                                     hasMatches = false;
                                 }
                             }

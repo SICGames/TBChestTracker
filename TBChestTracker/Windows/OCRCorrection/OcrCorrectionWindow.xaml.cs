@@ -1,4 +1,5 @@
 ﻿using com.HellStormGames.Diagnostics;
+using CsvHelper.Configuration.Attributes;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -143,27 +144,7 @@ namespace TBChestTracker.Windows.OCRCorrection
             var currentlySelectedItems = AffectedWordsViewBox.SelectedItem as AffectedWords;
             AffectedWordsCollection.Remove(currentlySelectedItems); 
         }
-
-        private void TextBlock_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void AffectedWordsViewBox_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-
-        }
-
-        private void AffectedWordsViewBox_DragEnter(object sender, DragEventArgs e)
-        {
-            
-        }
-
-        private void AffectedWordsViewBox_DragOver(object sender, DragEventArgs e)
-        {
-
-        }
-
+    
         private void AffectedWordsViewBox_Drop(object sender, DragEventArgs e)
         {
             Type type = typeof(List<string>);
@@ -240,89 +221,128 @@ namespace TBChestTracker.Windows.OCRCorrection
                 return false;   
             }
         }
-        private async Task<bool> SaveAndApply(string filename)
+
+        private string[] GetChestFiles()
         {
-            int errroCount = 0;
-
-            if (!bSaved)
+            List<string> files = new List<string>();
+            var chestsfolder = $"{ClanManager.Instance.CurrentProjectDirectory}\\Chests\\Data";
+            var di = new DirectoryInfo(chestsfolder);
+            if (di.Exists)
             {
-                if (AffectedWordsCollection.Count > 0)
+                files = di.EnumerateFiles("chests_*.txt", SearchOption.TopDirectoryOnly).Select(f => f.FullName).ToList();
+                var chestdataFile = $"{ClanManager.Instance.CurrentProjectDirectory}\\Chests\\ChestData.csv";
+                if (File.Exists(chestdataFile))
                 {
-                    bool result = SaveOcrCorrectionListToFile(filename);
-                    if (result)
+                    files.Add(chestdataFile);
+                }
+            }
+
+            return files.ToArray();
+        }
+        private string GetFileData(string filename)
+        {
+            string data = String.Empty;
+            using (StreamReader streamReader = new StreamReader(filename))
+            {
+                data = streamReader.ReadToEnd();
+            }
+            return data;    
+        }
+        private int FindAllOccurances(string src,string word)
+        {
+            var escaped = Regex.Escape(word);
+            return Regex.Matches(src, $@"{escaped}").Count;
+        }
+        private string Fix(string src, string correctword, string incorrectword)
+        {
+            string result = src.Replace(incorrectword, correctword);
+            return result;
+        }
+        private bool SaveFixedFile(string filename, string data)
+        {
+            using (StreamWriter writer = new StreamWriter(filename))
+            {
+                writer.Write(data);
+                writer.Close();
+            }
+            return true;
+        }
+
+        private bool SearchInFilesAndreplace(string[] files, List<AffectedWords> AffectedWords)
+        {
+            try
+            {
+                foreach (var file in files)
+                {
+                    Dictionary<string, string> WordsToFix = new Dictionary<string, string>();
+                    string data = String.Empty;
+                    try
                     {
-                        //-- let's apply the fix to every chest file
-                        var chestsfolder = $"{ClanManager.Instance.CurrentProjectDirectory}\\Chests\\Data";
-                        var di = new DirectoryInfo(chestsfolder);
-                        if (di.Exists)
+                        data = GetFileData(file);
+                    
+                        foreach (var affectedWord in AffectedWords)
                         {
-                            var files = di.EnumerateFiles("chests_*.txt", SearchOption.TopDirectoryOnly).Select(f => f.FullName).ToList();
-                            var chestdataFile = $"{ClanManager.Instance.CurrentProjectDirectory}\\Chests\\ChestData.csv";
-                            if (File.Exists(chestdataFile))
+                            var correct_spelling = affectedWord.Word;
+                            foreach (var incorrect_spelling in affectedWord.IncorrectWords)
                             {
-                                files.Add(chestdataFile);
-                            }
-
-                            foreach (var f in files)
-                            {
-                                var filedata = string.Empty;
-                                var modified_data = string.Empty;
-                                try
+                                var occurances = FindAllOccurances(data, incorrect_spelling.Word);
+                                if (occurances > 0)
                                 {
-                                    using (var reader = new StreamReader(f))
-                                    {
-                                        filedata = await reader.ReadToEndAsync();
-                                        reader.Close();
-                                    }
-
-                                    modified_data = filedata;
-                                    string escapedStr = string.Empty;
-
-                                    foreach (var affectedWord in AffectedWordsCollection)
-                                    {
-                                        var correctWord = affectedWord.Word;
-                                        foreach (var incorrectWord in affectedWord.IncorrectWords)
-                                        {
-                                            var incorrect = incorrectWord.Word;
-                                            var escaped = Regex.Escape(incorrect);
-                                            //var match_pattern = @"([#-}]+" + escaped + @")+";
-                                            var match_pattern = $@"({escaped})+";
-
-                                            escapedStr = modified_data;
-                                            var r = Regex.Matches(escapedStr, match_pattern, RegexOptions.Singleline);
-                                            if (r.Count > 0)
-                                            {
-                                                //var escaped_CorrectWord = Regex.Escape(correctWord);
-                                                escapedStr = Regex.Replace(escapedStr, match_pattern, correctWord);
-                                            }
-
-                                        }
-                                    }
-
-                                    if (String.IsNullOrEmpty(escapedStr) == false)
-                                    {
-                                        modified_data = escapedStr;
-                                    }
-
-                                    using (var writer = new StreamWriter(f))
-                                    {
-                                        writer.Write(modified_data);
-                                        writer.Close();
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    Loggio.Error(ex, "Ocr Correction Tool", "Issue occurred which needs to be addressed.");
-                                    errroCount++;
-                                    continue;
+                                    WordsToFix.Add(incorrect_spelling.Word, correct_spelling);
                                 }
                             }
                         }
                     }
+                    catch (Exception exc)
+                    {
+                        Loggio.Error(exc,"Ocr Correction Tool","An issue has arrised while attempting to correct ocr incorrect spellings.");
+                    }
+
+                    var hasWordsToFix = WordsToFix.Keys.Count();
+                    if (hasWordsToFix > 0)
+                    {
+                        Loggio.Info($"NUmber of words needing to be fixed is => {WordsToFix.Count}");
+
+                        foreach(var incorrect_word in WordsToFix.Keys)
+                        {
+                            var correct_spelling = WordsToFix[incorrect_word];
+                            data = Fix(data, correct_spelling, incorrect_word);
+                            Loggio.Info($"Corrected {incorrect_word} with {correct_spelling}");
+                        }
+                        Loggio.Info($"Finished correcting words!");
+                    }
+
+                    if(SaveFixedFile(file, data))
+                    {
+                        Loggio.Info($"Updated {file} with newer data");
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                //-- normally happens when same name is added in dictionary
+            }
+            return false;
+        }
+
+
+        private async Task<bool> SaveAndApply(string filename)
+        {
+            bool result = false;
+            if (!bSaved)
+            {
+                if (AffectedWordsCollection.Count > 0)
+                {
+                    result = SaveOcrCorrectionListToFile(filename);
+                    if (result)
+                    {
+                        result = SearchInFilesAndreplace(GetChestFiles(), AffectedWordsCollection.ToList());
+                    }
                 }
                 bSaved = true;
             }
-            return errroCount == 0;
+            return result;
         }
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
