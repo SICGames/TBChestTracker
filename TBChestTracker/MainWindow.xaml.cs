@@ -1816,5 +1816,11 @@ namespace TBChestTracker
         {
             DoBug();            
         }
+
+        private void MergeChestDataMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            ChestDataMergerWindow chestDataMergerWindow = new ChestDataMergerWindow();
+            chestDataMergerWindow.Show();
+        }
     }
 }

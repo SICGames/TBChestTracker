@@ -260,6 +260,9 @@
     <Compile Include="ClanData\ClanChestExporter.cs" />
     <Compile Include="ClanData\DateRangeEnum.cs" />
     <Compile Include="ClanData\GeneralClanSettings.cs" />
+    <Compile Include="Windows\ChestDataMerger\ChestDataMergerWindow.xaml.cs">
+      <DependentUpon>ChestDataMergerWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\ClanInsights\ClanInsightsWindow.xaml.cs">
       <DependentUpon>ClanInsightsWindow.xaml</DependentUpon>
     </Compile>
@@ -513,6 +516,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\ChestCreator\ChestCreatorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\ChestDataMerger\ChestDataMergerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

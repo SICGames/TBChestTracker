@@ -137,7 +137,6 @@ typeof(RoutedEventHandler), typeof(FilePicker));
             add { AddHandler(FileRejectedEvent, value); }
             remove { RemoveHandler(FileRejectedEvent, value); }
         }
-
         #endregion
         public FilePicker()
         {
