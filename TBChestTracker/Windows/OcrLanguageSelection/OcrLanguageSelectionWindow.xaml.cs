@@ -52,12 +52,21 @@ namespace TBChestTracker
                 Loggio.Warn("Ocr Languages Selection", "Ocr Languages from settings.json file is empty. It could be because the user is new.");
                 return;
             }
+            var languages = SettingsManager.Settings.OCRSettings.Languages;
+            if (languages.Contains("all"))
+            {
+                languages = languages.Replace("+all", "");
+                SettingsManager.Settings.OCRSettings.Languages = languages;
+                SettingsManager.Save();
+            }
 
-            var languages = SettingsManager.Settings.OCRSettings.Languages.Split('+');
-            foreach (var language in languages)
+            var languagesArray = languages.Split('+');
+            foreach (var language in languagesArray)
             {
                 var availableLanguage = OcrLanguages.Languages.Select(l => l).Where(c => c.Code.Equals(language)).FirstOrDefault();
-                SelectedLanguageList.Add(availableLanguage);
+                var index = AvailableLanguagesBox.Items.IndexOf(availableLanguage);
+                AvailableLanguagesBox.SelectedIndex = index;
+                MoveRight();
             }
         }
         private void BuildAvailableLanguageList()
@@ -105,13 +114,17 @@ namespace TBChestTracker
         {
             var langStr = String.Empty;
             Loggio.Info("Ocr Languages Selection", "Ocr Languages being generated and applied to settings.");
-            foreach (var langage in SelectedLanguageList?.ToList())
+            foreach (var language in SelectedLanguageList?.ToList())
             {
-                langStr += $"{langage.Code}+";
+                langStr += $"{language.Code}+";
             }
+            Loggio.Info("Fixing language string.");
             langStr = langStr.Substring(0, langStr.Length - 1);
+            Loggio.Info("Adding languages to settings.");
             SettingsManager.Settings.OCRSettings.Languages = langStr;
+            Loggio.Info("Disabling showing Ocr language Selection.");
             SettingsManager.Settings.GeneralSettings.ShowOcrLanguageSelection = false;
+            Loggio.Info("Saving settings.");
             SettingsManager?.Save();
             Loggio.Info("Ocr Languages Selection", "Ocr Languages Selected and saved.");
 
@@ -125,62 +138,121 @@ namespace TBChestTracker
             this.Close();            
         }
 
+        private void MoveUp()
+        {
+            var items = SelectedLanguagesBox.SelectedItems.Cast<OcrLanguage>();
+            foreach (var item in items.ToList())
+            {
+                var pos = SelectedLanguageList.IndexOf(item);
+                if (pos > 0)
+                {
+                    SelectedLanguageList.Move(pos, pos - 1);
+                }
+            }
+        }
+        private void MoveDown()
+        {
+            var items = SelectedLanguagesBox.SelectedItems.Cast<OcrLanguage>();
+            foreach (var item in items.ToList())
+            {
+                var pos = SelectedLanguageList.IndexOf(item);
+                if (pos < SelectedLanguageList.Count)
+                {
+                    SelectedLanguageList.Move(pos, pos + 1);
+                }
+            }
+        }
+        private void MoveToStart()
+        {
+            var items = SelectedLanguagesBox.SelectedItems.Cast<OcrLanguage>();
+            var start = 0;
+            foreach (var item in items.ToList())
+            {
+                var pos = SelectedLanguageList.IndexOf(item);
+                if (pos > 0)
+                {
+                    SelectedLanguageList.Move(pos, start);
+                }
+                start++;
+            }
+        }
+        private void MoveToEnd()
+        {
+            var items = SelectedLanguagesBox.SelectedItems.Cast<OcrLanguage>();
+            var end = SelectedLanguageList.Count - 1;
+            foreach (var item in items.ToList())
+            {
+                var pos = SelectedLanguageList.IndexOf(item);
+                if (pos < SelectedLanguageList.Count)
+                {
+                    SelectedLanguageList.Move(pos, end);
+                    end--;
+                }
+            }
+        }
+        private void MoveLeft()
+        {
+            var items = SelectedLanguagesBox.SelectedItems.Cast<OcrLanguage>();
+            foreach (var item in items.ToList())
+            {
+                OcrLanguagesList.Add(item);
+                SelectedLanguageList.Remove(item);
+            }
+            Resort();
+        }
 
+        private void MoveRight()
+        {
+            var item = AvailableLanguagesBox.SelectedItems.Cast<OcrLanguage>();
+            foreach (var i in item.ToList())
+            {
+                SelectedLanguageList.Add(i);
+                OcrLanguagesList.Remove(i);
+            }
+        }
+
+        private void MoveAllLeft()
+        {
+            if (SelectedLanguageList.Count > 0)
+            {
+                foreach (var item in SelectedLanguageList.ToList())
+                {
+                    OcrLanguagesList.Add(item);
+                }
+                SelectedLanguageList.Clear();
+            }
+        }
+
+        private void MoveAllRight()
+        {
+            if (OcrLanguagesList.Count > 0)
+            {
+                foreach (var item in OcrLanguagesList.ToList())
+                {
+                    SelectedLanguageList.Add(item);
+                }
+                OcrLanguagesList.Clear();
+            }
+        }
         private void SelectedListControl_Click(object sender, RoutedEventArgs e)
         {
             var fb = (FancyButton)e?.OriginalSource;
             var tag = fb?.Tag?.ToString().ToLower();
             if (tag.Equals("moveup"))
             {
-                var items = SelectedLanguagesBox.SelectedItems.Cast<OcrLanguage>();
-                foreach (var item in items.ToList())
-                {
-                    var pos = SelectedLanguageList.IndexOf(item);
-                    if (pos > 0)
-                    {
-                        SelectedLanguageList.Move(pos, pos - 1);
-                    }
-                }
+                MoveUp();
             }
             else if (tag.Equals("movedown"))
             {
-                var items = SelectedLanguagesBox.SelectedItems.Cast<OcrLanguage>();
-                foreach (var item in items.ToList())
-                {
-                    var pos = SelectedLanguageList.IndexOf(item);
-                    if (pos < SelectedLanguageList.Count)
-                    {
-                        SelectedLanguageList.Move(pos, pos + 1);
-                    }
-                }
+                MoveDown();   
             }
             else if (tag.Equals("movetostart"))
             {
-                var items = SelectedLanguagesBox.SelectedItems.Cast<OcrLanguage>();
-                var start = 0;
-                foreach (var item in items.ToList())
-                {
-                    var pos = SelectedLanguageList.IndexOf(item);
-                    if (pos > 0)
-                    {
-                        SelectedLanguageList.Move(pos, start);
-                    }
-                    start++;
-                }
+                MoveToStart();
             }
             else if (tag.Equals("movetoend"))
             {
-                var items = SelectedLanguagesBox.SelectedItems.Cast<OcrLanguage>();
-                var end = SelectedLanguageList.Count - 1;
-                foreach (var item in items.ToList())
-                {
-                    var pos = SelectedLanguageList.IndexOf(item);
-                    if (pos < SelectedLanguageList.Count)
-                    {
-                        SelectedLanguageList.Move(pos, end);
-                        end--;
-                    }
-                }
+                MoveToEnd();
             }
 
         }
@@ -191,43 +263,19 @@ namespace TBChestTracker
             var tag = fb?.Tag?.ToString().ToLower();
             if (tag.Equals("left"))
             {
-                var items = SelectedLanguagesBox.SelectedItems.Cast<OcrLanguage>();
-                foreach(var item in items.ToList()) {
-                    OcrLanguagesList.Add(item);
-                    SelectedLanguageList.Remove(item);
-                }
-                Resort();
+                MoveLeft();
             }
             else if(tag.Equals("right"))
             {
-                var item = AvailableLanguagesBox.SelectedItems.Cast<OcrLanguage>();
-                foreach (var i in item.ToList())
-                {
-                    SelectedLanguageList.Add(i);
-                    OcrLanguagesList.Remove(i);
-                }
+                MoveRight();
             }
             else if(tag.Equals("moveallleft"))
             {
-                if (SelectedLanguageList.Count > 0)
-                {
-                    foreach (var item in SelectedLanguageList.ToList())
-                    {
-                        OcrLanguagesList.Add(item);
-                    }
-                    SelectedLanguageList.Clear();
-                }
+                MoveAllLeft();
             }
             else if(tag.Equals("moveallright"))
             {
-                if (OcrLanguagesList.Count > 0)
-                {
-                    foreach (var item in OcrLanguagesList.ToList())
-                    {
-                        SelectedLanguageList.Add(item);
-                    }
-                    OcrLanguagesList.Clear();
-                }
+                MoveAllRight();
             }
         }
     }
