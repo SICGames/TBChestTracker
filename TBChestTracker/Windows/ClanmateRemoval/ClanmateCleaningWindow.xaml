@@ -1,0 +1,33 @@
+﻿<Window x:Class="TBChestTracker.Windows.ClanmateRemoval.ClanmateCleaningWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TBChestTracker.Windows.ClanmateRemoval"
+        xmlns:ui="clr-namespace:com.KonquestUI.Controls;assembly=KonquestUI"
+        mc:Ignorable="d"
+        Title="Clanmate Cleaner" Height="450" Width="800" Topmost="True" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Closing="Window_Closing">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Clanmate Cleaner" FontSize="16" FontWeight="Bold" Margin="5,10"/>
+        <TextBlock Grid.Row="1" Text="Delete any clanmates that are no longer in clan from chestdata.csv file. Select clanmates no longer in clan and click on trash icon to delete." Margin="5"/>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <ListView x:Name="CLANMATE_VIEW" Grid.Column="0" ItemsSource="{Binding Clanmates}"/>
+            <StackPanel Grid.Column="1" Orientation="Vertical" Width="32">
+                <ui:FancyImageButton x:Name="DeleteClanmateBtn" ToolTip="Delete Clanmates" ImageSource="/Images/ui/trashIcon.png" Width="24" Height="24" Click="DeleteClanmateBtn_Click" IsEnabled="{Binding ElementName=CLANMATE_VIEW, Path=SelectedItems.Count, Converter={StaticResource NotZeroBooleanConverter}}"/>
+            </StackPanel>
+        </Grid>
+        <DockPanel LastChildFill="True" Grid.Row="3" Height="32">
+            <ui:FancyButton x:Name="CloseBtn" Click="CloseBtn_Click" HoverBrush="#a00077ff" Foreground="White" Text="Close" Background="#0077ff" Width="100" Height="24" Corners="5"/>
+        </DockPanel>
+    </Grid>
+</Window>

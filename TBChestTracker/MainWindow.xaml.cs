@@ -33,6 +33,7 @@ using TBChestTracker.Windows.BuildingChests;
 using TBChestTracker.Windows.OCRCorrection;
 using TBChestTracker.Web;
 using TBChestTracker.Windows;
+using TBChestTracker.Windows.ClanmateRemoval;
 
 namespace TBChestTracker
 {
@@ -1796,6 +1797,12 @@ namespace TBChestTracker
         {
             ChestDataMergerWindow chestDataMergerWindow = new ChestDataMergerWindow();
             chestDataMergerWindow.Show();
+        }
+
+        private void CleanClanmates_Click(object sender, RoutedEventArgs e)
+        {
+            ClanmateCleaningWindow clanmateCleaningWindow = new ClanmateCleaningWindow();
+            clanmateCleaningWindow.Show();
         }
     }
 }

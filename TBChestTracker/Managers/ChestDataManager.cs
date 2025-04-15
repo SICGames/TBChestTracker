@@ -69,6 +69,7 @@ namespace TBChestTracker
                 return false;
             }
         }
+
         public void Save(string filename = "", List<ChestsDatabase> database = null)
         {
             if (String.IsNullOrEmpty(filename)) { 
@@ -95,7 +96,32 @@ namespace TBChestTracker
                 Loggio.Error(ex, "Chest Data Manager", "Couldn't save chest data.");
             }
         }
+        public void CreateBackup()
+        {
+            if (File.Exists(DefaultChestDatabaseFile) == false)
+            {
+                return;
+            }
+            try
+            {
+                var backupfile = DefaultChestDatabaseFile;
+                var ext = Path.GetExtension(backupfile);
+                backupfile = backupfile.Replace(ext, ".old");
+                using (var streamreader = new StreamReader(DefaultChestDatabaseFile))
+                {
+                    using(var streamwriter  = new StreamWriter(backupfile))
+                    {
+                        streamwriter.WriteLine(streamreader.ReadToEnd());
+                        streamwriter.Close();
+                    }
+                    streamreader.Close();
+                }
 
+            }
+            catch (Exception ex)
+            {
+            }
+        }
         public void ValidateChestPoints(ClanChestSettings clanChestSettings, System.Action<bool> fixedResult)
         {
             var usePoints = clanChestSettings.GeneralClanSettings.ChestOptions == ChestOptions.UsePoints;

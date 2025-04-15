@@ -29,21 +29,33 @@ namespace TBChestTracker
 
         private void CreateClanDatabaseBtn_Click(object sender, RoutedEventArgs e)
         {
+
             ClanManager.Instance.ClanDatabaseManager.Create(result =>
             {
                 if (result)
                 {
                     this.DialogResult = true;
-                    ClanManager.Instance.AddOcrProfile("Default", null);
-                    ClanManager.Instance.SetCurrentOcrProfile("Default");
+                    try
+                    {
+                        ClanManager.Instance.AddOcrProfile("Default", null);
+                        ClanManager.Instance.SetCurrentOcrProfile("Default");
+                    }
+                    catch(Exception ex)
+                    {
+                        if(ex is ArgumentException)
+                        {
+                            if (MessageBox.Show("There's already an existing OCR Profile for the created clan. This is catching the exception that is being tossed. You may need to re-run Ocr Studio to ensure everything is correct.") == MessageBoxResult.OK)
+                            {
+                                ClanManager.Instance.SetCurrentOcrProfile("Default");
+                            }
+                        }
+                    }
                     ClanManager.Instance.ClanDatabaseManager.Save();
                     AppContext.Instance.IsCurrentClandatabase = true;
                     AppContext.Instance.NewClandatabaseBeenCreated = true;
                     AppContext.Instance.OCRCompleted = false;
                     AppContext.Instance.RequiresOCRWizard = true;
                     AppContext.Instance.IsAutomationPlayButtonEnabled = false;
-
-                    
                     this.Close();
                 }
                 

@@ -288,6 +288,8 @@
                 <MenuItem Header="{x:Static ResourceStrings:Strings.Tools}">
                     <MenuItem Header="{x:Static ResourceStrings:Strings.ChestBuilder}" x:Name="ChestBuilderMenuItem" Click="ChestBuilderMenuItem_Click"/>
                     <Separator/>
+                    <MenuItem Header="Clean Clanmates" x:Name="CleanClanmates" Click="CleanClanmates_Click"/>
+                    <Separator/>
                     <MenuItem Header="OCR Correction Tool" x:Name="OcrCorrectionToolMenuItem" Click="OcrCorrectionToolMenuItem_Click"/>
                     <Separator/>
                     <MenuItem x:Name="BuildChests" Header="Build Clan Chests" Click="BuildChests_Click"/>

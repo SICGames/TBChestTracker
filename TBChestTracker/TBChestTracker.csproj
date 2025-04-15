@@ -267,6 +267,9 @@
       <DependentUpon>ClanInsightsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ClanInsights\ClanInsightsData.cs" />
+    <Compile Include="Windows\ClanmateRemoval\ClanmateCleaningWindow.xaml.cs">
+      <DependentUpon>ClanmateCleaningWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\Clan\ClanWealthBuilderWindow.xaml.cs">
       <DependentUpon>ClanWealthBuilderWindow.xaml</DependentUpon>
     </Compile>
@@ -521,6 +524,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\ClanInsights\ClanInsightsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\ClanmateRemoval\ClanmateCleaningWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
