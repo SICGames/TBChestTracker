@@ -369,7 +369,8 @@
                Click="OCRWizardButton_Click"
                ToolTip="{x:Static ResourceStrings:Strings.LaunchOCRWizardTooltip}"
                IsEnabled="True"/>
-                <UI:FancyImageButton Height="24" 
+               
+               <UI:FancyImageButton Height="24" 
                                      Width="24" 
                                      HighlightBrush="#0088ff" 
                                      HighlightStrokeBrush="#0044FF"
@@ -379,16 +380,9 @@
                                      ToolTip="Build Clan Chests after you had collected chests" 
                                      ImageSource="pack://application:,,,/Images/ui/BuildIcon.png"
                                      Command="Commands:CustomCommandBindings.BuildClanChests"/>
-                <UI:FancyImageButton Height="24" Width="24" 
-               HighlightOpacity="0.25" 
-               HighlightBrush="#0088ff" HighlightStrokeThickness="2" 
-               HighlightStrokeBrush="#0044FF" Corners="0"
-               ImageSource="pack://application:,,,/Images/ui/ConsoleIcon.png"
-               ToolTip="{x:Static ResourceStrings:Strings.ConsoleWindowTooltip}"
-               IsEnabled="False"
-               x:Name="ConsoleButton"
-               Click="ConsoleButton_Click"/>
+                
                 <Separator/>
+                
                 <UI:FancyImageButton Height="24" Width="24" 
                      HighlightOpacity="0.25" 
                      HighlightBrush="#0088ff" HighlightStrokeThickness="2" 

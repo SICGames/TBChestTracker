@@ -58,8 +58,6 @@ namespace TBChestTracker
         private CaptainHook CaptainHook { get; set; }
         
         //public AppContext appContext { get; private set; }
-        
-        ConsoleWindow consoleWindow { get; set; }
         CancellationTokenSource CancellationTokenSource { get; set; }
         SettingsWindow SettingsWindow { get; set; }
         OCRWizardWindow OCRWizardWindow { get; set; }
@@ -103,7 +101,6 @@ namespace TBChestTracker
             this.DataContext = AppContext.Instance;
             this.Closing += MainWindow_Closing;
             //recentlyOpenedDatabases = new RecentDatabase();
-            consoleWindow = new ConsoleWindow();
         }
         #endregion
 
@@ -1571,14 +1568,7 @@ namespace TBChestTracker
         }
         #endregion
 
-        #region Show Console
-        private void ConsoleMenuButton_Click(object sender, RoutedEventArgs e)
-        {
-            //consoleWindow.Show();
-        }
-
-        #endregion
-
+        
         #region Validate Chest Data Integrity
         
         #endregion
@@ -1616,20 +1606,7 @@ namespace TBChestTracker
         #endregion
 
         #endregion
-
-        private void ConsoleButton_Click(object sender, RoutedEventArgs e)
-        {
-            
-            /*
-            if(consoleWindow != null) consoleWindow.Show();
-            else
-            {
-                consoleWindow = new ConsoleWindow();
-                consoleWindow.Show();
-            }
-            */
-        }
-
+     
         private void OCRWizardButton_Click(object sender, RoutedEventArgs e)
         {
             if (OCRWizardWindow != null)
@@ -1749,8 +1726,6 @@ namespace TBChestTracker
         private void CloseClanProject()
         {
             ClanManager.UnloadClan();
-            //ClanManager = null;
-            // com.HellStormGames.Logging.Console.Destroy();
         }
         private void CloseDatabase_Click(object sender, RoutedEventArgs e)
         {

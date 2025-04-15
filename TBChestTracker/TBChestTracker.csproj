@@ -280,9 +280,6 @@
     <Compile Include="ConsoleInterlop\Events\ConsoleInterlopEventArgs.cs" />
     <Compile Include="Progresses\ClanMovingProgress.cs" />
     <Compile Include="Progresses\ConsoleInterlopProgress.cs" />
-    <Compile Include="Windows\Console\ConsoleWindow.xaml.cs">
-      <DependentUpon>ConsoleWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Console\Console.cs" />
     <Compile Include="Console\ConsoleData.cs" />
     <Compile Include="Converters\EnumToRadioOptionConverter.cs" />
@@ -552,10 +549,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\Clan\ClanWizardWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\Console\ConsoleWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
