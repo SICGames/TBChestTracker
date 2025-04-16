@@ -3,8 +3,21 @@
 ![GitHub contributors](https://img.shields.io/github/contributors/SICGames/TBChestTracker)
 [![Github All Releases](https://img.shields.io/github/downloads/SICGames/TBChestTracker/total.svg)]()
 
-## Iimportant Note
+## Important Note
 as of 4/20/2025, this project is no longer being worked on or maintained. 
+This is a very high dependant program made in C# WPF. See CONTRIBUTE.md for more information. All these can be obtained through my account
+Requirements are as follows:
+- Visual Studio 2022
+- Knowledge in C# and C++
+- [libTessy](https://github.com/SICGames/libTessy)
+- [Tessy](https://github.com/SICGames/Tessy)
+- [KonquestUI](https://github.com/SICGames/KonquestUI)
+- [libSnapture](https://github.com/SICGames/libSnapture)
+- [Snapster](https://github.com/SICGames/Snapster)
+- [Loggio.NET](https://github.com/SICGames/Loggio.NET)
+- [ChestBuilder](https://github.com/SICGames/ChestBoxBuilder)
+- TB Chest Tracker NodeJS related stuff (can be obtained through installation)
+- [CrashBox](https://github.com/SICGames/CrashBox)
 
 ## Description
 TotalBattle Chest Tracker was designed to easily track your clan's chest count without worrying about installing various dependancies to get it working. You don't need to install Tesseract OCR, configure your enviroment path to TESSDATA_PATH and figure out how to use a simple program. Total Battle Chest Tracker is install, and boom you're in. Create clan and start counting chests. 
