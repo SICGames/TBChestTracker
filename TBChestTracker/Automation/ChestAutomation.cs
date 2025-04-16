@@ -339,7 +339,6 @@ namespace TBChestTracker.Automation
 
                     //-- inside TesseractPlayground - Blur, Threshold gave better results on foreign names.
                     var blurStrength = 1;
-                    var brightness = ocrSettings.GlobalBrightness;
                     var threshold = new Gray(ocrSettings.Threshold); //-- 85
                     var maxThreshold = new Gray(ocrSettings.MaxThreshold); //--- 255
 

@@ -94,8 +94,7 @@ namespace TBChestTracker.Pages.Settings
             //-- let's ensure we have the updated image preview
             ocrResultsListView.DataContext = this;
             var ocr = SettingsManager.Instance.Settings.OCRSettings;
-            UpdatePreviewImage(ocr.GlobalBrightness, (int)ocr.Threshold, (int)ocr.MaxThreshold);
-            
+            UpdatePreviewImage((int)ocr.Threshold, (int)ocr.MaxThreshold);
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -120,9 +119,7 @@ namespace TBChestTracker.Pages.Settings
         {
             var value = ((FancyNumericValue)sender).Value;
             var ocr = SettingsManager.Instance.Settings.OCRSettings;
-            SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness = value;
-            UpdatePreviewImage(value, ocr.Threshold, ocr.MaxThreshold);
-
+            UpdatePreviewImage(ocr.Threshold, ocr.MaxThreshold);
         }
 
         private void ShowTessyResults(Bitmap bitmap)
@@ -183,7 +180,7 @@ namespace TBChestTracker.Pages.Settings
             return Task.Run(() => ShowTessyResults(bitmap));
         }
 
-        private void UpdatePreviewImage(double brightness, int threshold, int maxthreshold)
+        private void UpdatePreviewImage(int threshold, int maxthreshold)
         {
             if (String.IsNullOrEmpty(SettingsManager.Instance.Settings.OCRSettings.PreviewImage) == false)
             {
@@ -214,20 +211,18 @@ namespace TBChestTracker.Pages.Settings
         private void ThresholdNumericValue_ValueChanged(object sender, RoutedEventArgs e)
         {
             var fancyNumeric = (FancyNumericValue)sender;
-            var brightness = SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness;
-            UpdatePreviewImage((double)brightness, (int)fancyNumeric.Value, SettingsManager.Instance.Settings.OCRSettings.MaxThreshold);
+            UpdatePreviewImage((int)fancyNumeric.Value, SettingsManager.Instance.Settings.OCRSettings.MaxThreshold);
         }
 
         private void MaxThresholdNumericValue_ValueChanged(object sender, RoutedEventArgs e)
         {
             var fancyNumeric = (FancyNumericValue)sender;
-            var brightness = SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness;
-            UpdatePreviewImage(brightness, SettingsManager.Instance.Settings.OCRSettings.Threshold, (int)fancyNumeric.Value);
+            UpdatePreviewImage(SettingsManager.Instance.Settings.OCRSettings.Threshold, (int)fancyNumeric.Value);
         }
 
         private void EnableImageFilterCheckBox_Click(object sender, RoutedEventArgs e)
         {
-            UpdatePreviewImage(SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness, SettingsManager.Instance.Settings.OCRSettings.Threshold, SettingsManager.Instance.Settings.OCRSettings.MaxThreshold);
+            UpdatePreviewImage(SettingsManager.Instance.Settings.OCRSettings.Threshold, SettingsManager.Instance.Settings.OCRSettings.MaxThreshold);
         }
 
         private async void PreviewOCRButton_Click(object sender, RoutedEventArgs e)

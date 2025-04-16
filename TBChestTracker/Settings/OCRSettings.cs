@@ -60,22 +60,6 @@ namespace TBChestTracker
                 _languages = value;
             }
         }
-    
-
-        private double? _GlobalBrightness;
-        public double GlobalBrightness
-        {
-            get
-            {
-                return _GlobalBrightness.GetValueOrDefault(0.65);
-            }
-            set
-            {
-                _GlobalBrightness = value;
-                OnPropertyChanged(nameof(GlobalBrightness));
-            }
-        }
-
         private ObservableCollection<String> _tags;
         public ObservableCollection<String> Tags 
         {

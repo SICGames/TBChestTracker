@@ -46,16 +46,8 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Global OCR Brightness" Margin="5" Grid.Column="0" Grid.Row="0"/>
             <TextBlock Text="Threshold" Margin="5" Grid.Column="0" Grid.Row="1"/>
             <TextBlock Text="Max Threshold" Margin="5" Grid.Column="0" Grid.Row="2"/>
-            <ui:FancyNumericValue BorderBrush="LightGray" 
-                    HoverBrush="SkyBlue"
-                    BorderThickness="2" 
-                    Minimal="0.0" Maximum="1.0" Steps="0.01" Value="{Binding GlobalBrightness}"
-                    ValueChanged="FancyNumericValue_ValueChanged"
-                    CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" 
-                    Grid.Row="0" Grid.Column="1"/>
             <ui:FancyNumericValue x:Name="ThresholdNumericValue" BorderBrush="LightGray" 
                     HoverBrush="SkyBlue"
                     BorderThickness="2" 

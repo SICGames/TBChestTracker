@@ -197,7 +197,7 @@ namespace TBChestTracker.Windows.OCRStudio
             }));
         }
 
-        private System.Drawing.Bitmap ApplyImageFiltering(System.Drawing.Bitmap src, double brightness, int threshold, int maxthreshold)
+        private System.Drawing.Bitmap ApplyImageFiltering(System.Drawing.Bitmap src, int threshold, int maxthreshold)
         {
             System.Drawing.Bitmap result = null;
             Image<Gray, byte> image = ((System.Drawing.Bitmap)src).ToImage<Gray, byte>();
@@ -233,7 +233,7 @@ namespace TBChestTracker.Windows.OCRStudio
                 if(EnableImageFiltering)
                 {
                     var ocr = SettingsManager.Instance.Settings.OCRSettings;
-                    FinalBitmap = ApplyImageFiltering(bmp, ocr.GlobalBrightness, ocr.Threshold, ocr.MaxThreshold);
+                    FinalBitmap = ApplyImageFiltering(bmp,ocr.Threshold, ocr.MaxThreshold);
                 }
                 else
                 {
