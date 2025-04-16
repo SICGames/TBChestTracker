@@ -337,6 +337,8 @@ namespace TBChestTracker.Automation
                     var bitmap = image.ToBitmap();
                     var ocrSettings = SettingsManager.Instance.Settings.OCRSettings;
 
+                    //-- inside TesseractPlayground - Blur, Threshold gave better results on foreign names.
+                    var blurStrength = 1;
                     var brightness = ocrSettings.GlobalBrightness;
                     var threshold = new Gray(ocrSettings.Threshold); //-- 85
                     var maxThreshold = new Gray(ocrSettings.MaxThreshold); //--- 255
@@ -366,9 +368,10 @@ namespace TBChestTracker.Automation
                     }
 
                     outputImage = ImageEffects.ConvertToGrayscale(original_image, bSave, outputPath);
-                    outputImage = ImageEffects.Brighten(outputImage, brightness, bSave, outputPath);
-                    outputImage = ImageEffects.Resize(outputImage, 3, Emgu.CV.CvEnum.Inter.Cubic, bSave, outputPath);
+                    outputImage = ImageEffects.Blur(outputImage, blurStrength);
+                    //outputImage = ImageEffects.Brighten(outputImage, brightness, bSave, outputPath);
                     outputImage = ImageEffects.ThresholdBinaryInv(outputImage, threshold, maxThreshold, bSave, outputPath);
+                    outputImage = ImageEffects.Resize(outputImage, 3, Emgu.CV.CvEnum.Inter.Cubic, bSave, outputPath);
                     outputImage = 255 - outputImage;
                     if (ocrSettings.SaveScreenCaptures)
                     {

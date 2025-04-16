@@ -20,6 +20,7 @@ using TBChestTracker.Extensions;
 using com.HellStormGames.Diagnostics;
 using Emgu.CV.Structure;
 using Emgu.CV;
+using TBChestTracker.Effects;
 
 namespace TBChestTracker.Windows.OCRStudio
 {
@@ -200,16 +201,17 @@ namespace TBChestTracker.Windows.OCRStudio
         {
             System.Drawing.Bitmap result = null;
             Image<Gray, byte> image = ((System.Drawing.Bitmap)src).ToImage<Gray, byte>();
-            var imageBlurred = image.SmoothGaussian(3);
-            var imageBrightened = imageBlurred.Mul(brightness) + brightness;
-            var imageScaled = imageBrightened.Resize(2, Emgu.CV.CvEnum.Inter.Cubic);
+            var outputimage = image.Mat;
+            outputimage = ImageEffects.Blur(outputimage, 1);
             var threshold_gray = new Gray(threshold);
             var maxThreshold_gray = new Gray(maxthreshold);
-            var imageThreshold = imageScaled.ThresholdBinaryInv(threshold_gray, maxThreshold_gray);
-            
-            var invertedMat = 255 - imageThreshold;
-            result = invertedMat.ToBitmap();
+            outputimage = ImageEffects.ThresholdBinaryInv(outputimage, threshold_gray, maxThreshold_gray);
+            outputimage = ImageEffects.Resize(outputimage, 2, Emgu.CV.CvEnum.Inter.NearestExact);
+            outputimage = 255 - outputimage;
+            result = outputimage.ToBitmap();
             PreviewImage = result.AsBitmapSource();
+            outputimage.Dispose();
+            outputimage = null;
             image.Dispose();
             image = null;
             return result;

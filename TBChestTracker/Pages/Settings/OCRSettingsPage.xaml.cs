@@ -26,6 +26,7 @@ using com.HellStormGames.OCR;
 using TBChestTracker.Engine;
 using System.Collections.ObjectModel;
 using TBChestTracker.ViewModels;
+using TBChestTracker.Effects;
 
 namespace TBChestTracker.Pages.Settings
 {
@@ -187,27 +188,22 @@ namespace TBChestTracker.Pages.Settings
             if (String.IsNullOrEmpty(SettingsManager.Instance.Settings.OCRSettings.PreviewImage) == false)
             {
                 var bmp = System.Drawing.Bitmap.FromFile(SettingsManager.Instance.Settings.OCRSettings.PreviewImage);
-               
                 Image<Gray, byte> image = ((System.Drawing.Bitmap)bmp).ToImage<Gray, byte>();
-                
-                var imageBrightened = image.Mul(brightness) + brightness;
-                var imageScaled = imageBrightened.Resize(2, Emgu.CV.CvEnum.Inter.Cubic);
-
                 var threshold_gray = new Gray(threshold);
                 var maxThreshold_gray = new Gray(maxthreshold);
+                var blurStrength = 1;
+                var outputimage = ImageEffects.Blur(image.Mat, blurStrength);
+                outputimage = ImageEffects.ThresholdBinaryInv(outputimage, threshold_gray, maxThreshold_gray);
+                outputimage = ImageEffects.Resize(outputimage, 2, Emgu.CV.CvEnum.Inter.NearestExact);
+                outputimage = 255 - outputimage;
+                
+                ImagePreview.Source = outputimage.ToBitmap().AsBitmapSource();
 
-                var imageThreshold = imageScaled.ThresholdBinaryInv(threshold_gray, maxThreshold_gray);
-                imageThreshold = 255 - imageThreshold;
-                ImagePreview.Source = imageThreshold.ToBitmap().AsBitmapSource();
                 SettingsManager.Instance.Settings.OCRSettings.Threshold = threshold;
                 SettingsManager.Instance.Settings.OCRSettings.MaxThreshold = maxthreshold;
-                imageThreshold.Dispose();
-                imageThreshold = null;
-                imageScaled.Dispose();
-                imageScaled = null;
-                imageBrightened.Dispose();
-                imageBrightened = null;
-
+                
+                outputimage.Dispose();
+                outputimage = null;
                 image.Dispose();
                 image = null;
                 bmp.Dispose();
