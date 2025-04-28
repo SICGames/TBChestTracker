@@ -9,6 +9,7 @@ This is a very high dependant program made in C# WPF. See CONTRIBUTE.md for more
 Requirements are as follows:
 - Visual Studio 2022
 - Knowledge in C# and C++
+- [CaptainHook](https://github.com/SICGames/CaptainHook) - Obtained through NuGet packages within project. Or it should.
 - [libTessy](https://github.com/SICGames/libTessy)
 - [Tessy](https://github.com/SICGames/Tessy)
 - [KonquestUI](https://github.com/SICGames/KonquestUI)
