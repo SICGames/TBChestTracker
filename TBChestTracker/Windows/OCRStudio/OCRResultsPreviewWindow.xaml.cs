@@ -197,17 +197,26 @@ namespace TBChestTracker.Windows.OCRStudio
             }));
         }
 
-        private System.Drawing.Bitmap ApplyImageFiltering(System.Drawing.Bitmap src, int threshold, int maxthreshold)
+        private System.Drawing.Bitmap ApplyImageFiltering(System.Drawing.Bitmap src, double? globalbrightness, int threshold, int maxthreshold, bool applyBlur, bool applyInvert, int scaleFactor)
         {
             System.Drawing.Bitmap result = null;
             Image<Gray, byte> image = ((System.Drawing.Bitmap)src).ToImage<Gray, byte>();
             var outputimage = image.Mat;
-            outputimage = ImageEffects.Blur(outputimage, 1);
+            outputimage = ImageEffects.Brighten(outputimage, globalbrightness.Value);
+            if (applyBlur)
+            {
+                outputimage = ImageEffects.MedianBlur(outputimage, 1);
+            }
+
             var threshold_gray = new Gray(threshold);
             var maxThreshold_gray = new Gray(maxthreshold);
             outputimage = ImageEffects.ThresholdBinaryInv(outputimage, threshold_gray, maxThreshold_gray);
-            outputimage = ImageEffects.Resize(outputimage, 2, Emgu.CV.CvEnum.Inter.NearestExact);
-            outputimage = 255 - outputimage;
+            outputimage = ImageEffects.Resize(outputimage, scaleFactor, Emgu.CV.CvEnum.Inter.NearestExact);
+            if (applyInvert)
+            {
+                outputimage = 255 - outputimage;
+            }
+
             result = outputimage.ToBitmap();
             PreviewImage = result.AsBitmapSource();
             outputimage.Dispose();
@@ -233,7 +242,7 @@ namespace TBChestTracker.Windows.OCRStudio
                 if(EnableImageFiltering)
                 {
                     var ocr = SettingsManager.Instance.Settings.OCRSettings;
-                    FinalBitmap = ApplyImageFiltering(bmp,ocr.Threshold, ocr.MaxThreshold);
+                    FinalBitmap = ApplyImageFiltering(bmp,ocr.GlobalBrightness, ocr.Threshold, ocr.MaxThreshold, ocr.ApplyBlur, ocr.ApplyInvert, ocr.ScaleFactor);
                 }
                 else
                 {

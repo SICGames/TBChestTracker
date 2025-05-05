@@ -288,10 +288,6 @@
     <Compile Include="Converters\EnumToRadioOptionConverter.cs" />
     <Compile Include="Converters\MidPointValueConverter.cs" />
     <Compile Include="CrashBox\CrashBox.cs" />
-    <Compile Include="CrashBox\CrashBoxDialog.cs" />
-    <Compile Include="CrashBox\CrashBoxWindow.xaml.cs">
-      <DependentUpon>CrashBoxWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="CrashBox\Events\CrashBoxEvents.cs" />
     <Compile Include="CrashBox\Events\CrashBoxExceptionArgs.cs" />
     <Compile Include="CustomControls\DpiAwareImage.cs" />
@@ -532,10 +528,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\Clan\ClanWealthBuilderWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CrashBox\CrashBoxWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

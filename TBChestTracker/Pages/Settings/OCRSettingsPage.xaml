@@ -45,21 +45,44 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
+            <TextBlock Text="Global Brightness" Margin="5" Grid.Column="0" Grid.Row="0"/>
             <TextBlock Text="Threshold" Margin="5" Grid.Column="0" Grid.Row="1"/>
             <TextBlock Text="Max Threshold" Margin="5" Grid.Column="0" Grid.Row="2"/>
+            <TextBlock Text="Apply Blur" Margin="5" Grid.Column="0" Grid.Row="3"/>
+            <TextBlock Text="Invert Image" Margin="5" Grid.Column="0" Grid.Row="4"/>
+            <TextBlock Text="Scale Image" Margin="5" Grid.Column="0" Grid.Row="5"/>
+
+            <ui:FancyNumericValue x:Name="GlobalBrightnessNumericValue" BorderBrush="LightGray" 
+                    HoverBrush="SkyBlue"
+                    BorderThickness="2" 
+                    Minimal="0.0" Maximum="5.0" Steps="0.25" Value="{Binding GlobalBrightness}"
+                    ValueChanged="GlobalBrightnessNumericValue_ValueChanged"
+                    CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1"/>
+            
             <ui:FancyNumericValue x:Name="ThresholdNumericValue" BorderBrush="LightGray" 
                     HoverBrush="SkyBlue"
                     BorderThickness="2" 
                     Minimal="0.0" Maximum="255" Steps="1.0" Value="{Binding Threshold}"
                     ValueChanged="ThresholdNumericValue_ValueChanged"
                     CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1"/>
+            
             <ui:FancyNumericValue x:Name="MaxThresholdNumericValue" BorderBrush="LightGray" 
                     HoverBrush="SkyBlue"
                     BorderThickness="2" 
                     Minimal="0.0" Maximum="255" Steps="1.0" Value="{Binding MaxThreshold}"
                     ValueChanged="MaxThresholdNumericValue_ValueChanged"
                    CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="1"/>
+            <CheckBox IsChecked="{Binding ApplyBlur}" Margin="5" Grid.Column="1" Grid.Row="3" x:Name="ApplyBlurCheckbox" Checked="ApplyBlurCheckbox_Checked" Unchecked="ApplyBlurCheckbox_Unchecked"/>
+            <CheckBox IsChecked="{Binding ApplyInvert}" Margin="5" Grid.Column="1" Grid.Row="4" x:Name="ApplyInvertCheckbox" Checked="ApplyInvertCheckbox_Checked" Unchecked="ApplyInvertCheckbox_Unchecked"/>
+            <ui:FancyNumericValue x:Name="ScaleNumericValue" BorderBrush="LightGray" 
+                    HoverBrush="SkyBlue"
+                    BorderThickness="2" 
+                    Minimal="0" Maximum="5" Steps="1" Value="{Binding ScaleFactor}"
+                    ValueChanged="ScaleNumericValue_ValueChanged"
+                    CornerRadius="2" Height="22" Margin="5" Width="100" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="5" Grid.Column="1"/>
         </Grid>
 
         <TextBlock Text="Save Screen Captures?" Grid.Column="0" Grid.Row="10" Margin="5"/>

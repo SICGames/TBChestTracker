@@ -94,7 +94,7 @@ namespace TBChestTracker.Pages.Settings
             //-- let's ensure we have the updated image preview
             ocrResultsListView.DataContext = this;
             var ocr = SettingsManager.Instance.Settings.OCRSettings;
-            UpdatePreviewImage((int)ocr.Threshold, (int)ocr.MaxThreshold);
+            UpdatePreviewImage(ocr.GlobalBrightness.Value, (int)ocr.Threshold, (int)ocr.MaxThreshold, ocr.ApplyBlur, ocr.ApplyInvert, ocr.ScaleFactor);
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -114,13 +114,14 @@ namespace TBChestTracker.Pages.Settings
                 SettingsManager.Instance.Settings.OCRSettings.TessDataFolder = dialog.FileName;
             }
         }
-
+        /*
         private void FancyNumericValue_ValueChanged(object sender, RoutedEventArgs e)
         {
             var value = ((FancyNumericValue)sender).Value;
             var ocr = SettingsManager.Instance.Settings.OCRSettings;
             UpdatePreviewImage(ocr.Threshold, ocr.MaxThreshold);
         }
+        */
 
         private void ShowTessyResults(Bitmap bitmap)
         {
@@ -180,25 +181,40 @@ namespace TBChestTracker.Pages.Settings
             return Task.Run(() => ShowTessyResults(bitmap));
         }
 
-        private void UpdatePreviewImage(int threshold, int maxthreshold)
+        private void UpdatePreviewImage(double globalbrightness, int threshold, int maxthreshold, bool applyblur, bool applyinvert, int scaleFactor)
         {
             if (String.IsNullOrEmpty(SettingsManager.Instance.Settings.OCRSettings.PreviewImage) == false)
             {
                 var bmp = System.Drawing.Bitmap.FromFile(SettingsManager.Instance.Settings.OCRSettings.PreviewImage);
                 Image<Gray, byte> image = ((System.Drawing.Bitmap)bmp).ToImage<Gray, byte>();
+
                 var threshold_gray = new Gray(threshold);
                 var maxThreshold_gray = new Gray(maxthreshold);
-                var blurStrength = 1;
-                var outputimage = ImageEffects.Blur(image.Mat, blurStrength);
-                outputimage = ImageEffects.ThresholdBinaryInv(outputimage, threshold_gray, maxThreshold_gray);
-                outputimage = ImageEffects.Resize(outputimage, 2, Emgu.CV.CvEnum.Inter.NearestExact);
-                outputimage = 255 - outputimage;
-                
-                ImagePreview.Source = outputimage.ToBitmap().AsBitmapSource();
+                Mat outputimage = image.Mat;
+                outputimage = ImageEffects.Brighten(outputimage, globalbrightness);
 
+                if (applyblur)
+                {
+                    var blurStrength = 1;
+                    outputimage = ImageEffects.MedianBlur(outputimage, blurStrength);
+                }
+
+                outputimage = ImageEffects.ThresholdBinaryInv(outputimage, threshold_gray, maxThreshold_gray);
+                outputimage = ImageEffects.Resize(outputimage, scaleFactor, Emgu.CV.CvEnum.Inter.NearestExact);
+                if (applyinvert)
+                {
+                    outputimage = 255 - outputimage;
+                }
+
+                ImagePreview.Source = outputimage.ToBitmap().AsBitmapSource();
+                SettingsManager.Instance.Settings.OCRSettings.GlobalBrightness = globalbrightness;
                 SettingsManager.Instance.Settings.OCRSettings.Threshold = threshold;
                 SettingsManager.Instance.Settings.OCRSettings.MaxThreshold = maxthreshold;
-                
+                SettingsManager.Instance.Settings.OCRSettings.ApplyBlur = applyblur;
+                SettingsManager.Instance.Settings.OCRSettings.ApplyInvert = applyinvert;
+                SettingsManager.Instance.Settings.OCRSettings.ScaleFactor = scaleFactor;
+
+
                 outputimage.Dispose();
                 outputimage = null;
                 image.Dispose();
@@ -211,18 +227,64 @@ namespace TBChestTracker.Pages.Settings
         private void ThresholdNumericValue_ValueChanged(object sender, RoutedEventArgs e)
         {
             var fancyNumeric = (FancyNumericValue)sender;
-            UpdatePreviewImage((int)fancyNumeric.Value, SettingsManager.Instance.Settings.OCRSettings.MaxThreshold);
+            var settings = SettingsManager.Instance.Settings.OCRSettings;
+            UpdatePreviewImage(settings.GlobalBrightness.Value, (int)fancyNumeric.Value, settings.MaxThreshold, settings.ApplyBlur, settings.ApplyInvert, settings.ScaleFactor);
         }
 
         private void MaxThresholdNumericValue_ValueChanged(object sender, RoutedEventArgs e)
         {
             var fancyNumeric = (FancyNumericValue)sender;
-            UpdatePreviewImage(SettingsManager.Instance.Settings.OCRSettings.Threshold, (int)fancyNumeric.Value);
+            //UpdatePreviewImage(SettingsManager.Instance.Settings.OCRSettings.Threshold, (int)fancyNumeric.Value);
+            var settings = SettingsManager.Instance.Settings.OCRSettings;
+            UpdatePreviewImage(settings.GlobalBrightness.Value, settings.Threshold, (int)fancyNumeric.Value,  settings.ApplyBlur, settings.ApplyInvert, settings.ScaleFactor);
         }
 
+        private void GlobalBrightnessNumericValue_ValueChanged(object sender, RoutedEventArgs e)
+        {
+            var fancyNumeric = (FancyNumericValue)sender;
+            //UpdatePreviewImage(SettingsManager.Instance.Settings.OCRSettings.Threshold, (int)fancyNumeric.Value);
+            var settings = SettingsManager.Instance.Settings.OCRSettings;
+            UpdatePreviewImage(fancyNumeric.Value, settings.Threshold, settings.MaxThreshold, settings.ApplyBlur, settings.ApplyInvert, settings.ScaleFactor);
+        }
+
+        private void ScaleNumericValue_ValueChanged(object sender, RoutedEventArgs e)
+        {
+            var fancyNumeric = (FancyNumericValue)sender;
+            //UpdatePreviewImage(SettingsManager.Instance.Settings.OCRSettings.Threshold, (int)fancyNumeric.Value);
+            var settings = SettingsManager.Instance.Settings.OCRSettings;
+            UpdatePreviewImage(settings.GlobalBrightness.Value, settings.Threshold, settings.MaxThreshold, settings.ApplyBlur, settings.ApplyInvert, (int)fancyNumeric.Value);
+        }
+        private void ApplyBlurCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            var checkbox = (CheckBox)sender;
+            var settings = SettingsManager.Instance.Settings.OCRSettings;
+            UpdatePreviewImage(settings.GlobalBrightness.Value, settings.Threshold, settings.MaxThreshold, checkbox.IsChecked.Value, settings.ApplyInvert, settings.ScaleFactor);
+        }
+
+        private void ApplyBlurCheckbox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            var checkbox = (CheckBox)sender;
+            var settings = SettingsManager.Instance.Settings.OCRSettings;
+            UpdatePreviewImage(settings.GlobalBrightness.Value, settings.Threshold, settings.MaxThreshold, checkbox.IsChecked.Value, settings.ApplyInvert, settings.ScaleFactor);
+        }
+
+        private void ApplyInvertCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            var checkbox = (CheckBox)sender;
+            var settings = SettingsManager.Instance.Settings.OCRSettings;
+            UpdatePreviewImage(settings.GlobalBrightness.Value, settings.Threshold, settings.MaxThreshold, settings.ApplyBlur, checkbox.IsChecked.Value, settings.ScaleFactor);
+        }
+
+        private void ApplyInvertCheckbox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            var checkbox = (CheckBox)sender;
+            var settings = SettingsManager.Instance.Settings.OCRSettings;
+            UpdatePreviewImage(settings.GlobalBrightness.Value, settings.Threshold, settings.MaxThreshold, settings.ApplyBlur, checkbox.IsChecked.Value, settings.ScaleFactor);
+        }
         private void EnableImageFilterCheckBox_Click(object sender, RoutedEventArgs e)
         {
-            UpdatePreviewImage(SettingsManager.Instance.Settings.OCRSettings.Threshold, SettingsManager.Instance.Settings.OCRSettings.MaxThreshold);
+            var settings = SettingsManager.Instance.Settings.OCRSettings;
+            UpdatePreviewImage(settings.GlobalBrightness.Value, SettingsManager.Instance.Settings.OCRSettings.Threshold, SettingsManager.Instance.Settings.OCRSettings.MaxThreshold, settings.ApplyBlur, settings.ApplyInvert, settings.ScaleFactor);
         }
 
         private async void PreviewOCRButton_Click(object sender, RoutedEventArgs e)
@@ -256,5 +318,7 @@ namespace TBChestTracker.Pages.Settings
             OcrLanguageSelectionWindow langselect = new OcrLanguageSelectionWindow(SettingsManager.Instance);
             langselect.Show();
         }
+
+      
     }
 }

@@ -97,6 +97,47 @@ namespace TBChestTracker
             }
         }
 
+        private Double? _globalbrightness;
+        public Double? GlobalBrightness
+        {
+            get => _globalbrightness.GetValueOrDefault(0.65);
+            set
+            {
+                _globalbrightness = value;
+                OnPropertyChanged(nameof(GlobalBrightness));
+            }
+        }
+        private bool? _applyblur;
+        public bool ApplyBlur
+        {
+            get => _applyblur.GetValueOrDefault(true);
+            set
+            {
+                _applyblur = value;
+                OnPropertyChanged(nameof(ApplyBlur));
+            }
+        }
+        private bool? _applyInvert;
+        public bool ApplyInvert
+        {
+            get => _applyInvert.GetValueOrDefault(true);
+            set
+            {
+                _applyInvert = value;
+                OnPropertyChanged(nameof(ApplyInvert));
+            }
+        }
+        private Int32? _scaleFactor;
+        public Int32 ScaleFactor
+        {
+            get => _scaleFactor.GetValueOrDefault(2);
+            set
+            {
+                _scaleFactor = value;
+                OnPropertyChanged(nameof(ScaleFactor));
+            }
+        }
+
         private Int32? _threshold;
         public Int32 Threshold
         {

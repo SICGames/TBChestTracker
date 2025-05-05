@@ -93,63 +93,6 @@ namespace TBChestTracker
         {
             return new Chest(Chest.Name, Chest.Type, Chest.Source, Chest.Level);
         }
-        /*
-        public int GetPointValue(ObservableCollection<ChestPoints> ChestPoints)
-        {
-            int chestpoint = 0;
-            var m_chest = Chest;
-            var pointvalues = ChestPoints;
-
-            foreach (var pointvalue in pointvalues)
-            {
-                var chest_type = m_chest.Type.ToString();
-                var chest_name = m_chest.Name.ToString();
-                var level = m_chest.Level;
-
-                if (chest_type.ToLower().Contains(pointvalue.ChestType.ToLower()))
-                {
-                    if (pointvalue.ChestName.Equals("(Any)"))
-                    {
-                        if (pointvalue.Level.Equals("(Any)"))
-                        {
-                            chestpoint = pointvalue.PointValue;
-                            break;
-                        }
-                        else
-                        {
-                            var chestlevel = Int32.Parse(pointvalue.Level.ToString());
-                            if (level == chestlevel)
-                            {
-                                chestpoint = pointvalue.PointValue;
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (chest_name.ToLower().Equals(pointvalue.ChestName.ToLower()))
-                        {
-                            if (pointvalue.Level.Equals("(Any)"))
-                            {
-                                chestpoint = pointvalue.PointValue;
-                                break;
-                            }
-                            else
-                            {
-                                var chestlevel = Int32.Parse(pointvalue.Level.ToString());
-                                if (level == chestlevel)
-                                {
-                                    chestpoint = pointvalue.PointValue;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return chestpoint;
-        }
-        */
     }
 
 }
