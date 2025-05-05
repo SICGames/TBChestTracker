@@ -4,7 +4,12 @@
 [![Github All Releases](https://img.shields.io/github/downloads/SICGames/TBChestTracker/total.svg)]()
 
 ## Important Note
-as of 4/20/2025, this project is no longer being worked on or maintained. 
+This project is no longer being worked on or maintained. This project is being -reworked from the ground up. Meanwhile, working on other projects as well. So, I appreciate everyone's support and all. But I can not continue unarchiving this and re-archieving this. 
+I need to do what makes me happier. Honestly, this project been more stressful than I'd like. Complexity of how ocr stuff work is insane, and also depending on others hardware is more insane. Just because i'm running it fine on my system, may not work on others. In addition, the project is overwhemlingly bigger than it started out to be. 
+While I did learn a lot creating this, i can apply future knowledge to other projects. Maybe not having many singletons and maybe creating factory interfaces or other types of interfaces. 
+No more update gays and gals, i need to work on other projects and slowly take my time on a newer chest counter. I love C# and all, but newer chest counter should be written in another language. 
+
+## Building This Project using Visual Studio 2022
 This is a very high dependant program made in C# WPF. See CONTRIBUTE.md for more information. All these can be obtained through my account
 Requirements are as follows:
 - Visual Studio 2022
